@@ -1,0 +1,36 @@
+/* Sidebar Custom Styles matching Premium Screenshot */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.active-item {
+  background-color: #7c3aed !important; /* violet-600 */
+  color: white !important;
+  box-shadow: 0 10px 20px -5px rgba(124, 58, 237, 0.4);
+}
+
+.active-item ::ng-deep lucide-angular svg {
+  color: white !important;
+}
+
+.active-item::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 8px white;
+}

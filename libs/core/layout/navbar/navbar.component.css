@@ -1,0 +1,23 @@
+/* Styles for the native HTMLDialogElement to ensure perfect centering */
+dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  /* Centering across all browsers */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  display: block; 
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Ensure the animations work with native dialog opening */
+dialog[open] .animate-in {
+  /* This ensures the animation plays when the dialog is opened via showModal() */
+}

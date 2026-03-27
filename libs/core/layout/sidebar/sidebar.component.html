@@ -1,0 +1,103 @@
+<aside 
+  (mouseenter)="layoutService.setHovered(true)"
+  (mouseleave)="layoutService.setHovered(false)"
+  class="fixed left-0 top-0 z-50 h-screen border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 p-4 shadow-2xl shadow-zinc-500/10 overflow-hidden transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform"
+  [style.width.px]="layoutService.constants.SIDEBAR_WIDTH_EXPANDED"
+  [style.transform]="layoutService.isCollapsed() ? 'translateX(-' + layoutService.translateOffset() + 'px)' : 'translateX(0)'"
+>
+  <div 
+    class="h-full flex flex-col transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform"
+    [style.transform]="layoutService.isCollapsed() ? 'translateX(' + layoutService.translateOffset() + 'px)' : 'translateX(0)'"
+  >
+    <!-- Logo Section -->
+    <div class="mb-8 flex items-center gap-3 px-2 py-4 relative">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xl shadow-primary/30 active:scale-95 transition-transform duration-200">
+        <lucide-angular [img]="icons.Activity" class="h-6 w-6"></lucide-angular>
+      </div>
+      <div 
+        class="flex flex-col truncate transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[transform,opacity]"
+        [class.opacity-0]="layoutService.isCollapsed()"
+        [class.-translate-x-4]="layoutService.isCollapsed()"
+        [class.pointer-events-none]="layoutService.isCollapsed()"
+      >
+        <span class="text-lg font-bold tracking-tight leading-none text-zinc-900 dark:text-zinc-50 uppercase">ProdManager</span>
+        <span class="text-[10px] text-primary font-bold uppercase tracking-wider mt-0.5">{{ sessionService.activeNegocio().nombre || 'Panel Principal' }}</span>
+      </div>
+    </div>
+
+    <!-- Navigation Groups -->
+    <div class="flex flex-col gap-6 overflow-y-auto no-scrollbar pb-8 flex-1">
+      @for (group of sidebarMenu(); track group.title) {
+        <nav class="space-y-1">
+          <span 
+            class="px-3 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400/80 mb-2 block whitespace-nowrap transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+            [class.opacity-0]="layoutService.isCollapsed()"
+            [class.-translate-x-4]="layoutService.isCollapsed()"
+          >
+            {{ group.title }}
+          </span>
+          
+          @for (item of group.items; track item.href) {
+            <a 
+              [routerLink]="item.href" 
+              routerLinkActive="active-link"
+              #rla="routerLinkActive"
+              class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium relative overflow-hidden transition-colors duration-200"
+              [class.bg-primary]="rla.isActive"
+              [class.text-primary-foreground]="rla.isActive"
+              [class.shadow-lg]="rla.isActive"
+              [class.shadow-primary\/20]="rla.isActive"
+              [class.text-zinc-500]="!rla.isActive"
+              [class.hover:bg-zinc-100\/80]="!rla.isActive"
+              [class.hover:text-zinc-900]="!rla.isActive"
+              [class.dark:text-zinc-400]="!rla.isActive"
+              [class.dark:hover:bg-zinc-900\/50]="!rla.isActive"
+              [class.dark:hover:text-zinc-50]="!rla.isActive"
+            >
+              <div class="shrink-0 flex items-center justify-center w-5 h-5 relative z-10">
+                <lucide-angular 
+                  [img]="item.icon" 
+                  class="h-5 w-5 transition-colors duration-200"
+                  [ngClass]="rla.isActive ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-50'"
+                ></lucide-angular>
+              </div>
+
+              <span 
+                class="truncate whitespace-nowrap transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[transform,opacity]"
+                [class.opacity-0]="layoutService.isCollapsed()"
+                [class.-translate-x-4]="layoutService.isCollapsed()"
+                [class.pointer-events-none]="layoutService.isCollapsed()"
+              >
+                {{ item.label }}
+              </span>
+
+              @if (rla.isActive) {
+                <div 
+                  class="ml-auto h-1.5 w-1.5 rounded-full bg-white opacity-60 transition-all duration-200"
+                  [class.scale-0]="layoutService.isCollapsed()"
+                  [class.opacity-0]="layoutService.isCollapsed()"
+                ></div>
+              }
+            </a>
+          }
+        </nav>
+      }
+    </div>
+
+    <!-- Toggle Pinned Button (Footer of Sidebar) -->
+    <div class="pt-4 mt-auto border-t border-zinc-100 dark:border-zinc-800/50">
+      <button 
+        (click)="layoutService.togglePinned()"
+        class="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-zinc-400 hover:text-primary transition-colors duration-200 overflow-hidden"
+      >
+        <lucide-angular [img]="layoutService.isPinned() ? icons.Pin : icons.PinOff" class="h-5 w-5 shrink-0"></lucide-angular>
+        <span 
+          class="text-xs font-bold uppercase tracking-widest transition-all duration-200"
+          [class.opacity-0]="layoutService.isCollapsed()"
+        >
+          {{ layoutService.isPinned() ? 'Fijar' : 'Expandir' }}
+        </span>
+      </button>
+    </div>
+  </div>
+</aside>

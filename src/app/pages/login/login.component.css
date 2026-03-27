@@ -1,0 +1,10 @@
+/* Estilos para el login */
+:host {
+    display: block;
+    width: 100%;
+}
+
+/* Fallback styles in case Tailwind is still loading/missing components */
+input:focus {
+    outline: none;
+}

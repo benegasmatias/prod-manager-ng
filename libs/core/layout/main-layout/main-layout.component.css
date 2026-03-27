@@ -1,0 +1,18 @@
+/* Main Layout Component Styles */
+:host {
+  display: block;
+}
+
+/* Custom scrollbar for main content area */
+main::-webkit-scrollbar {
+  width: 6px;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+main:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+}
