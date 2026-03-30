@@ -350,7 +350,7 @@ export class OrderFormComponent {
         dueDate: this.fechaEntrega ? new Date(this.fechaEntrega).toISOString() : undefined,
         notes: this.observaciones, // Re-map 'observaciones' to 'notes' for DTO
         priority: 4, // Default priority
-        responsableGeneralId: this.responsableId,
+        responsableGeneralId: this.responsableId || undefined,
         items: this.items().map(it => {
           // Flatten/convert to backend's expected structure
           const mapped: any = {

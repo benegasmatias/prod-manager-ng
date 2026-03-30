@@ -22,7 +22,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 })
 export class PedidosPageComponent implements OnInit {
   private api = inject(PedidosApiService);
-  private session = inject(SessionService);
+  public session = inject(SessionService);
   private auth = inject(AuthService);
 
   // Labels and Icons for Template

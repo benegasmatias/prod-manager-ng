@@ -85,7 +85,7 @@ export interface Pedido {
   dueDate: string;
   fechaActualizacion: string;
   status: OrderStatus;
-  observaciones?: string;
+  notes?: string;
   items: ItemPedido[];
   total: number;
   totalPrice: number | string;

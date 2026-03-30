@@ -143,10 +143,15 @@ export class OrderStatusModalComponent implements OnInit {
     if (order) {
       this.status.set(order.status);
       this.responsableId.set(order.responsableGeneral?.id || '');
-      this.notes.set(order.observaciones || '');
+      this.notes.set(order.notes || '');
       this.isPaymentMode.set(false);
       this.isFailureMode.set(false);
-      this.paymentAmount.set(Number(order.saldo || 0));
+      const total = Number(order.totalPrice || order.total || 0);
+      const senia = Number((order as any).totalSenias || (order as any).senia || 0);
+      const payments = order.payments?.reduce((s, p) => s + Number(p.amount), 0) || 0;
+      const balance = (order as any).saldo !== undefined ? Number((order as any).saldo) : Math.max(0, total - (senia + payments));
+
+      this.paymentAmount.set(balance);
       this.failureReason.set('');
 
       // Metalurgica technical data sync
@@ -197,16 +202,16 @@ export class OrderStatusModalComponent implements OnInit {
         
         const updateData: any = {
           status: this.status() as OrderStatus,
-          responsableGeneralId: this.responsableId(),
-          notes: this.notes(), // Corregido de observaciones -> notes
-          totalPrice: this.totalPrice(),
+          responsableGeneralId: this.responsableId() || null,
+          notes: this.notes(), 
+          totalPrice: Number(this.totalPrice()) || 0,
         };
 
         if (this.isMetalurgica()) {
-          updateData['direccion_obra'] = this.visitAddress();
-          updateData['fecha_visita'] = this.visitDate();
-          updateData['hora_visita'] = this.visitTime();
-          updateData['observaciones_visita'] = this.visitObservations();
+          updateData['direccion_obra'] = this.visitAddress() || null;
+          updateData['fecha_visita'] = this.visitDate() || null;
+          updateData['hora_visita'] = this.visitTime() || null;
+          updateData['observaciones_visita'] = this.visitObservations() || null;
 
           // Sincronización del primer ítem (Metalúrgica suele tener 1 ítem principal)
           if (order.items && order.items.length > 0) {
