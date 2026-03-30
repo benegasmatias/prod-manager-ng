@@ -1,19 +1,21 @@
 import { Component, Input, Output, EventEmitter, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw } from 'lucide-angular';
 import { Router, RouterModule } from '@angular/router';
 import { SessionService } from '@core/session/session.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
+import { ClientesApiService } from '@core/api/clientes.api.service';
 import { Employee, Pedido, OrderStatus, Rubro } from '@shared/models';
 import { ClientSelectorComponent } from '@shared/ui/clientes/client-selector.component';
+import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 import { ItemDetailsFormComponent } from './items-section/item-details-form.component';
 import { cn } from '@shared/utils/cn';
 
 @Component({
   selector: 'app-order-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, RouterModule, ClientSelectorComponent, ItemDetailsFormComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, RouterModule, ClientSelectorComponent, AppDatePickerComponent, ItemDetailsFormComponent],
   template: `
     <form (submit)="handleSave($event)" class="space-y-10 pb-24 lg:pb-12 relative max-w-5xl mx-auto animate-in fade-in duration-700">
       
@@ -25,7 +27,7 @@ import { cn } from '@shared/utils/cn';
             (click)="goBack()"
             class="h-12 w-12 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:bg-zinc-50 transition-all active:scale-95 flex items-center justify-center text-zinc-600 dark:text-zinc-400"
           >
-            <lucide-icon name="arrow-left" size="20"></lucide-icon>
+            <lucide-angular [img]="icons.ArrowLeft" class="h-5 w-5"></lucide-angular>
           </button>
           <div class="space-y-1">
             <div class="flex items-center gap-2 mb-1">
@@ -72,15 +74,18 @@ import { cn } from '@shared/utils/cn';
                 @if (orderType() === 'CUSTOMER') {
                   <app-client-selector
                     label="Target de Cliente"
-                    [(value)]="clienteId"
+                    [value]="clienteId"
+                    (valueChange)="onClientChange($event)"
                     [error]="vErrors['clienteId']"
                     class="sm:col-span-2"
                   ></app-client-selector>
 
-                  <div class="space-y-3">
-                    <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Promesa de Entrega</label>
-                    <input type="date" [(ngModel)]="fechaEntrega" name="fechaEntrega" class="w-full h-12 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900 text-sm font-black focus:border-primary transition-all outline-none">
-                  </div>
+                  <app-date-picker
+                    label="Promesa de Entrega"
+                    [(value)]="fechaEntrega"
+                    name="fechaEntrega"
+                    placeholder="00/00/0000"
+                  ></app-date-picker>
                 }
 
                 <div class="space-y-3">
@@ -105,7 +110,7 @@ import { cn } from '@shared/utils/cn';
             <div class="flex items-center justify-between px-6">
                 <h2 class="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400">Canal de Fabricación ({{ items().length }} ítems)</h2>
                 <button type="button" (click)="addItem()" class="h-10 px-6 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-2 hover:scale-105 transition-all">
-                  <lucide-icon name="plus" size="14"></lucide-icon> Añadir Ítem
+                  <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Añadir Ítem
                 </button>
             </div>
 
@@ -126,47 +131,67 @@ import { cn } from '@shared/utils/cn';
         <!-- Sidebar Actions & Summary -->
         <div class="space-y-8">
            <div class="sticky top-24 space-y-8">
-              <!-- Summary Card -->
-              <div [class]="cn('p-8 rounded-[2.5rem] shadow-2xl transition-all', forcedStatus === 'QUOTATION' ? 'bg-indigo-600 text-white shadow-indigo-500/20' : 'bg-zinc-950 dark:bg-zinc-900 text-white shadow-black/20')">
-                 <h3 class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-6">Finanzas de la Orden</h3>
+              <!-- Summary Card (Premium White Style) -->
+              <div class="p-10 rounded-[3rem] bg-white border border-zinc-100 shadow-xl shadow-zinc-200/40">
+                 <h3 class="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-8 flex items-center gap-2">
+                   <div class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+                   Cierre de Orden
+                 </h3>
                  
                  <div class="space-y-6">
-                    <div class="flex justify-between items-baseline">
-                       <span class="text-[11px] font-black uppercase tracking-widest opacity-50">Subtotal Neto</span>
-                       <span class="text-xl font-black tabular-nums transition-all">{{ totales().subtotal | currency }}</span>
+                    <!-- Basic Info -->
+                    <div class="flex justify-between items-center group/unidades">
+                       <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 transition-colors group-hover/unidades:text-zinc-600">Total Unidades</span>
+                       <span class="text-lg font-black text-zinc-950 tabular-nums">{{ totales().unidades }}</span>
                     </div>
 
-                    @if (totales().diseno > 0) {
-                      <div class="flex justify-between items-baseline">
-                         <span class="text-[11px] font-black uppercase tracking-widest opacity-50">Costos de Ingeniería</span>
-                         <span class="text-sm font-bold tabular-nums">+ {{ totales().diseno | currency }}</span>
-                      </div>
-                    }
+                    <div class="flex justify-between items-center group/prod">
+                       <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400 transition-colors group-hover/prod:text-zinc-600">Subtotal Producción</span>
+                       <span class="text-sm font-black text-zinc-600 tabular-nums">{{ totales().subtotal + totales().diseno + totales().instalacion | currency }}</span>
+                    </div>
 
-                    <div class="h-[1px] bg-white/10 my-4"></div>
+                    <div class="h-[1px] bg-zinc-100 my-4"></div>
 
+                    <!-- Main Price -->
+                    <div class="flex justify-between items-center">
+                       <span class="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-950">Total Pedido</span>
+                       <span class="text-2xl font-black text-zinc-950 tabular-nums">{{ totales().total | currency }}</span>
+                    </div>
+
+                    <!-- Advance / Deposit -->
+                    <div class="flex justify-between items-center animate-in slide-in-from-right duration-500">
+                       <span class="text-[10px] font-black uppercase tracking-[0.15em] text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">T. Adelantos</span>
+                       <span class="text-lg font-black text-emerald-500 tabular-nums">- {{ totales().totalSenias | currency }}</span>
+                    </div>
+
+                    <div class="h-[1px] bg-zinc-100 my-4"></div>
+
+                    <!-- Final Balance -->
                     <div class="flex flex-col gap-1">
-                       <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-50">Total Final</span>
+                       <span class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">Saldo Pendiente</span>
                        <div class="flex items-baseline gap-2">
-                          <span class="text-4xl font-black tabular-nums tracking-tighter">{{ totales().total | currency }}</span>
+                          <span class="text-5xl font-black text-zinc-950 tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency }}</span>
                        </div>
                     </div>
 
-                    <button
-                      type="submit"
-                      [disabled]="isSaving()"
-                      [class]="cn('w-full h-16 rounded-[2rem] bg-white text-zinc-950 font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group px-4', forcedStatus === 'QUOTATION' ? 'text-indigo-600' : 'text-zinc-950')"
-                    >
-                      @if (isSaving()) {
-                        <lucide-icon name="loader-2" size="20" class="animate-spin"></lucide-icon>
-                      } @else {
-                        <lucide-icon name="save" size="20" class="group-hover:translate-x-1 transition-transform"></lucide-icon>
-                        {{ forcedStatus === 'QUOTATION' ? 'Enviar Propuesta' : 'Sincronizar Pedido' }}
-                      }
-                    </button>
+                    <div class="pt-4">
+                      <button
+                        type="submit"
+                        [disabled]="isSaving()"
+                        class="w-full h-18 rounded-[2rem] bg-zinc-950 dark:bg-zinc-800 text-white font-black uppercase tracking-[0.2em] shadow-2xl shadow-zinc-900/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-4 group"
+                      >
+                        @if (isSaving()) {
+                          <lucide-angular [img]="icons.RefreshCw" class="h-5 w-5 animate-spin"></lucide-angular>
+                        } @else {
+                          <div class="w-2 h-2 rounded-full border-2 border-white/40 group-hover:bg-primary transition-colors"></div>
+                          {{ forcedStatus === 'QUOTATION' ? 'Enviar Propuesta' : 'Guardar Pedido' }}
+                          <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 opacity-40 group-hover:opacity-100 transition-opacity"></lucide-angular>
+                        }
+                      </button>
+                    </div>
                     
-                    <p class="text-[9px] font-bold text-center opacity-40 uppercase tracking-widest px-4 italic">
-                      Al confirmar, se notificará al área de producción para dar inicio al flujo operativo.
+                    <p class="text-[8px] font-black text-center text-zinc-400 uppercase tracking-widest leading-relaxed pt-2">
+                      Al confirmar, se notificará al área de producción para dar inicio al flujo operativo
                     </p>
                  </div>
               </div>
@@ -178,26 +203,31 @@ import { cn } from '@shared/utils/cn';
 })
 export class OrderFormComponent {
   private api = inject(PedidosApiService);
+  private clientesApi = inject(ClientesApiService);
   private session = inject(SessionService);
   private router = inject(Router);
-
+ 
+  readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw };
+ 
   @Input() forcedType?: 'CUSTOMER' | 'STOCK';
   @Input() forcedStatus?: string;
   @Input() cloneId?: string;
-
+ 
   // Signal State
   orderType = signal<'CUSTOMER' | 'STOCK'>('CUSTOMER');
   items = signal<any[]>([]);
   clienteId = '';
+  selectedClientName = '';
   fechaEntrega = '';
   responsableId = '';
   observaciones = '';
   isSaving = signal(false);
   vErrors: Record<string, string> = {};
-
+ 
   // Context
   config = computed(() => this.session.config());
   employees = signal<Employee[]>([]);
+  clients = signal<any[]>([]);
   negocioId = computed(() => this.session.activeNegocio()?.id || '');
   rubro = computed(() => this.session.activeNegocio()?.rubro || 'GENERICO' as Rubro);
 
@@ -205,7 +235,10 @@ export class OrderFormComponent {
     subtotal: 0,
     diseno: 0,
     instalacion: 0,
-    total: 0
+    total: 0,
+    totalSenias: 0,
+    unidades: 0,
+    saldoPendiente: 0
   });
 
   constructor() {
@@ -218,7 +251,7 @@ export class OrderFormComponent {
     if (this.forcedType) {
       this.orderType.set(this.forcedType);
     }
-    
+
     // Default item
     this.addItem();
   }
@@ -226,14 +259,24 @@ export class OrderFormComponent {
   async loadEmployees() {
     if (!this.negocioId()) return;
     try {
-      this.employees.set(await this.api.getEmployees(this.negocioId()));
-    } catch (e) { console.error('Error loading employees', e); }
+      const [emps, cls] = await Promise.all([
+        this.api.getEmployees(this.negocioId()),
+        this.clientesApi.getListing(this.negocioId())
+      ]);
+      this.employees.set(emps);
+      this.clients.set(cls);
+      
+      if (this.clienteId) {
+        this.updateClientName(this.clienteId);
+      }
+    } catch (e) { console.error('Error loading data', e); }
   }
 
   addItem() {
     const newItem = {
       cantidad: 1,
       precioUnitario: 0,
+      senia: 0,
       nombreProducto: '',
       seDiseñaSTL: false,
     };
@@ -252,16 +295,36 @@ export class OrderFormComponent {
       const sub = (item.cantidad || 0) * (item.precioUnitario || 0);
       const dis = item.seDiseñaSTL ? (Number(item.precioDiseno) || 0) : 0;
       const inst = item.instalacion ? (Number(item.costo_instalacion) || 0) : 0;
-      
+      const senia = Number(item.senia) || 0;
+      const units = Number(item.cantidad) || 0;
+
       return {
         subtotal: acc.subtotal + sub,
         diseno: acc.diseno + dis,
         instalacion: acc.instalacion + inst,
-        total: acc.total + sub + dis + inst
+        total: acc.total + sub + dis + inst,
+        totalSenias: acc.totalSenias + senia,
+        unidades: acc.unidades + units
       };
-    }, { subtotal: 0, diseno: 0, instalacion: 0, total: 0 });
+    }, { subtotal: 0, diseno: 0, instalacion: 0, total: 0, totalSenias: 0, unidades: 0 });
 
-    this.totales.set(current);
+    const totalFinal = current.total;
+    const totalSenias = current.totalSenias;
+
+    this.totales.set({
+      ...current,
+      saldoPendiente: totalFinal - totalSenias
+    });
+  }
+
+  onClientChange(id: string) {
+    this.clienteId = id;
+    this.updateClientName(id);
+  }
+
+  updateClientName(id: string) {
+    const client = this.clients().find(c => c.id === id);
+    this.selectedClientName = client?.name || '';
   }
 
   goBack() {
@@ -284,17 +347,40 @@ export class OrderFormComponent {
         type: this.orderType(),
         businessId: this.negocioId(),
         customerId: this.orderType() === 'CUSTOMER' ? this.clienteId : undefined,
+        clientName: this.orderType() === 'CUSTOMER' ? this.selectedClientName : 'STOCK',
         dueDate: this.fechaEntrega ? new Date(this.fechaEntrega).toISOString() : undefined,
-        observaciones: this.observaciones,
+        notes: this.observaciones, // Re-map 'observaciones' to 'notes' for DTO
+        priority: 4, // Default priority
         responsableGeneralId: this.responsableId,
-        items: this.items().map(it => ({
-          ...it,
-          status: this.forcedStatus || (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING')
-        })),
+        items: this.items().map(it => {
+          // Flatten/convert to backend's expected structure
+          const mapped: any = {
+            name: it.nombreProducto || 'ITEM',
+            qty: Number(it.cantidad) || 1,
+            price: Number(it.precioUnitario) || 0,
+            deposit: Number(it.senia) || 0,
+            status: this.forcedStatus || (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING'),
+            
+            // Retain key additional fields
+            weightGrams: it.pesoEstimado,
+            estimatedMinutes: it.duracionMin,
+            ...it
+          };
+
+          // Remove frontend-specific fields that might cause schema validation errors
+          delete mapped.nombreProducto;
+          delete mapped.cantidad;
+          delete mapped.precioUnitario;
+          delete mapped.senia;
+          delete mapped.pesoEstimado;
+          delete mapped.duracionMin;
+
+          return mapped;
+        }),
         status: this.forcedStatus || (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING'),
-        total: this.totales().total
       };
 
+      console.log('[OrderForm] Payload Mapping:', payload);
       await this.api.create(payload);
       this.router.navigate(['/pedidos']);
     } catch (err) {

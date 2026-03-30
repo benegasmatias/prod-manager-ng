@@ -118,17 +118,12 @@
           </div>
         </div>
 
-        <div class="space-y-3">
-          <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1 flex items-center gap-2">
-            <lucide-angular [img]="icons.Calendar" class="h-[14px] w-[14px] text-zinc-300"></lucide-angular>
-            Fecha de Entrega
-          </label>
-          <div class="relative group">
-            <input type="date" [ngModel]="order()?.dueDate | date:'yyyy-MM-dd'"
-              (ngModelChange)="order()!.dueDate = $event"
-              class="w-full h-14 px-4 rounded-2xl border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-sm font-bold text-zinc-900 dark:text-zinc-50 focus:border-primary focus:ring-0 transition-all outline-none">
-          </div>
-        </div>
+        <app-date-picker
+          label="Fecha de Entrega"
+          [value]="order()?.dueDate || ''"
+          (valueChange)="order()!.dueDate = $event"
+          class="w-full"
+        ></app-date-picker>
       </div>
 
       <!-- Notes -->

@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Wrench, Ruler, MapPin, Calendar, Clock, Info, DollarSign } from 'lucide-angular';
 import { Pedido } from '@shared/models';
+import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 import { cn } from '@shared/utils/cn';
 
 @Component({
   selector: 'app-metalurgica-section',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, AppDatePickerComponent],
   template: `
     <div class="space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
       <!-- Datos de la Visita (Solo si está en fases comerciales) -->
@@ -31,15 +32,13 @@ import { cn } from '@shared/utils/cn';
           </div>
 
           <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-2">
-              <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Fecha</label>
-              <input 
-                type="date" 
-                [(ngModel)]="visitDate" 
-                (ngModelChange)="visitDateChange.emit($event)"
-                class="w-full h-12 px-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-sm font-bold focus:border-indigo-500 transition-all outline-none"
-              >
-            </div>
+              <app-date-picker
+                label="Fecha"
+                [(value)]="visitDate"
+                (valueChange)="visitDateChange.emit($event)"
+                placeholder="00/00/0000"
+                className="bg-white dark:bg-zinc-950"
+              ></app-date-picker>
             <div class="space-y-2">
               <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Hora</label>
               <input 

@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { PedidosApiService } from '../../core/api/pedidos.api.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { SessionService } from '../../core/session/session.service';
@@ -15,7 +16,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 @Component({
   selector: 'app-pedidos-page',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css']
 })
@@ -90,11 +91,6 @@ export class PedidosPageComponent implements OnInit {
     const hasta = this.dateHasta();
 
     return orders.filter(order => {
-      // Basic business logic from React: exclude STOCK in main list if needed
-      // const isBasicFilter = order.type !== 'STOCK' && order.clientName?.trim().toUpperCase() !== 'STOCK';
-      // if (!isBasicFilter) return false;
-
-      // Rubro specific filter (Metalurgica)
       if (this.negocio()?.rubro === 'METALURGICA') {
         const VISIT_STATUSES = ['SITE_VISIT', 'SITE_VISIT_DONE', 'VISITA_REPROGRAMADA', 'VISITA_CANCELADA'];
         const BUDGET_STATUSES = ['QUOTATION', 'BUDGET_GENERATED', 'BUDGET_REJECTED', 'SURVEY_DESIGN'];
@@ -172,7 +168,7 @@ export class PedidosPageComponent implements OnInit {
   hasPedidos = computed(() => this.allPedidos().length > 0);
 
   private lastLoadedBusinessId: string | null = null;
-  
+
   constructor() {
     // Refresh when businessId changes
     effect(() => {
@@ -209,29 +205,24 @@ export class PedidosPageComponent implements OnInit {
   async loadData() {
     const bId = this.businessId();
     if (!bId || (bId === this.lastLoadedBusinessId && this.allPedidos().length > 0)) return;
-    
+
     this.lastLoadedBusinessId = bId;
     this.loading.set(true);
     this.error.set(null);
 
     try {
-      const EXCLUDED = 'SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const [productionRes, commercialRes, summaryRes, employeesRes] = await Promise.all([
+      const EXCLUDED = 'IN_STOCK,SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
+      const [productionRes, summaryRes, employeesRes] = await Promise.all([
         this.api.getListing({
           businessId: bId,
           pageSize: 100,
           excludeStatuses: EXCLUDED
         }),
-        this.api.getListing({
-          businessId: bId,
-          pageSize: 100,
-          statuses: EXCLUDED
-        }),
         this.api.getSummary(bId),
         this.api.getEmployees(bId)
       ]);
 
-      this.allPedidos.set([...productionRes.data, ...commercialRes.data]);
+      this.allPedidos.set([...productionRes.data]);
       this.summary.set(summaryRes);
       this.employees.set(employeesRes);
     } catch (err) {

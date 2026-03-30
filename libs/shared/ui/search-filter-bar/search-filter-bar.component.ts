@@ -21,10 +21,12 @@ export interface FilterOptions {
   urgencies?: { label: string; value: string }[];
 }
 
+import { AppDatePickerComponent } from '../app-date-picker/app-date-picker.component';
+
 @Component({
   selector: 'app-search-filter-bar',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, AppDatePickerComponent],
   templateUrl: './search-filter-bar.component.html'
 })
 export class SearchFilterBarComponent {

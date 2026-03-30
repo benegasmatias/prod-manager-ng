@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, computed, inject, ElementRef, HostListener, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, User, Search, ChevronDown, Check, X, UserPlus, Loader2 } from 'lucide-angular';
+import { LucideAngularModule, User, Search, ChevronDown, Check, X, UserPlus, Loader2, RefreshCw } from 'lucide-angular';
 import { Client } from '@shared/models';
 import { ClientesApiService } from '@core/api/clientes.api.service';
 import { SessionService } from '@core/session/session.service';
@@ -30,8 +30,8 @@ import { cn } from '@shared/utils/cn';
       >
         <div class="flex items-center gap-3 w-full overflow-hidden">
           <div [class]="cn('transition-all flex-shrink-0', isOpen() ? 'text-primary' : 'text-zinc-400')">
-            @if (isOpen()) { <lucide-icon name="search" size="16"></lucide-icon> }
-            @else { <lucide-icon name="user" size="16"></lucide-icon> }
+            @if (isOpen()) { <lucide-angular [img]="icons.Search" class="h-4 w-4"></lucide-angular> }
+            @else { <lucide-angular [img]="icons.User" class="h-4 w-4"></lucide-angular> }
           </div>
           
           @if (isOpen()) {
@@ -60,16 +60,17 @@ import { cn } from '@shared/utils/cn';
 
         <div class="flex items-center gap-1 ml-2">
           @if (loading()) {
-            <lucide-icon name="loader-2" size="14" class="animate-spin text-zinc-400"></lucide-icon>
+            <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4 animate-spin text-zinc-400"></lucide-angular>
           } @else if (value && !isOpen()) {
             <button 
+              type="button"
               (click)="clearSelection($event)"
               class="hover:text-rose-500 text-zinc-300 transition-colors p-1"
             >
-              <lucide-icon name="x" size="14"></lucide-icon>
+              <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
             </button>
           }
-          <lucide-icon name="chevron-down" size="16" [class]="cn('text-zinc-400 transition-transform duration-200', isOpen() && 'rotate-180')"></lucide-icon>
+          <lucide-angular [img]="icons.ChevronDown" class="h-4 w-4 text-zinc-400 transition-transform duration-200" [class.rotate-180]="isOpen()"></lucide-angular>
         </div>
       </div>
 
@@ -86,6 +87,7 @@ import { cn } from '@shared/utils/cn';
               <div class="space-y-1">
                 @for (client of filteredClients(); track client.id) {
                   <button
+                    type="button"
                     (click)="selectClient(client)"
                     [class]="cn(
                       'w-full flex flex-col px-4 py-3 rounded-xl text-left transition-all group',
@@ -96,7 +98,7 @@ import { cn } from '@shared/utils/cn';
                   >
                     <div class="flex items-center justify-between w-full">
                       <span class="text-[12px] font-black uppercase tracking-tight">{{ client.name }}</span>
-                      @if (value === client.id) { <lucide-icon name="check" size="14" class="text-primary"></lucide-icon> }
+                      @if (value === client.id) { <lucide-angular [img]="icons.Check" class="h-4 w-4 text-primary"></lucide-angular> }
                     </div>
                     @if (client.email || client.phone) {
                       <div class="flex items-center gap-3 mt-0.5 opacity-60">
@@ -110,7 +112,7 @@ import { cn } from '@shared/utils/cn';
             } @else {
               <div class="py-10 px-4 text-center">
                 <div class="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-3">
-                  <lucide-icon name="search" size="16" class="text-zinc-300"></lucide-icon>
+                  <lucide-angular [img]="icons.Search" class="h-4 w-4 text-zinc-300"></lucide-angular>
                 </div>
                 <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-relaxed">
                   No se encontraron clientes <br/> para "{{ searchTerm() }}"
@@ -122,11 +124,12 @@ import { cn } from '@shared/utils/cn';
           <!-- Create New Option -->
           <div class="p-2 bg-zinc-50/50 dark:bg-zinc-800/20 border-t border-zinc-100 dark:border-zinc-800">
             <button
+              type="button"
               (click)="createNew($event)"
               class="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-left transition-all bg-primary/5 hover:bg-primary/10 text-primary group"
             >
               <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <lucide-icon name="user-plus" size="16"></lucide-icon>
+                <lucide-angular [img]="icons.UserPlus" class="h-4 w-4"></lucide-angular>
               </div>
               <div class="flex flex-col">
                 <span class="text-[11px] font-black uppercase tracking-widest">Registrar Nuevo Cliente</span>
@@ -143,6 +146,8 @@ export class ClientSelectorComponent implements OnInit {
   private api = inject(ClientesApiService);
   private session = inject(SessionService);
   private eRef = inject(ElementRef);
+ 
+  readonly icons = { User, Search, ChevronDown, Check, X, UserPlus, RefreshCw };
 
   @Input() value: string = '';
   @Output() valueChange = new EventEmitter<string>();

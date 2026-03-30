@@ -14,6 +14,7 @@ import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { SessionService } from '@core/session/session.service';
 import { getNegocioConfig, getStatusLabel, getStatusStyles } from '@shared/utils/negocio-utils';
 import { cn } from '@shared/utils/cn';
+import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 
 // Sections
 import { PaymentModuleComponent } from './sections/payment-module.component';
@@ -29,7 +30,8 @@ import { MetalurgicaSectionComponent } from './sections/metalurgica-section.comp
     FormsModule,
     PaymentModuleComponent,
     FailureModuleComponent,
-    MetalurgicaSectionComponent
+    MetalurgicaSectionComponent,
+    AppDatePickerComponent
   ],
   templateUrl: './status-modal.component.html',
   styleUrls: ['./status-modal.component.css']

@@ -1,39 +1,40 @@
-import { Component, Input, Output, EventEmitter, inject, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, computed, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Trash2, Check, Plus } from 'lucide-angular';
+import { MoneyInputComponent } from '@shared/ui/money-input/money-input.component';
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
 
 @Component({
   selector: 'app-item-details-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, MoneyInputComponent],
   template: `
     <div class="group relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] shadow-sm transition-all hover:shadow-xl hover:shadow-zinc-200/50 dark:hover:shadow-none">
-      <div [class]="cn('absolute top-0 left-0 w-1.5 h-full opacity-20 group-hover:opacity-100 transition-opacity', rubro === 'METALURGICA' ? 'bg-indigo-500' : 'bg-primary')"></div>
+      <div [class]="cn('absolute top-0 left-0 w-1.5 h-full opacity-20 group-hover:opacity-100 transition-opacity', rubro() === 'METALURGICA' ? 'bg-indigo-500' : 'bg-primary')"></div>
 
       <div class="p-8 space-y-8">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div [class]="cn('h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ring-4 ring-zinc-50 dark:ring-zinc-800', rubro === 'METALURGICA' ? 'bg-indigo-500 text-white' : 'bg-primary text-primary-foreground')">
-              {{ index + 1 }}
+            <div [class]="cn('h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ring-4 ring-zinc-50 dark:ring-zinc-800', rubro() === 'METALURGICA' ? 'bg-indigo-500 text-white' : 'bg-primary text-primary-foreground')">
+              {{ index() + 1 }}
             </div>
-            <h3 class="text-sm font-black uppercase tracking-widest text-zinc-400">Detalles de Manufactura</h3>
+            <h3 class="text-sm font-black uppercase tracking-widest text-zinc-400">Parámetros del Ítem</h3>
           </div>
-          @if (canRemove) {
+          @if (canRemove()) {
             <button type="button" (click)="onRemove.emit()" class="h-10 w-10 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center justify-center">
-              <lucide-icon name="trash-2" size="18"></lucide-icon>
+              <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
             </button>
           }
         </div>
 
         <!-- METALWORK TEMPLATES -->
-        @if (rubro === 'METALURGICA') {
+        @if (rubro() === 'METALURGICA') {
           <div class="space-y-4">
             <div class="bg-indigo-50/50 dark:bg-zinc-950/20 p-5 rounded-[1.5rem] border border-indigo-100/50 dark:border-indigo-900/30">
               <div class="flex items-center gap-2 mb-3">
-                <lucide-icon name="check" size="12" class="text-indigo-400"></lucide-icon>
+                <lucide-angular [img]="icons.Check" class="h-3 w-3 text-indigo-400"></lucide-angular>
                 <span class="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400/80">Plantillas de Ingeniería</span>
               </div>
               <div class="flex flex-wrap gap-2">
@@ -58,7 +59,7 @@ import { cn } from '@shared/utils/cn';
               <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 pb-2 border-b border-zinc-100 dark:border-zinc-800/50">
                 {{ section.name }}
               </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div [class]="cn('grid gap-6', section.name === 'OPCIONALES' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2')">
                 @for (f of section.fields; track f.key) {
                   @if (isFieldVisible(f)) {
                     <div [class]="cn('space-y-2', (f.key === 'nombreProducto' || f.tipo === 'textarea') ? 'sm:col-span-2' : '')">
@@ -98,15 +99,20 @@ import { cn } from '@shared/utils/cn';
                           class="flex min-h-[120px] w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-4 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/50 focus:bg-white dark:focus:bg-zinc-900 transition-all resize-none"
                           [placeholder]="f.placeholder || ''"
                         ></textarea>
-                      } @else if (f.tipo === 'money' || f.tipo === 'number') {
+                      } @else if (f.tipo === 'money') {
+                        <app-money-input
+                          [(value)]="item[f.key]"
+                          (valueChange)="onUpdate.emit()"
+                          [placeholder]="f.placeholder || '0,00'"
+                        ></app-money-input>
+                      } @else if (f.tipo === 'number') {
                          <div class="relative group">
-                            @if (f.tipo === 'money') { <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-zinc-300">$</span> }
                             <input 
                               type="number"
                               [(ngModel)]="item[f.key]"
                               (ngModelChange)="onUpdate.emit()"
-                              [class]="cn('flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all', f.tipo === 'money' ? 'pl-8' : '')"
-                              [placeholder]="f.placeholder || '0.00'"
+                              class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all font-mono"
+                              [placeholder]="f.placeholder || '0'"
                             >
                          </div>
                       } @else {
@@ -126,19 +132,52 @@ import { cn } from '@shared/utils/cn';
           }
         </div>
       </div>
+
+      <!-- PREMIUM ITEM FOOTER -->
+      <div class="px-8 pb-8 pt-4">
+        <div class="p-6 rounded-[2rem] bg-zinc-50/50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/50 backdrop-blur-sm flex flex-col sm:flex-row items-center gap-6">
+          <div class="flex-1 grid grid-cols-2 gap-4 w-full">
+            <app-money-input
+              label="Precio Unitario ($)"
+              [(value)]="item.precioUnitario"
+              (valueChange)="onUpdate.emit()"
+              placeholder="0,00"
+              inputClassName="h-12 text-sm shadow-sm"
+            ></app-money-input>
+
+            <app-money-input
+              [label]="'Seña / Adelanto ($)'"
+              [(value)]="item.senia"
+              (valueChange)="onUpdate.emit()"
+              [color]="rubro() === 'METALURGICA' ? 'indigo' : 'primary'"
+              placeholder="0,00"
+              inputClassName="h-12 text-sm shadow-sm"
+            ></app-money-input>
+          </div>
+          
+          <div class="flex flex-col items-center sm:items-end justify-center min-w-[140px] px-4">
+            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-2">Carga Final Ítem</span>
+            <div class="h-14 px-8 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-black text-2xl tabular-nums shadow-xl group/total overflow-hidden relative">
+              <div class="absolute inset-x-0 bottom-0 h-0.5 bg-primary/40 group-hover/total:h-full transition-all duration-500 opacity-20"></div>
+              <span class="relative z-10">{{ (item.cantidad || 0) * (item.precioUnitario || 0) | currency }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `
 })
 export class ItemDetailsFormComponent {
   @Input({ required: true }) item: any;
-  @Input({ required: true }) index: number = 0;
-  @Input({ required: true }) config!: NegocioConfig;
-  @Input() canRemove = false;
+  index = input.required<number>();
+  config = input.required<NegocioConfig>();
+  canRemove = input(false);
+  rubro = input.required<Rubro>();
   
   @Output() onRemove = new EventEmitter<void>();
   @Output() onUpdate = new EventEmitter<void>();
-
-  @Input({ required: true }) rubro!: Rubro;
+ 
+  readonly icons = { Trash2, Check, Plus };
 
   metalTemplates = [
     { label: 'Portón', data: { tipo_trabajo: 'Portón', typeAperture: 'CORREDIZO', material_estructura: 'Caño 40x40', fillMaterial: 'CHAPA' } },
@@ -149,7 +188,7 @@ export class ItemDetailsFormComponent {
 
   sectionedFields = computed(() => {
     const sections: { name: string, fields: any[] }[] = [];
-    const fields = this.config.itemFields || [];
+    const fields = this.config().itemFields || [];
 
     fields.forEach(f => {
       const sName = f.section || 'General';
@@ -172,7 +211,7 @@ export class ItemDetailsFormComponent {
       }
     }
 
-    if (this.rubro === 'IMPRESION_3D') {
+    if (this.rubro() === 'IMPRESION_3D') {
       if (f.key === 'url_stl' && this.item['seDiseñaSTL']) return false;
       if (f.key === 'precioDiseno' && !this.item['seDiseñaSTL']) return false;
     }

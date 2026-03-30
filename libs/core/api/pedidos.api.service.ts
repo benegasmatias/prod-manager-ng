@@ -55,14 +55,25 @@ export class PedidosApiService {
       return firstValueFrom(this.http.get<PedidoSummary>(`${this.API_URL}${API_ENDPOINTS.ORDERS.SUMMARY}`, { params }));
     }
   
+    private cachedEmployees: Employee[] = [];
+    private empLastBusinessId: string | null = null;
+
     /**
      * Obtiene los empleados de un negocio.
      */
     async getEmployees(businessId: string, activeOnly = true): Promise<Employee[]> {
+      if (businessId === this.empLastBusinessId && this.cachedEmployees.length > 0) {
+        return this.cachedEmployees;
+      }
+
       const params = new HttpParams()
         .set('businessId', businessId)
         .set('active', activeOnly.toString());
-      return firstValueFrom(this.http.get<Employee[]>(`${this.API_URL}${API_ENDPOINTS.EMPLOYEES.LIST}`, { params }));
+      
+      const res = await firstValueFrom(this.http.get<Employee[]>(`${this.API_URL}${API_ENDPOINTS.EMPLOYEES.LIST}`, { params }));
+      this.cachedEmployees = res || [];
+      this.empLastBusinessId = businessId;
+      return this.cachedEmployees;
     }
   
     /**
