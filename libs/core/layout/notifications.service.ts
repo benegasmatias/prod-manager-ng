@@ -17,13 +17,19 @@ export class NotificationsService {
   unreadCount = computed(() => this._notifications().filter(n => !n.isRead).length);
   isLoading = computed(() => this._isLoading());
 
+  private lastBusinessId: string | null = null;
+
   constructor() {
     // Escuchar cambios en el negocio activo para refrescar notificaciones
     effect(() => {
       const businessId = this.session.activeId();
-      if (businessId) {
+      if (businessId && businessId !== this.lastBusinessId) {
+        this.lastBusinessId = businessId;
         console.log('[NotificationsService] Business changed, refreshing:', businessId);
         this.refresh();
+      } else if (!businessId) {
+        this.lastBusinessId = null;
+        this._notifications.set([]);
       }
     });
   }

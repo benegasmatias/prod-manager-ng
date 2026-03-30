@@ -1,0 +1,221 @@
+<div class="p-8 space-y-10 pb-16 animate-in fade-in duration-500">
+  <!-- Header Area -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-2 mb-1">
+        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
+        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{{ labels.CATEGORY }}</span>
+      </div>
+      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        {{ labels.TITLE }}
+      </h1>
+      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed">
+        {{ labels.SUBTITLE }}
+      </p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex p-1.5 rounded-2xl bg-white/70 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 backdrop-blur-sm shadow-sm">
+        <a routerLink="/pedidos" class="flex h-9 w-12 items-center justify-center rounded-xl transition-all bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+          <lucide-angular [img]="icons.LIST" class="h-4 w-4"></lucide-angular>
+        </a>
+        <a routerLink="/pedidos/kanban" class="flex h-9 w-12 items-center justify-center rounded-xl transition-all text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-600 dark:hover:text-zinc-200">
+          <lucide-angular [img]="icons.LAYOUT_GRID" class="h-4 w-4"></lucide-angular>
+        </a>
+      </div>
+      <button routerLink="/pedidos/nuevo" class="h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] flex items-center gap-2">
+        <lucide-angular [img]="icons.PLUS" class="h-4 w-4"></lucide-angular>
+        {{ labels.ACTIONS.NEW_ORDER }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
+      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+        <lucide-angular [img]="icons.TRENDING" class="h-20 w-20 text-zinc-900 dark:text-white"></lucide-angular>
+      </div>
+      <div class="relative z-10 space-y-4">
+        <div class="h-12 w-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700">
+          <lucide-angular [img]="icons.TRENDING" class="h-5 w-5"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">{{ labels.STATS.SALES_VOLUME }}</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
+              {{ summary().totalVolume | currency:'ARS':'symbol-narrow':'1.0-0' }}
+            </span>
+            <span class="text-sm font-bold text-zinc-400">,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative group overflow-hidden bg-primary p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.01]">
+      <div class="absolute top-0 right-0 p-8 opacity-10">
+        <lucide-angular [img]="icons.WALLET" class="h-16 w-16 md:h-20 md:w-20 text-white"></lucide-angular>
+      </div>
+      <div class="relative z-10 space-y-3 md:space-y-4">
+        <div class="h-10 w-10 md:h-12 md:w-12 rounded-[1rem] md:rounded-[1.5rem] bg-white/10 flex items-center justify-center text-white border border-white/10 backdrop-blur-sm">
+          <lucide-angular [img]="icons.WALLET" class="h-5 w-5"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1">{{ labels.STATS.PENDING_COLLECTION }}</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-black tracking-tighter text-white">
+              {{ summary().pendingBalance | currency:'ARS':'symbol-narrow':'1.0-0' }}
+            </span>
+            <span class="text-sm font-bold text-white/40">,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
+      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+        <lucide-angular [img]="icons.PACKAGE" class="h-16 w-16 md:h-20 md:w-20 text-zinc-900 dark:text-white"></lucide-angular>
+      </div>
+      <div class="relative z-10 space-y-3 md:space-y-4">
+        <div class="h-10 w-10 md:h-12 md:w-12 rounded-[1rem] md:rounded-[1.25rem] bg-indigo-50 dark:bg-zinc-800 flex items-center justify-center text-primary border border-primary/10 transition-transform group-hover:scale-110">
+          <lucide-angular [img]="icons.PACKAGE" class="h-5 w-5 md:h-6 md:w-6"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">{{ labels.STATS.ACTIVE_ORDERS }}</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
+              {{ summary().activeCount }}
+            </span>
+            <span class="text-xs font-bold text-zinc-400 uppercase">{{ labels.STATS.IN_PROGRESS }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <app-search-filter-bar
+    [values]="currentFilterValues()"
+    [options]="filterOptions()"
+    [showUrgency]="true"
+    (valueChange)="onFilterChange($event)"
+    (clear)="clearFilters()"
+  ></app-search-filter-bar>
+
+  <!-- Commercial / Pre-sales Section (Metalurgica) -->
+  @if (commercialOrders().length > 0) {
+    <div class="space-y-6">
+      <div class="flex items-center justify-between px-2">
+        <div class="flex items-center gap-3">
+          <div class="h-6 w-1 bg-amber-500 rounded-full"></div>
+          <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
+            {{ labels.COMMERCIAL_SECTION }}
+            <span class="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-600 px-2 py-0.5 rounded-full">{{ commercialOrders().length }}</span>
+          </h2>
+        </div>
+        <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ labels.COMMERCIAL_SUBTITLE }}</p>
+      </div>
+
+      <div class="bg-white/50 dark:bg-zinc-950/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-sm">
+        <app-orders-table 
+          [orders]="commercialOrders()"
+          [sortKey]="sortKey()"
+          [sortDir]="sortDir()"
+          [hideTypeColumn]="true"
+          [rubro]="negocio().rubro"
+          (sortChange)="onSort($event)"
+          (statusClick)="openManageModal($event)"
+          (manageClick)="openManageModal($event)"
+        ></app-orders-table>
+      </div>
+    </div>
+  }
+
+  <!-- Production Section -->
+  <div class="space-y-6">
+    <div class="flex items-center justify-between px-2">
+      <div class="flex items-center gap-3">
+        <div class="h-6 w-1 bg-primary rounded-full"></div>
+        <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
+          {{ labels.ACTIVE_SECTION }}
+          <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{ productionOrders().length }}</span>
+        </h2>
+      </div>
+    </div>
+
+    @if (loading() && productionOrders().length === 0 && commercialOrders().length === 0) {
+      <div class="grid grid-cols-1 gap-4">
+        @for (i of [1,2,3]; track i) {
+          <div class="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-4">
+              <app-skeleton width="3.5rem" height="3.5rem" borderRadius="1.25rem"></app-skeleton>
+              <div class="space-y-2">
+                <app-skeleton width="200px" height="1rem"></app-skeleton>
+                <app-skeleton width="150px" height="0.75rem"></app-skeleton>
+              </div>
+            </div>
+            <app-skeleton width="100px" height="2rem" borderRadius="1rem"></app-skeleton>
+          </div>
+        }
+      </div>
+    } @else if (productionOrders().length > 0) {
+      <div class="bg-white/50 dark:bg-zinc-950/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-sm">
+        <app-orders-table 
+          [orders]="productionOrders()"
+          [sortKey]="sortKey()"
+          [sortDir]="sortDir()"
+          [hideTypeColumn]="true"
+          [rubro]="negocio().rubro"
+          (sortChange)="onSort($event)"
+          (statusClick)="openManageModal($event)"
+          (manageClick)="openManageModal($event)"
+        ></app-orders-table>
+      </div>
+    } @else if (commercialOrders().length === 0) {
+      <div class="py-20 text-center flex flex-col items-center justify-center gap-4 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/5 dark:bg-zinc-900/5">
+        <div class="h-16 w-16 rounded-[1.5rem] bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700 text-zinc-200">
+          <lucide-angular [img]="icons.CLOCK" class="h-7 w-7"></lucide-angular>
+        </div>
+        <p class="text-sm font-bold text-zinc-400 uppercase tracking-widest">{{ labels.EMPTY_ACTIVE }}</p>
+      </div>
+    }
+  </div>
+
+  <!-- History Section -->
+  @if (archivedOrders().length > 0 && (estadoFilter() === 'all' || estadoFilter() === 'DELIVERED' || estadoFilter() === 'CANCELLED')) {
+    <div class="pt-12 space-y-6">
+      <div class="flex items-center gap-4 px-2">
+        <div class="flex items-center gap-3">
+          <div class="h-6 w-1 bg-zinc-400 rounded-full"></div>
+          <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
+            {{ labels.HISTORY_SECTION }}
+            <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{ archivedOrders().length }}</span>
+          </h2>
+        </div>
+        <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+        <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ labels.HISTORY_SUBTITLE }}</p>
+      </div>
+      <div class="bg-white/30 dark:bg-zinc-950/10 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-[2px]">
+        <app-orders-table 
+          [orders]="archivedOrders()"
+          [sortKey]="sortKey()"
+          [sortDir]="sortDir()"
+          [hideTypeColumn]="true"
+          [hideUrgency]="true"
+          [hideDelivery]="true"
+          [rubro]="negocio().rubro"
+          (sortChange)="onSort($event)"
+          (statusClick)="openManageModal($event)"
+          (manageClick)="openManageModal($event)"
+        ></app-orders-table>
+      </div>
+    </div>
+  }
+  
+  <app-order-status-modal
+    [order]="selectedOrder()"
+    [isOpen]="isModalOpen()"
+    [employees]="employees()"
+    (onClose)="isModalOpen.set(false)"
+    (onSave)="loadData()"
+  ></app-order-status-modal>
+</div>

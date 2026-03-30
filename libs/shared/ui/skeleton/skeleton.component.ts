@@ -82,3 +82,33 @@ export class SkeletonComponent {
   `
 })
 export class DashboardSkeletonComponent {}
+
+@Component({
+  selector: 'app-sidebar-skeleton',
+  standalone: true,
+  imports: [CommonModule, SkeletonComponent],
+  template: `
+    <div class="space-y-6 pt-4">
+      <div class="px-2 mb-8 flex items-center gap-3">
+        <app-skeleton width="2.5rem" height="2.5rem" borderRadius="0.75rem"></app-skeleton>
+        <div class="space-y-1.5 flex-1">
+          <app-skeleton width="80%" height="0.75rem"></app-skeleton>
+          <app-skeleton width="50%" height="0.5rem"></app-skeleton>
+        </div>
+      </div>
+
+      @for (group of [1,2,3]; track group) {
+        <div class="space-y-3">
+          <app-skeleton width="40%" height="0.5rem" class="mx-3 mb-2 opacity-50"></app-skeleton>
+          @for (item of [1,2,3]; track item) {
+            <div class="flex items-center gap-3 px-3 py-1">
+              <app-skeleton width="1.25rem" height="1.25rem" borderRadius="0.4rem"></app-skeleton>
+              <app-skeleton width="60%" height="0.6rem"></app-skeleton>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  `
+})
+export class SidebarSkeletonComponent {}

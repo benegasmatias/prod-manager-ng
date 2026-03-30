@@ -1,0 +1,60 @@
+/* Advanced Glassmorphism and Backdrop Blurs */
+.backdrop-blur-xl {
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.backdrop-blur-2xl {
+    backdrop-filter: blur(40px) saturate(160%);
+    -webkit-backdrop-filter: blur(40px) saturate(160%);
+}
+
+/* Custom Scrollbar Logic (Standard is to hide it for Kanban UX) */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Senior Animations */
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+    animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Smooth Lane Height Logic */
+[id^="lane-"] {
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 800px;
+}
+
+/* Card Depth Effects */
+.group\/card:hover {
+    z-index: 50;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Column Hover Contrast */
+.group\/column:hover {
+    border-color: rgba(var(--color-primary), 0.15);
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Responsive Overrides */
+@media (max-width: 640px) {
+    [id^="lane-"] {
+        min-height: 600px;
+    }
+}

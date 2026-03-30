@@ -38,6 +38,7 @@ import { LayoutService } from '../layout.service';
 import { SessionService } from '../../session/session.service';
 import { AccessControlService } from '../../auth/access-control.service';
 import { MenuGroupMetadata } from '../../../shared/models/access-control';
+import { SidebarSkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-sidebar',
@@ -46,6 +47,7 @@ import { MenuGroupMetadata } from '../../../shared/models/access-control';
     CommonModule,
     RouterModule,
     LucideAngularModule,
+    SidebarSkeletonComponent,
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
@@ -86,7 +88,7 @@ export class SidebarComponent {
       {
         title: 'Operaciones',
         items: [
-          { label: 'Cola de Impresión', href: '/impresion', icon: Printer, requiredFeature: 'PRINT_QUEUE' },
+          { label: 'Cola de Impresión', href: '/impresion', icon: Printer, requiredFeature: 'MACHINERY' },
           { label: 'Producción', href: '/produccion', icon: Activity, requiredFeature: 'ORDERS' },
           { label: 'Inventario', href: '/stock', icon: Grid, requiredFeature: 'STOCK' },
         ]

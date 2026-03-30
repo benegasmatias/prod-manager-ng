@@ -28,6 +28,18 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
+      {
+        path: 'pedidos',
+        loadComponent: () => import('../../libs/features/pedidos/pedidos.component').then(m => m.PedidosPageComponent)
+      },
+      {
+        path: 'pedidos/kanban',
+        loadComponent: () => import('../../libs/features/pedidos/kanban.component').then(m => m.PedidosKanbanComponent)
+      },
+      {
+        path: 'pedidos/nuevo',
+        loadComponent: () => import('../../libs/features/pedidos/nuevo/nuevo-pedido.component').then(m => m.NuevoPedidoPageComponent)
+      },
       // Resto de páginas protegidas...
     ]
   },

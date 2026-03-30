@@ -35,13 +35,20 @@ export class SessionService {
 
   isInitialized = signal(false);
 
+  private lastUserId: string | null = null;
+
   constructor() {
     // Reaccionar al cambio de sesión
     effect(() => {
       const session = this.auth.session();
       if (session) {
-        this.initialize();
+        // Solo inicializar si el usuario cambió o si no está inicializado
+        if (this.lastUserId !== session.user.id) {
+          this.lastUserId = session.user.id;
+          this.initialize();
+        }
       } else {
+        this.lastUserId = null;
         this._negocios.set([]);
         this._activeId.set(null);
         this.isInitialized.set(true);

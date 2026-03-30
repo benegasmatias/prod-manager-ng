@@ -6,7 +6,7 @@ import { Rubro, FeatureCode, UserRole, BusinessFeatureConfig, RolePermissionsCon
  */
 export const BUSINESS_FEATURES: Record<Rubro, BusinessFeatureConfig> = {
   IMPRESION_3D: {
-    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'PRINT_QUEUE', 'MATERIALS', 'STOCK', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'MACHINERY', 'MATERIALS', 'STOCK', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   METALURGICA: {
@@ -30,14 +30,17 @@ export const BUSINESS_FEATURES: Record<Rubro, BusinessFeatureConfig> = {
 export const ROLE_PERMISSIONS: RolePermissionsConfig = {
   OWNER: {
     DASHBOARD: ['VIEW', 'MANAGE'],
-    CLIENTS: ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'MANAGE'],
-    ORDERS: ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'MANAGE'],
+    CLIENTS: ['VIEW', 'MANAGE'],
+    ORDERS: ['VIEW', 'MANAGE'],
     PRINT_QUEUE: ['VIEW', 'MANAGE'],
     STOCK: ['VIEW', 'MANAGE'],
     SETTINGS: ['VIEW', 'MANAGE'],
     REPORTS: ['VIEW', 'MANAGE'],
     VISITS: ['VIEW', 'MANAGE'],
-    QUOTES: ['VIEW', 'MANAGE']
+    QUOTES: ['VIEW', 'MANAGE'],
+    MATERIALS: ['VIEW', 'MANAGE'],
+    MACHINERY: ['VIEW', 'MANAGE'],
+    TEAM: ['VIEW', 'MANAGE']
   },
   ADMIN: {
     DASHBOARD: ['VIEW'],

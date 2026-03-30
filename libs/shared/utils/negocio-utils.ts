@@ -300,6 +300,7 @@ export function getStatusStyles(status: string, rubro?: Rubro): string {
   const baseColor = parts.length > 1 ? parts[1] : 'zinc';
 
   const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 text-primary border-primary/20 dark:bg-primary/20 dark:text-primary-foreground dark:border-primary/30',
     indigo: 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50',
     emerald: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50',
     amber: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50',
@@ -315,11 +316,36 @@ export function getStatusStyles(status: string, rubro?: Rubro): string {
 }
 
 export function mapCategoryToRubro(category: string): Rubro {
+  const normalized = (category || '').toUpperCase().trim();
+  
+  if (normalized === 'IMPRESION_3D' || normalized === 'IMPRESIONES_3D') {
+    return 'IMPRESION_3D';
+  }
+  
   const map: Record<string, Rubro> = {
-    'IMPRESION_3D': 'IMPRESION_3D',
     'METALURGICA': 'METALURGICA',
     'CARPINTERIA': 'CARPINTERIA',
     'GENERICO': 'GENERICO'
   };
-  return map[category] || 'GENERICO';
+  
+  return map[normalized] as Rubro || 'GENERICO';
+}
+export function getStatusColorBase(status: string, rubro?: Rubro): string {
+  const config = getNegocioConfig(rubro || 'GENERICO');
+  const stage = config.productionStages.find((s) => s.key === status);
+
+  if (stage?.color) return stage.color;
+
+  const fallbacks: Record<string, string> = {
+    PENDING: 'bg-zinc-100',
+    IN_PROGRESS: 'bg-blue-500',
+    DONE: 'bg-emerald-500',
+    DELIVERED: 'bg-zinc-100',
+    CANCELLED: 'bg-red-500',
+    READY: 'bg-emerald-500',
+    FAILED: 'bg-red-500',
+    IN_STOCK: 'bg-purple-500',
+  };
+
+  return fallbacks[status] || 'bg-zinc-100';
 }

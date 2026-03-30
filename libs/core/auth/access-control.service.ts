@@ -20,12 +20,15 @@ export class AccessControlService {
   /**
    * Current user role from auth metadata.
    */
-  userRole = computed(() => (this.authService.user()?.user_metadata?.['role'] as UserRole) || 'EMPLOYEE');
+  userRole = computed(() => (this.authService.user()?.user_metadata?.['role'] as UserRole) || 'OWNER');
 
   /**
    * Check if a feature is enabled for the current business type.
    */
   isFeatureEnabled(feature: FeatureCode): boolean {
+    // Universal features that are always enabled for everyone
+    if (feature === 'DASHBOARD') return true;
+
     const rubro = this.currentRubro();
     if (!rubro) return false;
     

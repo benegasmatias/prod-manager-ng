@@ -1,0 +1,125 @@
+export type OrderStatus =
+  | 'PENDING' | 'WAITING_MATERIALS' | 'IN_PRODUCTION' | 'WAITING_PRINTER' | 'READY_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED'
+  | 'DESIGN' | 'FAILED' | 'REPRINT_PENDING' | 'POST_PROCESS' | 'DONE' | 'IN_STOCK'
+  | 'SITE_VISIT' | 'SITE_VISIT_DONE' | 'VISITA_REPROGRAMADA' | 'VISITA_CANCELADA' | 'QUOTATION' | 'BUDGET_GENERATED' | 'BUDGET_REJECTED' | 'SURVEY_DESIGN' | 'APPROVED' | 'OFFICIAL_ORDER' | 'CUTTING' | 'WELDING' | 'ASSEMBLY' | 'PAINTING' | 'INSTALACION_OBRA'
+  | 'ARMADO' | 'BARNIZADO' | 'RE_WORK' | 'READY';
+
+export const ORDER_STATUS = {
+  PENDING: 'PENDING',
+  WAITING_MATERIALS: 'WAITING_MATERIALS',
+  IN_PRODUCTION: 'IN_PRODUCTION',
+  WAITING_PRINTER: 'WAITING_PRINTER',
+  READY_FOR_DELIVERY: 'READY_FOR_DELIVERY',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED'
+} as const;
+
+export type Priority = 'EXTREMA' | 'ALTA' | 'NORMAL' | 'BAJA' | 'EN TIEMPO' | 'VENCIDO' | 'LISTO' | 'PRÓXIMO';
+
+export const ORDER_PRIORITY = {
+  EXTREMA: 'EXTREMA',
+  ALTA: 'ALTA',
+  NORMAL: 'NORMAL',
+  BAJA: 'BAJA',
+  EN_TIEMPO: 'EN TIEMPO',
+  VENCIDO: 'VENCIDO',
+  LISTO: 'LISTO',
+  PROXIMO: 'PRÓXIMO'
+} as const;
+
+export interface Client {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}
+
+export interface Employee {
+  id: string;
+  firstName: string;
+  lastName?: string;
+  active: boolean;
+  phone?: string;
+  email?: string;
+  specialties?: string;
+}
+
+export interface Payment {
+  id: string;
+  paidAt: string;
+  amount: number;
+  method: string;
+  reference?: string;
+  note?: string;
+}
+
+export interface ItemPedido {
+  id: string;
+  nombreProducto: string;
+  descripcion?: string;
+  cantidad: number;
+  quantityProduced: number;
+  precioUnitario: number;
+  senia: number;
+  stlUrl?: string;
+  weightGrams?: number;
+  estimatedMinutes?: number;
+  metadata?: Record<string, any>;
+  // Metalurgica site visit fields
+  fecha_visita?: string;
+  hora_visita?: string;
+  direccion_obra?: string;
+  observaciones_visita?: string;
+}
+
+export interface Pedido {
+  id: string;
+  negocioId: string;
+  code: string;
+  type: 'CUSTOMER' | 'STOCK';
+  clienteId: string;
+  clientName: string;
+  clientPhone?: string;
+  fechaCreacion: string;
+  dueDate: string;
+  fechaActualizacion: string;
+  status: OrderStatus;
+  observaciones?: string;
+  items: ItemPedido[];
+  total: number;
+  totalPrice: number | string;
+  profit?: number;
+  totalSenias: number | string;
+  totalPayments: number | string;
+  saldo: number;
+  paid?: number;
+  urgencia: Priority;
+  responsableGeneral?: Employee;
+  payments: Payment[];
+  metadata?: Record<string, any>;
+
+  // Visit fields at order level
+  fecha_visita?: string;
+  hora_visita?: string;
+  direccion_obra?: string;
+  observaciones_visita?: string;
+}
+
+export type PedidoSortKey = 'code' | 'fechaCreacion' | 'dueDate' | 'fechaActualizacion' | 'saldo' | 'total' | string;
+export type PedidoSortDir = 'asc' | 'desc';
+
+export interface PedidosResponse {
+  data: Pedido[];
+  total?: number;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface PedidoSummary {
+  totalVolume: number;
+  pendingBalance: number;
+  activeCount: number;
+}
+
+export type PedidoType = 'CUSTOMER' | 'STOCK';
