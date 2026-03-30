@@ -134,20 +134,11 @@
       }
       <app-orders-table [orders]="sortedCommercial()" [sortKey]="sortKey()" [sortDir]="sortDir()"
         [hideTypeColumn]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"></app-orders-table>
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
         class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 flex flex-col sm:flex-row items-center gap-4">
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Mostrar</span>
-          <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)"
-            class="bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-primary focus:ring-0 cursor-pointer">
-            <option [ngValue]="5">5 filas</option>
-            <option [ngValue]="10">10 filas</option>
-            <option [ngValue]="25">25 filas</option>
-            <option [ngValue]="50">50 filas</option>
-          </select>
-        </div>
+        <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
         <div class="flex-1">
           <app-paginator [totalItems]="commercialTotal()" [pageSize]="pageSize" [currentPage]="commercialPage()"
             (pageChange)="onCommercialPageChange($event)"></app-paginator>
@@ -195,20 +186,11 @@
       }
       <app-orders-table [orders]="sortedProduction()" [sortKey]="sortKey()" [sortDir]="sortDir()"
         [hideTypeColumn]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"></app-orders-table>
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
         class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 flex flex-col sm:flex-row items-center gap-4">
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Mostrar</span>
-          <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)"
-            class="bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-primary focus:ring-0 cursor-pointer">
-            <option [ngValue]="5">5 filas</option>
-            <option [ngValue]="10">10 filas</option>
-            <option [ngValue]="25">25 filas</option>
-            <option [ngValue]="50">50 filas</option>
-          </select>
-        </div>
+        <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
         <div class="flex-1">
           <app-paginator [totalItems]="productionTotal()" [pageSize]="pageSize" [currentPage]="productionPage()"
             (pageChange)="onProductionPageChange($event)"></app-paginator>
@@ -251,20 +233,11 @@
       }
       <app-orders-table [orders]="sortedArchived()" [sortKey]="sortKey()" [sortDir]="sortDir()" [hideTypeColumn]="true"
         [hideUrgency]="true" [hideDelivery]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"></app-orders-table>
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
         class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 flex flex-col sm:flex-row items-center gap-4">
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Mostrar</span>
-          <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)"
-            class="bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-primary focus:ring-0 cursor-pointer">
-            <option [ngValue]="5">5 filas</option>
-            <option [ngValue]="10">10 filas</option>
-            <option [ngValue]="25">25 filas</option>
-            <option [ngValue]="50">50 filas</option>
-          </select>
-        </div>
+        <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
         <div class="flex-1">
           <app-paginator [totalItems]="archivedTotal()" [pageSize]="pageSize" [currentPage]="archivedPage()"
             (pageChange)="onArchivedPageChange($event)"></app-paginator>

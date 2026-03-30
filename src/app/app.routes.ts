@@ -33,6 +33,10 @@ export const routes: Routes = [
         loadComponent: () => import('../../libs/features/pedidos/pedidos.component').then(m => m.PedidosPageComponent)
       },
       {
+        path: 'pedidos/:id',
+        loadComponent: () => import('../../libs/features/pedidos/detalles/pedido-detalle.component').then(m => m.PedidoDetalleComponent)
+      },
+      {
         path: 'pedidos/kanban',
         loadComponent: () => import('../../libs/features/pedidos/kanban.component').then(m => m.PedidosKanbanComponent)
       },

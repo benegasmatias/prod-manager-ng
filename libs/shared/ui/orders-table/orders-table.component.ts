@@ -115,7 +115,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
  
               <td class="px-6 py-5 last:rounded-r-2xl border-y border-r border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
                 <div class="flex items-center justify-end gap-1">
-                  <button class="h-8 w-8 flex items-center justify-center rounded-xl text-zinc-400 hover:text-primary hover:bg-primary/5 transition-all">
+                  <button (click)="viewClick.emit(order)" class="h-8 w-8 flex items-center justify-center rounded-xl text-zinc-400 hover:text-primary hover:bg-primary/5 transition-all">
                     <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
                   </button>
                   <button (click)="_onManageClick(order)" class="h-8 w-8 flex items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
@@ -154,6 +154,7 @@ export class OrdersTableComponent {
 
   @Output() sortChange = new EventEmitter<string>();
   @Output() statusClick = new EventEmitter<Pedido>();
+  @Output() viewClick = new EventEmitter<Pedido>();
   @Output() manageClick = new EventEmitter<Pedido>();
 
   protected readonly labels = UI_LABELS;

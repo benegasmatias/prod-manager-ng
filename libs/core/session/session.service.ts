@@ -19,8 +19,8 @@ export class SessionService {
   activeId = computed(() => this._activeId());
 
   // El negocio activo es computado basado en la lista y el ID actual
-  activeNegocio = computed(() => 
-    this._negocios().find(n => n.id === this._activeId()) || this._negocios()[0]
+  activeNegocio = computed<Negocio | null>(() => 
+    this._negocios().find(n => n.id === this._activeId()) || this._negocios()[0] || null
   );
 
   // La configuración se deriva dinámicamente del rubro del negocio activo

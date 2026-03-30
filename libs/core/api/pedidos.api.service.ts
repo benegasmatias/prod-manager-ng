@@ -77,6 +77,13 @@ export class PedidosApiService {
     }
   
     /**
+     * Obtiene un pedido por su ID.
+     */
+    async findOne(id: string): Promise<Pedido> {
+      return firstValueFrom(this.http.get<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.ONE(id)}`));
+    }
+
+    /**
      * Crea un nuevo pedido.
      */
     async create(data: Partial<Pedido>): Promise<Pedido> {

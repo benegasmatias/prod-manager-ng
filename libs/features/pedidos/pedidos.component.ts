@@ -1,14 +1,14 @@
 import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { PedidosApiService } from '../../core/api/pedidos.api.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { SessionService } from '../../core/session/session.service';
 import { Pedido, OrderStatus, PedidoSummary, Employee, ORDER_STATUS } from '../../shared/models';
 import { LucideAngularModule } from 'lucide-angular';
 import { OrderStatusModalComponent } from './status-modal/status-modal.component';
-import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, FilterOptions, FilterValues, LoadingSpinnerComponent } from '../../shared/ui';
+import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, PageSizeSelectorComponent, FilterOptions, FilterValues, LoadingSpinnerComponent } from '../../shared/ui';
 import { PedidoSortKey, PedidoSortDir } from '../../shared/models/pedido';
 import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
@@ -16,7 +16,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 @Component({
   selector: 'app-pedidos-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, LoadingSpinnerComponent, PageSizeSelectorComponent],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css']
 })
@@ -24,6 +24,7 @@ export class PedidosPageComponent implements OnInit {
   private api = inject(PedidosApiService);
   public session = inject(SessionService);
   private auth = inject(AuthService);
+  private router = inject(Router);
 
   // Labels and Icons for Template
   protected readonly labels = PEDIDOS_LABELS;
@@ -279,6 +280,10 @@ export class PedidosPageComponent implements OnInit {
   onArchivedPageChange(page: number) {
     this.archivedPage.set(page);
     this.loadArchived();
+  }
+
+  goToDetail(order: Pedido) {
+    this.router.navigate(['/pedidos', order.id]);
   }
 
   openManageModal(order: Pedido) {

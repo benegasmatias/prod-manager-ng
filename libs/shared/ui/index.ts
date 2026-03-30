@@ -5,5 +5,6 @@ export * from './money-input/money-input.component';
 export * from './skeleton/skeleton.component';
 export * from './orders-table/orders-table.component';
 export * from './paginator/paginator.component';
+export * from './paginator/page-size-selector.component';
 export * from './loading-spinner/loading-spinner.component';
 // export * from './confirm-dialog'; // If needed later

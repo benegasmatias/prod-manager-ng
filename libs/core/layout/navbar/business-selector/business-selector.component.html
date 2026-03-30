@@ -2,7 +2,11 @@
   <button (click)="dropdownOpen.set(!dropdownOpen())"
     class="h-9 gap-2 border-none bg-zinc-100 hover:bg-zinc-200/70 transition-colors font-bold text-[10px] uppercase tracking-widest px-3 rounded-xl dark:bg-zinc-900 dark:hover:bg-zinc-800 flex items-center">
     <lucide-angular [img]="icons.Building2" class="h-4 w-4 text-primary"></lucide-angular>
-    <span class="max-w-[150px] truncate">{{ sessionService.activeNegocio()?.nombre || 'Seleccionar Negocio' }}</span>
+    @if (sessionService.activeNegocio(); as active) {
+      <span class="max-w-[150px] truncate">{{ active.nombre }}</span>
+    } @else {
+      <span class="max-w-[150px] truncate">Seleccionar Negocio</span>
+    }
     <lucide-angular [img]="icons.ChevronDown" class="h-3 w-3 text-zinc-400"
       [class.rotate-180]="dropdownOpen()"></lucide-angular>
   </button>
