@@ -8,7 +8,7 @@ import { SessionService } from '../../core/session/session.service';
 import { Pedido, OrderStatus, PedidoSummary, Employee, ORDER_STATUS } from '../../shared/models';
 import { LucideAngularModule } from 'lucide-angular';
 import { OrderStatusModalComponent } from './status-modal/status-modal.component';
-import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, FilterOptions, FilterValues } from '../../shared/ui';
+import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, FilterOptions, FilterValues } from '../../shared/ui';
 import { PedidoSortKey, PedidoSortDir } from '../../shared/models/pedido';
 import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
@@ -16,7 +16,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 @Component({
   selector: 'app-pedidos-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css']
 })
@@ -28,9 +28,6 @@ export class PedidosPageComponent implements OnInit {
   // Labels and Icons for Template
   protected readonly labels = PEDIDOS_LABELS;
   protected readonly icons = PEDIDOS_ICONS;
-
-  // Signals
-  allPedidos = signal<Pedido[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   summary = signal<PedidoSummary>({ totalVolume: 0, pendingBalance: 0, activeCount: 0 });
@@ -51,6 +48,21 @@ export class PedidosPageComponent implements OnInit {
   // UI State
   selectedOrder = signal<Pedido | null>(null);
   isModalOpen = signal(false);
+
+  // Pagination State
+  pageSize = 15;
+  
+  productionOrdersData = signal<Pedido[]>([]);
+  productionPage = signal(1);
+  productionTotal = signal(0);
+
+  commercialOrdersData = signal<Pedido[]>([]);
+  commercialPage = signal(1);
+  commercialTotal = signal(0);
+
+  archivedOrdersData = signal<Pedido[]>([]);
+  archivedPage = signal(1);
+  archivedTotal = signal(0);
 
   // Sort State
   sortKey = signal<PedidoSortKey>('fechaActualizacion');
@@ -80,92 +92,12 @@ export class PedidosPageComponent implements OnInit {
     };
   });
 
-  // Computed Data
-  filteredOrders = computed(() => {
-    const orders = this.allPedidos();
-    const search = this.searchTerm().toLowerCase();
-    const estado = this.estadoFilter();
-    const urgencia = this.urgenciaFilter();
-    const tecnico = this.tecnicoFilter();
-    const desde = this.dateDesde();
-    const hasta = this.dateHasta();
+  // Sorted Computeds for UI
+  sortedProduction = computed(() => this.sortOrders([...this.productionOrdersData()]));
+  sortedCommercial = computed(() => this.sortOrders([...this.commercialOrdersData()]));
+  sortedArchived = computed(() => this.sortOrders([...this.archivedOrdersData()]));
 
-    return orders.filter(order => {
-      if (this.negocio()?.rubro === 'METALURGICA') {
-        const VISIT_STATUSES = ['SITE_VISIT', 'SITE_VISIT_DONE', 'VISITA_REPROGRAMADA', 'VISITA_CANCELADA'];
-        const BUDGET_STATUSES = ['QUOTATION', 'BUDGET_GENERATED', 'BUDGET_REJECTED', 'SURVEY_DESIGN'];
-        if (VISIT_STATUSES.includes(order.status) || BUDGET_STATUSES.includes(order.status)) {
-          if (estado === 'all') return false; // Only hide from "all" view
-        }
-      }
-
-      const matchEstado = estado === 'all' || order.status === estado;
-      const matchUrgencia = urgencia === 'all' || order.urgencia === urgencia;
-
-      const matchSearch = search === '' ||
-        order.code.toLowerCase().includes(search) ||
-        order.clientName.toLowerCase().includes(search) ||
-        (order.responsableGeneral?.firstName || '').toLowerCase().includes(search) ||
-        (order.responsableGeneral?.lastName || '').toLowerCase().includes(search);
-
-      const orderDate = order.dueDate ? new Date(order.dueDate) : null;
-      const matchDesde = !desde || (orderDate && orderDate >= new Date(desde));
-      const matchHasta = !hasta || (orderDate && orderDate <= new Date(hasta + 'T23:59:59'));
-
-      const matchTechnician = tecnico === 'all' || order.responsableGeneral?.id === tecnico;
-
-      return matchEstado && matchUrgencia && matchSearch && matchDesde && matchHasta && matchTechnician;
-    });
-  });
-
-  sortedOrders = computed(() => {
-    const orders = [...this.filteredOrders()];
-    const key = this.sortKey();
-    const dir = this.sortDir();
-
-    return orders.sort((a, b) => {
-      let valA: any = (a as any)[key];
-      let valB: any = (b as any)[key];
-
-      if (key === 'fechaEntrega' || key === 'fechaActualizacion') {
-        const dateA = valA ? new Date(valA).getTime() : 0;
-        const dateB = valB ? new Date(valB).getTime() : 0;
-        return dir === 'asc' ? dateA - dateB : dateB - dateA;
-      }
-
-      const comparison = String(valA).localeCompare(String(valB));
-      return dir === 'asc' ? comparison : -comparison;
-    });
-  });
-
-  activeOrders = computed(() =>
-    this.sortedOrders().filter(o => o.status !== ORDER_STATUS.DELIVERED && o.status !== ORDER_STATUS.CANCELLED)
-  );
-
-  commercialOrders = computed(() => {
-    if (this.negocio()?.rubro !== 'METALURGICA') return [];
-    const VISIT_STATUSES = ['SITE_VISIT', 'SITE_VISIT_DONE', 'VISITA_REPROGRAMADA', 'VISITA_CANCELADA'];
-    const BUDGET_STATUSES = ['QUOTATION', 'BUDGET_GENERATED', 'BUDGET_REJECTED', 'SURVEY_DESIGN'];
-    const statuses = [...VISIT_STATUSES, ...BUDGET_STATUSES];
-    return this.activeOrders().filter(o => statuses.includes(o.status));
-  });
-
-  productionOrders = computed(() => {
-    const active = this.activeOrders();
-    if (this.negocio()?.rubro !== 'METALURGICA') return active;
-
-    const VISIT_STATUSES = ['SITE_VISIT', 'SITE_VISIT_DONE', 'VISITA_REPROGRAMADA', 'VISITA_CANCELADA'];
-    const BUDGET_STATUSES = ['QUOTATION', 'BUDGET_GENERATED', 'BUDGET_REJECTED', 'SURVEY_DESIGN'];
-    const statuses = [...VISIT_STATUSES, ...BUDGET_STATUSES];
-
-    return active.filter(o => !statuses.includes(o.status));
-  });
-
-  archivedOrders = computed(() =>
-    this.sortedOrders().filter(o => o.status === ORDER_STATUS.DELIVERED || o.status === ORDER_STATUS.CANCELLED)
-  );
-
-  hasPedidos = computed(() => this.allPedidos().length > 0);
+  hasPedidos = computed(() => this.productionTotal() > 0 || this.commercialTotal() > 0 || this.archivedTotal() > 0);
 
   private lastLoadedBusinessId: string | null = null;
 
@@ -189,6 +121,36 @@ export class PedidosPageComponent implements OnInit {
       this.sortKey.set(sortKey);
       this.sortDir.set('asc');
     }
+    // No need to loadData as sorting is client-side for the current page
+  }
+
+  private sortOrders(orders: Pedido[]): Pedido[] {
+    const key = this.sortKey();
+    const dir = this.sortDir();
+
+    return orders.sort((a, b) => {
+      let valA: any = (a as any)[key];
+      let valB: any = (b as any)[key];
+
+      if (key === 'dueDate' || key === 'createdAt' || key === 'updatedAt' || key === 'fechaActualizacion' || key === 'fechaEntrega') {
+        const dateA = valA ? new Date(valA).getTime() : 0;
+        const dateB = valB ? new Date(valB).getTime() : 0;
+        return dir === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+
+      if (key === 'code') {
+        return dir === 'asc' ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+      }
+
+      const numA = Number(valA);
+      const numB = Number(valB);
+      if (!isNaN(numA) && !isNaN(numB)) {
+          return dir === 'asc' ? numA - numB : numB - numA;
+      }
+
+      const comparison = String(valA || '').localeCompare(String(valB || ''));
+      return dir === 'asc' ? comparison : -comparison;
+    });
   }
 
   onFilterChange({ key, value }: { key: string, value: any }) {
@@ -200,37 +162,72 @@ export class PedidosPageComponent implements OnInit {
       case 'startDate': this.dateDesde.set(value); break;
       case 'endDate': this.dateHasta.set(value); break;
     }
+    // Optimization: avoid reloading everything if only some local filters changed?
+    // For now, reload all to ensure consistency
+    this.loadData();
   }
 
   async loadData() {
     const bId = this.businessId();
-    if (!bId || (bId === this.lastLoadedBusinessId && this.allPedidos().length > 0)) return;
+    if (!bId) return;
 
-    this.lastLoadedBusinessId = bId;
     this.loading.set(true);
     this.error.set(null);
 
+    const commonParams = {
+      businessId: bId,
+      search: this.searchTerm() || undefined,
+      startDate: this.dateDesde() || undefined,
+      endDate: this.dateHasta() || undefined,
+      responsableId: this.tecnicoFilter() === 'all' ? undefined : this.tecnicoFilter(),
+    };
+
     try {
-      const EXCLUDED = 'IN_STOCK,SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const [productionRes, summaryRes, employeesRes] = await Promise.all([
-        this.api.getListing({
-          businessId: bId,
-          pageSize: 100,
-          excludeStatuses: EXCLUDED
-        }),
+      const EXCLUDED_PRODUCTION = 'IN_STOCK,DELIVERED,CANCELLED,SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
+      const COMMERCIAL_STATUSES = 'SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
+      const HISTORY_STATUSES = 'DELIVERED,CANCELLED';
+
+      const [prodRes, commRes, histRes, summaryRes, empsRes] = await Promise.all([
+        this.api.getListing({ ...commonParams, page: this.productionPage(), pageSize: this.pageSize, excludeStatuses: EXCLUDED_PRODUCTION }),
+        this.api.getListing({ ...commonParams, page: this.commercialPage(), pageSize: this.pageSize, statuses: COMMERCIAL_STATUSES }),
+        this.api.getListing({ ...commonParams, page: this.archivedPage(), pageSize: this.pageSize, statuses: HISTORY_STATUSES }),
         this.api.getSummary(bId),
         this.api.getEmployees(bId)
       ]);
 
-      this.allPedidos.set([...productionRes.data]);
+      this.productionOrdersData.set(prodRes.data);
+      this.productionTotal.set(prodRes.total || 0);
+
+      this.commercialOrdersData.set(commRes.data);
+      this.commercialTotal.set(commRes.total || 0);
+
+      this.archivedOrdersData.set(histRes.data);
+      this.archivedTotal.set(histRes.total || 0);
+
       this.summary.set(summaryRes);
-      this.employees.set(employeesRes);
+      this.employees.set(empsRes);
+      this.lastLoadedBusinessId = bId;
     } catch (err) {
-      this.error.set('No se pudieron cargar los datos. Por favor, intente de nuevo.');
+      this.error.set('No se pudieron cargar los datos.');
       console.error(err);
     } finally {
       this.loading.set(false);
     }
+  }
+
+  onProductionPageChange(page: number) {
+    this.productionPage.set(page);
+    this.loadData();
+  }
+
+  onCommercialPageChange(page: number) {
+    this.commercialPage.set(page);
+    this.loadData();
+  }
+
+  onArchivedPageChange(page: number) {
+    this.archivedPage.set(page);
+    this.loadData();
   }
 
   openManageModal(order: Pedido) {

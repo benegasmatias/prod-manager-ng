@@ -102,14 +102,14 @@
   ></app-search-filter-bar>
 
   <!-- Commercial / Pre-sales Section (Metalurgica) -->
-  @if (commercialOrders().length > 0) {
+  @if (commercialTotal() > 0) {
     <div class="space-y-6">
       <div class="flex items-center justify-between px-2">
         <div class="flex items-center gap-3">
           <div class="h-6 w-1 bg-amber-500 rounded-full"></div>
           <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
             {{ labels.COMMERCIAL_SECTION }}
-            <span class="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-600 px-2 py-0.5 rounded-full">{{ commercialOrders().length }}</span>
+            <span class="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-600 px-2 py-0.5 rounded-full">{{ commercialTotal() }}</span>
           </h2>
         </div>
         <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ labels.COMMERCIAL_SUBTITLE }}</p>
@@ -117,15 +117,24 @@
 
       <div class="bg-white/50 dark:bg-zinc-950/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-sm">
         <app-orders-table 
-          [orders]="commercialOrders()"
+          [orders]="sortedCommercial()"
           [sortKey]="sortKey()"
           [sortDir]="sortDir()"
           [hideTypeColumn]="true"
-          [rubro]="negocio().rubro"
+          [rubro]="negocio()?.rubro"
           (sortChange)="onSort($event)"
           (statusClick)="openManageModal($event)"
           (manageClick)="openManageModal($event)"
         ></app-orders-table>
+        
+        <div class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4">
+          <app-paginator
+            [totalItems]="commercialTotal()"
+            [pageSize]="pageSize"
+            [currentPage]="commercialPage()"
+            (pageChange)="onCommercialPageChange($event)"
+          ></app-paginator>
+        </div>
       </div>
     </div>
   }
@@ -137,12 +146,12 @@
         <div class="h-6 w-1 bg-primary rounded-full"></div>
         <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
           {{ labels.ACTIVE_SECTION }}
-          <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{ productionOrders().length }}</span>
+          <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{ productionTotal() }}</span>
         </h2>
       </div>
     </div>
 
-    @if (loading() && productionOrders().length === 0 && commercialOrders().length === 0) {
+    @if (loading() && productionOrdersData().length === 0 && commercialOrdersData().length === 0) {
       <div class="grid grid-cols-1 gap-4">
         @for (i of [1,2,3]; track i) {
           <div class="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between shadow-sm">
@@ -157,20 +166,29 @@
           </div>
         }
       </div>
-    } @else if (productionOrders().length > 0) {
+    } @else if (productionTotal() > 0) {
       <div class="bg-white/50 dark:bg-zinc-950/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-sm">
         <app-orders-table 
-          [orders]="productionOrders()"
+          [orders]="sortedProduction()"
           [sortKey]="sortKey()"
           [sortDir]="sortDir()"
           [hideTypeColumn]="true"
-          [rubro]="negocio().rubro"
+          [rubro]="negocio()?.rubro"
           (sortChange)="onSort($event)"
           (statusClick)="openManageModal($event)"
           (manageClick)="openManageModal($event)"
         ></app-orders-table>
+
+        <div class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4">
+          <app-paginator
+            [totalItems]="productionTotal()"
+            [pageSize]="pageSize"
+            [currentPage]="productionPage()"
+            (pageChange)="onProductionPageChange($event)"
+          ></app-paginator>
+        </div>
       </div>
-    } @else if (commercialOrders().length === 0) {
+    } @else if (commercialTotal() === 0) {
       <div class="py-20 text-center flex flex-col items-center justify-center gap-4 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/5 dark:bg-zinc-900/5">
         <div class="h-16 w-16 rounded-[1.5rem] bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700 text-zinc-200">
           <lucide-angular [img]="icons.CLOCK" class="h-7 w-7"></lucide-angular>
@@ -181,14 +199,14 @@
   </div>
 
   <!-- History Section -->
-  @if (archivedOrders().length > 0 && (estadoFilter() === 'all' || estadoFilter() === 'DELIVERED' || estadoFilter() === 'CANCELLED')) {
+  @if (archivedTotal() > 0 && (estadoFilter() === 'all' || estadoFilter() === 'DELIVERED' || estadoFilter() === 'CANCELLED')) {
     <div class="pt-12 space-y-6">
       <div class="flex items-center gap-4 px-2">
         <div class="flex items-center gap-3">
           <div class="h-6 w-1 bg-zinc-400 rounded-full"></div>
           <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
             {{ labels.HISTORY_SECTION }}
-            <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{ archivedOrders().length }}</span>
+            <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{ archivedTotal() }}</span>
           </h2>
         </div>
         <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
@@ -196,17 +214,26 @@
       </div>
       <div class="bg-white/30 dark:bg-zinc-950/10 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-[2px]">
         <app-orders-table 
-          [orders]="archivedOrders()"
+          [orders]="sortedArchived()"
           [sortKey]="sortKey()"
           [sortDir]="sortDir()"
           [hideTypeColumn]="true"
           [hideUrgency]="true"
           [hideDelivery]="true"
-          [rubro]="negocio().rubro"
+          [rubro]="negocio()?.rubro"
           (sortChange)="onSort($event)"
           (statusClick)="openManageModal($event)"
           (manageClick)="openManageModal($event)"
         ></app-orders-table>
+
+        <div class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4">
+          <app-paginator
+            [totalItems]="archivedTotal()"
+            [pageSize]="pageSize"
+            [currentPage]="archivedPage()"
+            (pageChange)="onArchivedPageChange($event)"
+          ></app-paginator>
+        </div>
       </div>
     </div>
   }
