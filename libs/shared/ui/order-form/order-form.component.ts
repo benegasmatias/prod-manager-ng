@@ -79,7 +79,6 @@ import { cn } from '@shared/utils/cn';
                     [error]="vErrors['clienteId']"
                     class="sm:col-span-2"
                   ></app-client-selector>
-
                   <app-date-picker
                     label="Promesa de Entrega"
                     [(value)]="fechaEntrega"
@@ -206,13 +205,13 @@ export class OrderFormComponent {
   private clientesApi = inject(ClientesApiService);
   private session = inject(SessionService);
   private router = inject(Router);
- 
+
   readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw };
- 
+
   @Input() forcedType?: 'CUSTOMER' | 'STOCK';
   @Input() forcedStatus?: string;
   @Input() cloneId?: string;
- 
+
   // Signal State
   orderType = signal<'CUSTOMER' | 'STOCK'>('CUSTOMER');
   items = signal<any[]>([]);
@@ -223,7 +222,7 @@ export class OrderFormComponent {
   observaciones = '';
   isSaving = signal(false);
   vErrors: Record<string, string> = {};
- 
+
   // Context
   config = computed(() => this.session.config());
   employees = signal<Employee[]>([]);
@@ -265,7 +264,7 @@ export class OrderFormComponent {
       ]);
       this.employees.set(emps);
       this.clients.set(cls);
-      
+
       if (this.clienteId) {
         this.updateClientName(this.clienteId);
       }
@@ -356,28 +355,42 @@ export class OrderFormComponent {
           // Flatten/convert to backend's expected structure
           const mapped: any = {
             name: it.nombreProducto || 'ITEM',
-            qty: Number(it.cantidad) || 1,
+            qty: Math.max(1, Math.floor(Number(it.cantidad) || 1)),
             price: Number(it.precioUnitario) || 0,
             deposit: Number(it.senia) || 0,
-            status: this.forcedStatus || (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING'),
-            
-            // Retain key additional fields
-            weightGrams: it.pesoEstimado,
-            estimatedMinutes: it.duracionMin,
-            ...it
+            weightGrams: Number(it.peso_gramos) || 0,
+            estimatedMinutes: Math.floor(Number(it.duracion_estimada_minutos) || 0),
+            stlUrl: it.url_stl || '',
+            // Map known fields from DTO if present
+            medidas: it.medidas,
+            material: it.material,
+            tipo_trabajo: it.tipo_trabajo,
+            material_estructura: it.material_estructura,
+            fillMaterial: it.fillMaterial,
+            revestimiento: it.revestimiento,
+            terminacion: it.terminacion,
+            color: it.color,
+            accessories: it.accessories,
+            instalacion: it.instalacion,
+            direccion_obra: it.direccion_obra,
+            fecha_visita: it.fecha_visita,
+            hora_visita: it.hora_visita,
+            observaciones_visita: it.observaciones_visita,
+            description: it.description,
+            // Move rubric-specific fields to metadata
+            metadata: {
+              seDiseñaSTL: it.seDiseñaSTL,
+              tipo_filamento: it.tipo_filamento,
+              precioDiseno: it.precioDiseno,
+              ...it.metadata
+            }
           };
-
-          // Remove frontend-specific fields that might cause schema validation errors
-          delete mapped.nombreProducto;
-          delete mapped.cantidad;
-          delete mapped.precioUnitario;
-          delete mapped.senia;
-          delete mapped.pesoEstimado;
-          delete mapped.duracionMin;
 
           return mapped;
         }),
         status: this.forcedStatus || (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING'),
+        totalPrice: this.totales().total,
+        totalSenias: this.totales().totalSenias
       };
 
       console.log('[OrderForm] Payload Mapping:', payload);

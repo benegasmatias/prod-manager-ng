@@ -197,28 +197,45 @@ export class OrderStatusModalComponent implements OnInit {
         
         const updateData: any = {
           status: this.status() as OrderStatus,
-          responsableGeneral: selectedEmployee,
-          observaciones: this.notes(),
+          responsableGeneralId: this.responsableId(),
+          notes: this.notes(), // Corregido de observaciones -> notes
           totalPrice: this.totalPrice(),
         };
 
         if (this.isMetalurgica()) {
-          (updateData as any)['direccion_obra'] = this.visitAddress();
-          (updateData as any)['fecha_visita'] = this.visitDate();
-          (updateData as any)['hora_visita'] = this.visitTime();
-          (updateData as any)['observaciones_visita'] = this.visitObservations();
+          updateData['direccion_obra'] = this.visitAddress();
+          updateData['fecha_visita'] = this.visitDate();
+          updateData['hora_visita'] = this.visitTime();
+          updateData['observaciones_visita'] = this.visitObservations();
 
-          // Sync with first item for legacy support
+          // Sincronización del primer ítem (Metalúrgica suele tener 1 ítem principal)
           if (order.items && order.items.length > 0) {
-            updateData.items = order.items.map((it, idx) => 
-               idx === 0 ? { 
-                ...it, 
-                nombreProducto: this.itemName(),
-                precioUnitario: this.totalPrice(),
-                ['medidas']: this.measurements(),
-                ['tipo_trabajo']: this.tipoTrabajo(),
-              } : it
-            );
+            updateData.items = order.items.map((it, idx) => {
+              const itemAny = it as any;
+              if (idx === 0) {
+                return {
+                  ...it,
+                  name: this.itemName() || itemAny.name || it.nombreProducto,
+                  price: Number(this.totalPrice()) || itemAny.price || it.precioUnitario,
+                  medidas: this.measurements(),
+                  tipo_trabajo: this.tipoTrabajo(),
+                };
+              }
+              return it;
+            }).map((it: any) => {
+               // Limpiar todos los campos que no pertenezcan al DTO CreateOrderItemDto
+               const { 
+                 nombreProducto, precioUnitario, cantidad, senia, seDiseñaSTL, status,
+                 ...cleanIt 
+               } = it;
+               
+               return {
+                 ...cleanIt,
+                 name: it.name || nombreProducto,
+                 price: Number(it.price || precioUnitario) || 0,
+                 qty: Number(it.qty || cantidad) || 1
+               };
+            });
           }
         }
 
