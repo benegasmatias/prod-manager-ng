@@ -16,7 +16,7 @@ import { cn } from '@shared/utils/cn';
       @if (showVisitData()) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 bg-indigo-50/30 dark:bg-indigo-950/20 rounded-3xl border border-indigo-100 dark:border-indigo-800/30">
           <div class="sm:col-span-2 flex items-center gap-2 mb-2">
-            <lucide-icon name="map-pin" size="14" class="text-indigo-400"></lucide-icon>
+            <lucide-angular [img]="MapPin" class="h-3.5 w-3.5 text-indigo-400"></lucide-angular>
             <span class="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Logística de Obra</span>
           </div>
           
@@ -56,7 +56,7 @@ import { cn } from '@shared/utils/cn';
       <div class="space-y-6">
         <div class="flex items-center justify-between">
            <h3 class="text-[10px] font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2 px-1">
-              <lucide-icon name="wrench" size="14"></lucide-icon>
+              <lucide-angular [img]="Wrench" class="h-3.5 w-3.5"></lucide-angular>
               Especificaciones Técnicas
            </h3>
            <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-indigo-500 text-white shadow-lg shadow-indigo-500/20">Modo Metalúrgica</span>
@@ -80,7 +80,7 @@ import { cn } from '@shared/utils/cn';
               </p>
             </div>
             <div class="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center text-white backdrop-blur-sm group-hover:rotate-12 transition-transform">
-              <lucide-icon name="dollar-sign" size="30"></lucide-icon>
+              <lucide-angular [img]="DollarSign" class="h-[30px] w-[30px]"></lucide-angular>
             </div>
           </div>
 
@@ -111,7 +111,7 @@ import { cn } from '@shared/utils/cn';
                   placeholder="Ej: 3.50 x 2.10" 
                   class="w-full h-12 pl-10 px-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900 text-sm font-bold outline-none focus:border-indigo-500 transition-all"
                 >
-                <lucide-icon name="ruler" size="14" class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"></lucide-icon>
+                <lucide-angular [img]="Ruler" class="h-3.5 w-3.5 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"></lucide-angular>
               </div>
           </div>
 
@@ -164,5 +164,9 @@ export class MetalurgicaSectionComponent {
     return ['SITE_VISIT', 'SITE_VISIT_DONE', 'VISITA_REPROGRAMADA', 'VISITA_CANCELADA', 'QUOTATION', 'BUDGET_GENERATED', 'APPROVED'].includes(this.status);
   });
 
+  readonly MapPin = MapPin;
+  readonly Wrench = Wrench;
+  readonly DollarSign = DollarSign;
+  readonly Ruler = Ruler;
   cn = cn;
 }

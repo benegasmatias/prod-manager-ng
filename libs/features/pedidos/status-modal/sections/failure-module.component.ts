@@ -13,7 +13,7 @@ import { cn } from '@shared/utils/cn';
     <div class="space-y-6 animate-in slide-in-from-right duration-500">
        <div class="bg-red-50 dark:bg-red-950/20 p-6 rounded-3xl border border-red-100 dark:border-red-800/30 flex items-center gap-4">
           <div class="h-12 w-12 rounded-2xl bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-red-600 dark:text-red-400">
-            <lucide-icon name="alert-octagon" size="24"></lucide-icon>
+            <lucide-angular [img]="AlertOctagon" class="h-6 w-6"></lucide-angular>
           </div>
           <div>
             <p class="text-[10px] font-black uppercase text-red-600 dark:text-red-400 tracking-widest">¿Qué sucedió con la orden?</p>
@@ -39,14 +39,14 @@ import { cn } from '@shared/utils/cn';
             (click)="action.set('REDO')"
              [class]="cn('flex-1 h-20 rounded-2xl border-2 text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center gap-2 group', 
               action() === 'REDO' ? 'border-red-500 bg-red-50 text-red-600 shadow-lg shadow-red-500/10' : 'border-zinc-100 dark:border-zinc-800 text-zinc-400 hover:border-zinc-200')">
-             <lucide-icon name="undo-2" size="20" [class]="action() === 'REDO' ? 'text-red-600' : 'text-zinc-300'"></lucide-icon>
+             <lucide-angular [img]="Undo2" [class]="cn('h-5 w-5', action() === 'REDO' ? 'text-red-600' : 'text-zinc-300')"></lucide-angular>
              Re-hacer / Reparar
            </button>
            <button 
              (click)="action.set('DISCARD')"
              [class]="cn('flex-1 h-20 rounded-2xl border-2 text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center gap-2 group', 
               action() === 'DISCARD' ? 'border-zinc-950 bg-zinc-950 text-white shadow-xl' : 'border-zinc-100 dark:border-zinc-800 text-zinc-400 hover:border-zinc-200')">
-             <lucide-icon name="trash-2" size="20" [class]="action() === 'DISCARD' ? 'text-white' : 'text-zinc-300'"></lucide-icon>
+             <lucide-angular [img]="Trash2" [class]="cn('h-5 w-5', action() === 'DISCARD' ? 'text-white' : 'text-zinc-300')"></lucide-angular>
              Descartar Total
            </button>
          </div>
@@ -60,5 +60,8 @@ export class FailureModuleComponent {
   @Input({ required: true }) reason = signal<string>('');
   @Input({ required: true }) action = signal<'REDO' | 'DISCARD' | 'KEEP'>('REDO');
 
+  readonly AlertOctagon = AlertOctagon;
+  readonly Undo2 = Undo2;
+  readonly Trash2 = Trash2;
   cn = cn;
 }

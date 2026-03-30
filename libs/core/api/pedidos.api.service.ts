@@ -97,10 +97,21 @@ export class PedidosApiService {
       return firstValueFrom(this.http.post<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.PAYMENTS(orderId)}`, payment));
     }
 
-    /**
-     * Reporta un fallo en un pedido.
-     */
-    async reportFailure(orderId: string, data: { reason: string; action: 'REDO' | 'DISCARD' | 'KEEP'; targetStatus: string }): Promise<Pedido> {
-      return firstValueFrom(this.http.post<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.STATUS(orderId)}/failure`, data));
-    }
+   /**
+    * Reporta un fallo en un pedido (específicamente Impresión 3D o general).
+    */
+   async reportFailure(orderId: string, data: { 
+     reason: string; 
+     action?: 'REDO' | 'DISCARD' | 'KEEP'; 
+     targetStatus?: string;
+     wastedGrams?: number;
+     moveToReprint?: boolean;
+   }): Promise<Pedido> {
+     const payload = {
+       ...data,
+       wastedGrams: data.wastedGrams || 0,
+       moveToReprint: data.moveToReprint || (data.action === 'REDO' && data.targetStatus === 'REPRINT_PENDING')
+     };
+     return firstValueFrom(this.http.post<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.REPORT_FAILURE(orderId)}`, payload));
+   }
 }

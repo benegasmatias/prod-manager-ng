@@ -4,7 +4,7 @@ export const API_ENDPOINTS = {
     SUMMARY: '/orders/summary',
     STATUS: (id: string) => `/orders/${id}/status`,
     PAYMENTS: (id: string) => `/orders/${id}/payments`,
-    REPORT_FAILURE: (id: string) => `/orders/${id}/failure`,
+    REPORT_FAILURE: (id: string) => `/orders/${id}/fail`,
     ONE: (id: string) => `/orders/${id}`,
     ROOT: '/orders'
   },
