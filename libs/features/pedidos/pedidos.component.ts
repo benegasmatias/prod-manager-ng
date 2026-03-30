@@ -8,7 +8,7 @@ import { SessionService } from '../../core/session/session.service';
 import { Pedido, OrderStatus, PedidoSummary, Employee, ORDER_STATUS } from '../../shared/models';
 import { LucideAngularModule } from 'lucide-angular';
 import { OrderStatusModalComponent } from './status-modal/status-modal.component';
-import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, FilterOptions, FilterValues } from '../../shared/ui';
+import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, FilterOptions, FilterValues, LoadingSpinnerComponent } from '../../shared/ui';
 import { PedidoSortKey, PedidoSortDir } from '../../shared/models/pedido';
 import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
@@ -16,7 +16,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 @Component({
   selector: 'app-pedidos-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, SkeletonComponent, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, LoadingSpinnerComponent],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css']
 })
@@ -29,6 +29,9 @@ export class PedidosPageComponent implements OnInit {
   protected readonly labels = PEDIDOS_LABELS;
   protected readonly icons = PEDIDOS_ICONS;
   loading = signal(false);
+  loadingProduction = signal(false);
+  loadingCommercial = signal(false);
+  loadingArchived = signal(false);
   error = signal<string | null>(null);
   summary = signal<PedidoSummary>({ totalVolume: 0, pendingBalance: 0, activeCount: 0 });
   employees = signal<Employee[]>([]);
@@ -50,7 +53,7 @@ export class PedidosPageComponent implements OnInit {
   isModalOpen = signal(false);
 
   // Pagination State
-  pageSize = 15;
+  pageSize = 5;
   
   productionOrdersData = signal<Pedido[]>([]);
   productionPage = signal(1);
@@ -168,66 +171,114 @@ export class PedidosPageComponent implements OnInit {
   }
 
   async loadData() {
-    const bId = this.businessId();
-    if (!bId) return;
+    this.loadingProduction.set(true);
+    this.loadingCommercial.set(true);
+    this.loadingArchived.set(true);
+    this.loadGlobalData();
+    this.loadProduction();
+    this.loadCommercial();
+    this.loadArchived();
+  }
 
-    this.loading.set(true);
-    this.error.set(null);
-
-    const commonParams = {
-      businessId: bId,
+  private getCommonParams() {
+    return {
+      businessId: this.businessId(),
       search: this.searchTerm() || undefined,
       startDate: this.dateDesde() || undefined,
       endDate: this.dateHasta() || undefined,
       responsableId: this.tecnicoFilter() === 'all' ? undefined : this.tecnicoFilter(),
     };
+  }
 
+  async loadGlobalData() {
+    const bId = this.businessId();
+    if (!bId) return;
     try {
-      const EXCLUDED_PRODUCTION = 'IN_STOCK,DELIVERED,CANCELLED,SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const COMMERCIAL_STATUSES = 'SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const HISTORY_STATUSES = 'DELIVERED,CANCELLED';
-
-      const [prodRes, commRes, histRes, summaryRes, empsRes] = await Promise.all([
-        this.api.getListing({ ...commonParams, page: this.productionPage(), pageSize: this.pageSize, excludeStatuses: EXCLUDED_PRODUCTION }),
-        this.api.getListing({ ...commonParams, page: this.commercialPage(), pageSize: this.pageSize, statuses: COMMERCIAL_STATUSES }),
-        this.api.getListing({ ...commonParams, page: this.archivedPage(), pageSize: this.pageSize, statuses: HISTORY_STATUSES }),
+      const [summaryRes, empsRes] = await Promise.all([
         this.api.getSummary(bId),
         this.api.getEmployees(bId)
       ]);
-
-      this.productionOrdersData.set(prodRes.data);
-      this.productionTotal.set(prodRes.total || 0);
-
-      this.commercialOrdersData.set(commRes.data);
-      this.commercialTotal.set(commRes.total || 0);
-
-      this.archivedOrdersData.set(histRes.data);
-      this.archivedTotal.set(histRes.total || 0);
-
       this.summary.set(summaryRes);
       this.employees.set(empsRes);
       this.lastLoadedBusinessId = bId;
-    } catch (err) {
-      this.error.set('No se pudieron cargar los datos.');
-      console.error(err);
-    } finally {
-      this.loading.set(false);
-    }
+    } catch (err) { console.error('Error global data:', err); }
+  }
+
+  async loadProduction() {
+    const bId = this.businessId();
+    if (!bId) return;
+    this.loadingProduction.set(true);
+    try {
+      const EXCLUDED_PRODUCTION = 'IN_STOCK,DELIVERED,CANCELLED,SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
+      const res = await this.api.getListing({ 
+        ...this.getCommonParams(), 
+        page: this.productionPage(), 
+        pageSize: this.pageSize, 
+        excludeStatuses: EXCLUDED_PRODUCTION 
+      });
+      this.productionOrdersData.set(res.data);
+      this.productionTotal.set(res.total || 0);
+    } catch (err) { console.error('Error production:', err); }
+    finally { this.loadingProduction.set(false); }
+  }
+
+  async loadCommercial() {
+    const bId = this.businessId();
+    if (!bId) return;
+    this.loadingCommercial.set(true);
+    try {
+      const COMMERCIAL_STATUSES = 'SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
+      const res = await this.api.getListing({ 
+        ...this.getCommonParams(), 
+        page: this.commercialPage(), 
+        pageSize: this.pageSize, 
+        statuses: COMMERCIAL_STATUSES 
+      });
+      this.commercialOrdersData.set(res.data);
+      this.commercialTotal.set(res.total || 0);
+    } catch (err) { console.error('Error commercial:', err); }
+    finally { this.loadingCommercial.set(false); }
+  }
+
+  async loadArchived() {
+    const bId = this.businessId();
+    if (!bId) return;
+    this.loadingArchived.set(true);
+    try {
+      const HISTORY_STATUSES = 'DELIVERED,CANCELLED';
+      const res = await this.api.getListing({ 
+        ...this.getCommonParams(), 
+        page: this.archivedPage(), 
+        pageSize: this.pageSize, 
+        statuses: HISTORY_STATUSES 
+      });
+      this.archivedOrdersData.set(res.data);
+      this.archivedTotal.set(res.total || 0);
+    } catch (err) { console.error('Error archived:', err); }
+    finally { this.loadingArchived.set(false); }
+  }
+
+  onPageSizeChange(size: number) {
+    this.pageSize = size;
+    this.productionPage.set(1);
+    this.commercialPage.set(1);
+    this.archivedPage.set(1);
+    this.loadData();
   }
 
   onProductionPageChange(page: number) {
     this.productionPage.set(page);
-    this.loadData();
+    this.loadProduction();
   }
 
   onCommercialPageChange(page: number) {
     this.commercialPage.set(page);
-    this.loadData();
+    this.loadCommercial();
   }
 
   onArchivedPageChange(page: number) {
     this.archivedPage.set(page);
-    this.loadData();
+    this.loadArchived();
   }
 
   openManageModal(order: Pedido) {
