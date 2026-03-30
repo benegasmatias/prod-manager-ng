@@ -24,7 +24,7 @@
           [class.pointer-events-none]="layoutService.isCollapsed()"
         >
           <span class="text-lg font-bold tracking-tight leading-none text-zinc-900 dark:text-zinc-50 uppercase">ProdManager</span>
-          <span class="text-[10px] text-primary font-bold uppercase tracking-wider mt-0.5">{{ sessionService.activeNegocio()?.nombre || 'Panel Principal' }}</span>
+          <span class="text-[10px] text-primary font-bold uppercase tracking-wider mt-0.5">{{ sessionService.activeNegocio().nombre || 'Panel Principal' }}</span>
         </div>
       </div>
 
