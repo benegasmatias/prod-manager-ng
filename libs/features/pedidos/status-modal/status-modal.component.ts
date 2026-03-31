@@ -1,36 +1,41 @@
-import { 
-  Component, computed, inject, signal, input, Output, 
-  EventEmitter, OnInit, effect 
+import {
+  Component, computed, inject, signal, input, Output,
+  EventEmitter, OnInit, effect
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard, 
-  DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare, 
-  RefreshCw, ChevronDown, ChevronLeft 
+import {
+  LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
+  DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
+  RefreshCw, ChevronDown, ChevronLeft
 } from 'lucide-angular';
 import { Pedido, Employee, OrderStatus } from '@shared/models/pedido';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
+import { MaquinasApiService } from '@core/api/maquinas.api.service';
+import { MaterialesApiService } from '@core/api/materiales.api.service';
 import { SessionService } from '@core/session/session.service';
 import { getNegocioConfig, getStatusLabel, getStatusStyles } from '@shared/utils/negocio-utils';
 import { cn } from '@shared/utils/cn';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
+import { Machine, Material } from '@shared/models';
 
 // Sections
 import { PaymentModuleComponent } from './sections/payment-module.component';
 import { FailureModuleComponent } from './sections/failure-module.component';
 import { MetalurgicaSectionComponent } from './sections/metalurgica-section.component';
+import { Impresion3dSectionComponent, MultiMaterial } from './sections/impresion-3d-section.component';
 
 @Component({
   selector: 'app-order-status-modal',
   standalone: true,
   imports: [
-    CommonModule, 
-    LucideAngularModule, 
+    CommonModule,
+    LucideAngularModule,
     FormsModule,
     PaymentModuleComponent,
     FailureModuleComponent,
     MetalurgicaSectionComponent,
+    Impresion3dSectionComponent,
     AppDatePickerComponent
   ],
   templateUrl: './status-modal.component.html',
@@ -38,6 +43,8 @@ import { MetalurgicaSectionComponent } from './sections/metalurgica-section.comp
 })
 export class OrderStatusModalComponent implements OnInit {
   private api = inject(PedidosApiService);
+  private maquinasApi = inject(MaquinasApiService);
+  private materialesApi = inject(MaterialesApiService);
   private session = inject(SessionService);
 
   order = input<Pedido | null>(null);
@@ -63,6 +70,8 @@ export class OrderStatusModalComponent implements OnInit {
   // Failure Data
   failureReason = signal<string>('');
   failureAction = signal<'REDO' | 'DISCARD' | 'KEEP'>('REDO');
+  wastedTime = signal<number>(0);
+  wastedMaterial = signal<number>(0);
 
   // Metalurgica Specific Data
   tipoTrabajo = signal<string>('');
@@ -75,18 +84,25 @@ export class OrderStatusModalComponent implements OnInit {
   totalPrice = signal<number>(0);
   senia = signal<number>(0);
 
+  // Impresion 3D Specific Data
+  selectedMachineId = signal<string>('');
+  multiMaterials = signal<MultiMaterial[]>([]);
+  machines = signal<Machine[]>([]);
+  materials = signal<Material[]>([]);
+
   // Icons for Template (Senior standard: [img] syntax)
   icons = {
-    Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2, 
-    User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft
+    Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2,
+    User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu
   };
 
   // Derived Values
   rubro = computed(() => this.session.activeNegocio()?.rubro || 'GENERICO');
   isMetalurgica = computed(() => this.rubro() === 'METALURGICA');
-  
+
   config = computed(() => getNegocioConfig(this.rubro()));
-  
+  is3D = computed(() => this.rubro() === 'IMPRESION_3D');
+
   stages = computed(() => {
     const all = this.config().productionStages;
     const order = this.order();
@@ -104,7 +120,7 @@ export class OrderStatusModalComponent implements OnInit {
       if (isMetal) {
         const visitStatusList = ['SITE_VISIT', 'SITE_VISIT_DONE', 'VISITA_REPROGRAMADA', 'VISITA_CANCELADA', 'SURVEY_DESIGN'];
         const budgetStatusList = ['QUOTATION', 'BUDGET_GENERATED', 'BUDGET_REJECTED'];
-        
+
         const isAtVisitPhase = visitStatusList.includes(current);
         const isAtBudgetPhase = budgetStatusList.includes(current);
 
@@ -157,7 +173,7 @@ export class OrderStatusModalComponent implements OnInit {
       // Metalurgica technical data sync
       this.totalPrice.set(Number(order.totalPrice || order.total || 0));
       this.senia.set(Number((order as any).totalSenias || (order as any).senia || 0));
-      
+
       this.visitAddress.set((order?.metadata as any)?.['direccion_obra'] || (order as any)['direccion_obra'] || '');
       this.visitDate.set((order as any)['fecha_visita'] || '');
       this.visitTime.set((order as any)['hora_visita'] || '');
@@ -169,6 +185,24 @@ export class OrderStatusModalComponent implements OnInit {
         this.measurements.set((firstItem as any).medidas || '');
         this.tipoTrabajo.set((firstItem as any).tipo_trabajo || '');
       }
+
+      if (this.is3D()) {
+        this.load3DData();
+      }
+    }
+  }
+
+  async load3DData() {
+    const businessId = this.session.activeNegocio()?.id;
+    if (!businessId) return;
+
+    try {
+      const resp = await this.maquinasApi.getAll(businessId);
+      const mats = await this.materialesApi.getAll(businessId);
+      this.machines.set(resp.data || []);
+      this.materials.set(mats || []);
+    } catch (error) {
+      console.error('Error loading 3D data:', error);
     }
   }
 
@@ -199,11 +233,11 @@ export class OrderStatusModalComponent implements OnInit {
         });
       } else {
         const selectedEmployee = this.employees().find(e => e.id === this.responsableId());
-        
+
         const updateData: any = {
           status: this.status() as OrderStatus,
           responsableGeneralId: this.responsableId() || null,
-          notes: this.notes(), 
+          notes: this.notes(),
           totalPrice: Number(this.totalPrice()) || 0,
         };
 
@@ -228,20 +262,34 @@ export class OrderStatusModalComponent implements OnInit {
               }
               return it;
             }).map((it: any) => {
-               // Limpiar todos los campos que no pertenezcan al DTO CreateOrderItemDto
-               const { 
-                 nombreProducto, precioUnitario, cantidad, senia, seDiseñaSTL, status,
-                 ...cleanIt 
-               } = it;
-               
-               return {
-                 ...cleanIt,
-                 name: it.name || nombreProducto,
-                 price: Number(it.price || precioUnitario) || 0,
-                 qty: Number(it.qty || cantidad) || 1
-               };
+              // Limpiar todos los campos que no pertenezcan al DTO CreateOrderItemDto
+              const {
+                nombreProducto, precioUnitario, cantidad, senia, seDiseñaSTL, status,
+                ...cleanIt
+              } = it;
+
+              return {
+                ...cleanIt,
+                name: it.name || nombreProducto,
+                price: Number(it.price || precioUnitario) || 0,
+                qty: Number(it.qty || cantidad) || 1
+              };
             });
           }
+        }
+
+        if (this.status() === 'IN_PROGRESS' && this.is3D() && this.selectedMachineId()) {
+          const validMaterials = this.multiMaterials().filter(m => m.materialId && m.gramsPerUnit > 0);
+          const metadata = validMaterials.length > 0 ? { materials: validMaterials } : undefined;
+          const firstMaterialId = validMaterials[0]?.materialId || undefined;
+
+          await this.maquinasApi.assignOrder(
+            this.selectedMachineId(),
+            order.id,
+            firstMaterialId,
+            order.negocioId,
+            metadata
+          );
         }
 
         await this.api.update(order.id, updateData);

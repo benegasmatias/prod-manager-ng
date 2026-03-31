@@ -8,9 +8,9 @@ import { firstValueFrom } from 'rxjs';
 export class MaquinasApiService {
   private http = inject(HttpClient);
 
-  async getAll(businessId: string): Promise<Machine[]> {
+  async getAll(businessId: string): Promise<{ data: Machine[], total: number }> {
     return firstValueFrom(
-      this.http.get<Machine[]>(API_ENDPOINTS.MACHINES.LIST, { params: { businessId } })
+      this.http.get<{ data: Machine[], total: number }>(API_ENDPOINTS.MACHINES.LIST, { params: { businessId, page: '1', pageSize: '50' } })
     );
   }
 
@@ -38,9 +38,9 @@ export class MaquinasApiService {
     );
   }
 
-  async assignOrder(machineId: string, orderId: string, materialId?: string, businessId?: string): Promise<void> {
+  async assignOrder(machineId: string, orderId: string, materialId?: string, businessId?: string, metadata?: any): Promise<void> {
     await firstValueFrom(
-      this.http.post<void>(API_ENDPOINTS.MACHINES.ASSIGN(machineId), { orderId, materialId, businessId })
+      this.http.post<void>(API_ENDPOINTS.MACHINES.ASSIGN(machineId), { orderId, materialId, businessId, metadata })
     );
   }
 

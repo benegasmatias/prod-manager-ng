@@ -68,6 +68,10 @@ export const routes: Routes = [
         path: 'reportes',
         loadChildren: () => import('@features/reportes/reportes.routes').then(m => m.REPORTES_ROUTES)
       },
+      {
+        path: 'ajustes',
+        loadChildren: () => import('../../libs/features/ajustes/ajustes.routes').then(m => m.AJUSTES_ROUTES)
+      },
       { path: '**', redirectTo: 'dashboard' }
 
       // Resto de páginas protegidas...

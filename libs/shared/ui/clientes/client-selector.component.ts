@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, computed, inject, ElementRef, HostListener, OnInit, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed, inject, ElementRef, HostListener, OnInit, effect, input, output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, User, Search, ChevronDown, Check, X, UserPlus, Loader2, RefreshCw } from 'lucide-angular';
@@ -39,7 +39,7 @@ import { cn } from '@shared/utils/cn';
               #searchInput
               type="text"
               class="bg-transparent border-none outline-none text-[13px] font-bold w-full text-zinc-900 dark:text-zinc-50 placeholder:text-zinc-400"
-              [placeholder]="'Empiece a escribir para buscar...'"
+              [placeholder]="selectedClient() ? selectedClient()!.name : 'Empiece a escribir para buscar...'"
               [ngModel]="searchTerm()"
               (ngModelChange)="searchTerm.set($event)"
               (click)="$event.stopPropagation()"
@@ -61,7 +61,7 @@ import { cn } from '@shared/utils/cn';
         <div class="flex items-center gap-1 ml-2">
           @if (loading()) {
             <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4 animate-spin text-zinc-400"></lucide-angular>
-          } @else if (value && !isOpen()) {
+          } @else if (value() && !isOpen()) {
             <button 
               type="button"
               (click)="clearSelection($event)"
@@ -91,14 +91,14 @@ import { cn } from '@shared/utils/cn';
                     (click)="selectClient(client)"
                     [class]="cn(
                       'w-full flex flex-col px-4 py-3 rounded-xl text-left transition-all group',
-                      value === client.id 
+                      value() === client.id 
                         ? 'bg-primary/10 text-primary' 
                         : 'hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
                     )"
                   >
                     <div class="flex items-center justify-between w-full">
                       <span class="text-[12px] font-black uppercase tracking-tight">{{ client.name }}</span>
-                      @if (value === client.id) { <lucide-angular [img]="icons.Check" class="h-4 w-4 text-primary"></lucide-angular> }
+                      @if (value() === client.id) { <lucide-angular [img]="icons.Check" class="h-4 w-4 text-primary"></lucide-angular> }
                     </div>
                     @if (client.email || client.phone) {
                       <div class="flex items-center gap-3 mt-0.5 opacity-60">
@@ -147,10 +147,12 @@ export class ClientSelectorComponent implements OnInit {
   private session = inject(SessionService);
   private eRef = inject(ElementRef);
  
+  @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+  
   readonly icons = { User, Search, ChevronDown, Check, X, UserPlus, RefreshCw };
 
-  @Input() value: string = '';
-  @Output() valueChange = new EventEmitter<string>();
+  value = input<string>('');
+  valueChange = output<string>();
   
   @Input() label?: string;
   @Input() placeholder: string = 'Seleccionar cliente...';
@@ -173,7 +175,7 @@ export class ClientSelectorComponent implements OnInit {
   });
 
   selectedClient = computed(() => {
-    return this.clients().find(c => c.id === this.value) || null;
+    return this.clients().find(c => c.id === this.value()) || null;
   });
 
   businessId = computed(() => this.session.activeNegocio()?.id || '');
@@ -182,6 +184,12 @@ export class ClientSelectorComponent implements OnInit {
     effect(() => {
       if (this.businessId()) {
         this.loadClients();
+      }
+    });
+
+    effect(() => {
+      if (this.isOpen()) {
+        setTimeout(() => this.searchInput?.nativeElement.focus(), 0);
       }
     });
   }

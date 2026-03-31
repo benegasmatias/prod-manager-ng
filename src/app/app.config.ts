@@ -44,7 +44,10 @@ import {
   ClipboardList,
   Trees,
   HardHat,
-  PackageSearch
+  PackageSearch,
+  Landmark,
+  Globe,
+  Save
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -95,7 +98,10 @@ export const appConfig: ApplicationConfig = {
         ClipboardList,
         Trees,
         HardHat,
-        PackageSearch
+        PackageSearch,
+        Landmark,
+        Globe,
+        Save
       })
     )
   ]

@@ -113,7 +113,7 @@ export class AppDatePickerComponent {
 
   @Input() label?: string;
   @Input() name: string = '';
-  @Input() placeholder: string = '00/00/0000';
+  @Input() placeholder: string = '';
   @Input() disabled: boolean = false;
   @Input() readOnly: boolean = false;
   @Input() required: boolean = false;
@@ -122,10 +122,10 @@ export class AppDatePickerComponent {
 
   @Input() set minDate(v: string | Date | undefined) { this._minDate.set(v); }
   @Input() set maxDate(v: string | Date | undefined) { this._maxDate.set(v); }
-  
+
   @Input() set allowPastDates(v: boolean) { this._allowPastDates.set(v); }
   @Input() set allowToday(v: boolean) { this._allowToday.set(v); }
-  
+
   @Input() clearable: boolean = true;
   @Input() fullWidth: boolean = true;
   @Input() className: string = '';

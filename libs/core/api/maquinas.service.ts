@@ -29,8 +29,8 @@ export class MaquinasService {
 
     this.loading.set(true);
     try {
-      const data = await this.api.getAll(businessId);
-      this.items.set(data || []);
+      const res = await this.api.getAll(businessId);
+      this.items.set(res.data || []);
       this.loadedBusinessId.set(businessId);
     } catch (e) {
       console.error('Error loadMaquinas:', e);

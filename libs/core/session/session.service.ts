@@ -121,12 +121,14 @@ export class SessionService {
     try {
       const b = await this.api.businesses.update(id, {
         name: updates.nombre,
-        category: updates.rubro
+        category: updates.rubro,
+        currency: updates.moneda
       });
       this._negocios.update(list => list.map(n => n.id === id ? {
         ...n,
         nombre: b.name,
-        rubro: mapCategoryToRubro(b.category)
+        rubro: mapCategoryToRubro(b.category),
+        moneda: b.currency
       } : n));
     } catch (error) {
       console.error('[SessionService] Error updating business:', error);

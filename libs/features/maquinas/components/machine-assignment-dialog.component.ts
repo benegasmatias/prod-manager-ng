@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Machine, Pedido, Material } from '@shared/models';
+import { Pedido, Material } from '@shared/models';
 import { LucideAngularModule, X, ChevronDown, Package, Plus } from 'lucide-angular';
 import { SessionService } from '@core/session/session.service';
+
 
 @Component({
   selector: 'app-machine-assignment-dialog',
@@ -97,7 +98,7 @@ export class MachineAssignmentDialogComponent {
   @Input() pendingOrders: Pedido[] = [];
   @Input() availableMaterials: Material[] = [];
   @Input() loadingOrders = false;
-  
+
   @Output() onAssign = new EventEmitter<{ orderId: string; materialId: string }>();
   @Output() onCancel = new EventEmitter<void>();
 

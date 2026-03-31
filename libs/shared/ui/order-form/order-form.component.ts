@@ -386,10 +386,18 @@ export class OrderFormComponent {
             description: it.description,
             // Move rubric-specific fields to metadata
             metadata: {
-              seDiseñaSTL: it.seDiseñaSTL,
-              tipo_filamento: it.tipo_filamento,
-              precioDiseno: it.precioDiseno,
-              ...it.metadata
+              ...it.metadata,
+              ...(this.rubro() === 'IMPRESION_3D' ? {
+                print3d: {
+                  designsStl: it.seDiseñaSTL,
+                  stlUrl: it.url_stl,
+                  designPrice: it.precioDiseno,
+                  stlFile: it.stlFile,
+                  tipo_filamento: it.tipo_filamento,
+                  peso_gramos: it.peso_gramos,
+                  duracion_estimada_minutos: it.duracion_estimada_minutos
+                }
+              } : {})
             }
           };
 

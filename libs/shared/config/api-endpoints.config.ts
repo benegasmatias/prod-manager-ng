@@ -29,13 +29,13 @@ export const API_ENDPOINTS = {
     ONE: (id: string) => `/materials/${id}`
   },
   MACHINES: {
-    LIST: '/printers/list',
-    ONE: (id: string) => `/printers/${id}`,
-    CREATE: '/printers',
-    UPDATE: (id: string) => `/printers/${id}`,
-    REMOVE: (id: string) => `/printers/${id}`,
-    ASSIGN: (id: string) => `/printers/${id}/assign`,
-    RELEASE: (id: string) => `/printers/${id}/release`
+    LIST: '/machines',
+    ONE: (id: string) => `/machines/${id}`,
+    CREATE: '/machines',
+    UPDATE: (id: string) => `/machines/${id}`,
+    REMOVE: (id: string) => `/machines/${id}`,
+    ASSIGN: (id: string) => `/machines/${id}/assign`,
+    RELEASE: (id: string) => `/machines/${id}/release`
   },
   REPORTS: {
     SUMMARY: '/reports/summary'
@@ -46,8 +46,8 @@ export const API_ENDPOINTS = {
     ONE: (id: string) => `/stock/${id}`
   },
   USERS: {
-    ME: '/users/me',
-    SET_DEFAULT_BUSINESS: '/users/set-default-business'
+    ME: '/me',
+    SET_DEFAULT_BUSINESS: '/me/default-business'
   },
   NOTIFICATIONS: {
     LIST: (businessId?: string) => `/notifications${businessId ? `?businessId=${businessId}` : ''}`,
@@ -55,6 +55,9 @@ export const API_ENDPOINTS = {
     READ_ALL: '/notifications/read-all',
     REMOVE: (id: string) => `/notifications/${id}`,
     REMOVE_ALL: '/notifications/all'
+  },
+  FILES: {
+    UPLOAD: '/files/upload'
   }
 } as const;
 

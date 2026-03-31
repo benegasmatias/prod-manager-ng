@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, inject, computed, input, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Trash2, Check, Plus } from 'lucide-angular';
+import { LucideAngularModule, Trash2, Check, Plus, Upload, Loader2, FileCheck, X } from 'lucide-angular';
 import { MoneyInputComponent } from '@shared/ui/money-input/money-input.component';
+import { FilesApiService } from '@core/api/files.api.service';
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
 
@@ -12,6 +13,7 @@ import { cn } from '@shared/utils/cn';
   imports: [CommonModule, FormsModule, LucideAngularModule, MoneyInputComponent],
   template: `
     <div class="group relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] shadow-sm transition-all hover:shadow-xl hover:shadow-zinc-200/50 dark:hover:shadow-none">
+      <input type="file" #fileInput class="hidden" accept=".stl" (change)="onFileSelected($event)">
       <div [class]="cn('absolute top-0 left-0 w-1.5 h-full opacity-20 group-hover:opacity-100 transition-opacity', rubro() === 'METALURGICA' ? 'bg-indigo-500' : 'bg-primary')"></div>
 
       <div class="p-8 space-y-8">
@@ -116,13 +118,63 @@ import { cn } from '@shared/utils/cn';
                             >
                          </div>
                       } @else {
-                        <input
-                          type="text"
-                          [(ngModel)]="item[f.key]"
-                          (ngModelChange)="onUpdate.emit()"
-                          class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all"
-                          [placeholder]="f.placeholder || ''"
-                        >
+            @if (f.key === 'url_stl' && rubro() === 'IMPRESION_3D') {
+              <div class="flex flex-col gap-3">
+                <input
+                  type="text"
+                  [(ngModel)]="item[f.key]"
+                  (ngModelChange)="onUpdate.emit()"
+                  class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all"
+                  placeholder="URL del STL (Thingiverse, Printables, etc...)"
+                >
+                
+                <div class="flex items-center gap-3">
+                  <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+                  <span class="text-[9px] font-black text-zinc-300 uppercase tracking-widest">O Subir Archivo</span>
+                  <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+                </div>
+
+                @if (!item.stlFile) {
+                  <button
+                    type="button"
+                    (click)="fileInput.click()"
+                    [disabled]="isUploading()"
+                    class="h-12 w-full border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-widest text-zinc-400 hover:border-primary hover:text-primary transition-all disabled:opacity-50"
+                  >
+                    @if (isUploading()) {
+                      <lucide-angular [img]="icons.Loader2" class="h-4 w-4 animate-spin"></lucide-angular>
+                      Subiendo...
+                    } @else {
+                      <lucide-angular [img]="icons.Upload" class="h-4 w-4"></lucide-angular>
+                      Seleccionar Archivo .STL
+                    }
+                  </button>
+                } @else {
+                  <div class="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10 animate-in zoom-in-95 duration-300">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                      <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                        <lucide-angular [img]="icons.FileCheck" class="h-4 w-4"></lucide-angular>
+                      </div>
+                      <div class="flex flex-col overflow-hidden">
+                        <span class="text-[11px] font-black text-primary truncate">{{ item.stlFile.fileName }}</span>
+                        <span class="text-[9px] font-bold text-primary/50 uppercase tracking-tighter">{{ (item.stlFile.size / 1024 / 1024) | number:'1.1-2' }} MB</span>
+                      </div>
+                    </div>
+                    <button type="button" (click)="clearFile()" class="h-8 w-8 rounded-lg hover:bg-rose-500 hover:text-white text-zinc-300 transition-all flex items-center justify-center">
+                      <lucide-angular [img]="icons.X" class="h-3.5 w-3.5"></lucide-angular>
+                    </button>
+                  </div>
+                }
+              </div>
+            } @else {
+              <input
+                type="text"
+                [(ngModel)]="item[f.key]"
+                (ngModelChange)="onUpdate.emit()"
+                class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all"
+                [placeholder]="f.placeholder || ''"
+              >
+            }
                       }
                     </div>
                   }
@@ -177,10 +229,37 @@ export class ItemDetailsFormComponent {
   rubro = input.required<Rubro>();
   orderType = input<'CUSTOMER' | 'STOCK'>('CUSTOMER');
   
+  private filesApi = inject(FilesApiService);
+  
   @Output() onRemove = new EventEmitter<void>();
   @Output() onUpdate = new EventEmitter<void>();
  
-  readonly icons = { Trash2, Check, Plus };
+  readonly icons = { Trash2, Check, Plus, Upload, Loader2, FileCheck, X };
+  isUploading = signal(false);
+
+  async onFileSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    this.isUploading.set(true);
+    try {
+      const res = await this.filesApi.uploadFile(file);
+      this.item.stlFile = res;
+      this.onUpdate.emit();
+    } catch (error) {
+      console.error('Upload failed', error);
+      alert('Error al subir el archivo');
+    } finally {
+      this.isUploading.set(false);
+      // Reset input
+      event.target.value = '';
+    }
+  }
+
+  clearFile() {
+    this.item.stlFile = undefined;
+    this.onUpdate.emit();
+  }
 
   metalTemplates = [
     { label: 'Portón', data: { tipo_trabajo: 'Portón', typeAperture: 'CORREDIZO', material_estructura: 'Caño 40x40', fillMaterial: 'CHAPA' } },

@@ -7,7 +7,6 @@ import { MaterialesService } from '@core/api/materiales.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { Machine, Pedido, Material } from '@shared/models';
 import { LucideAngularModule, Plus, ChevronDown, Cpu } from 'lucide-angular';
-import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 import { cn } from '@shared/utils/cn';
 
 import { MachineCardComponent } from './components/machine-card.component';
@@ -19,10 +18,10 @@ import { MachineDetailSheetComponent } from './components/machine-detail-sheet.c
   selector: 'app-maquinas',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    LucideAngularModule, 
-    ButtonSpinnerComponent,
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+
     MachineCardComponent,
     MachineFormDialogComponent,
     MachineAssignmentDialogComponent,
@@ -41,7 +40,7 @@ export class MaquinasPageComponent {
   saving = this.maquinasService.saving;
   maquinas = this.maquinasService.items;
   stats = this.maquinasService.stats;
-  
+
   // Local state
   negocio = this.sessionService.activeNegocio;
   config = this.sessionService.config;
@@ -51,7 +50,7 @@ export class MaquinasPageComponent {
   isDialogOpen = signal(false);
   selectedMachineId = signal<string | null>(null);
   selectedMachineData = signal<Partial<Machine> | null>(null);
-  
+
   // Assignment states
   isAssignDialogOpen = signal(false);
   pendingOrders = signal<Pedido[]>([]);
@@ -123,16 +122,16 @@ export class MaquinasPageComponent {
     this.selectedMachineId.set(machine.id);
     this.isAssignDialogOpen.set(true);
     this.loadingOrders.set(true);
-    
+
     try {
       const businessId = this.negocio()?.id;
       if (!businessId) return;
 
       const [ordersRes] = await Promise.all([
         this.pedidosApi.getListing({ businessId, status: 'PENDING', pageSize: 100 }),
-        this.materialesService.loadMateriales() 
+        this.materialesService.loadMateriales()
       ]);
-      
+
       this.pendingOrders.set(ordersRes.data || []);
       this.availableMaterials.set(this.materialesService.items());
     } catch (e) {
@@ -147,8 +146,8 @@ export class MaquinasPageComponent {
     if (!machineId) return;
 
     await this.maquinasService.assignOrder(
-      machineId, 
-      event.orderId, 
+      machineId,
+      event.orderId,
       event.materialId || undefined
     );
     this.isAssignDialogOpen.set(false);

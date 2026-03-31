@@ -1,5 +1,6 @@
 import { Component, inject, signal, ViewChild, ElementRef, model, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Building2, ChevronDown, Plus, Settings, Monitor, Trash2, X } from 'lucide-angular';
 import { SessionService } from '../../../session/session.service';
@@ -18,6 +19,7 @@ export class BusinessSelectorComponent {
   
   sessionService = inject(SessionService);
   confirmService = inject(ConfirmService);
+  private router = inject(Router);
   
   dropdownOpen = signal(false);
   isDialogOpen = signal(false);
@@ -39,12 +41,9 @@ export class BusinessSelectorComponent {
 
   handleOpenEdit(event: Event, negocio: Negocio) {
     event.stopPropagation();
-    this.editingId.set(negocio.id);
-    this.formNombre.set(negocio.nombre);
-    this.formRubro.set(negocio.rubro);
-    this.isDialogOpen.set(true);
     this.dropdownOpen.set(false);
-    this.businessDialog.nativeElement.showModal();
+    this.sessionService.setActiveId(negocio.id);
+    this.router.navigate(['/ajustes']);
   }
 
   async handleSave() {
