@@ -6,7 +6,7 @@ import { Rubro, FeatureCode, UserRole, BusinessFeatureConfig, RolePermissionsCon
  */
 export const BUSINESS_FEATURES: Record<Rubro, BusinessFeatureConfig> = {
   IMPRESION_3D: {
-    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'MACHINERY', 'MATERIALS', 'STOCK', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'MATERIALS', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   METALURGICA: {

@@ -1,0 +1,267 @@
+<div class="space-y-8 pb-10 fade-in animate-in">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2 mb-1">
+              <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse w-min"></div>
+              <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Relaciones CRM</span>
+          </div>
+          <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              Cartera de <span class="text-primary italic">Clientes</span>
+          </h1>
+          <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed">
+              Base de datos centralizada de clientes, historial de pedidos y perfiles de contacto operativo.
+          </p>
+      </div>
+      <button
+          class="h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] flex items-center gap-2"
+          (click)="handleNewClient()"
+      >
+          <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nuevo Cliente
+      </button>
+  </div>
+
+  <!-- Dashboard Stats Section -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="relative overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm group">
+          <div class="absolute top-0 right-0 p-8 opacity-5 transition-opacity group-hover:opacity-10">
+              <lucide-angular [img]="icons.User" class="h-20 w-20 text-primary"></lucide-angular>
+          </div>
+          <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Total Clientes</span>
+          <div class="flex items-end gap-3">
+              <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().total }}</h3>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 bg-emerald-500/10 text-emerald-500">Registrados</span>
+          </div>
+      </div>
+
+      <div class="relative overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm group">
+          <div class="absolute top-0 right-0 p-8 opacity-5 transition-opacity group-hover:opacity-10">
+              <lucide-angular [img]="icons.DollarSign" class="h-20 w-20 text-emerald-500"></lucide-angular>
+          </div>
+          <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Clientes VIP</span>
+          <div class="flex items-end gap-3">
+              <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().vip }}</h3>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 bg-amber-500/10 text-amber-500">En Página Actual</span>
+          </div>
+      </div>
+
+      <div class="relative overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm group">
+          <div class="absolute top-0 right-0 p-8 opacity-5 transition-opacity group-hover:opacity-10">
+              <lucide-angular [img]="icons.Plus" class="h-20 w-20 text-blue-500"></lucide-angular>
+          </div>
+          <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Registrados (Mes)</span>
+          <div class="flex items-end gap-3">
+              <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().nuevosMes }}</h3>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 bg-blue-500/10 text-blue-500">Nuevos Visibles</span>
+          </div>
+      </div>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <div class="flex flex-col md:flex-row gap-4 items-center bg-white/70 dark:bg-zinc-900/40 p-4 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm">
+      <div class="relative flex-1 w-full group">
+          <lucide-angular [img]="icons.Search" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors duration-200"></lucide-angular>
+          <input
+              type="text"
+              [ngModel]="searchTerm()"
+              (ngModelChange)="onSearchChange($event)"
+              placeholder="Buscar por nombre, email o teléfono..."
+              class="h-11 w-full rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-950"
+          />
+      </div>
+  </div>
+
+  <!-- Desktop Table View -->
+  <div class="hidden md:block overflow-hidden bg-white dark:bg-zinc-900/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm">
+      <table class="w-full text-left text-sm text-zinc-500">
+          <thead class="bg-transparent border-b border-zinc-100 dark:border-zinc-800/50">
+              <tr>
+                  <th scope="col" class="h-16 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 font-normal px-8">Identidad</th>
+                  <th scope="col" class="h-16 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 font-normal px-6">Canal de Contacto</th>
+                  <th scope="col" class="h-16 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 font-normal px-6">Fidelización</th>
+                  <th scope="col" class="h-16 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 font-normal px-8 text-right">Acciones</th>
+              </tr>
+          </thead>
+          <tbody>
+              @if (clientes().length > 0) {
+                  @for (client of clientes(); track client.id) {
+                      <tr
+                          (click)="goToClient(client.id)"
+                          class="group transition-colors hover:bg-zinc-50/30 dark:hover:bg-zinc-900/40 border-b border-zinc-50 dark:border-zinc-800/30 cursor-pointer"
+                      >
+                          <td class="px-8 py-5">
+                              <div class="flex items-center gap-4">
+                                  <div class="h-12 w-12 flex-shrink-0 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+                                      {{ client.name.charAt(0).toUpperCase() }}
+                                  </div>
+                                  <div class="flex flex-col gap-0.5">
+                                      <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-primary transition-colors truncate max-w-[200px]">{{ client.name }}</span>
+                                      <div class="flex items-center gap-2">
+                                          <div class="h-1 w-1 rounded-full bg-emerald-500"></div>
+                                          <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-tight">Activo</span>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                          <td class="px-6 py-5">
+                              <div class="space-y-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                                  <div class="flex items-center gap-2">
+                                      <lucide-angular [img]="icons.Mail" class="h-3 w-3 text-zinc-400"></lucide-angular>
+                                      @if (client.email) {
+                                          <span class="truncate max-w-[150px] inline-block">{{ client.email }}</span>
+                                      } @else {
+                                          <span class="text-zinc-300 italic">Sin email</span>
+                                      }
+                                  </div>
+                                  <div class="flex items-center gap-2">
+                                      <lucide-angular [img]="icons.Phone" class="h-3 w-3 text-zinc-400"></lucide-angular>
+                                      @if (client.phone) {
+                                          {{ client.phone }}
+                                      } @else {
+                                          <span class="text-zinc-300 italic">Sin teléfono</span>
+                                      }
+                                  </div>
+                              </div>
+                          </td>
+                          <td class="px-6 py-5">
+                              <div class="inline-flex flex-col gap-1.5 align-baseline">
+                                  <div class="w-fit flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 text-[10px] font-bold text-primary border border-primary/10">
+                                      <lucide-angular [img]="icons.DollarSign" class="h-3 w-3"></lucide-angular> {{ client.totalOrders || 0 }} PEDIDOS
+                                  </div>
+                                  @if ((client.totalOrders || 0) > 5) {
+                                      <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-widest ml-1">Cliente VIP</span>
+                                  }
+                              </div>
+                          </td>
+                          <td class="px-8 py-5 text-right">
+                              <div class="flex items-center justify-end gap-2 transition-all">
+                                  <button class="h-10 w-10 flex flex-shrink-0 items-center justify-center rounded-xl hover:bg-white dark:hover:bg-zinc-800 shadow-sm transition-all border border-transparent hover:border-zinc-200 hover:text-primary" (click)="handleEdit($event, client)" title="Editar Cliente">
+                                      <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+                                  </button>
+                                  <button class="h-10 w-10 flex flex-shrink-0 items-center justify-center rounded-xl hover:bg-white dark:hover:bg-zinc-800 shadow-sm transition-all border border-transparent hover:border-zinc-200 hover:text-primary" (click)="goToClient(client.id); $event.stopPropagation();" title="Ver Detalle">
+                                      <lucide-angular [img]="icons.ExternalLink" class="h-4 w-4"></lucide-angular>
+                                  </button>
+                                  <button class="h-10 w-10 flex flex-shrink-0 items-center justify-center rounded-xl transition-all border border-transparent hover:bg-rose-900/20 hover:text-rose-500 hover:border-rose-100" (click)="handleDelete($event, client)" title="Eliminar Cliente">
+                                      <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>
+                  }
+              } @else {
+                  <tr>
+                      <td colspan="5" class="h-64 text-center">
+                          <div class="flex flex-col items-center justify-center gap-4">
+                              <div class="h-16 w-16 rounded-3xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center">
+                                  @if (loading()) {
+                                    <div class="h-6 w-6 border-4 border-zinc-200 border-t-primary rounded-full animate-spin"></div>
+                                  } @else {
+                                    <lucide-angular [img]="icons.User" class="h-8 w-8 text-zinc-200 dark:text-zinc-800"></lucide-angular>
+                                  }
+                              </div>
+                              <div class="space-y-1">
+                                  <p class="text-sm font-bold text-zinc-400 uppercase tracking-widest">
+                                      {{ loading() ? 'Sincronizando clientes...' : 'Sin registros encontrados' }}
+                                  </p>
+                                  <p class="text-xs text-zinc-400 italic">Probá ajustando los términos de búsqueda</p>
+                              </div>
+                          </div>
+                      </td>
+                  </tr>
+              }
+          </tbody>
+      </table>
+      
+      @if (clientes().length > 0) {
+        <div class="border-t border-zinc-100 dark:border-zinc-800/50">
+          <app-paginator 
+            [totalItems]="total()" 
+            [pageSize]="pageSize()" 
+            [currentPage]="page()" 
+            (pageChange)="onPageChange($event)">
+          </app-paginator>
+        </div>
+      }
+  </div>
+
+  <!-- Mobile Cards View -->
+  <div class="grid grid-cols-1 gap-6 md:hidden">
+      @for (client of clientes(); track client.id) {
+          <div class="group relative p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/40 shadow-sm transition-all hover:shadow-xl">
+              <div class="flex items-start justify-between mb-8">
+                  <div class="flex items-center gap-4 truncate">
+                      <div class="h-14 w-14 flex-shrink-0 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+                          {{ client.name.charAt(0).toUpperCase() }}
+                      </div>
+                      <div class="truncate">
+                          <p class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight group-hover:text-primary transition-colors truncate">{{ client.name }}</p>
+                          <div class="flex items-center gap-2 mt-1.5">
+                              <div class="h-1 w-1 rounded-full bg-emerald-500"></div>
+                              <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Activo</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                      <button class="h-10 w-10 flex items-center justify-center rounded-xl border-transparent transition-all bg-zinc-50 dark:bg-zinc-800" (click)="handleEdit($event, client)">
+                          <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+                      </button>
+                      <button class="h-10 w-10 flex items-center justify-center rounded-xl border-transparent transition-all bg-rose-50 dark:bg-rose-900/20 text-rose-500" (click)="handleDelete($event, client)">
+                          <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+                      </button>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 pb-8 mb-8 border-b border-zinc-50 dark:border-zinc-800/50">
+                  <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 rounded-2xl">
+                      <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-zinc-400"></lucide-angular>
+                      @if (client.email) { <span class="truncate">{{ client.email }}</span> } @else { <span class="text-zinc-300 italic">Sin datos</span> }
+                  </div>
+                  <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 rounded-2xl">
+                      <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-zinc-400"></lucide-angular>
+                      @if (client.phone) { {{ client.phone }} } @else { <span class="text-zinc-300 italic">Sin datos</span> }
+                  </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-4">
+                  <div class="px-4 py-1.5 rounded-full bg-primary/10 text-[10px] font-bold text-primary border border-primary/10 uppercase tracking-widest flex-shrink-0">
+                      {{ client.totalOrders || 0 }} Pedidos
+                  </div>
+                  <button (click)="goToClient(client.id)" class="w-full flex-1 h-11 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 shadow-lg shadow-zinc-900/10 active:scale-95 transition-all">
+                      Expediente
+                  </button>
+              </div>
+          </div>
+      }
+      
+      @if (clientes().length === 0 && !loading()) {
+          <div class="py-24 text-center flex flex-col items-center justify-center gap-6 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10">
+              <div class="h-20 w-20 rounded-[2.5rem] bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center">
+                  <lucide-angular [img]="icons.User" class="h-10 w-10 text-zinc-200 dark:text-zinc-800"></lucide-angular>
+              </div>
+              <div class="space-y-2">
+                  <p class="font-bold text-zinc-400 uppercase tracking-widest text-xs">Sin coincidencias</p>
+                  <p class="text-[11px] text-zinc-400 italic px-10 leading-relaxed">No encontramos clientes con los criterios de búsqueda actuales.</p>
+              </div>
+          </div>
+      }
+      @if (clientes().length > 0) {
+        <app-paginator 
+          [totalItems]="total()" 
+          [pageSize]="pageSize()" 
+          [currentPage]="page()" 
+          (pageChange)="onPageChange($event)">
+        </app-paginator>
+      }
+  </div>
+
+  <!-- Dialog Form -->
+  @if(isFormOpen()) {
+    <app-cliente-form-dialog
+        [open]="isFormOpen()"
+        [initialData]="editingClient()"
+        [isSaving]="isSaving()"
+        (onOpenChange)="isFormOpen.set($event)"
+        (onSave)="handleSaveCliente($event)"
+    ></app-cliente-form-dialog>
+  }
+</div>

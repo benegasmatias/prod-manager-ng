@@ -4,6 +4,9 @@ export type OrderStatus =
   | 'SITE_VISIT' | 'SITE_VISIT_DONE' | 'VISITA_REPROGRAMADA' | 'VISITA_CANCELADA' | 'QUOTATION' | 'BUDGET_GENERATED' | 'BUDGET_REJECTED' | 'SURVEY_DESIGN' | 'APPROVED' | 'OFFICIAL_ORDER' | 'CUTTING' | 'WELDING' | 'ASSEMBLY' | 'PAINTING' | 'INSTALACION_OBRA'
   | 'ARMADO' | 'BARNIZADO' | 'RE_WORK' | 'READY';
 
+import { Employee } from './employee';
+export type { Employee };
+
 export const ORDER_STATUS = {
   PENDING: 'PENDING',
   WAITING_MATERIALS: 'WAITING_MATERIALS',
@@ -33,16 +36,6 @@ export interface Client {
   email?: string;
   phone?: string;
   address?: string;
-}
-
-export interface Employee {
-  id: string;
-  firstName: string;
-  lastName?: string;
-  active: boolean;
-  phone?: string;
-  email?: string;
-  specialties?: string;
 }
 
 export interface Payment {

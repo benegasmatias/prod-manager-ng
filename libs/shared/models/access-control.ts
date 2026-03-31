@@ -4,10 +4,11 @@ import { Rubro } from './negocio';
  * All possible capabilities/modules in the system.
  * This represents the "What" can be done.
  */
-export type FeatureCode = 
+export type FeatureCode =
   | 'DASHBOARD'
   | 'CLIENTS'
   | 'ORDERS'
+  | 'ORDERS_PRODUCTION'
   | 'VISITS'
   | 'QUOTES'
   | 'PRINT_QUEUE'
@@ -24,7 +25,7 @@ export type FeatureCode =
  * Specific permissions for user authorization.
  * This represents the "Who" can do what.
  */
-export type PermissionAction = 
+export type PermissionAction =
   | 'VIEW'
   | 'CREATE'
   | 'EDIT'
@@ -34,7 +35,7 @@ export type PermissionAction =
 /**
  * User roles in the system.
  */
-export type UserRole = 
+export type UserRole =
   | 'OWNER'
   | 'ADMIN'
   | 'EMPLOYEE'

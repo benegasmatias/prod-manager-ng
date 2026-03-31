@@ -30,3 +30,5 @@ Quiero que me propongas:
 
 
 No hagas cambios masivos innecesarios. Priorizá soluciones incrementales, seguras y fáciles de integrar sin romper otras pantallas.
+
+* Regla obligatoria: Siempre usar `<app-button-spinner>` en botones que hacen peticiones a la API para mostrar estados de carga.

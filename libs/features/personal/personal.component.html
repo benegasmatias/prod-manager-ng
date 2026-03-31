@@ -1,0 +1,371 @@
+<div class="space-y-8 pb-10 px-8 pt-8 animate-in fade-in duration-500">
+  <!-- Header Area -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-2 mb-1">
+        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Recursos Humanos</span>
+      </div>
+      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 text-left">
+        Equipo <span class="text-primary italic">de Trabajo</span>
+      </h1>
+      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed text-left">
+        Administración de operarios, roles de producción y seguimiento de desempeño del personal operativo.
+      </p>
+    </div>
+    <button
+      (click)="openNew()"
+      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2"
+    >
+      <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Agregar Integrante
+    </button>
+  </div>
+
+  <!-- Dashboard Stats Section -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm text-left">
+      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+        <lucide-angular [img]="icons.HardHat" class="h-20 w-20 text-primary"></lucide-angular>
+      </div>
+      <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Total Personal</span>
+      <div class="flex items-end gap-3">
+        <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().total }}</h3>
+        <span class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full mb-1">Registrados</span>
+      </div>
+    </div>
+
+    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm text-left">
+      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+        <lucide-angular [img]="icons.Award" class="h-20 w-20 text-blue-500"></lucide-angular>
+      </div>
+      <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Activos Hoy</span>
+      <div class="flex items-end gap-3">
+        <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().active }}</h3>
+        <span class="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full mb-1">Operativos</span>
+      </div>
+    </div>
+
+    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm text-left">
+      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+        <lucide-angular [img]="icons.Search" class="h-20 w-20 text-zinc-400"></lucide-angular>
+      </div>
+      <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Especialidades</span>
+      <div class="flex items-end gap-3">
+        <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().specialties }}</h3>
+        <span class="text-[10px] font-bold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full mb-1">Categorías</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <div class="flex flex-col md:flex-row gap-4 items-center bg-white/70 dark:bg-zinc-900/40 p-4 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm">
+    <div class="relative flex-1 w-full group">
+      <lucide-angular [img]="icons.Search" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors duration-200"></lucide-angular>
+      <input
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Buscar por nombre o especialidad..."
+        class="h-11 w-full rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-950"
+      >
+    </div>
+  </div>
+
+  <!-- Desktop Table View -->
+  <div class="hidden lg:block overflow-hidden bg-white dark:bg-zinc-900/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800/50">
+          <th class="h-16 px-8 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Integrante</th>
+          <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Especialidad</th>
+          <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Canal de Contacto</th>
+          <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 text-center">Estado</th>
+          <th class="h-16 px-8 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (staff of filteredStaff(); track staff.id) {
+          <tr
+            [class]="cn(
+              'group transition-colors hover:bg-zinc-50/30 dark:hover:bg-zinc-900/40 border-b border-zinc-50 dark:border-zinc-800/30',
+              !staff.active && 'opacity-60 grayscale-[0.5]'
+            )"
+          >
+            <td class="px-8 py-5">
+              <div class="flex items-center gap-4">
+                <div [class]="cn(
+                  'h-12 w-12 rounded-2xl flex items-center justify-center font-bold transition-all duration-300',
+                  staff.active 
+                    ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary'
+                    : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300'
+                )">
+                  {{ staff.firstName.charAt(0).toUpperCase() }}
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-primary transition-colors">
+                    {{ staff.firstName }} {{ staff.lastName }}
+                  </span>
+                  <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-tight text-left">
+                    ID {{ staff.id.slice(0, 8) }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <div class="inline-flex items-center px-3 py-1 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 border border-zinc-100 dark:border-zinc-800 uppercase tracking-widest">
+                {{ staff.specialties || 'General' }}
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                  <lucide-angular [img]="icons.Mail" class="h-3 w-3 text-zinc-400"></lucide-angular>
+                  {{ staff.email || 'Sin email' }}
+                </div>
+                <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                  <lucide-angular [img]="icons.Phone" class="h-3 w-3 text-zinc-400"></lucide-angular>
+                  {{ staff.phone || 'Sin teléfono' }}
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <div class="flex justify-center">
+                <span [class]="cn(
+                  'inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border transform transition-transform group-hover:scale-105',
+                  staff.active
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10'
+                    : 'bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700'
+                )">
+                  <span [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')" />
+                  {{ staff.active ? 'ACTIVO' : 'INACTIVO' }}
+                </span>
+              </div>
+            </td>
+            <td class="px-8 py-5 text-right">
+              <div class="flex items-center justify-end gap-2 transition-all">
+                <button
+                  (click)="editStaff(staff)"
+                  class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-800 hover:text-primary shadow-sm transition-all border border-transparent hover:border-zinc-200 flex items-center justify-center text-zinc-500"
+                >
+                  <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+                </button>
+
+                <button
+                  (click)="handleToggleStatus(staff)"
+                  [class]="cn(
+                    'h-10 w-10 rounded-xl transition-all shadow-sm border border-transparent hover:border-zinc-200 flex items-center justify-center text-zinc-500',
+                    staff.active
+                      ? 'hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-500'
+                      : 'hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-500'
+                  )"
+                >
+                  <lucide-angular [img]="icons.Power" class="h-4 w-4"></lucide-angular>
+                </button>
+
+                <button
+                  (click)="handleDelete(staff)"
+                  class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-rose-900/20 hover:text-rose-500 shadow-sm transition-all border border-transparent hover:border-rose-100 flex items-center justify-center text-zinc-500"
+                >
+                  <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colSpan="5" class="h-64 text-center">
+              <div class="flex flex-col items-center justify-center gap-4">
+                <div class="h-16 w-16 rounded-3xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800">
+                  <lucide-angular [img]="icons.HardHat" class="h-8 w-8 text-zinc-200 dark:text-zinc-800"></lucide-angular>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-zinc-400 uppercase tracking-widest">
+                    {{ loading() ? 'Sincronizando equipo...' : 'Sin registros encontrados' }}
+                  </p>
+                  <p class="text-xs text-zinc-400 italic">Probá ajustando los términos de búsqueda</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Cards View -->
+  <div class="grid grid-cols-1 gap-6 lg:hidden">
+    @for (staff of filteredStaff(); track staff.id) {
+      <div [class]="cn(
+        'group relative p-8 rounded-[2.5rem] border transition-all hover:shadow-xl animate-slide-up text-left',
+        staff.active 
+          ? 'bg-white dark:bg-zinc-900/40 border-zinc-100 dark:border-zinc-800/50 shadow-sm'
+          : 'bg-zinc-50/50 dark:bg-zinc-950/20 border-zinc-100 dark:border-zinc-800/30 opacity-70'
+      )">
+        <div class="flex items-start justify-between mb-8">
+          <div class="flex items-center gap-4">
+            <div [class]="cn(
+              'h-14 w-14 rounded-2xl flex items-center justify-center font-bold transition-all duration-300 shadow-sm',
+              staff.active 
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary'
+                : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300'
+            )">
+              {{ staff.firstName.charAt(0).toUpperCase() }}
+            </div>
+            <div class="space-y-1">
+              <p class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight group-hover:text-primary transition-colors text-base">
+                {{ staff.firstName }} {{ staff.lastName }}
+              </p>
+              <div class="flex items-center gap-2">
+                <span [class]="cn('h-1.5 w-1.5 rounded-full', staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')" />
+                <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest text-left">
+                  {{ staff.active ? 'Activo' : 'Inactivo' }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <button (click)="editStaff(staff)" class="h-10 w-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-transparent shadow-sm flex items-center justify-center flex-shrink-0 text-zinc-500">
+            <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 pb-8 mb-8 border-b border-zinc-50 dark:border-zinc-800/50">
+          <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-transparent dark:border-zinc-800/50">
+            <lucide-angular [img]="icons.Award" class="h-4 w-4 text-primary"></lucide-angular>
+            <span class="uppercase tracking-widest font-bold text-[10px]">{{ staff.specialties || 'General' }}</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-transparent dark:border-zinc-800/50">
+            <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-zinc-400"></lucide-angular>
+            <span class="truncate">{{ staff.email || '—' }}</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-transparent dark:border-zinc-800/50">
+            <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-zinc-400"></lucide-angular>
+            <span>{{ staff.phone || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+          <button
+            (click)="handleToggleStatus(staff)"
+            [class]="cn(
+              'flex-1 h-11 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] border shadow-sm transition-all active:scale-95 flex items-center justify-center',
+              staff.active
+                ? 'text-rose-600 border-rose-100 bg-white hover:bg-rose-500 hover:text-white hover:border-rose-500'
+                : 'text-emerald-600 border-emerald-100 bg-white hover:bg-emerald-500 hover:text-white hover:border-emerald-500'
+            )"
+          >
+            <lucide-angular [img]="icons.Power" class="h-3.5 w-3.5 mr-2"></lucide-angular> {{ staff.active ? 'Baja' : 'Alta' }}
+          </button>
+          
+          <button
+            (click)="handleDelete(staff)"
+            class="h-11 w-11 rounded-2xl bg-rose-50 dark:bg-rose-900/20 text-rose-500 border-transparent hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center flex-shrink-0"
+          >
+            <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal Creation/Edit -->
+@if (isFormOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-4 slide-in-from-bottom-4 animate-in duration-300">
+      <div class="p-8 border-b border-zinc-50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
+          <div class="flex items-center gap-4 text-left">
+              <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
+                <lucide-angular [img]="icons.HardHat" class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
+              </div>
+              <div class="space-y-1">
+                  <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                    {{ editingStaffId() ? 'Editar Integrante' : 'Nuevo Integrante' }}
+                  </h2>
+                  <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
+                    Recursos Humanos / Equipo
+                  </p>
+              </div>
+          </div>
+          <button (click)="isFormOpen.set(false)" class="absolute right-8 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors">
+            <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
+          </button>
+      </div>
+
+      <div class="p-8 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+        <div class="grid grid-cols-2 gap-4 text-left">
+          <div class="space-y-2.5">
+              <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 block text-left">Nombre</label>
+              <input
+                  [ngModel]="formFirstName()"
+                  (ngModelChange)="formFirstName.set($event)"
+                  placeholder="Ej: Juan"
+                  class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+              />
+          </div>
+          <div class="space-y-2.5 text-left">
+              <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 block text-left">Apellido</label>
+              <input
+                  [ngModel]="formLastName()"
+                  (ngModelChange)="formLastName.set($event)"
+                  placeholder="Ej: Pérez"
+                  class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+              />
+          </div>
+        </div>
+
+        <div class="space-y-2.5 text-left">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 block text-left">Especialidad / Rol</label>
+            <input
+                [ngModel]="formSpecialties()"
+                (ngModelChange)="formSpecialties.set($event)"
+                placeholder="Ej: Diseño, Operario, Logística"
+                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+            />
+        </div>
+
+        <div class="space-y-2.5 text-left">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 block text-left">Email de Contacto</label>
+            <input
+                [ngModel]="formEmail()"
+                (ngModelChange)="formEmail.set($event)"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+            />
+        </div>
+
+        <div class="space-y-2.5 text-left">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 block text-left">Teléfono / WhatsApp</label>
+            <input
+                [ngModel]="formPhone()"
+                (ngModelChange)="formPhone.set($event)"
+                placeholder="+54 9..."
+                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+            />
+        </div>
+      </div>
+
+      <div class="p-8 pt-0 flex flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
+        <button
+            (click)="isFormOpen.set(false)"
+            [disabled]="saving()"
+            class="rounded-2xl font-bold h-12 px-6 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
+        >
+            Cancelar
+        </button>
+
+        <button
+            (click)="handleSave()"
+            [disabled]="saving()"
+            class="flex items-center justify-center rounded-2xl font-bold h-12 px-10 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+            @if (saving()) {
+                <app-button-spinner text="Guardando..."></app-button-spinner>
+            } @else {
+                {{ editingStaffId() ? 'Actualizar Datos' : 'Registrar Integrante' }}
+            }
+        </button>
+      </div>
+    </div>
+  </div>
+}

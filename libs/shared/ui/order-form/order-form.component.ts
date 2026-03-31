@@ -119,6 +119,7 @@ import { cn } from '@shared/utils/cn';
                  [item]="item"
                  [config]="config()"
                  [rubro]="rubro()"
+                 [orderType]="orderType()"
                  [canRemove]="items().length > 1"
                  (onRemove)="removeItem($index)"
                  (onUpdate)="recalcTotales()"
@@ -153,25 +154,29 @@ import { cn } from '@shared/utils/cn';
 
                     <!-- Main Price -->
                     <div class="flex justify-between items-center">
-                       <span class="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-950">Total Pedido</span>
+                       <span class="text-[11px] font-black uppercase tracking-[0.15em] text-zinc-950">
+                         {{ orderType() === 'STOCK' ? 'Valor Est. Inventario' : 'Total Pedido' }}
+                       </span>
                        <span class="text-2xl font-black text-zinc-950 tabular-nums">{{ totales().total | currency }}</span>
                     </div>
 
-                    <!-- Advance / Deposit -->
-                    <div class="flex justify-between items-center animate-in slide-in-from-right duration-500">
-                       <span class="text-[10px] font-black uppercase tracking-[0.15em] text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">T. Adelantos</span>
-                       <span class="text-lg font-black text-emerald-500 tabular-nums">- {{ totales().totalSenias | currency }}</span>
-                    </div>
+                    @if (orderType() !== 'STOCK') {
+                      <!-- Advance / Deposit -->
+                      <div class="flex justify-between items-center animate-in slide-in-from-right duration-500">
+                         <span class="text-[10px] font-black uppercase tracking-[0.15em] text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">T. Adelantos</span>
+                         <span class="text-lg font-black text-emerald-500 tabular-nums">- {{ totales().totalSenias | currency }}</span>
+                      </div>
 
-                    <div class="h-[1px] bg-zinc-100 my-4"></div>
+                      <div class="h-[1px] bg-zinc-100 my-4"></div>
 
-                    <!-- Final Balance -->
-                    <div class="flex flex-col gap-1">
-                       <span class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">Saldo Pendiente</span>
-                       <div class="flex items-baseline gap-2">
-                          <span class="text-5xl font-black text-zinc-950 tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency }}</span>
-                       </div>
-                    </div>
+                      <!-- Final Balance -->
+                      <div class="flex flex-col gap-1">
+                         <span class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">Saldo Pendiente</span>
+                         <div class="flex items-baseline gap-2">
+                            <span class="text-5xl font-black text-zinc-950 tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency }}</span>
+                         </div>
+                      </div>
+                    }
 
                     <div class="pt-4">
                       <button
@@ -208,9 +213,15 @@ export class OrderFormComponent {
 
   readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw };
 
-  @Input() forcedType?: 'CUSTOMER' | 'STOCK';
+  @Input() set forcedType(val: 'CUSTOMER' | 'STOCK' | undefined) {
+    if (val) {
+      this.orderType.set(val);
+    }
+  }
+
   @Input() forcedStatus?: string;
   @Input() cloneId?: string;
+  @Input() returnUrl: string = '/pedidos';
 
   // Signal State
   orderType = signal<'CUSTOMER' | 'STOCK'>('CUSTOMER');
@@ -246,10 +257,6 @@ export class OrderFormComponent {
         this.loadEmployees();
       }
     });
-
-    if (this.forcedType) {
-      this.orderType.set(this.forcedType);
-    }
 
     // Default item
     this.addItem();
@@ -327,7 +334,7 @@ export class OrderFormComponent {
   }
 
   goBack() {
-    this.router.navigate(['/pedidos']);
+    this.router.navigate([this.returnUrl]);
   }
 
   async handleSave(e: Event) {
@@ -395,7 +402,7 @@ export class OrderFormComponent {
 
       console.log('[OrderForm] Payload Mapping:', payload);
       await this.api.create(payload);
-      this.router.navigate(['/pedidos']);
+      this.router.navigate([this.returnUrl]);
     } catch (err) {
       console.error('Error saving order', err);
       alert('Error al guardar el pedido');

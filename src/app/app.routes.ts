@@ -33,10 +33,6 @@ export const routes: Routes = [
         loadComponent: () => import('../../libs/features/pedidos/pedidos.component').then(m => m.PedidosPageComponent)
       },
       {
-        path: 'pedidos/:id',
-        loadComponent: () => import('../../libs/features/pedidos/detalles/pedido-detalle.component').then(m => m.PedidoDetalleComponent)
-      },
-      {
         path: 'pedidos/kanban',
         loadComponent: () => import('../../libs/features/pedidos/kanban.component').then(m => m.PedidosKanbanComponent)
       },
@@ -44,6 +40,32 @@ export const routes: Routes = [
         path: 'pedidos/nuevo',
         loadComponent: () => import('../../libs/features/pedidos/nuevo/nuevo-pedido.component').then(m => m.NuevoPedidoPageComponent)
       },
+      {
+        path: 'pedidos/:id',
+        loadComponent: () => import('../../libs/features/pedidos/detalles/pedido-detalle.component').then(m => m.PedidoDetalleComponent)
+      },
+      {
+        path: 'clientes',
+        loadChildren: () => import('../../libs/features/clientes/clientes.routes').then(m => m.CLIENTES_ROUTES)
+      },
+      {
+        path: 'stock',
+        loadChildren: () => import('../../libs/features/stock/stock.routes').then(m => m.STOCK_ROUTES)
+      },
+      {
+        path: 'materiales',
+        loadChildren: () => import('@features/materiales/materiales.routes').then(m => m.MATERIALES_ROUTES)
+      },
+      {
+        path: 'maquinas',
+        loadChildren: () => import('@features/maquinas/maquinas.routes').then(m => m.MAQUINAS_ROUTES)
+      },
+      {
+        path: 'personal',
+        loadChildren: () => import('@features/personal/personal.routes').then(m => m.PERSONAL_ROUTES)
+      },
+      { path: '**', redirectTo: 'dashboard' }
+
       // Resto de páginas protegidas...
     ]
   },

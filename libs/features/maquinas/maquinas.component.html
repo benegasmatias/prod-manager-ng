@@ -1,0 +1,460 @@
+<div class="space-y-8 pb-10 px-8 pt-8 animate-in fade-in duration-500">
+  <!-- Header Area -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-2 mb-1">
+        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
+        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{{ config().labels.produccion || 'Gestión de Equipamiento' }}</span>
+      </div>
+      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        Producción y <span class="text-primary italic">{{ config().labels.maquinas || 'Máquinas' }}</span>
+      </h1>
+      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed">
+        Monitoreo en tiempo real, mantenimiento preventivo y optimización de carga de trabajo por unidad operativa.
+      </p>
+    </div>
+    <button
+      (click)="openNew()"
+      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2"
+    >
+      <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nueva Registro
+    </button>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="flex flex-col sm:flex-row items-center gap-4 bg-white/70 dark:bg-zinc-900/40 p-4 rounded-[2rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm">
+    <div class="w-full sm:w-[280px] relative group">
+      <select 
+        [ngModel]="estadoFilter()"
+        (ngModelChange)="estadoFilter.set($event)"
+        class="w-full h-11 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-xs font-bold text-zinc-600 dark:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
+      >
+        <option value="all">TODOS LOS ESTADOS</option>
+        <option value="IDLE">OPERATIVA / LIBRE</option>
+        <option value="WORKING">EN PRODUCCIÓN / OCUPADA</option>
+        <option value="MAINTENANCE">MANTENIMIENTO / FUERA DE LÍNEA</option>
+      </select>
+      <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none transition-colors group-hover:text-zinc-500"></lucide-angular>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div class="h-64 bg-zinc-100 dark:bg-zinc-800/20 rounded-[2.5rem] animate-pulse"></div>
+        <div class="h-64 bg-zinc-100 dark:bg-zinc-800/20 rounded-[2.5rem] animate-pulse"></div>
+        <div class="h-64 bg-zinc-100 dark:bg-zinc-800/20 rounded-[2.5rem] animate-pulse"></div>
+    </div>
+  } @else if (filteredMaquinas().length > 0) {
+    <!-- Grid System -->
+    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      @for (machine of filteredMaquinas(); track machine.id) {
+        <div [class]="cn(
+          'group relative overflow-hidden bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/50 rounded-[2.5rem] p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-slide-up',
+          machine.status === 'MAINTENANCE' && 'opacity-75 grayscale-[0.3]'
+        )">
+          <div class="flex items-start justify-between mb-6">
+            <div class="space-y-1.5 text-left">
+              <div class="flex items-center gap-2">
+                <div [class]="cn('h-1.5 w-1.5 rounded-full', getStatusColor(machine.status))"></div>
+                <span [class]="cn('text-[10px] font-bold uppercase tracking-wider', getStatusClass(machine.status))">
+                  {{ getStatusText(machine.status) }}
+                </span>
+              </div>
+              <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">{{ machine.name }}</h3>
+            </div>
+            <div class="h-10 w-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center text-zinc-400 group-hover:text-primary transition-colors">
+              <lucide-angular [img]="icons.Cpu" class="h-5 w-5"></lucide-angular>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/10 border border-zinc-100 dark:border-zinc-800/50">
+              <div class="flex items-center gap-2.5">
+                <div class="p-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                  <lucide-angular [img]="icons.Settings" class="h-3.5 w-3.5 text-zinc-400"></lucide-angular>
+                </div>
+                <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-tight">{{ machine.model || 'N/A' }}</span>
+              </div>
+              <lucide-angular [img]="icons.Activity" class="h-3.5 w-3.5 text-zinc-300"></lucide-angular>
+            </div>
+
+            <div class="min-h-[50px] flex flex-col justify-center px-1 text-left">
+              @if (machine.status === 'WORKING') {
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                    <lucide-angular [img]="icons.PlayCircle" class="h-4 w-4 text-emerald-500"></lucide-angular>
+                    <span>Trabajo en curso</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-500 font-medium ml-6 truncate">{{ machine.currentJobId || 'Monitorizando carga...' }}</p>
+                </div>
+              } @else if (machine.status === 'MAINTENANCE') {
+                <div class="space-y-1.5 text-rose-600 dark:text-rose-400">
+                  <div class="flex items-center gap-2 text-xs font-semibold">
+                    <lucide-angular [img]="icons.AlertTriangle" class="h-4 w-4"></lucide-angular>
+                    <span>Fuera de servicio</span>
+                  </div>
+                  <p class="text-[11px] font-medium ml-6 opacity-70 italic">Intervención técnica requerida</p>
+                </div>
+              } @else {
+                <div class="flex items-center gap-3 opacity-60">
+                  <div class="h-8 w-8 rounded-full bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center">
+                    <lucide-angular [img]="icons.Check" class="h-4 w-4 text-emerald-600 dark:text-emerald-400"></lucide-angular>
+                  </div>
+                  <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400 italic">Lista para producción</span>
+                </div>
+              }
+            </div>
+
+            <div class="flex gap-2 pt-2">
+              @if (machine.status === 'IDLE') {
+                <button
+                  (click)="openAssign(machine)"
+                  class="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-sm transition-all active:scale-[0.98] disabled:opacity-50"
+                >
+                  Asignar Trabajo
+                </button>
+              } @else {
+                <button
+                  (click)="handleRelease(machine)"
+                  [disabled]="saving()"
+                  class="flex-1 h-10 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all disabled:opacity-50"
+                >
+                  {{ saving() ? '...' : 'Liberar Unidad' }}
+                </button>
+              }
+              <button
+                (click)="openDetail(machine)"
+                class="h-10 w-10 rounded-xl border border-zinc-200 dark:border-zinc-800 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all group/btn"
+              >
+                <lucide-angular [img]="icons.MoreHorizontal" class="h-4 w-4 text-zinc-500 group-hover/btn:text-primary transition-colors"></lucide-angular>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <div class="py-24 text-center flex flex-col items-center justify-center gap-6 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/10 dark:bg-zinc-900/5">
+        <div class="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700">
+            <lucide-angular [img]="icons.Cpu" class="h-7 w-7 text-zinc-300 p-0.5"></lucide-angular>
+        </div>
+        <div class="space-y-1 px-8 text-center">
+            <p class="text-lg font-bold text-zinc-400 tracking-tight">Sin {{ config().labels.maquinas?.toLowerCase() || 'unidades' }} registradas</p>
+            <p class="text-sm text-zinc-500 max-w-sm mx-auto">Comienza añadiendo un activo para habilitar el flujo de producción.</p>
+        </div>
+    </div>
+  }
+</div>
+
+<!-- Modal Creation/Edit -->
+@if (isDialogOpen()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+  <div class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-4 slide-in-from-bottom-4 animate-in duration-300">
+    <div class="p-8 border-b border-zinc-50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
+        <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
+              <lucide-angular [img]="icons.Cpu" class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
+            </div>
+            <div class="space-y-1">
+                <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                  {{ selectedMachineId() ? 'Editar ' + (config().labels.maquinas?.slice(0, -1) || 'Máquina') : 'Nueva ' + (config().labels.maquinas?.slice(0, -1) || 'Máquina') }}
+                </h2>
+                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
+                  {{ config().labels.produccion || 'Gestión de Equipamiento' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form Body -->
+    <div class="p-8 space-y-8">
+      <div class="space-y-6">
+        <div class="space-y-2.5">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 text-left block">Nombre de Unidad</label>
+            <input
+                [ngModel]="formNombre()"
+                (ngModelChange)="formNombre.set($event)"
+                placeholder="Ej: Impresora Pro #1 / Torno CNC"
+                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+            />
+        </div>
+
+        <div class="space-y-2.5">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 text-left block">Modelo / Marca</label>
+            <input
+                [ngModel]="formModelo()"
+                (ngModelChange)="formModelo.set($event)"
+                placeholder="Especificación técnica o modelo"
+                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+            />
+        </div>
+      </div>
+
+      @if (negocio()?.rubro === 'IMPRESION_3D') {
+          <div class="pt-8 border-t border-zinc-50 dark:border-zinc-800/50 grid grid-cols-2 gap-6">
+              <div class="space-y-2.5">
+                  <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 text-left block">Nozzle</label>
+                  <input
+                      [ngModel]="formNozzle()"
+                      (ngModelChange)="formNozzle.set($event)"
+                      placeholder="0.4mm"
+                      class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                  />
+              </div>
+              <div class="space-y-2.5">
+                  <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 text-left block">Insumos (Max)</label>
+                  <div class="relative">
+                      <input
+                          type="number"
+                          [ngModel]="formMaxFilaments()"
+                          (ngModelChange)="formMaxFilaments.set($event)"
+                          class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 pr-12 focus:outline-none"
+                      />
+                      <span class="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-400">UNID</span>
+                  </div>
+              </div>
+          </div>
+      }
+
+      <div class="p-6 rounded-3xl bg-primary/5 border border-primary/10 flex gap-4 items-start mx-2">
+          <lucide-angular [img]="icons.Info" class="h-5 w-5 text-primary shrink-0 mt-0.5"></lucide-angular>
+          <p class="text-xs text-primary/80 font-medium leading-relaxed text-left">
+              Una vez creada, la unidad aparecerá disponible en el panel de producción para asignar nuevos pedidos y monitorear su estado en tiempo real.
+          </p>
+      </div>
+    </div>
+
+    <!-- Dialog Footer -->
+    <div class="p-8 pt-0 flex flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
+      <button
+          (click)="isDialogOpen.set(false)"
+          [disabled]="saving()"
+          class="rounded-2xl font-bold h-12 px-6 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
+      >
+          Cancelar
+      </button>
+
+      <button
+          (click)="handleSave()"
+          [disabled]="saving()"
+          class="flex items-center justify-center rounded-2xl font-bold h-12 px-10 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50"
+      >
+          @if (saving()) {
+              <app-button-spinner text="Guardando..."></app-button-spinner>
+          } @else {
+              {{ selectedMachineId() ? 'Actualizar Registro' : 'Confirmar y Crear' }}
+          }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Modal Assignment -->
+@if (isAssignDialogOpen()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+  <div class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-4 slide-in-from-bottom-4 animate-in duration-300">
+    <div class="p-8 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
+        <div class="flex items-baseline justify-between mb-1">
+          <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Asignar Producción</h2>
+          <button (click)="isAssignDialogOpen.set(false)" class="text-zinc-400 hover:text-zinc-600 transition-colors">
+            <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
+          </button>
+        </div>
+        <p class="text-xs text-zinc-500 font-medium">Selecciona el material y el pedido para iniciar el proceso.</p>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-8 space-y-8">
+      <div class="space-y-3">
+          <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left block">Seleccionar Material / Insumo</label>
+          @if (availableMaterials().length > 0) {
+              <div class="relative group">
+                  <select
+                      [ngModel]="selectedMaterialId()"
+                      (ngModelChange)="selectedMaterialId.set($event)"
+                      class="w-full h-11 rounded-xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-950/50 px-4 text-sm font-semibold dark:border-zinc-800 shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer"
+                  >
+                      @for (m of availableMaterials(); track m.id) {
+                          <option [value]="m.id">
+                              {{ m.name }} ({{ m.remainingWeightGrams }} {{ m.unit }} disponibles)
+                          </option>
+                      }
+                  </select>
+                  <lucide-angular [img]="icons.ChevronDown" class="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none transition-colors group-hover:text-zinc-500"></lucide-angular>
+              </div>
+          } @else {
+              <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 text-left">
+                  <div class="flex items-center gap-2 text-amber-800 dark:text-amber-400 mb-1">
+                      <lucide-angular [img]="icons.Package" class="h-4 w-4"></lucide-angular>
+                      <p class="text-xs font-bold">Sin materiales registrados</p>
+                  </div>
+                  <p class="text-xs text-amber-700/70 dark:text-amber-500/70 leading-relaxed">
+                      No tienes stock cargado. Se asignará el trabajo sin descontar insumos automáticamente.
+                  </p>
+              </div>
+          }
+      </div>
+
+      <div class="space-y-4">
+          <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left block">Seleccionar Pedido Pendiente</label>
+          <div class="max-h-[280px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+              @if (loadingOrders()) {
+                  <div class="py-12 flex flex-col items-center justify-center gap-2">
+                      <div class="h-6 w-6 border-2 border-zinc-100 border-t-primary rounded-full animate-spin"></div>
+                      <p class="text-[10px] font-bold text-zinc-400 uppercase">Consultando pedidos...</p>
+                  </div>
+              } @else if (pendingOrders().length > 0) {
+                  @for (order of pendingOrders(); track order.id) {
+                      <div
+                          (click)="handleAssign(order.id)"
+                          class="group relative flex items-center justify-between p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-200 dark:hover:border-zinc-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                      >
+                          <div class="flex flex-col text-left">
+                              <div class="flex items-center gap-2">
+                                  <p class="font-bold text-sm text-zinc-900 dark:text-zinc-100">{{ order.clientName }}</p>
+                                  <span class="text-[10px] font-bold text-primary group-hover:translate-x-1 transition-transform">#{{ order.code || order.id.slice(0, 8) }}</span>
+                              </div>
+                              <p class="text-[11px] text-zinc-500 font-medium">Items: {{ order.items?.length || 0 }}</p>
+                          </div>
+                          <div class="h-8 w-8 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                              <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular>
+                          </div>
+                      </div>
+                  }
+              } @else {
+                  <div class="py-12 text-center space-y-2">
+                      <p class="text-sm font-semibold text-zinc-400">Todo al día</p>
+                      <p class="text-xs text-zinc-500 italic">No hay pedidos pendientes para asignar.</p>
+                  </div>
+              }
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Slide-Over Sidebar (Sheet) -->
+@if (isDetailSheetOpen()) {
+<div class="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-300">
+  <div (click)="isDetailSheetOpen.set(false)" class="absolute inset-0"></div>
+  <div class="relative w-full max-w-md h-full bg-white dark:bg-zinc-950 shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col">
+    <div class="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+        <div class="space-y-1 text-left">
+            <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Gestión de {{ config().labels.maquinas?.slice(0, -1) || 'Unidad' }}</h2>
+            <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ selectedMachineDetail()?.name || 'Cargando...' }}</p>
+        </div>
+        <div class="flex gap-2">
+            <button
+                (click)="editMachine(selectedMachineDetail()!)"
+                class="h-9 w-9 rounded-xl border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-500 hover:text-primary transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
+            >
+                <lucide-angular [img]="icons.Edit2" class="h-4 w-4"></lucide-angular>
+            </button>
+            <button
+                (click)="handleDelete(selectedMachineDetail()!.id)"
+                class="h-9 w-9 rounded-xl border border-rose-100 text-rose-500 bg-rose-50/50 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center"
+            >
+                <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+            </button>
+            <button (click)="isDetailSheetOpen.set(false)" class="h-9 w-9 rounded-xl text-zinc-400 hover:text-zinc-600 flex items-center justify-center">
+              <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+        @if (loadingDetail()) {
+            <div class="h-full flex flex-col items-center justify-center space-y-4">
+                <div class="h-10 w-10 border-4 border-zinc-100 border-t-primary rounded-full animate-spin"></div>
+                <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Sincronizando...</p>
+            </div>
+        } @else if (selectedMachineDetail()) {
+          @let det = selectedMachineDetail()!;
+          <section class="space-y-5">
+              <h3 class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left">Especificaciones</h3>
+              <div class="grid grid-cols-2 gap-4">
+                  <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 text-left">
+                      <p class="text-[10px] text-zinc-400 font-bold uppercase mb-1">Estado Operativo</p>
+                      <div class="flex items-center gap-2">
+                          <div [class]="cn('h-2 w-2 rounded-full', getStatusColor(det.status))"></div>
+                          <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ getStatusText(det.status) }}</p>
+                      </div>
+                  </div>
+                  <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 text-left">
+                      <p class="text-[10px] text-zinc-400 font-bold uppercase mb-1">Modelo / Marca</p>
+                      <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{{ det.model || 'N/A' }}</p>
+                  </div>
+                  
+                  @if (negocio()?.rubro === 'IMPRESION_3D') {
+                      <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 text-left">
+                          <p class="text-[10px] text-zinc-400 font-bold uppercase mb-1">Nozzle actual</p>
+                          <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ det.nozzle || '0.4mm' }}</p>
+                      </div>
+                      <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 text-left">
+                          <p class="text-[10px] text-zinc-400 font-bold uppercase mb-1">Capacidad Max.</p>
+                          <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ det.maxFilaments || 1 }} Rollos</p>
+                      </div>
+                  }
+              </div>
+          </section>
+
+          <section class="space-y-5">
+              <div class="flex items-center justify-between">
+                  <h3 class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left line-clamp-1">Historial Reciente</h3>
+                  <span class="text-[10px] font-bold text-zinc-500 border border-zinc-100 dark:border-zinc-800 px-2 py-0.5 rounded-md whitespace-nowrap">ÚLTIMOS TRABAJOS</span>
+              </div>
+              <div class="space-y-4">
+                  @if (det.productionJobs && det.productionJobs.length > 0) {
+                      @for (job of det.productionJobs; track job.id) {
+                          <div class="group p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 space-y-4 hover:shadow-md transition-all duration-300">
+                              <div class="flex justify-between items-start">
+                                  <div class="space-y-1 text-left">
+                                      <p class="text-[10px] font-bold text-primary uppercase tracking-tight">#{{ job.order?.code || job.orderId.slice(0, 8) }}</p>
+                                      <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ job.order?.clientName || 'Cliente' }}</p>
+                                  </div>
+                                  <div [class]="cn(
+                                      'text-[9px] font-bold uppercase px-2.5 py-1 rounded-full',
+                                      job.status === 'DONE' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30' : 'bg-blue-50 text-blue-600 dark:bg-blue-950/30'
+                                  )">
+                                      {{ job.status === 'DONE' ? 'Terminado' : 'En Curso' }}
+                                  </div>
+                              </div>
+
+                              <div class="flex items-start gap-3 p-3 rounded-xl bg-zinc-50/50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800/50 group-hover:bg-zinc-50 transition-colors text-left">
+                                  <div class="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
+                                      <lucide-angular [img]="icons.Package" class="h-4 w-4 text-zinc-400"></lucide-angular>
+                                  </div>
+                                  <div class="flex-1 min-w-0">
+                                      <p class="text-[10px] text-zinc-500 font-bold uppercase mb-0.5 whitespace-nowrap">Producto / Ítem</p>
+                                      <p class="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate leading-relaxed">
+                                          {{ job.orderItem?.name || 'Item General' }}
+                                      </p>
+                                  </div>
+                              </div>
+
+                              <div class="flex justify-between items-center pt-2">
+                                  <div class="flex items-center gap-2 text-[11px] text-zinc-500 font-medium">
+                                      <lucide-angular [img]="icons.Calendar" class="h-3.5 w-3.5 opacity-60"></lucide-angular>
+                                      <span>{{ job.createdAt | date:'shortDate' }}</span>
+                                  </div>
+                                  <div class="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-lg shrink-0">
+                                      {{ job.totalUnits || 1 }} UNID.
+                                  </div>
+                              </div>
+                          </div>
+                      }
+                  } @else {
+                      <div class="py-12 text-center border-2 border-dashed rounded-2xl border-zinc-100 dark:border-zinc-800 bg-zinc-50/10">
+                          <p class="text-xs text-zinc-400 italic">No hay registros previos en este activo.</p>
+                      </div>
+                  }
+              </div>
+          </section>
+        }
+    </div>
+  </div>
+</div>
+}

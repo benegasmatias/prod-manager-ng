@@ -138,21 +138,23 @@ import { cn } from '@shared/utils/cn';
         <div class="p-6 rounded-[2rem] bg-zinc-50/50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/50 backdrop-blur-sm flex flex-col sm:flex-row items-center gap-6">
           <div class="flex-1 grid grid-cols-2 gap-4 w-full">
             <app-money-input
-              label="Precio Unitario ($)"
+              [label]="orderType() === 'STOCK' ? 'Precio Venta Est. ($)' : 'Precio Unitario ($)'"
               [(value)]="item.precioUnitario"
               (valueChange)="onUpdate.emit()"
               placeholder="0,00"
               inputClassName="h-12 text-sm shadow-sm"
             ></app-money-input>
 
-            <app-money-input
-              [label]="'Seña / Adelanto ($)'"
-              [(value)]="item.senia"
-              (valueChange)="onUpdate.emit()"
-              [color]="rubro() === 'METALURGICA' ? 'indigo' : 'primary'"
-              placeholder="0,00"
-              inputClassName="h-12 text-sm shadow-sm"
-            ></app-money-input>
+            @if (orderType() !== 'STOCK') {
+              <app-money-input
+                [label]="'Seña / Adelanto ($)'"
+                [(value)]="item.senia"
+                (valueChange)="onUpdate.emit()"
+                [color]="rubro() === 'METALURGICA' ? 'indigo' : 'primary'"
+                placeholder="0,00"
+                inputClassName="h-12 text-sm shadow-sm"
+              ></app-money-input>
+            }
           </div>
           
           <div class="flex flex-col items-center sm:items-end justify-center min-w-[140px] px-4">
@@ -173,6 +175,7 @@ export class ItemDetailsFormComponent {
   config = input.required<NegocioConfig>();
   canRemove = input(false);
   rubro = input.required<Rubro>();
+  orderType = input<'CUSTOMER' | 'STOCK'>('CUSTOMER');
   
   @Output() onRemove = new EventEmitter<void>();
   @Output() onUpdate = new EventEmitter<void>();

@@ -58,7 +58,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
               <td class="px-6 py-5 border-y border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
                 <div class="flex flex-col">
                   <span class="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px]">
-                    {{ order.clientName }}
+                    {{ order.clientName || fallbackClientName || 'S/N' }}
                   </span>
                   <span class="text-[10px] text-zinc-400 line-clamp-1">
                     {{ order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
@@ -150,6 +150,7 @@ export class OrdersTableComponent {
   @Input() hideDelivery = false;
   @Input() hideFinancials = false;
   @Input() clientLabel = 'Cliente / Referencia';
+  @Input() fallbackClientName?: string;
   @Input() rubro?: Rubro;
 
   @Output() sortChange = new EventEmitter<string>();

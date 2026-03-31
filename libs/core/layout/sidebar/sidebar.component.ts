@@ -88,16 +88,25 @@ export class SidebarComponent {
       {
         title: 'Operaciones',
         items: [
-          { label: 'Cola de Impresión', href: '/impresion', icon: Printer, requiredFeature: 'MACHINERY' },
-          { label: 'Producción', href: '/produccion', icon: Activity, requiredFeature: 'ORDERS' },
+          { label: 'Producción', href: '/produccion', icon: Activity, requiredFeature: 'ORDERS_PRODUCTION' },
           { label: 'Inventario', href: '/stock', icon: Grid, requiredFeature: 'STOCK' },
         ]
       },
       {
         title: 'Mi Taller',
         items: [
-          { label: 'Maquinaria', href: '/maquinas', icon: Wrench, requiredFeature: 'MACHINERY' },
-          { label: 'Materiales', href: '/materiales', icon: Package, requiredFeature: 'MATERIALS' },
+          { 
+            label: this.sessionService.config()?.labels?.maquinas || 'Maquinaria', 
+            href: '/maquinas', 
+            icon: Wrench, 
+            requiredFeature: 'MACHINERY' 
+          },
+          { 
+            label: this.sessionService.config()?.labels?.materiales || 'Materiales', 
+            href: '/materiales', 
+            icon: Package, 
+            requiredFeature: 'MATERIALS' 
+          },
           { label: 'Equipo', href: '/personal', icon: UserCog, requiredFeature: 'TEAM' },
         ]
       },

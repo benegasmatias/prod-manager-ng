@@ -4,3 +4,6 @@ export * from './notification';
 export * from './dashboard';
 export * from './access-control';
 export * from './pedido';
+export * from './material';
+export * from './machine';
+export * from './employee';

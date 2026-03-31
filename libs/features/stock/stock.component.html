@@ -1,0 +1,203 @@
+<div class="space-y-10 pb-16 animate-in fade-in duration-500 p-8">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-2 mb-1">
+        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
+        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Monitoreo de Activos</span>
+      </div>
+      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        Inventario de <span class="text-primary italic">Producción</span>
+      </h1>
+      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed">
+        Control centralizado de manufactura interna, gestión de activos terminados y proyecciones de rentabilidad.
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a routerLink="/stock/nuevo" class="flex items-center h-11 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2 lg:h-12 lg:px-8 group">
+        <lucide-angular [img]="icons.Plus" class="h-4 w-4 transition-transform group-hover:rotate-90"></lucide-angular>
+        <span>Generar Reposición</span>
+      </a>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex flex-col items-center justify-center py-40 gap-4">
+      <div class="h-10 w-10 border-4 border-zinc-100 border-t-zinc-900 rounded-full animate-spin"></div>
+      <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Cargando Inventario...</p>
+    </div>
+  } @else {
+    <!-- Premium Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
+        <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+          <lucide-angular [img]="icons.Wallet" class="h-20 w-20 text-zinc-900 dark:text-white"></lucide-angular>
+        </div>
+        <div class="relative z-10 space-y-4">
+          <div class="h-12 w-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700">
+            <lucide-angular [img]="icons.Wallet" class="h-5 w-5"></lucide-angular>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">Capital Invertido</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
+                {{ stockStats().totalInvestment | currency:'ARS':'symbol-narrow':'1.0-0' }}
+              </span>
+              <span class="text-sm font-bold text-zinc-400">,00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative group overflow-hidden bg-primary p-8 rounded-[2.5rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.01]">
+        <div class="absolute top-0 right-0 p-8 opacity-10">
+          <lucide-angular [img]="icons.TrendingUp" class="h-20 w-20 text-white"></lucide-angular>
+        </div>
+        <div class="relative z-10 space-y-4">
+          <div class="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/10 backdrop-blur-sm">
+            <lucide-angular [img]="icons.TrendingUp" class="h-5 w-5"></lucide-angular>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1">Retorno Proyectado</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-black tracking-tighter text-white">
+                {{ (stockStats().totalInvestment + stockStats().pendingProfit) | currency:'ARS':'symbol-narrow':'1.0-0' }}
+              </span>
+              <span class="text-sm font-bold text-white/40">,00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
+        <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+          <lucide-angular [img]="icons.Package2" class="h-20 w-20 text-zinc-900 dark:text-white"></lucide-angular>
+        </div>
+        <div class="relative z-10 space-y-4">
+          <div class="h-12 w-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700">
+            <lucide-angular [img]="icons.Package2" class="h-5 w-5"></lucide-angular>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">Órdenes Activas</p>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
+                {{ stockStats().activeOrdersCount }}
+              </span>
+              <span class="text-xs font-bold text-zinc-400 uppercase">Procesos</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="flex flex-col lg:flex-row items-center gap-6 bg-white dark:bg-zinc-900/40 p-4 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm overflow-hidden mt-6">
+      <div class="relative flex-1 w-full group">
+        <lucide-angular [img]="icons.Search" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
+        <input type="text"
+               placeholder="Filtrar por número de orden, producto o responsable..."
+               class="h-11 w-full rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-12 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-950"
+               [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+      </div>
+
+      <div class="flex items-center gap-4 w-full lg:w-auto">
+        <div class="relative w-full lg:w-[240px] group">
+          <select class="w-full h-11 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-4 pr-10 text-xs font-bold text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
+                  [ngModel]="estadoFilter()" (ngModelChange)="estadoFilter.set($event)">
+            <option value="all">TODOS LOS ESTADOS</option>
+            @for (stage of config().productionStages; track stage.key) {
+              <option [value]="stage.key">{{ stage.label | uppercase }}</option>
+            }
+          </select>
+          <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none group-hover:text-zinc-600 transition-colors"></lucide-angular>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Production Section -->
+    <div class="space-y-6 mt-10">
+      <div class="flex items-center justify-between px-2">
+        <div class="flex items-center gap-3">
+          <div class="h-6 w-1 bg-primary rounded-full"></div>
+          <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            En Línea de Producción
+            <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{ filteredActive().length }}</span>
+          </h2>
+        </div>
+        <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Crucial para Inventario</p>
+      </div>
+
+      @if (filteredActive().length > 0) {
+        <div class="overflow-hidden rounded-3xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 shadow-sm">
+          <app-orders-table 
+            [orders]="filteredActive()"
+            [sortKey]="sortKey()"
+            [sortDir]="sortDir()"
+            (sortChange)="handleSort($event)"
+            [hideTypeColumn]="true"
+            [hideUrgency]="true"
+            [hideDelivery]="true"
+            [hideFinancials]="true"
+            clientLabel="Referencia"
+            fallbackClientName="STOCK"
+            [rubro]="session.rubro()"
+          ></app-orders-table>
+        </div>
+      } @else {
+        <div class="py-20 text-center flex flex-col items-center justify-center gap-6 border-2 border-dashed rounded-[2.5rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/5 dark:bg-zinc-900/5">
+          <div class="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700">
+            <lucide-angular [img]="icons.Package2" class="h-7 w-7 text-zinc-200"></lucide-angular>
+          </div>
+          <div class="space-y-1">
+            <p class="text-base font-bold text-zinc-400 tracking-tight">Sin procesos activos</p>
+            <p class="text-xs text-zinc-500 max-w-sm mx-auto font-medium">No se detectan órdenes de reposición en la línea actual.</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- In Stock History -->
+    @if (filteredInStock().length > 0) {
+      <div class="pt-12 space-y-6">
+        <div class="flex items-center gap-4 px-2">
+          <div class="flex items-center gap-3">
+            <div class="h-6 w-1 bg-emerald-500 rounded-full"></div>
+            <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              Disponibles en Depósito
+              <span class="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 px-2 py-0.5 rounded-full">{{ filteredInStock().length }}</span>
+            </h2>
+          </div>
+          <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+          <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Listos p/ Venta</p>
+        </div>
+
+        <div class="overflow-hidden rounded-3xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/10 backdrop-blur-sm shadow-sm transition-all hover:shadow-md">
+          <app-orders-table 
+            [orders]="filteredInStock()"
+            [sortKey]="sortKey()"
+            [sortDir]="sortDir()"
+            (sortChange)="handleSort($event)"
+            [hideTypeColumn]="true"
+            [hideUrgency]="true"
+            [hideDelivery]="true"
+            [hideFinancials]="true"
+            clientLabel="Referencia"
+            fallbackClientName="STOCK"
+            [rubro]="session.rubro()"
+            (statusClick)="openSellModal($event)"
+            (manageClick)="openSellModal($event)"
+          ></app-orders-table>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Venta Dialog -->
+  <app-stock-sale-dialog 
+    [order]="selectedOrder()" 
+    [isOpen]="isSellModalOpen()" 
+    [isSubmitting]="isSelling()"
+    (onClose)="isSellModalOpen.set(false)" 
+    (onConfirm)="handleSellConfirm($event)">
+  </app-stock-sale-dialog>
+</div>
