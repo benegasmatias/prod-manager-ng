@@ -64,6 +64,10 @@ export const routes: Routes = [
         path: 'personal',
         loadChildren: () => import('@features/personal/personal.routes').then(m => m.PERSONAL_ROUTES)
       },
+      {
+        path: 'reportes',
+        loadChildren: () => import('@features/reportes/reportes.routes').then(m => m.REPORTES_ROUTES)
+      },
       { path: '**', redirectTo: 'dashboard' }
 
       // Resto de páginas protegidas...

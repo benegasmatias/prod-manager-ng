@@ -3,7 +3,7 @@
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
     <div class="flex flex-col gap-1">
       <div class="flex items-center gap-2 mb-1">
-        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
         <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Recursos Humanos</span>
       </div>
       <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 text-left">
@@ -136,7 +136,7 @@
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10'
                     : 'bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700'
                 )">
-                  <span [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')" />
+                  <span [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
                   {{ staff.active ? 'ACTIVO' : 'INACTIVO' }}
                 </span>
               </div>
@@ -216,7 +216,7 @@
                 {{ staff.firstName }} {{ staff.lastName }}
               </p>
               <div class="flex items-center gap-2">
-                <span [class]="cn('h-1.5 w-1.5 rounded-full', staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')" />
+                <span [class]="cn('h-1.5 w-1.5 rounded-full', staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
                 <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest text-left">
                   {{ staff.active ? 'Activo' : 'Inactivo' }}
                 </p>

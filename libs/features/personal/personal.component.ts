@@ -6,12 +6,7 @@ import { SessionService } from '@core/session/session.service';
 import { Employee } from '@shared/models';
 import { LucideAngularModule, Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '@shared/utils/cn';
 
 @Component({
   selector: 'app-personal',

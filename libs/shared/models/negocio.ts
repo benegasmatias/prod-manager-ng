@@ -55,4 +55,12 @@ export interface NegocioConfig {
     defaultType: string;
   };
   staffPlaceholder: string;
+  features: {
+    hasNozzle: boolean;
+    hasMaxFilaments: boolean;
+    hasVisits: boolean;
+    hasQuotes: boolean;
+    hasMaterials: boolean;
+  };
+  machineStatusLabels?: Record<string, string>;
 }

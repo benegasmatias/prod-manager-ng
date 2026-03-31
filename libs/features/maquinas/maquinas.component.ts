@@ -6,19 +6,28 @@ import { SessionService } from '@core/session/session.service';
 import { MaterialesService } from '@core/api/materiales.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { Machine, Pedido, Material } from '@shared/models';
-import { LucideAngularModule, Plus, ChevronDown, Settings, Activity, PlayCircle, AlertTriangle, Check, MoreHorizontal, Info, Cpu, Edit2, Trash2, Calendar, Package, X } from 'lucide-angular';
+import { LucideAngularModule, Plus, ChevronDown, Cpu } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@shared/utils/cn';
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { MachineCardComponent } from './components/machine-card.component';
+import { MachineFormDialogComponent } from './components/machine-form-dialog.component';
+import { MachineAssignmentDialogComponent } from './components/machine-assignment-dialog.component';
+import { MachineDetailSheetComponent } from './components/machine-detail-sheet.component';
 
 @Component({
   selector: 'app-maquinas',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    LucideAngularModule, 
+    ButtonSpinnerComponent,
+    MachineCardComponent,
+    MachineFormDialogComponent,
+    MachineAssignmentDialogComponent,
+    MachineDetailSheetComponent
+  ],
   templateUrl: './maquinas.component.html'
 })
 export class MaquinasPageComponent {
@@ -41,19 +50,12 @@ export class MaquinasPageComponent {
   // Dialog states
   isDialogOpen = signal(false);
   selectedMachineId = signal<string | null>(null);
+  selectedMachineData = signal<Partial<Machine> | null>(null);
   
-  // Form states
-  formNombre = signal('');
-  formModelo = signal('');
-  formNozzle = signal('0.4mm');
-  formMaxFilaments = signal(1);
-
   // Assignment states
   isAssignDialogOpen = signal(false);
   pendingOrders = signal<Pedido[]>([]);
   availableMaterials = signal<Material[]>([]);
-  selectedOrderId = signal<string>('');
-  selectedMaterialId = signal<string>('');
   loadingOrders = signal(false);
 
   // Detail states
@@ -61,7 +63,7 @@ export class MaquinasPageComponent {
   selectedMachineDetail = signal<Machine | null>(null);
   loadingDetail = signal(false);
 
-  readonly icons = { Plus, ChevronDown, Settings, Activity, PlayCircle, AlertTriangle, Check, MoreHorizontal, Info, Cpu, Edit2, Trash2, Calendar, Package, X };
+  readonly icons = { Plus, ChevronDown, Cpu };
 
   filteredMaquinas = computed(() => {
     const all = this.maquinas();
@@ -80,37 +82,28 @@ export class MaquinasPageComponent {
 
   openNew() {
     this.selectedMachineId.set(null);
-    this.formNombre.set('');
-    this.formModelo.set('');
-    this.formNozzle.set('0.4mm');
-    this.formMaxFilaments.set(1);
+    this.selectedMachineData.set({
+      name: '',
+      model: '',
+      nozzle: '0.4mm',
+      maxFilaments: 1
+    });
     this.isDialogOpen.set(true);
   }
 
   async editMachine(machine: Machine) {
     this.selectedMachineId.set(machine.id);
-    this.formNombre.set(machine.name);
-    this.formModelo.set(machine.model || '');
-    this.formNozzle.set(machine.nozzle || '0.4mm');
-    this.formMaxFilaments.set(machine.maxFilaments || 1);
+    this.selectedMachineData.set({ ...machine });
     this.isDialogOpen.set(true);
     this.isDetailSheetOpen.set(false);
   }
 
-  async handleSave() {
-    if (!this.formNombre()) return;
-
+  async handleSave(data: Partial<Machine>) {
     const payload: Partial<Machine> = {
-      name: this.formNombre(),
-      model: this.formModelo(),
+      ...data,
       businessId: this.negocio()?.id,
       active: true
     };
-
-    if (this.negocio()?.rubro === 'IMPRESION_3D') {
-      payload.nozzle = this.formNozzle();
-      payload.maxFilaments = this.formMaxFilaments();
-    }
 
     if (this.selectedMachineId()) {
       await this.maquinasService.update(this.selectedMachineId()!, payload);
@@ -121,7 +114,7 @@ export class MaquinasPageComponent {
   }
 
   async handleDelete(machineId: string) {
-    if (!confirm('¿Estás seguro de desactivar esta unidad?')) return;
+    if (!confirm(`¿Estás seguro de desactivar esta ${this.config().labels.maquinas.slice(0, -1).toLowerCase()}?`)) return;
     await this.maquinasService.remove(machineId);
     this.isDetailSheetOpen.set(false);
   }
@@ -135,18 +128,13 @@ export class MaquinasPageComponent {
       const businessId = this.negocio()?.id;
       if (!businessId) return;
 
-      const [ordersRes, materials] = await Promise.all([
+      const [ordersRes] = await Promise.all([
         this.pedidosApi.getListing({ businessId, status: 'PENDING', pageSize: 100 }),
-        this.materialesService.loadMateriales() // Ensure materials are loaded
+        this.materialesService.loadMateriales() 
       ]);
       
       this.pendingOrders.set(ordersRes.data || []);
-      const currentMaterials = this.materialesService.items();
-      this.availableMaterials.set(currentMaterials);
-      
-      if (currentMaterials.length > 0) {
-        this.selectedMaterialId.set(currentMaterials[0].id);
-      }
+      this.availableMaterials.set(this.materialesService.items());
     } catch (e) {
       console.error('Error loading assign options:', e);
     } finally {
@@ -154,14 +142,14 @@ export class MaquinasPageComponent {
     }
   }
 
-  async handleAssign(orderId: string) {
+  async handleAssign(event: { orderId: string; materialId: string }) {
     const machineId = this.selectedMachineId();
     if (!machineId) return;
 
     await this.maquinasService.assignOrder(
       machineId, 
-      orderId, 
-      this.selectedMaterialId() || undefined
+      event.orderId, 
+      event.materialId || undefined
     );
     this.isAssignDialogOpen.set(false);
   }
@@ -182,30 +170,6 @@ export class MaquinasPageComponent {
       this.isDetailSheetOpen.set(false);
     } finally {
       this.loadingDetail.set(false);
-    }
-  }
-
-  getStatusColor(status: string) {
-    switch (status) {
-      case 'WORKING': return 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]';
-      case 'MAINTENANCE': return 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]';
-      default: return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse';
-    }
-  }
-
-  getStatusText(status: string) {
-    switch (status) {
-      case 'WORKING': return 'Producción';
-      case 'MAINTENANCE': return 'Mantenimiento';
-      default: return 'Libre / Operativa';
-    }
-  }
-
-  getStatusClass(status: string) {
-    switch (status) {
-      case 'WORKING': return 'text-amber-600 dark:text-amber-400';
-      case 'MAINTENANCE': return 'text-rose-600 dark:text-rose-400';
-      default: return 'text-emerald-600 dark:text-emerald-400';
     }
   }
 }

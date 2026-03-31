@@ -1,9 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Pedido, PedidosResponse, PedidoSummary, Employee } from '../../shared/models';
-import { environment } from '../../../src/environments/environment';
-import { API_ENDPOINTS } from '../../shared/config/api-endpoints.config';
+import { Pedido, PedidosResponse, PedidoSummary, Employee } from '@shared/models';
+import { API_ENDPOINTS } from '@shared/config/api-endpoints.config';
 
 export interface ListingParams {
   businessId: string;
@@ -24,7 +23,6 @@ export interface ListingParams {
 })
 export class PedidosApiService {
   private http = inject(HttpClient);
-  private readonly API_URL = environment.apiUrl;
 
   /**
    * Obtiene el listado de pedidos para un negocio con filtros opcionales.
@@ -44,7 +42,7 @@ export class PedidosApiService {
     if (params.endDate) httpParams = httpParams.set('endDate', params.endDate.toString());
       if (params.responsableId) httpParams = httpParams.set('responsableId', params.responsableId);
   
-      return firstValueFrom(this.http.get<PedidosResponse>(`${this.API_URL}${API_ENDPOINTS.ORDERS.LISTING}`, { params: httpParams }));
+      return firstValueFrom(this.http.get<PedidosResponse>(API_ENDPOINTS.ORDERS.LISTING, { params: httpParams }));
     }
   
     /**
@@ -52,7 +50,7 @@ export class PedidosApiService {
      */
     async getSummary(businessId: string): Promise<PedidoSummary> {
       const params = new HttpParams().set('businessId', businessId);
-      return firstValueFrom(this.http.get<PedidoSummary>(`${this.API_URL}${API_ENDPOINTS.ORDERS.SUMMARY}`, { params }));
+      return firstValueFrom(this.http.get<PedidoSummary>(API_ENDPOINTS.ORDERS.SUMMARY, { params }));
     }
   
     private cachedEmployees: Employee[] = [];
@@ -70,7 +68,7 @@ export class PedidosApiService {
         .set('businessId', businessId)
         .set('active', activeOnly.toString());
       
-      const res = await firstValueFrom(this.http.get<Employee[]>(`${this.API_URL}${API_ENDPOINTS.EMPLOYEES.LIST}`, { params }));
+      const res = await firstValueFrom(this.http.get<Employee[]>(API_ENDPOINTS.EMPLOYEES.LIST, { params }));
       this.cachedEmployees = res || [];
       this.empLastBusinessId = businessId;
       return this.cachedEmployees;
@@ -80,28 +78,28 @@ export class PedidosApiService {
      * Obtiene un pedido por su ID.
      */
     async findOne(id: string): Promise<Pedido> {
-      return firstValueFrom(this.http.get<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.ONE(id)}`));
+      return firstValueFrom(this.http.get<Pedido>(API_ENDPOINTS.ORDERS.ONE(id)));
     }
 
     /**
      * Crea un nuevo pedido.
      */
     async create(data: Partial<Pedido>): Promise<Pedido> {
-      return firstValueFrom(this.http.post<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.ROOT}`, data));
+      return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.ROOT, data));
     }
   
     /**
      * Actualiza un pedido existente.
      */
     async update(id: string, data: Partial<Pedido>): Promise<Pedido> {
-      return firstValueFrom(this.http.patch<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.STATUS(id)}`, data));
+      return firstValueFrom(this.http.patch<Pedido>(API_ENDPOINTS.ORDERS.STATUS(id), data));
     }
   
     /**
      * Registra un pago para un pedido.
      */
     async addPayment(orderId: string, payment: { amount: number; method: string; note?: string }): Promise<Pedido> {
-      return firstValueFrom(this.http.post<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.PAYMENTS(orderId)}`, payment));
+      return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.PAYMENTS(orderId), payment));
     }
 
    /**
@@ -119,6 +117,6 @@ export class PedidosApiService {
        wastedGrams: data.wastedGrams || 0,
        moveToReprint: data.moveToReprint || (data.action === 'REDO' && data.targetStatus === 'REPRINT_PENDING')
      };
-     return firstValueFrom(this.http.post<Pedido>(`${this.API_URL}${API_ENDPOINTS.ORDERS.REPORT_FAILURE(orderId)}`, payload));
+     return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.REPORT_FAILURE(orderId), payload));
    }
 }

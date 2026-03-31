@@ -69,6 +69,18 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'duracion_estimada_minutos', label: 'Duración (MIN)', tipo: 'number', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej. 120' },
         ],
         staffPlaceholder: 'Ej: Operario de Impresión, Modelador, Post-procesado...',
+        features: {
+          hasNozzle: true,
+          hasMaxFilaments: true,
+          hasVisits: false,
+          hasQuotes: false,
+          hasMaterials: true,
+        },
+        machineStatusLabels: {
+          WORKING: 'Imprimiendo',
+          MAINTENANCE: 'Mantenimiento / Calibración',
+          IDLE: 'Lista para Imprimir'
+        }
       };
 
     case 'METALURGICA':
@@ -137,7 +149,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           ],
         },
         itemFields: [
-          { key: 'tipo_trabajo', label: 'Tipo de Trabajo', tipo: 'select', section: 'INFORMACIÓN DEL TRABAJO', options: ['Portón', 'Reja', 'Escalera', 'Estructura', 'Puerta', 'Paño Fijo', 'Otro'], required: true },
+          { key: 'tipo_trabajo', label: 'Tipo de Trabajo', tipo: 'select', section: 'INFORMACIÓN DEL TRABAJO', options: ['Portón', 'Reja', 'Escalera', 'Estructura', 'Puerta', ' Paño Fijo', 'Otro'], required: true },
           { key: 'nombreProducto', label: 'Descripción / Nombre', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: 'Ej: Portón principal frente' },
           { key: 'medidas', label: 'Medidas (Ancho x Alto)', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'Ej: 3.50 x 2.10 m' },
           { key: 'cantidad', label: 'Cantidad', tipo: 'number', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: '1' },
@@ -154,6 +166,18 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'refuerzos_estructurales', label: 'Refuerzos Estructurales', tipo: 'boolean', section: 'OPCIONALES' },
         ],
         staffPlaceholder: 'Ej: Soldador, Pintor, Armado, Plegador...',
+        features: {
+          hasNozzle: false,
+          hasMaxFilaments: false,
+          hasVisits: true,
+          hasQuotes: true,
+          hasMaterials: true,
+        },
+        machineStatusLabels: {
+          WORKING: 'En Producción',
+          MAINTENANCE: 'Fuera de Servicio / Reparación',
+          IDLE: 'Disponible / Espera'
+        }
       };
 
     case 'CARPINTERIA':
@@ -214,6 +238,18 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'herrajes', label: 'Detalle de Herrajes', tipo: 'textarea', section: 'ESPECIFICACIONES TÉCNICAS' },
         ],
         staffPlaceholder: 'Ej: Carpintero, Lijador, Lustrador, Diseñador...',
+        features: {
+          hasNozzle: false,
+          hasMaxFilaments: false,
+          hasVisits: false,
+          hasQuotes: false,
+          hasMaterials: true,
+        },
+        machineStatusLabels: {
+          WORKING: 'En Armado',
+          MAINTENANCE: 'Fuera de Servicio',
+          IDLE: 'Banco Libre'
+        }
       };
 
     case 'GENERICO':
@@ -269,6 +305,18 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'descripcion', label: 'Descripción Extendida', tipo: 'textarea', section: 'INFORMACIÓN DEL TRABAJO' },
         ],
         staffPlaceholder: 'Ej: Operario, Vendedor, Administrativo...',
+        features: {
+          hasNozzle: false,
+          hasMaxFilaments: false,
+          hasVisits: false,
+          hasQuotes: false,
+          hasMaterials: true,
+        },
+        machineStatusLabels: {
+          WORKING: 'En Uso',
+          MAINTENANCE: 'No Disponible',
+          IDLE: 'Disponible'
+        }
       };
   }
 }
@@ -332,6 +380,7 @@ export function mapCategoryToRubro(category: string): Rubro {
   
   return map[normalized] as Rubro || 'GENERICO';
 }
+
 export function getStatusColorBase(status: string, rubro?: Rubro): string {
   const config = getNegocioConfig(rubro || 'GENERICO');
   const stage = config.productionStages.find((s) => s.key === status);
