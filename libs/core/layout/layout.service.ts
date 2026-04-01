@@ -46,13 +46,28 @@ export class LayoutService {
     LAYOUT_CONSTANTS.SIDEBAR_WIDTH_EXPANDED - LAYOUT_CONSTANTS.SIDEBAR_WIDTH_COLLAPSED
   );
 
+  private hoverTimeout: any;
+
   togglePinned() {
     this.isPinned.set(!this.isPinned());
   }
 
   setHovered(hovered: boolean) {
-    if (!this.isMobile()) {
-      this.isHovered.set(hovered);
+    if (this.isMobile()) return;
+
+    if (hovered) {
+      if (this.hoverTimeout) {
+        clearTimeout(this.hoverTimeout);
+        this.hoverTimeout = null;
+      }
+      this.isHovered.set(true);
+    } else {
+      // Small delay before collapsing to prevent flickering
+      if (this.hoverTimeout) clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = setTimeout(() => {
+        this.isHovered.set(false);
+        this.hoverTimeout = null;
+      }, 150);
     }
   }
 

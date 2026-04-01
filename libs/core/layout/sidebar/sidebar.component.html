@@ -1,16 +1,12 @@
 <aside 
+  class="fixed left-0 top-0 z-[60] h-screen border-r border-border bg-background shadow-2xl shadow-black/5 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden will-change-[width,transform]"
+  [style.width.px]="layoutService.isMobile() ? 280 : layoutService.sidebarWidth()"
+  [class.-translate-x-full]="layoutService.isMobile() && !layoutService.isMobileMenuOpen()"
   (mouseenter)="layoutService.setHovered(true)"
   (mouseleave)="layoutService.setHovered(false)"
-  class="fixed left-0 top-0 z-50 h-screen border-r border-border bg-background shadow-2xl shadow-black/5 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform"
-  [class.w-72]="!layoutService.isMobile() && layoutService.isPinned()"
-  [class.w-20]="!layoutService.isMobile() && !layoutService.isPinned()"
-  [class.w-[280px]]="layoutService.isMobile()"
-  [class.-translate-x-full]="layoutService.isMobile() && !layoutService.isMobileMenuOpen()"
-  [class.translate-x-0]="!layoutService.isMobile() || layoutService.isMobileMenuOpen()"
 >
   <div 
-    class="h-full flex flex-col p-4 transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform"
-    [style.transform]="!layoutService.isMobile() && layoutService.isCollapsed() ? 'translateX(' + layoutService.translateOffset() + 'px)' : 'translateX(0)'"
+    class="h-full flex flex-col p-4 w-full min-w-[280px] shrink-0"
   >
     @if (!sessionService.isInitialized()) {
       <app-sidebar-skeleton></app-sidebar-skeleton>
