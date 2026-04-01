@@ -1,20 +1,40 @@
-import { Component, Input, Output, EventEmitter, inject, computed, input, signal } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { 
+  Component, 
+  Input, 
+  Output, 
+  EventEmitter, 
+  inject, 
+  computed, 
+  input, 
+  signal,
+  ChangeDetectionStrategy 
+} from '@angular/core';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Trash2, Check, Plus, Upload, Loader2, FileCheck, X } from 'lucide-angular';
+import { LucideAngularModule, Trash2 } from 'lucide-angular';
 import { MoneyInputComponent } from '@shared/ui/money-input/money-input.component';
-import { FilesApiService } from '@core/api/files.api.service';
-import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
+import { OrderCalculatorService } from '../../../services/order-calculator.service';
+
+// enhancements
+import { MetalurgicaItemEnhancementComponent } from './enhancements/metalurgica-enhancement.component';
+import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancement.component';
 
 @Component({
   selector: 'app-item-details-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, MoneyInputComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    LucideAngularModule, 
+    MoneyInputComponent,
+    MetalurgicaItemEnhancementComponent,
+    Print3dItemEnhancementComponent,
+    CurrencyPipe
+  ],
   template: `
     <div class="group relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] shadow-sm transition-all hover:shadow-xl hover:shadow-zinc-200/50 dark:hover:shadow-none">
-      <input type="file" #fileInput class="hidden" accept=".stl" (change)="onFileSelected($event)">
       <div [class]="cn('absolute top-0 left-0 w-1.5 h-full opacity-20 group-hover:opacity-100 transition-opacity', rubro() === 'METALURGICA' ? 'bg-indigo-500' : 'bg-primary')"></div>
 
       <div class="p-8 space-y-8">
@@ -32,27 +52,11 @@ import { cn } from '@shared/utils/cn';
           }
         </div>
 
-        <!-- METALWORK TEMPLATES -->
-        @if (rubro() === 'METALURGICA') {
-          <div class="space-y-4">
-            <div class="bg-indigo-50/50 dark:bg-zinc-950/20 p-5 rounded-[1.5rem] border border-indigo-100/50 dark:border-indigo-900/30">
-              <div class="flex items-center gap-2 mb-3">
-                <lucide-angular [img]="icons.Check" class="h-3 w-3 text-indigo-400"></lucide-angular>
-                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400/80">Plantillas de Ingeniería</span>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                @for (tpl of metalTemplates; track tpl.label) {
-                  <button
-                    type="button"
-                    (click)="applyTemplate(tpl.data)"
-                    class="px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-zinc-900 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-800/50 transition-all hover:border-indigo-500"
-                  >
-                    {{ tpl.label }}
-                  </button>
-                }
-              </div>
-            </div>
-          </div>
+        <!-- RUBRIC ENHANCEMENTS AREA -->
+        @switch (rubro()) {
+          @case ('METALURGICA') {
+            <app-metalurgica-item-enhancement (onApply)="applyEnhancement($event)"></app-metalurgica-item-enhancement>
+          }
         }
 
         <!-- DYNAMIC FIELDS BY SECTION -->
@@ -119,63 +123,23 @@ import { cn } from '@shared/utils/cn';
                             >
                          </div>
                       } @else {
-            @if (f.key === 'url_stl' && rubro() === 'IMPRESION_3D') {
-              <div class="flex flex-col gap-3">
-                <input
-                  type="text"
-                  [(ngModel)]="item[f.key]"
-                  (ngModelChange)="onUpdate.emit()"
-                  class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all"
-                  placeholder="URL del STL (Thingiverse, Printables, etc...)"
-                >
-                
-                <div class="flex items-center gap-3">
-                  <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
-                  <span class="text-[9px] font-black text-zinc-300 uppercase tracking-widest">O Subir Archivo</span>
-                  <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
-                </div>
-
-                @if (!item.stlFile) {
-                  <button
-                    type="button"
-                    (click)="fileInput.click()"
-                    [disabled]="isUploading()"
-                    class="h-12 w-full border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-widest text-zinc-400 hover:border-primary hover:text-primary transition-all disabled:opacity-50"
-                  >
-                    @if (isUploading()) {
-                      <lucide-angular [img]="icons.Loader2" class="h-4 w-4 animate-spin"></lucide-angular>
-                      Subiendo...
-                    } @else {
-                      <lucide-angular [img]="icons.Upload" class="h-4 w-4"></lucide-angular>
-                      Seleccionar Archivo .STL
-                    }
-                  </button>
-                } @else {
-                  <div class="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10 animate-in zoom-in-95 duration-300">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                      <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                        <lucide-angular [img]="icons.FileCheck" class="h-4 w-4"></lucide-angular>
-                      </div>
-                      <div class="flex flex-col overflow-hidden">
-                        <span class="text-[11px] font-black text-primary truncate">{{ item.stlFile.fileName }}</span>
-                        <span class="text-[9px] font-bold text-primary/50 uppercase tracking-tighter">{{ (item.stlFile.size / 1024 / 1024) | number:'1.1-2' }} MB</span>
-                      </div>
-                    </div>
-                    <button type="button" (click)="clearFile()" class="h-8 w-8 rounded-lg hover:bg-rose-500 hover:text-white text-zinc-300 transition-all flex items-center justify-center">
-                      <lucide-angular [img]="icons.X" class="h-3.5 w-3.5"></lucide-angular>
-                    </button>
-                  </div>
-                }
-              </div>
-            } @else {
-              <input
-                type="text"
-                [(ngModel)]="item[f.key]"
-                (ngModelChange)="onUpdate.emit()"
-                class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all"
-                [placeholder]="f.placeholder || ''"
-              >
-            }
+                        <!-- ITEM SPECIFIC ENHANCEMENTS PLUGINS -->
+                        @if (f.key === 'url_stl' && rubro() === 'IMPRESION_3D') {
+                          <app-print3d-item-enhancement
+                            [item]="item"
+                            (onFileUpload)="onFileUpload.emit($event)"
+                            (onFileDelete)="onFileDelete.emit($event)"
+                            (onUpdate)="onUpdate.emit()"
+                          ></app-print3d-item-enhancement>
+                        } @else {
+                          <input
+                            type="text"
+                            [(ngModel)]="item[f.key]"
+                            (ngModelChange)="onUpdate.emit()"
+                            class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all"
+                            [placeholder]="f.placeholder || ''"
+                          >
+                        }
                       }
                     </div>
                   }
@@ -213,13 +177,14 @@ import { cn } from '@shared/utils/cn';
             <span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-2">Carga Final Ítem</span>
             <div class="h-16 w-full md:w-auto px-8 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-black text-2xl tabular-nums shadow-xl group/total overflow-hidden relative transition-all">
               <div class="absolute inset-x-0 bottom-0 h-0.5 bg-primary/40 group-hover/total:h-full transition-all duration-500 opacity-20"></div>
-              <span class="relative z-10">{{ (item.cantidad || 0) * (item.precioUnitario || 0) | currency }}</span>
+              <span class="relative z-10">{{ getItemTotal() | currency }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-  `
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemDetailsFormComponent {
   @Input({ required: true }) item: any;
@@ -229,69 +194,18 @@ export class ItemDetailsFormComponent {
   rubro = input.required<Rubro>();
   orderType = input<'CUSTOMER' | 'STOCK'>('CUSTOMER');
 
-  private filesApi = inject(FilesApiService);
-  private confirm = inject(ConfirmService);
+  private calculator = inject(OrderCalculatorService);
 
   @Output() onRemove = new EventEmitter<void>();
   @Output() onUpdate = new EventEmitter<void>();
   @Output() onFileUpload = new EventEmitter<string>();
   @Output() onFileDelete = new EventEmitter<string>();
 
-  readonly icons = { Trash2, Check, Plus, Upload, Loader2, FileCheck, X };
-  isUploading = signal(false);
-
-  async onFileSelected(event: any) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    this.isUploading.set(true);
-    try {
-      const res = await this.filesApi.uploadFile(file);
-      this.item.stlFile = res;
-      this.onFileUpload.emit(res.path);
-      this.onUpdate.emit();
-    } catch (error) {
-      console.error('Upload failed', error);
-      alert('Error al subir el archivo');
-    } finally {
-      this.isUploading.set(false);
-      // Reset input
-      event.target.value = '';
-    }
+  getItemTotal(): number {
+    return this.calculator.calculateItem(this.item, this.rubro()).total;
   }
 
-  async clearFile() {
-    if (!this.item.stlFile) return;
-
-    const confirmed = await this.confirm.confirm({
-      title: 'Eliminar Diseño',
-      message: '¿Estás seguro de que deseas eliminar este archivo de diseño? Esta acción lo borrará permanentemente de la nube.',
-      confirmLabel: 'Sí, eliminar',
-      type: 'danger'
-    });
-
-    if (confirmed) {
-      this.isUploading.set(true); // Re-use loading state for deletion
-      try {
-        await this.filesApi.deleteFile(this.item.stlFile.path);
-        this.onFileDelete.emit(this.item.stlFile.path);
-        this.item.stlFile = undefined;
-        this.onUpdate.emit();
-      } catch (error) {
-        console.error('Delete failed', error);
-        alert('Error al eliminar el archivo de la nube');
-      } finally {
-        this.isUploading.set(false);
-      }
-    }
-  }
-
-  metalTemplates = [
-    { label: 'Portón', data: { tipo_trabajo: 'Portón', typeAperture: 'CORREDIZO', material_estructura: 'Caño 40x40', fillMaterial: 'CHAPA' } },
-    { label: 'Reja', data: { tipo_trabajo: 'Reja', fillMaterial: 'BARROTES', material_estructura: 'Hierro Redondo 1/2"' } },
-    { label: 'Puerta Reja', data: { tipo_trabajo: 'Puerta', typeAperture: 'BATIENTE', fillMaterial: 'BARROTES', accessories: ['CERRADURA', 'BISAGRAS'] } },
-    { label: 'Tinglado', data: { tipo_trabajo: 'Estructura', material_estructura: 'Perfil C 100x50', fillMaterial: 'CHAPA' } },
-  ];
+  readonly icons = { Trash2 };
 
   sectionedFields = computed(() => {
     const sections: { name: string, fields: any[] }[] = [];
@@ -326,7 +240,7 @@ export class ItemDetailsFormComponent {
     return true;
   }
 
-  applyTemplate(data: any) {
+  applyEnhancement(data: any) {
     Object.assign(this.item, data);
     this.onUpdate.emit();
   }

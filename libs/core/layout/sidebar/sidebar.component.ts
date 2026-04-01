@@ -44,6 +44,8 @@ import { AccessControlService } from '../../auth/access-control.service';
 import { MenuGroupMetadata } from '../../../shared/models/access-control';
 import { SidebarSkeletonComponent } from '../../../shared/ui/skeleton/skeleton.component';
 
+import { SIDEBAR_MENU_CONFIG } from '../../../shared/constants/sidebar-config';
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -63,8 +65,14 @@ export class SidebarComponent {
   accessService = inject(AccessControlService);
   router = inject(Router);
 
+  readonly icons = {
+    LayoutDashboard, ShoppingCart, Users, Wrench, Cpu, BarChart3, Settings,
+    Package, Layers, Box, Printer, FileText, Cog, Grid, ClipboardList,
+    Hammer, Trees, Clock, HardHat, PackageSearch, Activity, UserCog, Database, Zap,
+    ChevronLeft, ChevronRight, Pin, PinOff, User, X
+  };
+
   constructor() {
-    // Close mobile menu on navigation
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       takeUntilDestroyed()
@@ -73,72 +81,22 @@ export class SidebarComponent {
     });
   }
 
-  readonly icons = {
-    LayoutDashboard, ShoppingCart, Users, Wrench, Cpu, BarChart3, Settings,
-    Package, Layers, Box, Printer, FileText, Cog, Grid, ClipboardList,
-    Hammer, Trees, Clock, HardHat, PackageSearch, Activity, UserCog, Database, Zap,
-    ChevronLeft, ChevronRight, Pin, PinOff, User, X
-  };
-// ...
-
   /**
    * Computed list of visible menu groups based on business features and user permissions.
+   * Dynamically resolves labels from the business-specific configuration if a configKey is present.
    */
   readonly sidebarMenu = computed(() => {
-    const rawGroups: MenuGroupMetadata[] = [
-      {
-        title: 'Principal',
-        items: [
-          { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, requiredFeature: 'DASHBOARD' },
-        ]
-      },
-      {
-        title: 'Comercial',
-        items: [
-          { label: 'Visitas', href: '/visitas', icon: Clock, requiredFeature: 'VISITS' },
-          { label: 'Presupuestos', href: '/presupuestos', icon: FileText, requiredFeature: 'QUOTES' },
-          { label: 'Pedidos', href: '/pedidos', icon: ShoppingCart, requiredFeature: 'ORDERS' },
-          { label: 'Clientes', href: '/clientes', icon: Users, requiredFeature: 'CLIENTS' },
-        ]
-      },
-      {
-        title: 'Operaciones',
-        items: [
-          { label: 'Producción', href: '/produccion', icon: Activity, requiredFeature: 'ORDERS_PRODUCTION' },
-          { label: 'Inventario', href: '/stock', icon: Grid, requiredFeature: 'STOCK' },
-        ]
-      },
-      {
-        title: 'Mi Taller',
-        items: [
-          { 
-            label: this.sessionService.config()?.labels?.maquinas || 'Maquinaria', 
-            href: '/maquinas', 
-            icon: Wrench, 
-            requiredFeature: 'MACHINERY' 
-          },
-          { 
-            label: this.sessionService.config()?.labels?.materiales || 'Materiales', 
-            href: '/materiales', 
-            icon: Package, 
-            requiredFeature: 'MATERIALS' 
-          },
-          { label: 'Equipo', href: '/personal', icon: UserCog, requiredFeature: 'TEAM' },
-        ]
-      },
-      {
-        title: 'Sistema',
-        items: [
-          { label: 'Reportes', href: '/reportes', icon: BarChart3, requiredFeature: 'REPORTS' },
-          { label: 'Ajustes', href: '/ajustes', icon: Settings, requiredFeature: 'SETTINGS' },
-        ]
-      }
-    ];
-
-    return rawGroups
+    return SIDEBAR_MENU_CONFIG
       .map(group => ({
         ...group,
-        items: group.items.filter(item => this.accessService.canViewMenuItem(item))
+        items: group.items
+          .filter(item => this.accessService.canViewMenuItem(item))
+          .map(item => ({
+            ...item,
+            // Override static label with business-specific label from config if available
+            label: (item.configKey && this.sessionService.config()?.labels?.[item.configKey]) 
+                    || item.label
+          }))
       }))
       .filter(group => group.items.length > 0);
   });

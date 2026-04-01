@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -16,4 +16,9 @@ import { ConfirmDialogComponent } from '../../../shared/ui/confirm-dialog/confir
 })
 export class MainLayoutComponent {
   layoutService = inject(LayoutService);
+
+  @HostListener('document:keydown.escape')
+  handleEscape() {
+    this.layoutService.activeDropdown.set(null);
+  }
 }

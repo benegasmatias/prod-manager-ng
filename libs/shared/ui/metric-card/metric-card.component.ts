@@ -38,7 +38,7 @@ export class MetricCardComponent {
     const base = 'group relative transition-all duration-500 flex flex-col justify-between h-full border-none shadow-none bg-transparent';
     const variantStyles = {
       default: '',
-      highlight: 'text-primary-foreground hover:scale-[1.02]',
+      highlight: 'bg-primary text-primary-foreground rounded-[2rem] overflow-hidden hover:scale-[1.02] shadow-xl shadow-primary/20',
       status: 'border-b-4'
     };
 

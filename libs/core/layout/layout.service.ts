@@ -13,6 +13,9 @@ export class LayoutService {
   isPinned = signal(true);
   isHovered = signal(false);
   isMobileMenuOpen = signal(false);
+  
+  // UI overlay state
+  activeDropdown = signal<'business' | 'notifications' | 'user' | null>(null);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -69,6 +72,10 @@ export class LayoutService {
         this.hoverTimeout = null;
       }, 150);
     }
+  }
+
+  onEscape() {
+    this.activeDropdown.set(null);
   }
 
   toggleMobileMenu() {

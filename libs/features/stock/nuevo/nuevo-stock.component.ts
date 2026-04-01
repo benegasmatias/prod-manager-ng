@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OrderFormComponent } from '../../../shared/ui/order-form/order-form.component';
+import { OrderFormComponent } from '../../pedidos/components/form';
 
 @Component({
   selector: 'app-nuevo-stock-page',

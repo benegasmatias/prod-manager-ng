@@ -42,6 +42,7 @@ export interface NegocioConfig {
     materiales: string;
     unidadName: string;
     unidadModel: string;
+    [key: string]: string | undefined;
   };
   icons: Record<string, string>;
   stats: StatMetric[];

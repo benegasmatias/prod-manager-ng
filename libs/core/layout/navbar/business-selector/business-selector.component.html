@@ -1,55 +1,55 @@
-<!-- MOBILE VERSION -->
 <div class="lg:hidden flex items-center relative">
-  <button (click)="dropdownOpen.set(!dropdownOpen())"
+  <button (click)="toggleDropdown($event)"
     class="h-9 w-9 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 transition-colors active:scale-90 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm overflow-hidden group">
     @if (sessionService.activeNegocio(); as active) {
-      <div class="flex items-center justify-center h-full w-full bg-primary/10 text-primary group-active:bg-primary group-active:text-white transition-colors">
-        <span class="text-[10px] font-black uppercase">{{ active.nombre.charAt(0) }}</span>
-      </div>
+    <div
+      class="flex items-center justify-center h-full w-full bg-primary/10 text-primary group-active:bg-primary group-active:text-white transition-colors">
+      <span class="text-[10px] font-black uppercase">{{ active.nombre.charAt(0) }}</span>
+    </div>
     } @else {
-      <lucide-angular [img]="icons.Building2" class="h-4 w-4 text-zinc-400"></lucide-angular>
+    <lucide-angular [img]="icons.Building2" class="h-4 w-4 text-zinc-400"></lucide-angular>
     }
   </button>
 
   @if (dropdownOpen()) {
-    <div
-      class="fixed top-16 left-4 right-4 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-      <div class="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-zinc-400">Mis Negocios</div>
-      <div class="h-px bg-zinc-100 dark:bg-zinc-800 my-1"></div>
-      
-      <div class="max-h-[300px] overflow-y-auto no-scrollbar space-y-1">
-        @for (negocio of sessionService.negocios(); track negocio.id) {
-          <button (click)="sessionService.setActiveId(negocio.id); dropdownOpen.set(false)"
-            class="w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all cursor-pointer text-left"
-            [class.bg-primary/5]="sessionService.activeId() === negocio.id"
-            [class.text-primary]="sessionService.activeId() === negocio.id"
-            [class.hover:bg-zinc-50]="sessionService.activeId() !== negocio.id"
-            [class.dark:hover:bg-zinc-900]="sessionService.activeId() !== negocio.id">
-            <div class="flex flex-col">
-              <span class="text-xs font-black tracking-tight">{{ negocio.nombre }}</span>
-              <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter">{{ negocio.rubro }}</span>
-            </div>
-            @if (sessionService.activeId() === negocio.id) {
-              <lucide-angular [img]="icons.CheckCircle2" class="h-3.5 w-3.5 animate-in zoom-in duration-200"></lucide-angular>
-            }
-          </button>
+  <div
+    class="fixed top-16 left-4 right-4 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+    <div class="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-zinc-400">Mis Negocios</div>
+    <div class="h-px bg-zinc-100 dark:bg-zinc-800 my-1"></div>
+
+    <div class="max-h-[300px] overflow-y-auto no-scrollbar space-y-1">
+      @for (negocio of sessionService.negocios(); track negocio.id) {
+      <button (click)="sessionService.setActiveId(negocio.id); layoutService.activeDropdown.set(null)"
+        class="w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all cursor-pointer text-left"
+        [class.bg-primary/5]="sessionService.activeId() === negocio.id"
+        [class.text-primary]="sessionService.activeId() === negocio.id"
+        [class.hover:bg-zinc-50]="sessionService.activeId() !== negocio.id"
+        [class.dark:hover:bg-zinc-900]="sessionService.activeId() !== negocio.id">
+        <div class="flex flex-col">
+          <span class="text-xs font-black tracking-tight">{{ negocio.nombre }}</span>
+          <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter">{{ negocio.rubro }}</span>
+        </div>
+        @if (sessionService.activeId() === negocio.id) {
+        <lucide-angular [img]="icons.CheckCircle2" class="h-3.5 w-3.5 animate-in zoom-in duration-200"></lucide-angular>
         }
-      </div>
+      </button>
+      }
     </div>
-    <!-- Backdrop for mobile dropdown -->
-    <div class="fixed inset-0 z-[90] bg-zinc-950/20 backdrop-blur-[2px]" (click)="dropdownOpen.set(false)"></div>
+  </div>
+  <!-- Backdrop for mobile dropdown -->
+  <div class="fixed inset-0 z-[90] bg-zinc-950/20 backdrop-blur-[2px]" (click)="layoutService.activeDropdown.set(null)"></div>
   }
 </div>
 
 <!-- DESKTOP VERSION -->
 <div class="hidden lg:flex items-center gap-2 relative">
-  <button (click)="dropdownOpen.set(!dropdownOpen())"
+  <button (click)="toggleDropdown($event)"
     class="h-9 gap-2 border-none bg-zinc-100 hover:bg-zinc-200/70 transition-colors font-bold text-[10px] uppercase tracking-widest px-3 rounded-xl dark:bg-zinc-900 dark:hover:bg-zinc-800 flex items-center">
     <lucide-angular [img]="icons.Building2" class="h-4 w-4 text-primary"></lucide-angular>
     @if (sessionService.activeNegocio(); as active) {
-      <span class="max-w-[150px] truncate">{{ active.nombre }}</span>
+    <span class="max-w-[150px] truncate">{{ active.nombre }}</span>
     } @else {
-      <span class="max-w-[150px] truncate">Seleccionar Negocio</span>
+    <span class="max-w-[150px] truncate">Seleccionar Negocio</span>
     }
     <lucide-angular [img]="icons.ChevronDown" class="h-3 w-3 text-zinc-400"
       [class.rotate-180]="dropdownOpen()"></lucide-angular>
@@ -65,7 +65,7 @@
     <div class="max-h-[300px] overflow-y-auto no-scrollbar space-y-1">
       @for (negocio of sessionService.negocios(); track negocio.id) {
       <div class="group relative flex items-center">
-        <button (click)="sessionService.setActiveId(negocio.id); dropdownOpen.set(false)"
+        <button (click)="sessionService.setActiveId(negocio.id); layoutService.activeDropdown.set(null)"
           class="w-full flex flex-col items-start gap-0.5 px-3 py-2.5 rounded-xl transition-all cursor-pointer text-left"
           [class.bg-primary/5]="sessionService.activeId() === negocio.id"
           [class.text-primary]="sessionService.activeId() === negocio.id"
@@ -105,11 +105,13 @@
     (click)="$event.stopPropagation()">
     <div
       class="p-6 sm:p-8 border-b border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/10 flex items-center gap-4">
-      <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+      <div
+        class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
         <lucide-angular [img]="icons.Building2" class="h-5 w-5 sm:h-6 sm:w-6"></lucide-angular>
       </div>
       <div class="space-y-1">
-        <h3 class="text-lg sm:text-xl font-bold tracking-tight">{{ editingId() ? 'Editar Espacio' : 'Nuevo Negocio' }}</h3>
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight">{{ editingId() ? 'Editar Espacio' : 'Nuevo Negocio' }}
+        </h3>
         <p class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
           {{ editingId() ? 'Ajusta los detalles operativos' : 'Comienza una nueva línea' }}
         </p>

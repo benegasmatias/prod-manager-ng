@@ -64,6 +64,7 @@ export interface MenuItemMetadata {
   requiredFeature?: FeatureCode;
   requiredPermission?: PermissionAction;
   shortcut?: string;
+  configKey?: string; // Links to business-specific label overrides
 }
 
 export interface MenuGroupMetadata {

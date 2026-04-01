@@ -1,39 +1,37 @@
 <header 
-  class="fixed top-0 right-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b border-border bg-surface/80 px-3 sm:px-6 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
-  [class.lg:left-72]="layoutService.isPinned() && !layoutService.isMobile()"
-  [class.lg:left-20]="!layoutService.isPinned() && !layoutService.isMobile()"
-  [class.left-0]="layoutService.isMobile()"
+  class="fixed top-0 right-0 z-[75] flex h-14 sm:h-16 items-center justify-between border-b border-border bg-background/80 px-3 sm:px-6 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+  [style.left.px]="layoutService.isMobile() ? 0 : (layoutService.isPinned() ? layoutService.constants.SIDEBAR_WIDTH_EXPANDED : layoutService.constants.SIDEBAR_WIDTH_COLLAPSED)"
 >
   <div class="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
     <!-- Mobile Hamburger Menu Button -->
     @if (layoutService.isMobile()) {
       <button 
         (click)="layoutService.toggleMobileMenu()"
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-surface-2 transition-colors active:scale-95"
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors active:scale-95"
       >
         <lucide-angular 
           [img]="icons.Menu" 
           [class.text-primary]="layoutService.isMobileMenuOpen()" 
-          [class.text-text-muted]="!layoutService.isMobileMenuOpen()"
+          [class.text-muted-foreground]="!layoutService.isMobileMenuOpen()"
           class="h-5 w-5 transition-all"
         ></lucide-angular>
       </button>
     } @else {
       <button 
         (click)="layoutService.togglePinned()"
-        class="hidden lg:flex h-10 w-10 items-center justify-center rounded-xl hover:bg-surface-2 transition-colors"
+        class="hidden lg:flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors"
       >
         <lucide-angular 
           [img]="icons.Menu" 
           [class.text-primary]="layoutService.isPinned()" 
-          [class.text-text-muted]="!layoutService.isPinned()"
+          [class.text-muted-foreground]="!layoutService.isPinned()"
           class="h-5 w-5 transition-all"
         ></lucide-angular>
       </button>
     }
 
     <!-- Business Selector -->
-    <div class="truncate max-w-[140px] sm:max-w-none">
+    <div class="flex items-center min-w-0">
       <app-business-selector></app-business-selector>
     </div>
   </div>
@@ -48,10 +46,11 @@
       <!-- Theme Toggle -->
       <button 
         (click)="toggleTheme()"
-        class="h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl hover:bg-surface-2 transition-colors relative active:scale-95"
+        class="h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl hover:bg-muted/50 transition-colors relative active:scale-95"
       >
-        <lucide-angular [img]="icons.Sun" class="h-4 w-4 transition-all scale-100 rotate-0 dark:scale-0 dark:-rotate-90 text-text"></lucide-angular>
-        <lucide-angular [img]="icons.Moon" class="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 text-text"></lucide-angular>
+        <!-- Icon swap: Sun indicates switching to light, Moon indicates switching to dark -->
+        <lucide-angular [img]="icons.Moon" class="h-4 w-4 transition-all scale-100 rotate-0 dark:scale-0 dark:-rotate-90 text-foreground"></lucide-angular>
+        <lucide-angular [img]="icons.Sun" class="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 text-foreground"></lucide-angular>
       </button>
     </div>
 

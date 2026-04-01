@@ -1,10 +1,11 @@
-import { Component, inject, signal, ViewChild, ElementRef, model, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, ViewChild, ElementRef, model, ChangeDetectionStrategy, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Building2, ChevronDown, Plus, Settings, Monitor, Trash2, X, CheckCircle2 } from 'lucide-angular';
 import { SessionService } from '../../../session/session.service';
 import { ConfirmService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
+import { LayoutService } from '../../layout.service';
 import { Rubro, Negocio } from '../../../../shared/models';
 
 @Component({
@@ -16,12 +17,14 @@ import { Rubro, Negocio } from '../../../../shared/models';
 })
 export class BusinessSelectorComponent {
   @ViewChild('businessDialog') businessDialog!: ElementRef<HTMLDialogElement>;
-  
+
   sessionService = inject(SessionService);
+  layoutService = inject(LayoutService);
   confirmService = inject(ConfirmService);
   private router = inject(Router);
-  
-  dropdownOpen = signal(false);
+  private elementRef = inject(ElementRef);
+
+  dropdownOpen = computed(() => this.layoutService.activeDropdown() === 'business');
   isDialogOpen = signal(false);
   editingId = signal<string | null>(null);
   formNombre = model('');
@@ -30,25 +33,37 @@ export class BusinessSelectorComponent {
 
   protected readonly icons = { Building2, ChevronDown, Plus, Settings, Monitor, Trash2, X, CheckCircle2 };
 
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if (!this.elementRef.nativeElement.contains(event.target) && this.dropdownOpen()) {
+      this.layoutService.activeDropdown.set(null);
+    }
+  }
+
+  toggleDropdown(event: Event) {
+    event.stopPropagation();
+    this.layoutService.activeDropdown.set(this.dropdownOpen() ? null : 'business');
+  }
+
   handleOpenAdd() {
     this.editingId.set(null);
     this.formNombre.set('');
     this.formRubro.set('GENERICO');
     this.isDialogOpen.set(true);
-    this.dropdownOpen.set(false);
+    this.layoutService.activeDropdown.set(null);
     this.businessDialog.nativeElement.showModal();
   }
 
   handleOpenEdit(event: Event, negocio: Negocio) {
     event.stopPropagation();
-    this.dropdownOpen.set(false);
+    this.layoutService.activeDropdown.set(null);
     this.sessionService.setActiveId(negocio.id);
     this.router.navigate(['/ajustes']);
   }
 
   async handleSave() {
     if (!this.formNombre()) return;
-    
+
     this.isSaving.set(true);
     try {
       if (this.editingId()) {

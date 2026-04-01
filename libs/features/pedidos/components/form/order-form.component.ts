@@ -12,6 +12,7 @@ import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-pick
 import { ItemDetailsFormComponent } from './items-section/item-details-form.component';
 import { FilesApiService } from '@core/api/files.api.service';
 import { cn } from '@shared/utils/cn';
+import { OrderCalculatorService } from '../../services/order-calculator.service';
 
 @Component({
   selector: 'app-order-form',
@@ -213,6 +214,7 @@ export class OrderFormComponent implements OnDestroy {
   private clientesApi = inject(ClientesApiService);
   private session = inject(SessionService);
   private router = inject(Router);
+  private calculator = inject(OrderCalculatorService);
 
   readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw };
 
@@ -343,30 +345,8 @@ export class OrderFormComponent implements OnDestroy {
   }
 
   recalcTotales() {
-    const current = this.items().reduce((acc, item) => {
-      const sub = (item.cantidad || 0) * (item.precioUnitario || 0);
-      const dis = item.seDiseñaSTL ? (Number(item.precioDiseno) || 0) : 0;
-      const inst = item.instalacion ? (Number(item.costo_instalacion) || 0) : 0;
-      const senia = Number(item.senia) || 0;
-      const units = Number(item.cantidad) || 0;
-
-      return {
-        subtotal: acc.subtotal + sub,
-        diseno: acc.diseno + dis,
-        instalacion: acc.instalacion + inst,
-        total: acc.total + sub + dis + inst,
-        totalSenias: acc.totalSenias + senia,
-        unidades: acc.unidades + units
-      };
-    }, { subtotal: 0, diseno: 0, instalacion: 0, total: 0, totalSenias: 0, unidades: 0 });
-
-    const totalFinal = current.total;
-    const totalSenias = current.totalSenias;
-
-    this.totales.set({
-      ...current,
-      saldoPendiente: totalFinal - totalSenias
-    });
+    const summary = this.calculator.calculateOrder(this.items(), this.rubro());
+    this.totales.set(summary);
   }
 
   onClientChange(id: string) {

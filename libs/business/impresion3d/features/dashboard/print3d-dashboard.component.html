@@ -1,0 +1,243 @@
+<div class="space-y-8 animate-in fade-in duration-500">
+  
+  <!-- 1. KPIs PRODUCTIVOS -->
+  <header>
+    <app-metric-cards-grid [columns]="4">
+      @for (kpi of kpis(); track kpi.title) {
+        <app-metric-card
+          [title]="kpi.title"
+          [value]="kpi.value"
+          [icon]="kpi.icon"
+          [subtitle]="kpi.subtitle"
+          [trendText]="kpi.trend"
+          [trendDirection]="kpi.trendDirection || 'neutral'"
+          [variant]="kpi.variant"
+          [accentColor]="kpi.accentColor"
+          [loading]="loading()"
+        ></app-metric-card>
+      }
+    </app-metric-cards-grid>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- 2. PRODUCCIÓN EN VIVO (Grid Impresoras) -->
+    <section class="lg:col-span-8 flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black tracking-tight flex items-center gap-3">
+            <span class="h-8 w-1.5 bg-primary rounded-full"></span>
+            {{ config().sectionTitles?.printers }}
+          </h2>
+          <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Control de hardware remoto y telemetría de nodos</p>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/10 rounded-full animate-pulse">
+           <span class="h-2 w-2 bg-primary rounded-full"></span>
+           <span class="text-[10px] font-black uppercase tracking-widest text-primary">Live Monitoring</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (printer of printers(); track printer.id) {
+          <app-base-card 
+            variant="surface" 
+            padding="none" 
+            [hover]="true"
+            class="group overflow-hidden border-zinc-200/50 dark:border-zinc-800/50"
+          >
+            <div class="p-5 space-y-4">
+              <!-- Printer Header -->
+              <div class="flex items-start justify-between">
+                <div class="space-y-1">
+                  <h3 class="text-sm font-black tracking-tight group-hover:text-primary transition-colors">{{ printer.name }}</h3>
+                  <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">{{ printer.model }}</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border" [class]="getStatusColor(printer.status)">
+                  {{ getStatusLabel(printer.status) }}
+                </span>
+              </div>
+
+              <!-- Job Info -->
+              <div class="bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-3 border border-zinc-100 dark:border-white/5">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[9px] font-black uppercase tracking-wider text-zinc-400">Trabajo Actual</span>
+                  <span class="text-[10px] font-bold text-primary">{{ printer.progress }}%</span>
+                </div>
+                <p class="text-xs font-bold truncate">{{ printer.jobTitle || 'En espera...' }}</p>
+                
+                <!-- Progress Bar -->
+                <div class="mt-3 h-1.5 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-primary transition-all duration-1000 ease-in-out relative" [style.width.%]="printer.progress">
+                    <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer Stats -->
+              <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest">
+                <div class="flex items-center gap-2 text-zinc-400">
+                  <lucide-angular [img]="icons.Timer" class="h-3 w-3"></lucide-angular>
+                  <span>{{ printer.timeRemaining || '-' }}</span>
+                </div>
+                <div class="flex items-center gap-2" [class]="printer.status === 'READY' ? 'text-emerald-500' : 'text-zinc-400'">
+                  <lucide-angular [img]="icons.Layers" class="h-3 w-3"></lucide-angular>
+                  <span>{{ printer.filamentType || '-' }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quick Actions Banner -->
+            <div class="bg-zinc-50 dark:bg-zinc-900/50 p-2 flex items-center justify-end gap-2 border-t border-zinc-100 dark:border-white/5 h-0 group-hover:h-10 opacity-0 group-hover:opacity-100 transition-all duration-300">
+               <button class="text-[9px] font-black flex items-center gap-1 hover:text-primary transition-colors">
+                  <lucide-angular [img]="icons.Play" class="h-3 w-3"></lucide-angular> DETENER
+               </button>
+               <button class="text-[9px] font-black flex items-center gap-1 hover:text-primary transition-colors">
+                  <lucide-angular [img]="icons.Pause" class="h-3 w-3"></lucide-angular> PAUSAR
+               </button>
+            </div>
+          </app-base-card>
+        }
+      </div>
+    </section>
+
+    <div class="lg:col-span-4 space-y-8">
+      <!-- 4. MATERIAL (Stock & Consumo) -->
+      <section class="space-y-4">
+        <h2 class="text-sm font-black tracking-tight uppercase tracking-[0.2em] flex items-center gap-2 text-zinc-400">
+          <lucide-angular [img]="icons.Package" class="h-4 w-4"></lucide-angular>
+          {{ config().sectionTitles?.materials }}
+        </h2>
+        
+        <app-base-card variant="surface" padding="none">
+          <div class="divide-y divide-zinc-100 dark:divide-white/5">
+            @for (mat of materials(); track mat.id) {
+              <div class="p-4 flex items-center justify-between group hover:bg-zinc-50 dark:hover:bg-primary/5 transition-colors">
+                <div class="flex items-center gap-3">
+                   <div class="h-8 w-8 rounded-lg flex items-center justify-center border transition-colors"
+                     [class]="mat.isLowStock ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-zinc-100 dark:border-white/5 group-hover:border-primary/30 group-hover:text-primary'">
+                      <lucide-angular [img]="icons.Layers" class="h-4 w-4"></lucide-angular>
+                   </div>
+                   <div class="flex flex-col">
+                      <span class="text-xs font-bold">{{ mat.name }}</span>
+                      <span class="text-[8px] font-black uppercase text-zinc-400">Uso: {{ mat.dailyUsage }} {{ mat.unit }}/día</span>
+                   </div>
+                </div>
+                <div class="text-right">
+                   <p class="text-xs font-black tracking-tight">{{ mat.stockLevel }} {{ mat.unit }}</p>
+                   @if (mat.isLowStock) {
+                      <span class="text-[8px] font-black uppercase text-rose-500 animate-pulse">Stock Bajo</span>
+                   }
+                </div>
+              </div>
+            }
+          </div>
+          <button class="w-full p-3 text-[10px] font-black uppercase tracking-widest text-primary border-t border-zinc-100 dark:border-white/5 hover:bg-primary/5 transition-colors">
+            Ver Inventario Total
+          </button>
+        </app-base-card>
+      </section>
+
+      <!-- 6. FINANZAS (Secundario) - Control Center Style -->
+      <section class="bg-primary rounded-[2rem] p-6 text-white shadow-xl shadow-primary/20 relative overflow-hidden group">
+         <div class="absolute -top-10 -right-10 h-40 w-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+         <div class="relative z-10 space-y-6">
+            <div class="flex items-center justify-between">
+               <span class="text-[9px] font-black uppercase tracking-widest opacity-70">{{ config().sectionTitles?.financials }}</span>
+               <lucide-angular [img]="icons.TrendingUp" class="h-4 w-4"></lucide-angular>
+            </div>
+            <div class="space-y-1">
+               <h3 class="text-3xl font-black tracking-tighter">$12.500</h3>
+               <p class="text-[10px] font-bold text-white/50 uppercase tracking-widest text-balance">{{ config().sectionTitles?.financialsNeto }}</p>
+            </div>
+            <div class="h-px bg-white/20"></div>
+            <div class="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+               <span>{{ config().sectionTitles?.financialsMonthly }}</span>
+               <span class="text-white/60">ROI: 125%</span>
+            </div>
+         </div>
+      </section>
+
+      <!-- 5. ALERTAS CRÍTICAS -->
+      <section class="space-y-4">
+        <h2 class="text-sm font-black tracking-tight uppercase tracking-[0.2em] flex items-center gap-2 text-rose-500">
+          <lucide-angular [img]="icons.AlertTriangle" class="h-4 w-4"></lucide-angular>
+          {{ config().sectionTitles?.alerts }}
+        </h2>
+        <div class="space-y-2">
+           @for (alert of alerts(); track alert.message) {
+             <div class="p-3 rounded-xl border flex items-start gap-3 transition-all hover:scale-[1.02]"
+               [class]="alert.type === 'error' ? 'bg-rose-500/5 border-rose-500/20 text-rose-700 dark:text-rose-400' : 'bg-amber-500/5 border-amber-500/20 text-amber-700 dark:text-amber-400'">
+                <lucide-angular [img]="alert.type === 'error' ? icons.AlertCircle : icons.AlertTriangle" class="h-4 w-4 mt-0.5 shrink-0"></lucide-angular>
+                <div class="flex-1 min-w-0">
+                   <p class="text-[11px] font-bold leading-tight">{{ alert.message }}</p>
+                   <p class="text-[8px] font-black uppercase opacity-60 mt-1">{{ alert.timestamp }}</p>
+                </div>
+             </div>
+           }
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <!-- 3. COLA DE PRODUCCIÓN -->
+  <section class="space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-black tracking-tight flex items-center gap-3">
+          <span class="h-8 w-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full"></span>
+          {{ config().sectionTitles?.queue }}
+        </h2>
+        <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Sincronización con el flujo de pedidos comercial</p>
+      </div>
+      <button routerLink="/pedidos/kanban" class="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:translate-x-2 transition-transform">
+        Modo Kanban <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4"></lucide-angular>
+      </button>
+    </div>
+
+    <app-base-card variant="surface" padding="none" class="overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-100 dark:border-white/5">
+              <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">ID</th>
+              <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">Cliente</th>
+              <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">Pieza / Trabajo</th>
+              <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">Prioridad</th>
+              <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">Estado</th>
+              <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">ETA Estimado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100 dark:divide-white/5">
+            @for (item of queue(); track item.id) {
+              <tr class="group hover:bg-zinc-50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td class="px-6 py-4 text-[10px] font-black text-zinc-400 group-hover:text-primary transition-colors cursor-pointer">#{{ item.id }}</td>
+                <td class="px-6 py-4 text-xs font-bold">{{ item.clientName }}</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold leading-tight">{{ item.jobName }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                   <span class="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest border" [class]="getPriorityColor(item.priority)">
+                     {{ item.priority }}
+                   </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full" 
+                        [class]="item.status === 'PRINTING' ? 'bg-primary' : (item.status === 'PENDING' ? 'bg-zinc-300' : 'bg-emerald-500')">
+                    </span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest">{{ item.status }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-[10px] font-black text-zinc-400 uppercase tracking-widest">{{ item.eta }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-base-card>
+  </section>
+
+</div>

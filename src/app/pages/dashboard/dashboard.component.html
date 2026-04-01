@@ -1,5 +1,10 @@
-<app-metalurgica-dashboard 
-  [summary]="dashboardSummary()" 
-  [loading]="loading()"
-  rubro="METALURGICA">
-</app-metalurgica-dashboard>
+<!-- Orchestrated Generic Dashboard Shell -->
+<!-- The layout and widgets are controlled via DASHBOARD_CONFIG based on the active rubric -->
+@if (summary()) {
+  <!-- Main shell is resolved inside the TS component using PageShell -->
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+} @else {
+  <div class="flex items-center justify-center min-h-[60vh]">
+     <div class="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+  </div>
+}

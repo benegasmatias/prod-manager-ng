@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OrderFormComponent } from '../../../shared/ui/order-form/order-form.component';
+import { OrderFormComponent } from '../components/form';
+
 
 @Component({
   selector: 'app-nuevo-pedido-page',
@@ -12,4 +13,4 @@ import { OrderFormComponent } from '../../../shared/ui/order-form/order-form.com
     </div>
   `
 })
-export class NuevoPedidoPageComponent {}
+export class NuevoPedidoPageComponent { }

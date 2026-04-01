@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   LucideAngularModule,
@@ -15,6 +15,7 @@ import {
   X
 } from 'lucide-angular';
 import { NotificationsService } from '../../notifications.service';
+import { LayoutService } from '../../layout.service';
 
 @Component({
   selector: 'app-notification-dropdown',
@@ -23,7 +24,7 @@ import { NotificationsService } from '../../notifications.service';
   template: `
     <div class="relative">
       <button 
-        (click)="toggleDropdown()"
+        (click)="toggleDropdown($event)"
         class="h-10 w-10 flex items-center justify-center rounded-2xl relative hover:bg-zinc-100 dark:hover:bg-zinc-900 group transition-all"
       >
         <lucide-angular 
@@ -178,11 +179,22 @@ import { NotificationsService } from '../../notifications.service';
 })
 export class NotificationDropdownComponent {
   notificationsService = inject(NotificationsService);
-  isOpen = signal(false);
+  layoutService = inject(LayoutService);
+  private elementRef = inject(ElementRef);
+  
+  isOpen = computed(() => this.layoutService.activeDropdown() === 'notifications');
 
-  toggleDropdown() {
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if (!this.elementRef.nativeElement.contains(event.target) && this.isOpen()) {
+      this.layoutService.activeDropdown.set(null);
+    }
+  }
+
+  toggleDropdown(event: Event) {
+    event.stopPropagation();
     const next = !this.isOpen();
-    this.isOpen.set(next);
+    this.layoutService.activeDropdown.set(next ? 'notifications' : null);
     if (next) {
       this.notificationsService.refresh();
     }

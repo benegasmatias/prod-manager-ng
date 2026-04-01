@@ -1,9 +1,10 @@
-import { Component, inject, signal, computed, effect, ViewChild, ElementRef, model, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, effect, ViewChild, ElementRef, model, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule, User, ChevronDown, Settings, LogOut, X } from 'lucide-angular';
 import { AuthService } from '../../../auth/auth.service';
+import { LayoutService } from '../../layout.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -17,6 +18,8 @@ export class UserProfileComponent {
   
   private authService = inject(AuthService);
   private router = inject(Router);
+  layoutService = inject(LayoutService);
+  private elementRef = inject(ElementRef);
   
   user = this.authService.user;
   
@@ -26,12 +29,24 @@ export class UserProfileComponent {
     return u.user_metadata?.['full_name'] || u.email?.split('@')[0] || 'Usuario';
   });
 
-  dropdownOpen = signal(false);
+  dropdownOpen = computed(() => this.layoutService.activeDropdown() === 'user');
   isDialogOpen = signal(false);
   profileName = model('');
   isSaving = signal(false);
 
   readonly icons = { User, ChevronDown, Settings, LogOut, X };
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if (!this.elementRef.nativeElement.contains(event.target) && this.dropdownOpen()) {
+      this.layoutService.activeDropdown.set(null);
+    }
+  }
+
+  toggleDropdown(event: Event) {
+    event.stopPropagation();
+    this.layoutService.activeDropdown.set(this.dropdownOpen() ? null : 'user');
+  }
 
   constructor() {
     effect(() => {
@@ -44,7 +59,7 @@ export class UserProfileComponent {
 
   handleOpenProfile() {
     this.isDialogOpen.set(true);
-    this.dropdownOpen.set(false);
+    this.layoutService.activeDropdown.set(null);
     this.profileDialog.nativeElement.showModal();
   }
 

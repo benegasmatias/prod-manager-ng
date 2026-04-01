@@ -1,26 +1,54 @@
+export type DashboardAlertTone = 'info' | 'warning' | 'error' | 'success';
+
+export interface DashboardKPI {
+  title: string;
+  value: string | number;
+  icon?: string;
+  trend?: string;
+  trendDirection?: 'up' | 'down' | 'neutral';
+  variant?: 'default' | 'highlight' | 'status';
+  accentColor?: string;
+  subtitle?: string;
+}
+
+export interface RecentOrderEntry {
+  id: string;
+  clientName: string;
+  type: string;
+  status: string;
+  total: number;
+  dueDate: string;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+
 export interface DashboardSummary {
-  operationalCounters: {
-    visitsToday: number;
-    pendingBudgets: number;
-    inProduction: number;
-    deliveriesThisWeek: number;
-    delayedOrders: number;
-    pendingPayments: number;
-  };
-  pipelineSummary: {
-    stage: string;
-    count: number;
-  }[];
-  calendarEvents: {
-    id: string;
-    type: string;
-    clientName: string;
-    date: string;
-    time: string;
-    status: string;
-  }[];
+  // Core Business Metrics (Real Backend Data)
+  totalSales: number;
+  pendingBalance: number;
+  activeOrders: number;
+  productionOrders: number;
+  activeMachines: number;
+  newCustomers: number;
+  
+  // Lists
   alerts: {
+    id?: string;
     message: string;
-    type?: 'warning' | 'error';
+    type: DashboardAlertTone;
+    timestamp: string;
+    orderId?: string;
   }[];
+  
+  recentOrders: RecentOrderEntry[];
+  
+  // Analysis
+  trends: any | null;
+
+  // Legacy / UI Helpers
+  kpis?: DashboardKPI[];
+  
+  // Specialized Rubric Data (Only if returned by backend)
+  printers?: any[];
+  productionQueue?: any[];
+  materials?: any[];
 }

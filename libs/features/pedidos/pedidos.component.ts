@@ -1,7 +1,8 @@
 import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { PageShellComponent } from '@shared/ui';
 import { PedidosApiService } from '../../core/api/pedidos.api.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { SessionService } from '../../core/session/session.service';
@@ -16,7 +17,21 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 @Component({
   selector: 'app-pedidos-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, FormsModule, OrderStatusModalComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, LoadingSpinnerComponent, PageSizeSelectorComponent, MetricCardComponent, MetricCardsGridComponent],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    LucideAngularModule, 
+    FormsModule, 
+    OrderStatusModalComponent, 
+    SearchFilterBarComponent, 
+    OrdersTableComponent, 
+    PaginatorComponent, 
+    LoadingSpinnerComponent, 
+    PageSizeSelectorComponent, 
+    MetricCardComponent, 
+    MetricCardsGridComponent,
+    PageShellComponent
+  ],
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css']
 })
@@ -25,6 +40,7 @@ export class PedidosPageComponent implements OnInit {
   public session = inject(SessionService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   // Labels and Icons for Template
   protected readonly labels = PEDIDOS_LABELS;
@@ -115,7 +131,14 @@ export class PedidosPageComponent implements OnInit {
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    // Handle search from QueryParams (deep linking)
+    const initialSearch = this.route.snapshot.queryParamMap.get('search');
+    if (initialSearch) {
+      this.searchTerm.set(initialSearch);
+      this.loadData();
+    }
+  }
 
   onSort(key: string) {
     const sortKey = key as PedidoSortKey;
