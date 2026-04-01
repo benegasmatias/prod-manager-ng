@@ -211,6 +211,7 @@ export class PedidosPageComponent implements OnInit {
       startDate: this.dateDesde() || undefined,
       endDate: this.dateHasta() || undefined,
       responsableId: this.tecnicoFilter() === 'all' ? undefined : this.tecnicoFilter(),
+      type: 'CUSTOMER' // Excluir pedidos de Stock
     };
   }
 

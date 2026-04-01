@@ -169,39 +169,39 @@
             placeholder="Ej: El cliente solicitó cambio de color en el marco..."
             class="w-full p-4 rounded-2xl border-2 border-border bg-muted/20 text-sm font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-0 transition-all outline-none resize-none"></textarea>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="pt-6 border-t border-border">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+ 
+        <!-- Quick Actions Grid -->
+        <div class="pt-8 border-t border-zinc-100 dark:border-zinc-800">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Cobrar Saldo -->
             <button (click)="isPaymentMode.set(true)"
-              class="flex-1 h-16 rounded-[1.5rem] bg-emerald-500/5 border border-emerald-500/20 flex items-center gap-4 px-4 hover:bg-emerald-500/10 transition-all group overflow-hidden relative">
+              class="h-16 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-4 px-5 hover:bg-emerald-500/10 transition-all group overflow-hidden relative active:scale-[0.98]">
               <div
-                class="h-10 w-10 rounded-xl bg-emerald-600 text-white shrink-0">
+                class="h-10 w-10 rounded-2xl bg-emerald-600 text-white shrink-0 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                 <lucide-angular [img]="icons.DollarSign" class="h-5 w-5"></lucide-angular>
               </div>
               <div class="flex flex-col text-left">
                 <span
                   class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Cobrar
                   Saldo</span>
-                <span class="text-[11px] font-black text-emerald-700 leading-none mt-1">$ {{
+                <span class="text-sm font-black text-emerald-950 dark:text-emerald-50 mt-0.5">$ {{
                   paymentAmount() }}</span>
               </div>
             </button>
-
+ 
             <!-- Reportar Fallo -->
             <button (click)="isFailureMode.set(true)"
-              class="flex-1 h-16 rounded-[1.5rem] bg-red-500/5 border border-red-500/20 flex items-center gap-4 px-4 hover:bg-red-500/10 transition-all group">
+              class="h-16 rounded-3xl bg-rose-500/5 border border-rose-500/10 flex items-center gap-4 px-5 hover:bg-rose-500/10 transition-all group active:scale-[0.98]">
               <div
-                class="h-10 w-10 rounded-xl bg-red-600 text-white shrink-0">
+                class="h-10 w-10 rounded-2xl bg-rose-600 text-white shrink-0 flex items-center justify-center shadow-lg shadow-rose-500/20">
                 <lucide-angular [img]="icons.AlertOctagon" class="h-5 w-5"></lucide-angular>
               </div>
               <div class="flex flex-col text-left">
-                <span class="text-[9px] font-black uppercase tracking-widest text-red-600">Reportar
+                <span class="text-[9px] font-black uppercase tracking-widest text-rose-600">Reportar
                   Fallo</span>
                 <p
-                  class="text-[8px] font-bold text-red-700 leading-tight mt-0.5 uppercase opacity-80">
-                  Registrar Descarte</p>
+                  class="text-[9px] font-bold text-rose-950 dark:text-rose-50 leading-tight mt-0.5 uppercase opacity-60">
+                  Descartes</p>
               </div>
             </button>
           </div>
@@ -212,11 +212,11 @@
 
     <!-- Footer Actions -->
     <div
-      class="p-5 sm:p-8 pt-4 bg-muted/20 border-t border-border flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-4">
+      class="p-6 sm:p-10 pt-4 bg-zinc-50 dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
       <button (click)="isPaymentMode() || isFailureMode() ? resetForm() : onClose.emit()"
-        class="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-all active:scale-95"
+        class="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-95"
         [disabled]="isSaving()">
-        {{ isPaymentMode() || isFailureMode() ? 'Volver' : 'Cancelar' }}
+        {{ isPaymentMode() || isFailureMode() ? 'Volver al Control' : 'Cancelar' }}
       </button>
       
       <app-button-spinner
@@ -224,13 +224,13 @@
         [loading]="isSaving()"
         [disabled]="isSaving()"
         (onClick)="handleSave()"
-        [btnClass]="cn('w-full h-12 rounded-2xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 group', 
+        [btnClass]="cn('w-full h-12 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 group shadow-xl', 
               isPaymentMode() ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' : 
-              isFailureMode() ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-500/20' : 
-              'bg-primary dark:bg-white text-primary-foreground dark:text-zinc-950 shadow-primary/20 dark:shadow-black/10 hover:opacity-90')"
+              isFailureMode() ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/20' : 
+              'bg-primary dark:bg-white text-primary-foreground dark:text-zinc-950 shadow-primary/10 hover:opacity-90')"
       >
         <span class="text-[10px] font-black uppercase tracking-widest">
-          {{ isPaymentMode() ? 'Confirmar Cobro' : isFailureMode() ? 'Someter Reporte' : 'Sincronizar Cambios' }}
+          {{ isPaymentMode() ? 'Confirmar Pago' : isFailureMode() ? 'Someter Reporte' : 'Guardar Cambios' }}
         </span>
         <lucide-angular [img]="icons.CheckCircle2"
           class="h-4 w-4 group-hover:translate-x-1 transition-transform"></lucide-angular>
