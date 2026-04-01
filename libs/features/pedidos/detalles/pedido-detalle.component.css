@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+/* Operational Progress Animation */
+@keyframes progress-glimmer {
+  0% { transform: translateX(-100%); }
+  50% { opacity: 0.5; }
+  100% { transform: translateX(100%); }
+}
+
+.bg-primary .absolute {
+  animation: progress-glimmer 3s infinite linear;
+}
+
+/* Operational Shake for Alerts */
+@keyframes operative-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+.shake {
+  animation: operative-shake 0.5s ease-in-out infinite;
+}
+
+/* Custom Scrollbar for Timeline */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-primary), 0.1);
+  border-radius: 10px;
+}
+
+/* Premium Perspective on Cards */
+.bg-zinc-900 {
+  perspective: 1000px;
+}
+
+/* Hover scales */
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
+.group:hover .group-hover\:scale-150 {
+  transform: scale(1.5);
+}
+
+/* Timeline Continuity */
+.last\:pb-0 {
+  padding-bottom: 0;
+}

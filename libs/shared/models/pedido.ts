@@ -90,6 +90,8 @@ export interface Pedido {
   urgencia: Priority;
   responsableGeneral?: Employee;
   payments: Payment[];
+  // History & Metadata
+  statusHistory?: StatusHistoryEntry[];
   metadata?: Record<string, any>;
 
   // Visit fields at order level
@@ -97,6 +99,16 @@ export interface Pedido {
   hora_visita?: string;
   direccion_obra?: string;
   observaciones_visita?: string;
+}
+
+export interface StatusHistoryEntry {
+  id: string;
+  orderId: string;
+  fromStatus: string;
+  toStatus: string;
+  employee?: Employee;
+  notes?: string;
+  createdAt: string;
 }
 
 export type PedidoSortKey = 'code' | 'fechaCreacion' | 'dueDate' | 'fechaActualizacion' | 'saldo' | 'total' | string;

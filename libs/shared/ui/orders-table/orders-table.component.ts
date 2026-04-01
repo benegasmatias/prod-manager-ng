@@ -266,9 +266,13 @@ export class OrdersTableComponent {
 
   protected getTotalPaid(order: Pedido): number {
     const senia = Number(order.totalSenias || 0);
-    const payments = Number(order.totalPayments || 0);
+    const paymentsSummary = Number(order.totalPayments || 0);
     const paid = Number(order.paid || 0);
-    return senia + payments + paid;
+    
+    // Sumar array de pagos si existe
+    const paymentsArraySum = (order.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0);
+    
+    return senia + paymentsSummary + paid + paymentsArraySum;
   }
 
   protected getBalance(order: Pedido): number {
