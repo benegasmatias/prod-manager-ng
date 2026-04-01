@@ -1,5 +1,5 @@
 <div
-  class="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-all duration-300 font-sans selection:bg-primary/10 selection:text-primary overflow-x-hidden relative">
+  class="flex min-h-screen bg-background text-foreground transition-all duration-300 font-sans selection:bg-primary/10 selection:text-primary overflow-x-hidden relative">
 
   <!-- Content Background Decorations -->
   <div class="fixed top-0 right-0 z-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none">
@@ -8,17 +8,28 @@
     class="fixed bottom-0 left-0 z-0 w-[300px] h-[300px] bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none">
   </div>
 
+  <!-- Mobile Overlay -->
+  @if (layoutService.isMobile() && layoutService.isMobileMenuOpen()) {
+    <div 
+      class="fixed inset-0 z-[45] bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
+      (click)="layoutService.closeMobileMenu()"
+    ></div>
+  }
+
   <!-- Sidebar Component -->
   <app-sidebar></app-sidebar>
 
   <!-- Content Area -->
-  <div [style.padding-left.px]="layoutService.sidebarWidth()"
-    class="flex-1 flex flex-col min-w-0 min-h-screen relative transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]">
+  <div 
+    class="flex-1 flex flex-col min-w-0 min-h-screen relative transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+    [class.lg:pl-72]="layoutService.isPinned() && !layoutService.isMobile()"
+    [class.lg:pl-20]="!layoutService.isPinned() && !layoutService.isMobile()"
+  >
     <!-- Navbar Component -->
     <app-navbar></app-navbar>
 
     <!-- Main Page Content -->
-    <main class="flex-1 mt-16 p-2 sm:p-4 lg:p-6 relative z-10 overflow-visible">
+    <main class="flex-1 mt-14 sm:mt-16 p-3 sm:p-5 lg:p-8 relative z-10 overflow-visible">
       <div class="animate-in fade-in zoom-in-95 duration-500" style="height: 100%;">
         <router-outlet></router-outlet>
       </div>
@@ -26,17 +37,17 @@
 
     <!-- System Status Footer -->
     <footer
-      class="h-16 shrink-0 border-t border-zinc-100 bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm dark:border-zinc-800/50 px-8 flex items-center justify-between text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 z-10">
+      class="h-14 sm:h-16 shrink-0 border-t border-border bg-bg/50 backdrop-blur-sm px-4 sm:px-8 flex items-center justify-between text-[9px] font-black uppercase tracking-[0.2em] text-text-muted z-10">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2">
-          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
-          <span>Prod-NG Version 1.0</span>
+          <span class="h-1.2 w-1.2 sm:h-1.5 sm:w-1.5 rounded-full bg-success shadow-sm animate-pulse"></span>
+          <span>Prod-NG v1.0</span>
         </div>
-        <div class="h-3 w-px bg-zinc-200 dark:bg-zinc-800"></div>
-        <span class="hidden sm:inline">Angular 21 + Tailwind 4</span>
+        <div class="hidden sm:block h-3 w-px bg-border"></div>
+        <span class="hidden lg:inline">Angular 21 + Tailwind 4</span>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-zinc-500 dark:text-zinc-400">Panel de Control: Matias Benegas</span>
+        <span class="hidden sm:inline text-text-muted">Panel de Control: Matias Benegas</span>
         <div
           class="h-6 w-6 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-black text-primary text-[8px]">
           MB</div>
@@ -46,4 +57,4 @@
 
   <!-- Global Confirm Dialog -->
   <app-confirm-dialog></app-confirm-dialog>
-</div>
+</div>

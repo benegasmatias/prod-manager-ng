@@ -8,21 +8,26 @@ import { LucideAngularModule, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsR
   imports: [CommonModule, LucideAngularModule],
   template: `
     <div class="flex items-center justify-between px-4 py-3 sm:px-6">
-      <div class="flex flex-1 justify-between sm:hidden">
-        <button
-          (click)="onPageChange(currentPage - 1)"
-          [disabled]="currentPage === 1"
-          class="relative inline-flex items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-black uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-        >
-          Anterior
-        </button>
-        <button
-          (click)="onPageChange(currentPage + 1)"
-          [disabled]="currentPage === totalPages"
-          class="relative ml-3 inline-flex items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-black uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 disabled:opacity-30 transition-all active:scale-95 shadow-sm"
-        >
-          Siguiente
-        </button>
+      <div class="flex flex-col sm:hidden items-center gap-4 w-full">
+        <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+          Página <span class="text-zinc-900 dark:text-zinc-100">{{ currentPage }}</span> de <span class="text-zinc-900 dark:text-zinc-100">{{ totalPages }}</span>
+        </p>
+        <div class="flex items-center justify-between w-full">
+          <button
+            (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1"
+            class="relative inline-flex items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2 text-[10px] font-black uppercase tracking-[0.1em] text-zinc-500 hover:bg-zinc-50 disabled:opacity-30 transition-all active:scale-95 shadow-sm"
+          >
+            Anterior
+          </button>
+          <button
+            (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+            class="relative inline-flex items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2 text-[10px] font-black uppercase tracking-[0.1em] text-zinc-500 hover:bg-zinc-50 disabled:opacity-30 transition-all active:scale-95 shadow-sm"
+          >
+            Siguiente
+          </button>
+        </div>
       </div>
 
       <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">

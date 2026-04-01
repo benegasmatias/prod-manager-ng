@@ -57,7 +57,8 @@ export const API_ENDPOINTS = {
     REMOVE_ALL: '/notifications/all'
   },
   FILES: {
-    UPLOAD: '/files/upload'
+    UPLOAD: '/files/upload',
+    DELETE: '/files/delete'
   }
 } as const;
 

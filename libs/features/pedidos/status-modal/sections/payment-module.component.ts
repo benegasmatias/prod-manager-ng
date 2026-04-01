@@ -13,15 +13,15 @@ import { MoneyInputComponent } from '@shared/ui/money-input/money-input.componen
   template: `
     <div class="space-y-8 animate-in slide-in-from-right duration-500">
       <!-- Balance Display -->
-      <div class="relative overflow-hidden p-8 rounded-[2.5rem] bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 group">
+      <div class="relative overflow-hidden p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 group">
         <!-- Decoration -->
-        <div class="absolute top-[-10px] right-[-10px] opacity-10 rotate-12 group-hover:rotate-45 transition-transform duration-1000">
-           <lucide-angular [img]="icons.Cpu" class="h-40 w-40"></lucide-angular>
+        <div class="absolute top-[-10px] right-[-10px] opacity-10 rotate-12 group-hover:rotate-45 transition-transform duration-1000 text-white">
+           <lucide-angular [img]="icons.Cpu" class="h-32 w-32 sm:h-40 sm:w-40"></lucide-angular>
         </div>
         
-        <div class="relative z-10 flex flex-col items-center justify-center text-center space-y-2">
-          <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Saldo Pendiente de Cobro</span>
-          <p class="text-5xl font-black tabular-nums tracking-tighter">
+        <div class="relative z-10 flex flex-col items-center justify-center text-center space-y-1">
+          <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Saldo Pendiente de Cobro</span>
+          <p class="text-3xl sm:text-5xl font-black tabular-nums tracking-tighter">
             $ {{ getBalance() }}
           </p>
         </div>
@@ -38,9 +38,9 @@ import { MoneyInputComponent } from '@shared/ui/money-input/money-input.componen
             color="emerald"
             placeholder="0,00"
             className="w-full"
-            inputClassName="h-16 text-3xl font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50/30 dark:bg-zinc-950/40 border-emerald-100 dark:border-emerald-900/20 rounded-[1.5rem]"
+            inputClassName="h-14 sm:h-16 text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50/30 dark:bg-zinc-950/40 border-emerald-100 dark:border-emerald-900/20 rounded-2xl sm:rounded-[1.5rem]"
           ></app-money-input>
-          <button (click)="amount.set(getBalance())" class="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-emerald-500/20">
+          <button (click)="amount.set(getBalance())" class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-lg sm:rounded-xl transition-all shadow-lg shadow-emerald-500/20">
             Total
           </button>
         </div>

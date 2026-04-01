@@ -1,110 +1,63 @@
-<div class="p-8 space-y-10 pb-16 animate-in fade-in duration-500">
+<div class="p-4 sm:p-8 space-y-6 sm:space-y-10 pb-16 animate-in fade-in duration-500">
   <!-- Header Area -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
     <div class="flex flex-col gap-1">
-      <div class="flex items-center gap-2 mb-1">
+      <div class="flex items-center gap-2 mb-0.5 sm:mb-1">
         <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{{ labels.CATEGORY }}</span>
+        <span class="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.2em]">{{ labels.CATEGORY }}</span>
       </div>
-      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter sm:tracking-tight text-foreground">
         {{ labels.TITLE }}
       </h1>
-      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed">
+      <p class="text-xs sm:text-sm font-medium text-muted-foreground max-w-2xl leading-relaxed hidden sm:block">
         {{ labels.SUBTITLE }}
       </p>
     </div>
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3 sm:gap-4 shrink-0">
       <div
-        class="flex p-1.5 rounded-2xl bg-white/70 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/50 backdrop-blur-sm shadow-sm">
+        class="flex p-1 rounded-xl sm:rounded-2xl bg-background/70 border border-border/50 backdrop-blur-sm shadow-sm">
         <a routerLink="/pedidos"
-          class="flex h-9 w-12 items-center justify-center rounded-xl transition-all bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-          <lucide-angular [img]="icons.LIST" class="h-4 w-4"></lucide-angular>
+          class="flex h-8 sm:h-9 w-10 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl transition-all bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+          <lucide-angular [img]="icons.LIST" class="h-3.5 sm:h-4 w-3.5 sm:w-4"></lucide-angular>
         </a>
         <a routerLink="/pedidos/kanban"
-          class="flex h-9 w-12 items-center justify-center rounded-xl transition-all text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-600 dark:hover:text-zinc-200">
-          <lucide-angular [img]="icons.LAYOUT_GRID" class="h-4 w-4"></lucide-angular>
+          class="flex h-8 sm:h-9 w-10 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl transition-all text-muted-foreground hover:bg-muted hover:text-foreground">
+          <lucide-angular [img]="icons.LAYOUT_GRID" class="h-3.5 sm:h-4 w-3.5 sm:w-4"></lucide-angular>
         </a>
       </div>
       <button routerLink="/pedidos/nuevo"
-        class="h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] flex items-center gap-2">
-        <lucide-angular [img]="icons.PLUS" class="h-4 w-4"></lucide-angular>
+        class="flex-1 sm:flex-none h-10 px-4 sm:h-12 sm:px-8 rounded-xl bg-primary text-primary-foreground font-black text-[10px] sm:text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+        <lucide-angular [img]="icons.PLUS" class="h-3.5 sm:h-4 w-3.5 sm:w-4"></lucide-angular>
         {{ labels.ACTIONS.NEW_ORDER }}
       </button>
     </div>
   </div>
 
   <!-- Stats Cards Section -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div
-      class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
-      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-        <lucide-angular [img]="icons.TRENDING" class="h-20 w-20 text-zinc-900 dark:text-white"></lucide-angular>
-      </div>
-      <div class="relative z-10 space-y-4">
-        <div
-          class="h-12 w-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700">
-          <lucide-angular [img]="icons.TRENDING" class="h-5 w-5"></lucide-angular>
-        </div>
-        <div>
-          <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">{{ labels.STATS.SALES_VOLUME }}
-          </p>
-          <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
-              {{ summary().totalVolume | currency:'ARS':'symbol-narrow':'1.0-0' }}
-            </span>
-            <span class="text-sm font-bold text-zinc-400">,00</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <app-metric-cards-grid [columns]="3">
+    <app-metric-card
+      [title]="labels.STATS.SALES_VOLUME"
+      [value]="(summary().totalVolume | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'"
+      [icon]="icons.TRENDING"
+      [loading]="loading()"
+    ></app-metric-card>
 
-    <div
-      class="relative group overflow-hidden bg-primary p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.01]">
-      <div class="absolute top-0 right-0 p-8 opacity-10">
-        <lucide-angular [img]="icons.WALLET" class="h-16 w-16 md:h-20 md:w-20 text-white"></lucide-angular>
-      </div>
-      <div class="relative z-10 space-y-3 md:space-y-4">
-        <div
-          class="h-10 w-10 md:h-12 md:w-12 rounded-[1rem] md:rounded-[1.5rem] bg-white/10 flex items-center justify-center text-white border border-white/10 backdrop-blur-sm">
-          <lucide-angular [img]="icons.WALLET" class="h-5 w-5"></lucide-angular>
-        </div>
-        <div>
-          <p class="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1">{{
-            labels.STATS.PENDING_COLLECTION }}</p>
-          <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-black tracking-tighter text-white">
-              {{ summary().pendingBalance | currency:'ARS':'symbol-narrow':'1.0-0' }}
-            </span>
-            <span class="text-sm font-bold text-white/40">,00</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-metric-card
+      [title]="labels.STATS.PENDING_COLLECTION"
+      [value]="(summary().pendingBalance | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'"
+      [icon]="icons.WALLET"
+      variant="highlight"
+      [loading]="loading()"
+    ></app-metric-card>
 
-    <div
-      class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
-      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-        <lucide-angular [img]="icons.PACKAGE"
-          class="h-16 w-16 md:h-20 md:w-20 text-zinc-900 dark:text-white"></lucide-angular>
-      </div>
-      <div class="relative z-10 space-y-3 md:space-y-4">
-        <div
-          class="h-10 w-10 md:h-12 md:w-12 rounded-[1rem] md:rounded-[1.25rem] bg-indigo-50 dark:bg-zinc-800 flex items-center justify-center text-primary border border-primary/10 transition-transform group-hover:scale-110">
-          <lucide-angular [img]="icons.PACKAGE" class="h-5 w-5 md:h-6 md:w-6"></lucide-angular>
-        </div>
-        <div>
-          <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">{{ labels.STATS.ACTIVE_ORDERS
-            }}</p>
-          <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
-              {{ summary().activeCount }}
-            </span>
-            <span class="text-xs font-bold text-zinc-400 uppercase">{{ labels.STATS.IN_PROGRESS }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    <app-metric-card
+      [title]="labels.STATS.ACTIVE_ORDERS"
+      [value]="summary().activeCount"
+      [icon]="icons.PACKAGE"
+      [subtitle]="labels.STATS.IN_PROGRESS"
+      [loading]="loading()"
+    ></app-metric-card>
+  </app-metric-cards-grid>
 
   <!-- Filters Section -->
   <app-search-filter-bar [values]="currentFilterValues()" [options]="filterOptions()" [showUrgency]="true"
@@ -112,23 +65,23 @@
 
   <!-- Commercial / Pre-sales Section (Metalurgica) -->
   @if (commercialTotal() > 0) {
-  <div class="space-y-6 ">
+  <div class="space-y-4 sm:space-y-6">
     <div class="flex items-center justify-between px-2">
       <div class="flex items-center gap-3">
         <div class="h-6 w-1 bg-amber-500 rounded-full"></div>
         <h2
-          class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
+          class="text-xs sm:text-sm font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-wide leading-none">
           {{ labels.COMMERCIAL_SECTION }}
           <span
-            class="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-600 px-2 py-0.5 rounded-full">{{
+            class="text-[9px] font-black bg-amber-100 dark:bg-amber-900/40 text-amber-600 px-2 py-0.5 rounded-full">{{
             commercialTotal() }}</span>
         </h2>
       </div>
-      <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ labels.COMMERCIAL_SUBTITLE }}</p>
+      <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest hidden sm:block">{{ labels.COMMERCIAL_SUBTITLE }}</p>
     </div>
 
     <div
-      class="bg-white/50 dark:bg-zinc-950/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-sm relative min-h-[200px]">
+      class="bg-white/50 dark:bg-zinc-950/20 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-2 sm:p-6 backdrop-blur-sm relative min-h-[200px] overflow-hidden">
       @if (loadingCommercial()) {
       <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
       }
@@ -137,9 +90,9 @@
         (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
-        class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 flex flex-col sm:flex-row items-center gap-4">
+        class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
         <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
-        <div class="flex-1">
+        <div class="flex-1 w-full">
           <app-paginator [totalItems]="commercialTotal()" [pageSize]="pageSize" [currentPage]="commercialPage()"
             (pageChange)="onCommercialPageChange($event)"></app-paginator>
         </div>
@@ -149,38 +102,38 @@
   }
 
   <!-- Production Section -->
-  <div class="space-y-6 mt-5">
+  <div class="space-y-4 sm:space-y-6 mt-4 sm:mt-5">
     <div class="flex items-center justify-between px-2">
       <div class="flex items-center gap-3">
         <div class="h-6 w-1 bg-primary rounded-full"></div>
         <h2
-          class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
+          class="text-xs sm:text-sm font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-wide leading-none">
           {{ labels.ACTIVE_SECTION }}
-          <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{
+          <span class="text-[9px] font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{
             productionTotal() }}</span>
         </h2>
       </div>
     </div>
 
     @if (loadingProduction() && productionOrdersData().length === 0 && commercialOrdersData().length === 0) {
-    <div class="grid grid-cols-1 gap-4">
+    <div class="grid grid-cols-1 gap-4 px-1">
       @for (i of [1,2,3]; track i) {
       <div
-        class="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between shadow-sm">
+        class="p-4 sm:p-6 rounded-3xl sm:rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between shadow-sm animate-pulse">
         <div class="flex items-center gap-4">
-          <app-skeleton width="3.5rem" height="3.5rem" borderRadius="1.25rem"></app-skeleton>
+          <div class="h-10 w-10 sm:h-14 sm:w-14 bg-zinc-100 dark:bg-zinc-800 rounded-xl"></div>
           <div class="space-y-2">
-            <app-skeleton width="200px" height="1rem"></app-skeleton>
-            <app-skeleton width="150px" height="0.75rem"></app-skeleton>
+            <div class="h-3 w-32 bg-zinc-100 dark:bg-zinc-800 rounded-full"></div>
+            <div class="h-2 w-24 bg-zinc-100 dark:bg-zinc-800 rounded-full"></div>
           </div>
         </div>
-        <app-skeleton width="100px" height="2rem" borderRadius="1rem"></app-skeleton>
+        <div class="h-8 w-20 bg-zinc-100 dark:bg-zinc-800 rounded-lg"></div>
       </div>
       }
     </div>
     } @else if (productionTotal() > 0) {
     <div
-      class="bg-white/50 dark:bg-zinc-950/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-sm relative min-h-[200px]">
+      class="bg-white/50 dark:bg-zinc-950/20 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-2 sm:p-6 backdrop-blur-sm relative min-h-[200px] overflow-hidden">
       @if (loadingProduction()) {
       <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
       }
@@ -189,9 +142,9 @@
         (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
-        class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 flex flex-col sm:flex-row items-center gap-4">
+        class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
         <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
-        <div class="flex-1">
+        <div class="flex-1 w-full">
           <app-paginator [totalItems]="productionTotal()" [pageSize]="pageSize" [currentPage]="productionPage()"
             (pageChange)="onProductionPageChange($event)"></app-paginator>
         </div>
@@ -199,12 +152,12 @@
     </div>
     } @else if (commercialTotal() === 0) {
     <div
-      class="py-20 text-center flex flex-col items-center justify-center gap-4 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/5 dark:bg-zinc-900/5">
+      class="py-12 sm:py-20 text-center flex flex-col items-center justify-center gap-4 border-2 border-dashed rounded-[2rem] sm:rounded-[3rem] border-border bg-muted/20 mx-2">
       <div
-        class="h-16 w-16 rounded-[1.5rem] bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700 text-zinc-200">
-        <lucide-angular [img]="icons.CLOCK" class="h-7 w-7"></lucide-angular>
+        class="h-12 w-12 sm:h-16 w-16 rounded-2xl sm:rounded-[1.5rem] bg-background shadow-sm flex items-center justify-center border border-border text-muted-foreground/30">
+        <lucide-angular [img]="icons.CLOCK" class="h-6 w-6 sm:h-7 w-7"></lucide-angular>
       </div>
-      <p class="text-sm font-bold text-zinc-400 uppercase tracking-widest">{{ labels.EMPTY_ACTIVE }}</p>
+      <p class="text-[10px] sm:text-sm font-black text-muted-foreground uppercase tracking-widest px-4 leading-relaxed">{{ labels.EMPTY_ACTIVE }}</p>
     </div>
     }
   </div>
@@ -212,22 +165,22 @@
   <!-- History Section -->
   @if (archivedTotal() > 0 && (estadoFilter() === 'all' || estadoFilter() === 'DELIVERED' || estadoFilter() ===
   'CANCELLED')) {
-  <div class="pt-12 space-y-6">
+  <div class="pt-8 sm:pt-12 space-y-4 sm:space-y-6">
     <div class="flex items-center gap-4 px-2">
       <div class="flex items-center gap-3">
         <div class="h-6 w-1 bg-zinc-400 rounded-full"></div>
         <h2
-          class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-widest">
+          class="text-xs sm:text-sm font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-wide leading-none">
           {{ labels.HISTORY_SECTION }}
-          <span class="text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{
+          <span class="text-[9px] font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{
             archivedTotal() }}</span>
         </h2>
       </div>
       <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
-      <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ labels.HISTORY_SUBTITLE }}</p>
+      <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest hidden sm:block">{{ labels.HISTORY_SUBTITLE }}</p>
     </div>
     <div
-      class="bg-white/30 dark:bg-zinc-950/10 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-6 backdrop-blur-[2px] relative min-h-[200px]">
+      class="bg-white/30 dark:bg-zinc-950/10 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-2 sm:p-6 backdrop-blur-[2px] relative min-h-[200px] overflow-hidden">
       @if (loadingArchived()) {
       <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
       }
@@ -236,9 +189,9 @@
         (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
-        class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 flex flex-col sm:flex-row items-center gap-4">
+        class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
         <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
-        <div class="flex-1">
+        <div class="flex-1 w-full">
           <app-paginator [totalItems]="archivedTotal()" [pageSize]="pageSize" [currentPage]="archivedPage()"
             (pageChange)="onArchivedPageChange($event)"></app-paginator>
         </div>
@@ -249,4 +202,4 @@
 
   <app-order-status-modal [order]="selectedOrder()" [isOpen]="isModalOpen()" [employees]="employees()"
     (onClose)="isModalOpen.set(false)" (onSave)="loadData()"></app-order-status-modal>
-</div>
+</div>

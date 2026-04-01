@@ -2,7 +2,7 @@ import { Component, inject, signal, ViewChild, ElementRef, model, ChangeDetectio
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Building2, ChevronDown, Plus, Settings, Monitor, Trash2, X } from 'lucide-angular';
+import { LucideAngularModule, Building2, ChevronDown, Plus, Settings, Monitor, Trash2, X, CheckCircle2 } from 'lucide-angular';
 import { SessionService } from '../../../session/session.service';
 import { ConfirmService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
 import { Rubro, Negocio } from '../../../../shared/models';
@@ -28,7 +28,7 @@ export class BusinessSelectorComponent {
   formRubro = model<Rubro>('GENERICO');
   isSaving = signal(false);
 
-  readonly icons = { Building2, ChevronDown, Plus, Settings, Monitor, Trash2, X };
+  protected readonly icons = { Building2, ChevronDown, Plus, Settings, Monitor, Trash2, X, CheckCircle2 };
 
   handleOpenAdd() {
     this.editingId.set(null);

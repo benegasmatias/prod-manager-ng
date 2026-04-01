@@ -1,0 +1,9 @@
+<div [class]="cardClasses()">
+  <div class="relative z-10 flex flex-col h-full w-full">
+    <ng-content select="[card-header]"></ng-content>
+    <div class="flex-1 min-w-0">
+      <ng-content></ng-content>
+    </div>
+    <ng-content select="[card-footer]"></ng-content>
+  </div>
+</div>

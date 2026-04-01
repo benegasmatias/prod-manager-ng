@@ -14,10 +14,10 @@ import { cn } from '@shared/utils/cn';
     <div class="space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
       <!-- Datos de la Visita (Solo si está en fases comerciales) -->
       @if (showVisitData()) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 bg-indigo-50/30 dark:bg-indigo-950/20 rounded-3xl border border-indigo-100 dark:border-indigo-800/30">
-          <div class="sm:col-span-2 flex items-center gap-2 mb-2">
-            <lucide-angular [img]="MapPin" class="h-3.5 w-3.5 text-indigo-400"></lucide-angular>
-            <span class="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Logística de Obra</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-6 bg-indigo-50/30 dark:bg-indigo-950/20 rounded-2xl sm:rounded-3xl border border-indigo-100 dark:border-indigo-800/30">
+          <div class="sm:col-span-2 flex items-center gap-2 mb-1">
+            <lucide-angular [img]="MapPin" class="h-3 w-3 sm:h-3.5 sm:w-3.5 text-indigo-400"></lucide-angular>
+            <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Logística de Obra</span>
           </div>
           
           <div class="space-y-2">
@@ -36,7 +36,6 @@ import { cn } from '@shared/utils/cn';
                 label="Fecha"
                 [(value)]="visitDate"
                 (valueChange)="visitDateChange.emit($event)"
-                placeholder="00/00/0000"
                 className="bg-white dark:bg-zinc-950"
               ></app-date-picker>
             <div class="space-y-2">
@@ -64,23 +63,23 @@ import { cn } from '@shared/utils/cn';
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <!-- Monto Indigo Estilizado -->
-          <div class="sm:col-span-2 bg-indigo-600 rounded-3xl p-6 shadow-xl shadow-indigo-500/20 flex items-center justify-between group transition-all hover:scale-[1.01]">
+          <div class="sm:col-span-2 bg-indigo-600 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xl shadow-indigo-500/20 flex items-center justify-between group transition-all hover:scale-[1.01]">
             <div class="space-y-1">
-              <span class="text-[10px] font-black uppercase text-indigo-100/60 tracking-widest">Presupuesto Confirmado</span>
-              <p class="text-3xl font-black text-white tabular-nums flex items-baseline gap-1">
-                <span class="text-xl opacity-50">$</span>
+              <span class="text-[9px] sm:text-[10px] font-black uppercase text-indigo-100/60 tracking-widest">Presupuesto Confirmado</span>
+              <p class="text-2xl sm:text-3xl font-black text-white tabular-nums flex items-baseline gap-1">
+                <span class="text-lg sm:text-xl opacity-50">$</span>
                 <input 
                   type="number" 
                   [(ngModel)]="totalPrice" 
                   (ngModelChange)="totalPriceChange.emit($event)"
                   [readonly]="isPriceReadOnly"
-                  class="bg-transparent border-none text-white focus:ring-0 w-40 p-0 text-3xl font-black outline-none placeholder:text-indigo-400"
+                  class="bg-transparent border-none text-white focus:ring-0 w-32 sm:w-40 p-0 text-2xl sm:text-3xl font-black outline-none placeholder:text-indigo-400"
                   placeholder="0.00"
                 >
               </p>
             </div>
-            <div class="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center text-white backdrop-blur-sm group-hover:rotate-12 transition-transform">
-              <lucide-angular [img]="DollarSign" class="h-[30px] w-[30px]"></lucide-angular>
+            <div class="h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl bg-white/10 flex items-center justify-center text-white backdrop-blur-sm group-hover:rotate-12 transition-transform">
+              <lucide-angular [img]="DollarSign" class="h-5 w-5 sm:h-[30px] sm:w-[30px]"></lucide-angular>
             </div>
           </div>
 

@@ -19,16 +19,18 @@ import {
   Printer,
   TrendingUp,
   ShoppingCart,
-  ArrowRight
+  ArrowRight,
+  AlertTriangle
 } from 'lucide-angular';
 import { Rubro } from '@shared/models';
 import { getStatusLabel, getStatusStyles, cn } from '@shared/utils';
 import { DashboardSkeletonComponent } from '../../../../shared/ui/skeleton/skeleton.component';
+import { MetricCardComponent, MetricCardsGridComponent, BaseCardComponent } from '@shared/ui';
 
 @Component({
   selector: 'app-metalurgica-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, DashboardSkeletonComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, DashboardSkeletonComponent, MetricCardComponent, MetricCardsGridComponent, BaseCardComponent],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -55,6 +57,7 @@ export class MetalurgicaDashboardComponent {
     Printer,
     TrendingUp,
     ShoppingCart,
+    AlertTriangle,
     ArrowRight
   };
 

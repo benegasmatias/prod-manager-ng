@@ -2,13 +2,13 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReportsApiService, ReportsSummary } from '../../core/api/reports.api.service';
 import { SessionService } from '../../core/session/session.service';
-import { StatCardComponent } from '@shared/ui';
+import { MetricCardComponent, MetricCardsGridComponent } from '@shared/ui';
 import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as PieChartIcon, Calendar, Printer, Info, Activity, Package } from 'lucide-angular';
 
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule, StatCardComponent, LucideAngularModule],
+  imports: [CommonModule, MetricCardComponent, MetricCardsGridComponent, LucideAngularModule],
   template: `
     <div class="space-y-10 pb-16 px-8 pt-8 animate-in fade-in duration-700">
       <!-- Header Area -->
@@ -18,15 +18,15 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
             <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
             <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Inteligencia de Datos</span>
           </div>
-          <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
             Análisis y <span class="text-primary italic">Métricas</span>
           </h1>
-          <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed text-left">
+          <p class="text-sm font-medium text-muted-foreground max-w-2xl leading-relaxed text-left">
             Desempeño operativo, rentabilidad por unidad y proyecciones estratégicas de manufactura.
           </p>
         </div>
         <button
-          class="h-11 px-6 lg:h-12 lg:px-8 rounded-xl border border-zinc-200 dark:border-zinc-800 font-black text-[10px] uppercase tracking-widest bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center gap-2 shadow-sm whitespace-nowrap"
+          class="h-11 px-6 lg:h-12 lg:px-8 rounded-xl border border-border font-black text-[10px] uppercase tracking-widest bg-background hover:bg-muted transition-all flex items-center gap-2 shadow-sm whitespace-nowrap"
           (click)="printReport()"
         >
           <lucide-angular [img]="icons.Calendar" class="h-4 w-4"></lucide-angular> Exportar Reporte
@@ -35,37 +35,41 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
 
       @if (loading()) {
         <div class="flex flex-col items-center justify-center py-24 space-y-4">
-          <div class="h-12 w-12 border-4 border-zinc-100 border-t-primary rounded-full animate-spin"></div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Analizando registros...</p>
+          <div class="h-12 w-12 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Analizando registros...</p>
         </div>
       } @else if (data()) {
         @let d = data()!;
         
         <!-- Summary Stats Grid -->
-        <div class="grid gap-6 md:grid-cols-3">
-          <app-stat-card
+        <app-metric-cards-grid [columns]="3">
+          <app-metric-card
             title="Ventas del Mes"
             [value]="(d.summary.monthlyTotal | currency:'ARS':'$':'1.0-0') || ''"
             [icon]="icons.TrendingUp"
-            [trend]="{ value: 12.5, label: 'proyectado vs mes ant.', isPositive: true }"
-          ></app-stat-card>
-          <app-stat-card
+            trendText="12.5% proyectado vs mes ant."
+            trendDirection="up"
+            [loading]="loading()"
+          ></app-metric-card>
+          <app-metric-card
             title="Pedidos Pendientes"
             [value]="d.summary.pendingOrders.toString()"
             [icon]="icons.BarChart"
-          ></app-stat-card>
-          <app-stat-card
+            [loading]="loading()"
+          ></app-metric-card>
+          <app-metric-card
             title="Trabajos en Curso"
             [value]="d.summary.activeJobs.toString()"
             [icon]="icons.Printer"
-          ></app-stat-card>
-        </div>
+            [loading]="loading()"
+          ></app-metric-card>
+        </app-metric-cards-grid>
 
         <div class="grid gap-8 md:grid-cols-2">
           <!-- Monthly Sales Chart -->
-          <div class="bg-white dark:bg-zinc-900/40 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm overflow-hidden flex flex-col backdrop-blur-sm">
-            <div class="p-8 border-b border-zinc-50 dark:border-zinc-800/20 bg-zinc-50/10 dark:bg-zinc-900/10">
-              <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-left">Ventas Mensuales (Últimos 6 Meses)</h3>
+          <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-border shadow-sm overflow-hidden flex flex-col backdrop-blur-sm">
+            <div class="p-8 border-b border-border bg-muted/30">
+              <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground text-left">Ventas Mensuales (Últimos 6 Meses)</h3>
             </div>
             <div class="p-8 flex-1 min-h-[300px] flex items-end justify-around gap-2 px-10">
               @for (month of d.charts.salesByMonth; track month.name) {
@@ -109,8 +113,8 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
                   }
                 </svg>
                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                   <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none">Total</span>
-                   <span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">{{ totalProductQty() }}</span>
+                   <span class="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none">Total</span>
+                   <span class="text-2xl font-black text-foreground tracking-tighter">{{ totalProductQty() }}</span>
                 </div>
               </div>
 
@@ -131,12 +135,12 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
         </div>
 
         <!-- Machine Performance -->
-        <div class="bg-white dark:bg-zinc-900/40 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm overflow-hidden backdrop-blur-sm">
-          <div class="p-8 border-b border-zinc-50 dark:border-zinc-800/20 bg-zinc-50/10 dark:bg-zinc-900/10 flex items-center justify-between">
-            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-left">Rendimiento Técnico Unidades</h3>
+        <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-border shadow-sm overflow-hidden backdrop-blur-sm">
+          <div class="p-8 border-b border-border bg-muted/30 flex items-center justify-between">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground text-left">Rendimiento Técnico Unidades</h3>
             <div class="flex items-center gap-2">
-               <lucide-angular [img]="icons.Info" class="h-3.5 w-3.5 text-zinc-400"></lucide-angular>
-               <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Basado en trabajos finalizados</span>
+               <lucide-angular [img]="icons.Info" class="h-3.5 w-3.5 text-muted-foreground"></lucide-angular>
+               <span class="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Basado en trabajos finalizados</span>
             </div>
           </div>
           <div class="p-8">
@@ -154,11 +158,11 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
                       </span>
                     </div>
                     <div class="text-right">
-                       <span class="text-xl font-black text-zinc-900 dark:text-zinc-50 tabular-nums">{{ machine.efficiency }}%</span>
+                       <span class="text-xl font-black text-foreground tabular-nums">{{ machine.efficiency }}%</span>
                        <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Optimizado</p>
                     </div>
                   </div>
-                  <div class="h-3 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-50 dark:border-zinc-800/50">
+                  <div class="h-3 w-full bg-muted rounded-full overflow-hidden p-0.5 border border-border">
                     <div
                       class="h-full rounded-full bg-primary transition-all duration-1000 ease-in-out shadow-[0_0_12px_rgba(var(--primary-rgb),0.3)] relative group-hover:bg-primary/80"
                       [style.width.%]="machine.efficiency"
@@ -197,8 +201,8 @@ export class ReportesPageComponent implements OnInit {
 
   readonly icons = { TrendingUp, BarChart: BarChartIcon, PieChart: PieChartIcon, Calendar, Printer, Info, Activity, Package };
 
-  // Helper for Pie Charts without libraries
-  colors = ['#18181b', '#3f3f46', '#71717a', '#a1a1aa', '#d4d4d8'];
+  // Helper for Pie Charts without libraries - using a vibrant palette
+  colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
   totalProductQty = computed(() => {
     const d = this.data();

@@ -95,17 +95,15 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
             Cancelar
           </button>
 
-          <button
-            (click)="handleSave()"
-            [disabled]="saving || !form.name"
-            class="flex items-center justify-center rounded-2xl font-bold h-12 px-10 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50"
+          <app-button-spinner
+            [loading]="saving"
+            [disabled]="!form.name"
+            loadingText="Guardando..."
+            btnClass="flex items-center justify-center rounded-2xl font-bold h-12 px-10 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50"
+            (onClick)="handleSave()"
           >
-            @if (saving) {
-              <app-button-spinner text="Guardando..."></app-button-spinner>
-            } @else {
-              {{ machineId ? 'Actualizar Registro' : 'Confirmar y Crear' }}
-            }
-          </button>
+            {{ machineId ? 'Actualizar Registro' : 'Confirmar y Crear' }}
+          </app-button-spinner>
         </div>
       </div>
     </div>

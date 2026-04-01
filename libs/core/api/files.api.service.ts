@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '@shared/config/api-endpoints.config';
 
 export interface UploadedFileResponse {
   url: string;
+  path: string;
   fileName: string;
   size: number;
   mimeType: string;
@@ -22,6 +23,12 @@ export class FilesApiService {
 
     return firstValueFrom(
       this.http.post<UploadedFileResponse>(API_ENDPOINTS.FILES.UPLOAD, formData)
+    );
+  }
+
+  async deleteFile(path: string): Promise<{ success: boolean }> {
+    return firstValueFrom(
+      this.http.delete<{ success: boolean }>(API_ENDPOINTS.FILES.DELETE || '/files/delete', { body: { path } })
     );
   }
 }

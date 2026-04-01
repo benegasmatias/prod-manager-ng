@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal, computed, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, computed, effect, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw } from 'lucide-angular';
@@ -10,6 +10,7 @@ import { Employee, Pedido, OrderStatus, Rubro } from '@shared/models';
 import { ClientSelectorComponent } from '@shared/ui/clientes/client-selector.component';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 import { ItemDetailsFormComponent } from './items-section/item-details-form.component';
+import { FilesApiService } from '@core/api/files.api.service';
 import { cn } from '@shared/utils/cn';
 
 @Component({
@@ -83,7 +84,6 @@ import { cn } from '@shared/utils/cn';
                     label="Promesa de Entrega"
                     [(value)]="fechaEntrega"
                     name="fechaEntrega"
-                    placeholder="00/00/0000"
                   ></app-date-picker>
                 }
 
@@ -123,6 +123,8 @@ import { cn } from '@shared/utils/cn';
                  [canRemove]="items().length > 1"
                  (onRemove)="removeItem($index)"
                  (onUpdate)="recalcTotales()"
+                 (onFileUpload)="trackPendingFile($event)"
+                 (onFileDelete)="untrackFile($event)"
                ></app-item-details-form>
             }
           </div>
@@ -205,8 +207,9 @@ import { cn } from '@shared/utils/cn';
     </form>
   `
 })
-export class OrderFormComponent {
+export class OrderFormComponent implements OnDestroy {
   private api = inject(PedidosApiService);
+  private filesApi = inject(FilesApiService);
   private clientesApi = inject(ClientesApiService);
   private session = inject(SessionService);
   private router = inject(Router);
@@ -232,6 +235,8 @@ export class OrderFormComponent {
   responsableId = '';
   observaciones = '';
   isSaving = signal(false);
+  isSaved = false;
+  pendingFiles: string[] = [];
   vErrors: Record<string, string> = {};
 
   // Context
@@ -260,6 +265,47 @@ export class OrderFormComponent {
 
     // Default item
     this.addItem();
+  }
+
+  ngOnDestroy() {
+    this.cleanupFiles();
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent) {
+    if (this.pendingFiles.length > 0 && !this.isSaved) {
+      event.preventDefault();
+      // Most browsers require assigning to returnValue for standard alert
+      event.returnValue = 'Tienes archivos subidos que no se guardarán. ¿Estás seguro de que quieres salir?';
+    }
+  }
+
+  trackPendingFile(path: string) {
+    if (!this.pendingFiles.includes(path)) {
+      this.pendingFiles.push(path);
+    }
+  }
+
+  untrackFile(path: string) {
+    this.pendingFiles = this.pendingFiles.filter(p => p !== path);
+  }
+
+  async cleanupFiles() {
+    if (this.isSaved || this.pendingFiles.length === 0) return;
+
+    // We can't use await if we're in the middle of a teardown (sometimes) 
+    // but for client-side navigation it's fine.
+    // For reload, it's impossible to delete from Supabase async while the page closes.
+    const filesToDelete = [...this.pendingFiles];
+    this.pendingFiles = [];
+
+    for (const path of filesToDelete) {
+      try {
+        await this.filesApi.deleteFile(path);
+      } catch (e) {
+        console.error('Cleanup: Error deleting orphan file', path, e);
+      }
+    }
   }
 
   async loadEmployees() {
@@ -410,6 +456,8 @@ export class OrderFormComponent {
 
       console.log('[OrderForm] Payload Mapping:', payload);
       await this.api.create(payload);
+      this.isSaved = true;
+      this.pendingFiles = []; // All good
       this.router.navigate([this.returnUrl]);
     } catch (err) {
       console.error('Error saving order', err);

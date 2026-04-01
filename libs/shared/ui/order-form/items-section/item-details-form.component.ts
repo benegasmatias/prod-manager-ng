@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Trash2, Check, Plus, Upload, Loader2, FileCheck, X } from 'lucide-angular';
 import { MoneyInputComponent } from '@shared/ui/money-input/money-input.component';
 import { FilesApiService } from '@core/api/files.api.service';
+import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
 
@@ -187,13 +188,12 @@ import { cn } from '@shared/utils/cn';
 
       <!-- PREMIUM ITEM FOOTER -->
       <div class="px-8 pb-8 pt-4">
-        <div class="p-6 rounded-[2rem] bg-zinc-50/50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/50 backdrop-blur-sm flex flex-col sm:flex-row items-center gap-6">
-          <div class="flex-1 grid grid-cols-2 gap-4 w-full">
+        <div class="p-6 rounded-[2rem] bg-zinc-50/50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/50 backdrop-blur-sm flex flex-col md:flex-row items-center gap-8">
+          <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
             <app-money-input
               [label]="orderType() === 'STOCK' ? 'Precio Venta Est. ($)' : 'Precio Unitario ($)'"
               [(value)]="item.precioUnitario"
               (valueChange)="onUpdate.emit()"
-              placeholder="0,00"
               inputClassName="h-12 text-sm shadow-sm"
             ></app-money-input>
 
@@ -209,9 +209,9 @@ import { cn } from '@shared/utils/cn';
             }
           </div>
           
-          <div class="flex flex-col items-center sm:items-end justify-center min-w-[140px] px-4">
+          <div class="flex flex-col items-center md:items-end justify-center min-w-[140px] px-4 w-full md:w-auto">
             <span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-2">Carga Final Ítem</span>
-            <div class="h-14 px-8 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-black text-2xl tabular-nums shadow-xl group/total overflow-hidden relative">
+            <div class="h-16 w-full md:w-auto px-8 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-black text-2xl tabular-nums shadow-xl group/total overflow-hidden relative transition-all">
               <div class="absolute inset-x-0 bottom-0 h-0.5 bg-primary/40 group-hover/total:h-full transition-all duration-500 opacity-20"></div>
               <span class="relative z-10">{{ (item.cantidad || 0) * (item.precioUnitario || 0) | currency }}</span>
             </div>
@@ -228,12 +228,15 @@ export class ItemDetailsFormComponent {
   canRemove = input(false);
   rubro = input.required<Rubro>();
   orderType = input<'CUSTOMER' | 'STOCK'>('CUSTOMER');
-  
+
   private filesApi = inject(FilesApiService);
-  
+  private confirm = inject(ConfirmService);
+
   @Output() onRemove = new EventEmitter<void>();
   @Output() onUpdate = new EventEmitter<void>();
- 
+  @Output() onFileUpload = new EventEmitter<string>();
+  @Output() onFileDelete = new EventEmitter<string>();
+
   readonly icons = { Trash2, Check, Plus, Upload, Loader2, FileCheck, X };
   isUploading = signal(false);
 
@@ -245,6 +248,7 @@ export class ItemDetailsFormComponent {
     try {
       const res = await this.filesApi.uploadFile(file);
       this.item.stlFile = res;
+      this.onFileUpload.emit(res.path);
       this.onUpdate.emit();
     } catch (error) {
       console.error('Upload failed', error);
@@ -256,9 +260,30 @@ export class ItemDetailsFormComponent {
     }
   }
 
-  clearFile() {
-    this.item.stlFile = undefined;
-    this.onUpdate.emit();
+  async clearFile() {
+    if (!this.item.stlFile) return;
+
+    const confirmed = await this.confirm.confirm({
+      title: 'Eliminar Diseño',
+      message: '¿Estás seguro de que deseas eliminar este archivo de diseño? Esta acción lo borrará permanentemente de la nube.',
+      confirmLabel: 'Sí, eliminar',
+      type: 'danger'
+    });
+
+    if (confirmed) {
+      this.isUploading.set(true); // Re-use loading state for deletion
+      try {
+        await this.filesApi.deleteFile(this.item.stlFile.path);
+        this.onFileDelete.emit(this.item.stlFile.path);
+        this.item.stlFile = undefined;
+        this.onUpdate.emit();
+      } catch (error) {
+        console.error('Delete failed', error);
+        alert('Error al eliminar el archivo de la nube');
+      } finally {
+        this.isUploading.set(false);
+      }
+    }
   }
 
   metalTemplates = [

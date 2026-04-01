@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+.base-card {
+  /* Minimal logic as we use Tailwind semantic classes */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.2s ease;
+}
+
+/* Base Card is meant to be structural, using semantic tokens like --bg and --card */
+.bg-card {
+  background-color: var(--card);
+}
+
+.bg-surface {
+  background-color: var(--surface);
+}
+
+.bg-surface-2 {
+  background-color: var(--surface-2);
+}
+
+.border-border {
+  border-color: var(--border);
+}
+
+.text-text {
+  color: var(--text);
+}
+
+.text-text-muted {
+  color: var(--text-muted);
+}

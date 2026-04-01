@@ -1,6 +1,9 @@
-import { Component, inject, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, computed, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+// ... (rest of lucide imports)
 import {
   LucideAngularModule,
   LayoutDashboard,
@@ -32,7 +35,8 @@ import {
   Zap,
   Pin,
   PinOff,
-  User
+  User,
+  X
 } from 'lucide-angular';
 import { LayoutService } from '../layout.service';
 import { SessionService } from '../../session/session.service';
@@ -57,13 +61,25 @@ export class SidebarComponent {
   layoutService = inject(LayoutService);
   sessionService = inject(SessionService);
   accessService = inject(AccessControlService);
+  router = inject(Router);
+
+  constructor() {
+    // Close mobile menu on navigation
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntilDestroyed()
+    ).subscribe(() => {
+      this.layoutService.closeMobileMenu();
+    });
+  }
 
   readonly icons = {
     LayoutDashboard, ShoppingCart, Users, Wrench, Cpu, BarChart3, Settings,
     Package, Layers, Box, Printer, FileText, Cog, Grid, ClipboardList,
     Hammer, Trees, Clock, HardHat, PackageSearch, Activity, UserCog, Database, Zap,
-    ChevronLeft, ChevronRight, Pin, PinOff, User
+    ChevronLeft, ChevronRight, Pin, PinOff, User, X
   };
+// ...
 
   /**
    * Computed list of visible menu groups based on business features and user permissions.

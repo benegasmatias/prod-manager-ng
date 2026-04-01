@@ -55,18 +55,16 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
             <button class="px-6 py-2.5 rounded-xl text-sm font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors" (click)="close()" [disabled]="isSaving">
               Cancelar
             </button>
-            <button 
-              class="px-6 py-2.5 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 min-w-[140px]"
-              [disabled]="!formData.name || isSaving"
-              (click)="save()"
+            <app-button-spinner
+              [loading]="isSaving"
+              [disabled]="!formData.name"
+              [loadingText]="initialData ? 'Guardando...' : 'Registrando...'"
+              btnClass="px-6 py-2.5 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 min-w-[140px]"
+              (onClick)="save()"
             >
-              @if (isSaving) {
-                <app-button-spinner [text]="initialData ? 'Guardando...' : 'Registrando...'"></app-button-spinner>
-              } @else {
-                <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
-                {{ initialData ? 'Guardar Cambios' : 'Registrar' }}
-              }
-            </button>
+              <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
+              {{ initialData ? 'Guardar Cambios' : 'Registrar' }}
+            </app-button-spinner>
           </div>
         </div>
       </div>

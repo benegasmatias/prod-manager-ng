@@ -1,146 +1,146 @@
 @if (loading()) {
-  <app-dashboard-skeleton></app-dashboard-skeleton>
+<app-dashboard-skeleton></app-dashboard-skeleton>
 } @else {
-  <div class="space-y-6 p-4 pt-0 animate-in fade-in duration-700">
-  
+<div
+  class="space-y-4 sm:space-y-6 p-3 sm:p-4 pt-2 sm:pt-0 animate-in fade-in duration-700 max-w-full overflow-x-hidden">
+
   <!-- Header Info -->
-  <div class="space-y-1">
-    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-violet-500">Resumen Ejecutivo</p>
-    <h1 class="text-4xl font-black tracking-tight text-zinc-900 uppercase">
-      Control <span class="text-violet-600 italic">Center</span>
-    </h1>
-    <p class="text-xs text-zinc-400 font-medium">Análisis predictivo y monitoreo operativo de Impresiones 3D - Mi Espacio.</p>
+  <div class="space-y-0.5 px-1 sm:px-0">
+    <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.3em] text-primary">Resumen
+      Ejecutivo</p>
+    <div class="flex items-center gap-2">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-foreground uppercase">
+        Control <span class="text-primary italic">Center</span>
+      </h1>
+      <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse hidden sm:block"></div>
+    </div>
+    <p class="text-[9px] sm:text-xs text-muted-foreground font-medium max-w-[240px] sm:max-w-none leading-tight">
+      Monitoreo operativo de Producción.</p>
   </div>
 
   <!-- KPI Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-    <!-- Card: Ventas Totales -->
-    <div class="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-xl transition-all border-b-4 border-b-emerald-400">
-      <div class="flex items-center justify-between relative z-10">
-        <div class="space-y-1">
-          <p class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Ventas Totales</p>
-          <h3 class="text-3xl font-black tracking-tighter text-zinc-900">$ 84.258,00</h3>
-          <p class="text-[9px] font-bold text-zinc-300 uppercase">Histórico acumulado</p>
-        </div>
-        <div class="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
-          <lucide-angular [img]="icons.TrendingUp" class="h-6 w-6"></lucide-angular>
-        </div>
-      </div>
-    </div>
+  <app-metric-cards-grid [columns]="4">
+    <app-metric-card
+      title="Ventas Totales"
+      value="$ 84.258"
+      subtitle="Acumulado"
+      [icon]="icons.TrendingUp"
+      variant="status"
+      accentColor="emerald-400"
+    ></app-metric-card>
 
-    <!-- Card: Saldo a Cobrar -->
-    <div class="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-xl transition-all border-b-4 border-b-rose-400">
-      <div class="flex items-center justify-between relative z-10">
-        <div class="space-y-1">
-          <p class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Saldo a Cobrar</p>
-          <h3 class="text-3xl font-black tracking-tighter text-zinc-900">$ 0,00</h3>
-          <p class="text-[9px] font-bold text-zinc-300 uppercase">Histórico acumulado</p>
-        </div>
-        <div class="h-12 w-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
-          <lucide-angular [img]="icons.Wallet" class="h-6 w-6"></lucide-angular>
-        </div>
-      </div>
-    </div>
+    <app-metric-card
+      title="Cobrar"
+      value="$ 12.500"
+      badgeText="Pendiente"
+      badgeTone="danger"
+      [icon]="icons.Wallet"
+      variant="status"
+      accentColor="rose-400"
+    ></app-metric-card>
 
-    <!-- Card: Producción en Curso -->
-    <div class="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-xl transition-all border-b-4 border-b-blue-400">
-      <div class="flex items-center justify-between relative z-10">
-        <div class="space-y-1">
-          <p class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Producción en Curso</p>
-          <h3 class="text-3xl font-black tracking-tighter text-zinc-900">0</h3>
-          <p class="text-[9px] font-bold text-zinc-300 uppercase">Estado actual</p>
-        </div>
-        <div class="h-12 w-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-          <lucide-angular [img]="icons.Printer" class="h-6 w-6"></lucide-angular>
-        </div>
-      </div>
-    </div>
+    <app-metric-card
+      title="En Curso"
+      value="8"
+      subtitle="Activos"
+      [icon]="icons.Printer"
+      variant="status"
+      accentColor="blue-500"
+    ></app-metric-card>
 
-    <!-- Card: Impresoras Activas -->
-    <div class="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-xl transition-all border-b-4 border-b-amber-400">
-      <div class="flex items-center justify-between relative z-10">
-        <div class="space-y-1">
-          <p class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Impresoras Activas</p>
-          <h3 class="text-3xl font-black tracking-tighter text-zinc-900">4</h3>
-          <p class="text-[9px] font-bold text-zinc-300 uppercase">Estado actual</p>
-        </div>
-        <div class="h-12 w-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
-          <lucide-angular [img]="icons.Zap" class="h-6 w-6"></lucide-angular>
-        </div>
-      </div>
-    </div>
-  </div>
+    <app-metric-card
+      title="Retrasos"
+      value="2"
+      subtitle="Críticos"
+      [icon]="icons.AlertTriangle"
+      variant="status"
+      accentColor="amber-400"
+    ></app-metric-card>
+  </app-metric-cards-grid>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
     <!-- Recent Movements -->
-    <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-zinc-100 p-8 space-y-6">
-      <div class="flex items-center justify-between mb-4">
-        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Últimos Movimientos</p>
-        <button class="text-[9px] font-black uppercase tracking-widest text-violet-500 hover:underline">Ver todo ></button>
+    <app-base-card 
+      class="lg:col-span-2" 
+      [tone]="'list'" 
+      [padding]="'lg'"
+    >
+      <div card-header class="flex items-center justify-between mb-6 px-1">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Movimientos</p>
+        <button
+          class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-border text-primary hover:bg-primary/5 transition-all">Ver
+          todo</button>
       </div>
 
-      <div class="divide-y divide-zinc-50">
+      <div class="divide-y divide-border">
         @for (item of [
-          { name: 'Adan Rodriguez', code: 'ORD-69BBDE', price: '$ 6.000,00', status: 'ENTREGADO', color: 'emerald' },
-          { name: 'Adan Rodriguez', code: 'ORD-54DFD9', price: '$ 45.000,00', status: 'ENTREGADO', color: 'emerald' },
-          { name: 'Adan Rodriguez', code: 'ORD-EF2395', price: '$ 30.000,00', status: 'ANULADO', color: 'rose' },
-          { name: 'Adan Rodriguez', code: 'ORD-B36AA7', price: '$ 1.200,00', status: 'ENTREGADO', color: 'emerald' }
+        { name: 'Adan Rodriguez', code: 'ORD-69BBDE', price: '$ 6.000', status: 'COMPLETADO', color: 'emerald' },
+        { name: 'Sanjuanino SA', code: 'ORD-54DFD9', price: '$ 45.000', status: 'PRODUCIdO', color: 'emerald' },
+        { name: 'Taller Phoenix', code: 'ORD-EF2395', price: '$ 30.000', status: 'ANULADO', color: 'rose' },
+        { name: 'Juan Perez', code: 'ORD-B36AA7', price: '$ 1.200', status: 'COMPLETADO', color: 'emerald' }
         ]; track item.code) {
-          <div class="py-6 flex items-center justify-between group transition-all hover:translate-x-1">
-            <div class="flex items-center gap-5">
-              <div class="h-12 w-12 rounded-xl bg-zinc-50 flex items-center justify-center border border-zinc-100 group-hover:border-violet-200 transition-colors">
-                 <lucide-angular [img]="icons.ShoppingCart" class="h-5 w-5 text-zinc-400"></lucide-angular>
-              </div>
-              <div class="space-y-0.5">
-                <h4 class="text-sm font-black text-zinc-900">{{ item.name }}</h4>
-                <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">{{ item.code }} • 12/3/2026</p>
-              </div>
+        <div class="py-4 flex flex-row items-center justify-between group transition-all group/item">
+          <div class="flex items items-center gap-3 sm:gap-5 min-w-0">
+            <div
+              class="h-9 w-9 sm:h-12 sm:w-12 rounded-xl bg-surface-2 flex items-center justify-center border border-border shrink-0 group-hover/item:border-primary/30 transition-colors">
+              <lucide-angular [img]="icons.ShoppingCart"
+                class="h-4 w-4 sm:h-5 sm:w-5 text-text-muted"></lucide-angular>
             </div>
-            <div class="flex items-center gap-6">
-              <span class="text-xs font-black text-zinc-900">{{ item.price }}</span>
-              <span [class]="'text-[8px] font-black px-2.5 py-1 rounded-md uppercase tracking-widest border ' + (item.color === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100')">
-                {{ item.status }}
-              </span>
+            <div class="space-y-0.5 truncate">
+              <h4 class="text-[11px] sm:text-sm font-black text-text truncate tracking-tight">{{ item.name }}</h4>
+              <p class="text-[8px] sm:text-[9px] font-bold text-text-muted uppercase tracking-tighter">{{
+                item.code }} • Hoy</p>
             </div>
           </div>
+          <div class="flex flex-col items-end gap-1.5 shrink-0 ml-3">
+            <span class="text-[11px] sm:text-xs font-black text-text">{{ item.price }}</span>
+            <span
+              [class]="cn('text-[7px] sm:text-[8px] font-black px-2 py-0.5 sm:py-1 rounded-md uppercase tracking-[0.1em] border', 
+                   item.color === 'emerald' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-rose-500/10 text-rose-500 border-rose-500/20')">
+              {{ item.status }}
+            </span>
+          </div>
+        </div>
         }
       </div>
-    </div>
+    </app-base-card>
 
     <!-- Side Actions -->
-    <div class="space-y-6">
+    <div class="space-y-4 sm:space-y-6">
       <!-- Operational Alerts -->
-      <div class="bg-white rounded-[2.5rem] border border-zinc-100 p-8 space-y-6">
-        <div class="flex items-center gap-2">
-          <lucide-angular [img]="icons.AlertCircle" class="h-3.5 w-3.5 text-amber-500"></lucide-angular>
-          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Alertas Operativas</p>
+      <app-base-card 
+        [padding]="'lg'"
+        [tone]="'alert'"
+      >
+        <div card-header class="flex items-center gap-2 px-1 mb-6">
+          <lucide-angular [img]="icons.AlertCircle" class="h-3.5 w-3.5 text-warning"></lucide-angular>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Ops Alert</p>
         </div>
-        <div class="flex flex-col items-center justify-center py-10 space-y-4">
-          <div class="h-12 w-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
-            <lucide-angular [img]="icons.Zap" class="h-6 w-6"></lucide-angular>
+        
+        <div class="flex flex-col items-center justify-center py-6 sm:py-10 space-y-3 sm:space-y-4 bg-surface-2 rounded-3xl border border-dashed border-border transition-colors">
+          <div
+            class="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-success/10 flex items-center justify-center text-success shadow-sm shadow-success/10">
+            <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 sm:h-6 sm:w-6"></lucide-angular>
           </div>
-          <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2">
-            <lucide-angular [img]="icons.CheckCircle2" class="h-3.5 w-3.5"></lucide-angular> Todo bajo control
+          <p
+            class="text-[9px] sm:text-[10px] font-black text-success uppercase tracking-widest flex items-center gap-2 bg-surface px-3 py-1 rounded-full shadow-sm">
+            Todo bajo control
           </p>
         </div>
-      </div>
+      </app-base-card>
 
       <!-- Action Card -->
-      <div class="bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
-        <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="relative z-10 space-y-6">
-          <div class="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center">
-            <lucide-angular [img]="icons.TrendingUp" class="h-6 w-6"></lucide-angular>
-          </div>
-          <div class="space-y-2">
-            <h3 class="text-xl font-black uppercase leading-[1.1] tracking-tighter">Impulsa tu <br/> Producción</h3>
-            <p class="text-[11px] font-medium text-white/70 leading-relaxed">Explora los reportes avanzados para encontrar cuellos de botella.</p>
-          </div>
-          <button class="w-full h-12 bg-white text-zinc-900 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-zinc-50 transition-all shadow-xl">
-            Reportes <lucide-angular [img]="icons.ArrowRight" class="h-3 w-3"></lucide-angular>
-          </button>
-        </div>
-      </div>
+      <app-metric-card
+        title="Impulsa tu Producción"
+        value=""
+        subtitle="Detección predictiva de cuellos de botella."
+        [icon]="icons.TrendingUp"
+        variant="highlight"
+      >
+        <button class="w-full h-11 sm:h-12 bg-white dark:bg-primary text-primary dark:text-white rounded-xl sm:rounded-2xl font-black uppercase text-[9px] sm:text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-white/90 dark:hover:bg-primary/90 transition-all shadow-lg shadow-black/5 hover:scale-[1.02] active:scale-95 mt-4">
+          Reportes <lucide-angular [img]="icons.ArrowRight" class="h-3 w-3 group-hover:translate-x-1 transition-transform"></lucide-angular>
+        </button>
+      </app-metric-card>
     </div>
   </div>
 </div>

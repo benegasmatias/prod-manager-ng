@@ -1,5 +1,5 @@
 <div [class]="cn(
-  'grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white/70 dark:bg-zinc-900/40 p-6 rounded-[2.5rem] border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm backdrop-blur-sm relative z-30 transition-all group/filter',
+  'grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 bg-white/70 dark:bg-zinc-900/40 p-4 sm:p-6 rounded-3xl sm:rounded-[2.5rem] border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm backdrop-blur-sm relative z-30 transition-all group/filter',
   className
 )">
   <!-- Search Input Section -->
@@ -8,10 +8,24 @@
       showDates ? 'lg:col-span-4' : 'lg:col-span-12',
       'relative group'
     )">
-      <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1 mb-2 block flex items-center gap-2">
-        <lucide-angular [img]="icons.Search" class="h-[14px] w-[14px] text-zinc-300"></lucide-angular>
-        Buscar Cliente o N°
-      </label>
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1 flex items-center gap-2">
+          <lucide-angular [img]="icons.Search" class="h-[14px] w-[14px] text-zinc-300"></lucide-angular>
+          Buscar Cliente o N°
+        </label>
+        
+        <!-- Mobile Toggle Filter Button -->
+        @if (showDates || showTechnician || showStatus || showUrgency) {
+          <button 
+            (click)="toggleExpanded()"
+            [class]="'lg:hidden text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all ' + 
+                     (isExpanded ? 'bg-primary border-primary text-white shadow-lg' : 'bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 text-zinc-500')"
+          >
+            Filtros
+          </button>
+        }
+      </div>
+
       <div class="relative group/search">
         <input 
           type="text"
@@ -36,106 +50,109 @@
     </div>
   }
 
-  <!-- Date Pickers Section -->
-  @if (showDates) {
-    <div class="lg:col-span-4 grid grid-cols-2 gap-3 items-end">
-      <app-date-picker
-        label="Desde"
-        [value]="values.startDate || ''"
-        (valueChange)="onValueChange('startDate', $event)"
-        [allowPastDates]="true"
-        class="w-full"
-      ></app-date-picker>
-      <app-date-picker
-        label="Hasta"
-        [value]="values.endDate || ''"
-        (valueChange)="onValueChange('endDate', $event)"
-        [allowPastDates]="true"
-        class="w-full"
-      ></app-date-picker>
-    </div>
-  }
+  <!-- Secondary Filters (Collapsible on Mobile) -->
+  <div [class.hidden]="!isExpanded" class="lg:contents">
+    <!-- Date Pickers Section -->
+    @if (showDates) {
+      <div class="lg:col-span-4 grid grid-cols-2 gap-3 items-end animate-in fade-in slide-in-from-top-2 duration-300">
+        <app-date-picker
+          label="Desde"
+          [value]="values.startDate || ''"
+          (valueChange)="onValueChange('startDate', $event)"
+          [allowPastDates]="true"
+          class="w-full"
+        ></app-date-picker>
+        <app-date-picker
+          label="Hasta"
+          [value]="values.endDate || ''"
+          (valueChange)="onValueChange('endDate', $event)"
+          [allowPastDates]="true"
+          class="w-full"
+        ></app-date-picker>
+      </div>
+    }
 
-  <!-- Selectors / Technicians -->
-  @if (showTechnician || showStatus || showUrgency) {
-    <div [class]="cn(
-      'grid gap-3 relative self-end items-end',
-      'lg:col-span-12 xl:col-span-4 grid-cols-1 md:grid-cols-2',
-      showUrgency ? 'xl:grid-cols-3 xl:col-span-4' : 'xl:col-span-4',
-      !showDates && !showSearch ? 'lg:col-span-12' : ''
-    )">
-      
-      @if (showTechnician && options?.technicians) {
-        <div class="space-y-2">
-          <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1 flex items-center gap-2">
-             <lucide-angular [img]="icons.User" class="h-3 w-3 text-zinc-300"></lucide-angular>
-             Técnico
-          </label>
-          <div class="relative group/sel">
-            <select 
-              [ngModel]="values.technician"
-              (ngModelChange)="onValueChange('technician', $event)"
-              class="w-full h-11 pl-4 pr-10 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50 appearance-none focus:ring-2 focus:ring-primary/20 transition-all outline-none cursor-pointer"
-            >
-              <option value="all">TODOS</option>
-              @for (emp of options?.technicians; track emp.id) {
-                <option [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }}</option>
-              }
-            </select>
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/sel:opacity-100 pointer-events-none transition-all">
-              <lucide-angular [img]="icons.ChevronDown" class="h-[14px] w-[14px]"></lucide-angular>
+    <!-- Selectors / Technicians -->
+    @if (showTechnician || showStatus || showUrgency) {
+      <div [class]="cn(
+        'grid gap-3 relative self-end items-end animate-in fade-in slide-in-from-top-2 duration-300 delay-75',
+        'lg:col-span-12 xl:col-span-4 grid-cols-1 md:grid-cols-2',
+        showUrgency ? 'xl:grid-cols-3 xl:col-span-4' : 'xl:col-span-4',
+        !showDates && !showSearch ? 'lg:col-span-12' : ''
+      )">
+        
+        @if (showTechnician && options?.technicians) {
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1 flex items-center gap-2">
+               <lucide-angular [img]="icons.User" class="h-3 w-3 text-zinc-300"></lucide-angular>
+               Técnico
+            </label>
+            <div class="relative group/sel">
+              <select 
+                [ngModel]="values.technician"
+                (ngModelChange)="onValueChange('technician', $event)"
+                class="w-full h-11 pl-4 pr-10 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50 appearance-none focus:ring-2 focus:ring-primary/20 transition-all outline-none cursor-pointer"
+              >
+                <option value="all">TODOS</option>
+                @for (emp of options?.technicians; track emp.id) {
+                  <option [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }}</option>
+                }
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/sel:opacity-100 pointer-events-none transition-all">
+                <lucide-angular [img]="icons.ChevronDown" class="h-[14px] w-[14px]"></lucide-angular>
+              </div>
             </div>
           </div>
-        </div>
-      }
+        }
 
-      @if (showStatus && options?.statuses) {
-        <div class="space-y-2">
-          <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Estado</label>
-          <div class="relative group/sel">
-            <select 
-              [ngModel]="values.status"
-              (ngModelChange)="onValueChange('status', $event)"
-              class="w-full h-11 pl-4 pr-10 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50 appearance-none focus:ring-2 focus:ring-primary/20 transition-all outline-none cursor-pointer"
-            >
-              <option value="all">TODOS</option>
-              @for (st of options?.statuses; track st.value) {
-                <option [value]="st.value">{{ st.label }}</option>
-              }
-            </select>
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/sel:opacity-100 pointer-events-none transition-all">
-              <lucide-angular [img]="icons.ChevronDown" class="h-[14px] w-[14px]"></lucide-angular>
+        @if (showStatus && options?.statuses) {
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Estado</label>
+            <div class="relative group/sel">
+              <select 
+                [ngModel]="values.status"
+                (ngModelChange)="onValueChange('status', $event)"
+                class="w-full h-11 pl-4 pr-10 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50 appearance-none focus:ring-2 focus:ring-primary/20 transition-all outline-none cursor-pointer"
+              >
+                <option value="all">TODOS</option>
+                @for (st of options?.statuses; track st.value) {
+                  <option [value]="st.value">{{ st.label }}</option>
+                }
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/sel:opacity-100 pointer-events-none transition-all">
+                <lucide-angular [img]="icons.ChevronDown" class="h-[14px] w-[14px]"></lucide-angular>
+              </div>
             </div>
           </div>
-        </div>
-      }
+        }
 
-      @if (showUrgency && options?.urgencies) {
-        <div class="space-y-2">
-          <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Urgencia</label>
-          <div class="relative group/sel">
-            <select 
-              [ngModel]="values.urgency"
-              (ngModelChange)="onValueChange('urgency', $event)"
-              class="w-full h-11 pl-4 pr-10 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50 appearance-none focus:ring-2 focus:ring-primary/20 transition-all outline-none cursor-pointer"
-            >
-              <option value="all">TODAS</option>
-              @for (ur of options?.urgencies; track ur.value) {
-                <option [value]="ur.value">{{ ur.label }}</option>
-              }
-            </select>
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/sel:opacity-100 pointer-events-none transition-all">
-              <lucide-angular [img]="icons.ChevronDown" class="h-[14px] w-[14px]"></lucide-angular>
+        @if (showUrgency && options?.urgencies) {
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Urgencia</label>
+            <div class="relative group/sel">
+              <select 
+                [ngModel]="values.urgency"
+                (ngModelChange)="onValueChange('urgency', $event)"
+                class="w-full h-11 pl-4 pr-10 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50 appearance-none focus:ring-2 focus:ring-primary/20 transition-all outline-none cursor-pointer"
+              >
+                <option value="all">TODAS</option>
+                @for (ur of options?.urgencies; track ur.value) {
+                  <option [value]="ur.value">{{ ur.label }}</option>
+                }
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/sel:opacity-100 pointer-events-none transition-all">
+                <lucide-angular [img]="icons.ChevronDown" class="h-[14px] w-[14px]"></lucide-angular>
+              </div>
             </div>
           </div>
-        </div>
-      }
-    </div>
-  }
+        }
+      </div>
+    }
+  </div>
 
   <!-- Clear Filters Action -->
   @if (hasActiveFilters()) {
-    <div class="lg:col-span-12 flex justify-end -mt-4 animate-in fade-in duration-300">
+    <div class="lg:col-span-12 flex justify-end -mt-2 animate-in fade-in duration-300">
       <button 
         (click)="clear.emit()"
         class="text-[10px] font-black text-zinc-400 hover:text-primary transition-all uppercase tracking-widest flex items-center gap-1.5 group/clear"

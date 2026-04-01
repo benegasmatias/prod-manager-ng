@@ -6,12 +6,13 @@ import { SessionService } from '@core/session/session.service';
 import { Employee } from '@shared/models';
 import { LucideAngularModule, Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
+import { MetricCardComponent, MetricCardsGridComponent } from '@shared/ui';
 import { cn } from '@shared/utils/cn';
 
 @Component({
   selector: 'app-personal',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent, MetricCardComponent, MetricCardsGridComponent],
   templateUrl: './personal.component.html'
 })
 export class PersonalPageComponent {

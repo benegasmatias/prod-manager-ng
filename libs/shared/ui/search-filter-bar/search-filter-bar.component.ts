@@ -63,5 +63,11 @@ export class SearchFilterBarComponent {
 
   protected readonly icons = { Search, Calendar, User, ChevronDown, Filter, X };
 
+  isExpanded = false;
+
+  toggleExpanded() {
+    this.isExpanded = !this.isExpanded;
+  }
+
   cn = cn;
 }

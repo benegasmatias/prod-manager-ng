@@ -28,67 +28,30 @@
     </div>
   } @else {
     <!-- Premium Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
-        <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-          <lucide-angular [img]="icons.Wallet" class="h-20 w-20 text-zinc-900 dark:text-white"></lucide-angular>
-        </div>
-        <div class="relative z-10 space-y-4">
-          <div class="h-12 w-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700">
-            <lucide-angular [img]="icons.Wallet" class="h-5 w-5"></lucide-angular>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">Capital Invertido</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
-                {{ stockStats().totalInvestment | currency:'ARS':'symbol-narrow':'1.0-0' }}
-              </span>
-              <span class="text-sm font-bold text-zinc-400">,00</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <app-metric-cards-grid [columns]="3">
+      <app-metric-card
+        title="Capital Invertido"
+        [value]="(stockStats().totalInvestment | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'"
+        [icon]="icons.Wallet"
+        [loading]="loading()"
+      ></app-metric-card>
 
-      <div class="relative group overflow-hidden bg-primary p-8 rounded-[2.5rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.01]">
-        <div class="absolute top-0 right-0 p-8 opacity-10">
-          <lucide-angular [img]="icons.TrendingUp" class="h-20 w-20 text-white"></lucide-angular>
-        </div>
-        <div class="relative z-10 space-y-4">
-          <div class="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/10 backdrop-blur-sm">
-            <lucide-angular [img]="icons.TrendingUp" class="h-5 w-5"></lucide-angular>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mb-1">Retorno Proyectado</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-black tracking-tighter text-white">
-                {{ (stockStats().totalInvestment + stockStats().pendingProfit) | currency:'ARS':'symbol-narrow':'1.0-0' }}
-              </span>
-              <span class="text-sm font-bold text-white/40">,00</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <app-metric-card
+        title="Retorno Proyectado"
+        [value]="((stockStats().totalInvestment + stockStats().pendingProfit) | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'"
+        [icon]="icons.TrendingUp"
+        variant="highlight"
+        [loading]="loading()"
+      ></app-metric-card>
 
-      <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
-        <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-          <lucide-angular [img]="icons.Package2" class="h-20 w-20 text-zinc-900 dark:text-white"></lucide-angular>
-        </div>
-        <div class="relative z-10 space-y-4">
-          <div class="h-12 w-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 border border-zinc-100 dark:border-zinc-700">
-            <lucide-angular [img]="icons.Package2" class="h-5 w-5"></lucide-angular>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">Órdenes Activas</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">
-                {{ stockStats().activeOrdersCount }}
-              </span>
-              <span class="text-xs font-bold text-zinc-400 uppercase">Procesos</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <app-metric-card
+        title="Órdenes Activas"
+        [value]="stockStats().activeOrdersCount"
+        [icon]="icons.Package2"
+        subtitle="Procesos"
+        [loading]="loading()"
+      ></app-metric-card>
+    </app-metric-cards-grid>
 
     <!-- Filter Section -->
     <div class="flex flex-col lg:flex-row items-center gap-6 bg-white dark:bg-zinc-900/40 p-4 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm overflow-hidden mt-6">

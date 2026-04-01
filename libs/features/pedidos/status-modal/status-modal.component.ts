@@ -9,6 +9,7 @@ import {
   DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
   RefreshCw, ChevronDown, ChevronLeft
 } from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui';
 import { Pedido, Employee, OrderStatus } from '@shared/models/pedido';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { MaquinasApiService } from '@core/api/maquinas.api.service';
@@ -32,6 +33,7 @@ import { Impresion3dSectionComponent, MultiMaterial } from './sections/impresion
     CommonModule,
     LucideAngularModule,
     FormsModule,
+    ButtonSpinnerComponent,
     PaymentModuleComponent,
     FailureModuleComponent,
     MetalurgicaSectionComponent,
