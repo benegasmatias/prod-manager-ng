@@ -4,7 +4,8 @@
     <div class="flex flex-col gap-1">
       <div class="flex items-center gap-2 mb-0.5 sm:mb-1">
         <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-        <span class="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.2em]">{{ labels.CATEGORY }}</span>
+        <span class="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.2em]">{{ labels.CATEGORY
+          }}</span>
       </div>
       <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter sm:tracking-tight text-foreground">
         {{ labels.TITLE }}
@@ -35,29 +36,18 @@
 
   <!-- Stats Cards Section -->
   <app-metric-cards-grid [columns]="3">
-    <app-metric-card
-      [title]="labels.STATS.SALES_VOLUME"
-      [value]="(summary().totalVolume | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'"
-      [icon]="icons.TRENDING"
-      [loading]="loading()"
-    ></app-metric-card>
+    <app-metric-card [title]="labels.STATS.SALES_VOLUME"
+      [value]="(summary().totalVolume | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'" [icon]="icons.TRENDING"
+      [loading]="loading()"></app-metric-card>
 
-    <app-metric-card
-      [title]="labels.STATS.PENDING_COLLECTION"
-      [value]="(summary().pendingBalance | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'"
-      [icon]="icons.WALLET"
-      variant="highlight"
-      [loading]="loading()"
-    ></app-metric-card>
+    <app-metric-card [title]="labels.STATS.PENDING_COLLECTION"
+      [value]="(summary().pendingBalance | currency:'ARS':'symbol-narrow':'1.0-0') + ',00'" [icon]="icons.WALLET"
+      variant="highlight" [loading]="loading()"></app-metric-card>
 
-    <app-metric-card
-      [title]="labels.STATS.ACTIVE_ORDERS"
-      [value]="summary().activeCount"
-      [icon]="icons.PACKAGE"
-      [subtitle]="labels.STATS.IN_PROGRESS"
-      [loading]="loading()"
-    ></app-metric-card>
+    <app-metric-card [title]="labels.STATS.ACTIVE_ORDERS" [value]="summary().activeCount" [icon]="icons.PACKAGE"
+      [subtitle]="labels.STATS.IN_PROGRESS" [loading]="loading()"></app-metric-card>
   </app-metric-cards-grid>
+
 
   <!-- Filters Section -->
   <app-search-filter-bar [values]="currentFilterValues()" [options]="filterOptions()" [showUrgency]="true"
@@ -77,7 +67,8 @@
             commercialTotal() }}</span>
         </h2>
       </div>
-      <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest hidden sm:block">{{ labels.COMMERCIAL_SUBTITLE }}</p>
+      <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest hidden sm:block">{{
+        labels.COMMERCIAL_SUBTITLE }}</p>
     </div>
 
     <div
@@ -87,11 +78,13 @@
       }
       <app-orders-table [orders]="sortedCommercial()" [sortKey]="sortKey()" [sortDir]="sortDir()"
         [hideTypeColumn]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
+        (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
         class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
-        <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
+        <app-page-size-selector [pageSize]="pageSize"
+          (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
         <div class="flex-1 w-full">
           <app-paginator [totalItems]="commercialTotal()" [pageSize]="pageSize" [currentPage]="commercialPage()"
             (pageChange)="onCommercialPageChange($event)"></app-paginator>
@@ -139,11 +132,13 @@
       }
       <app-orders-table [orders]="sortedProduction()" [sortKey]="sortKey()" [sortDir]="sortDir()"
         [hideTypeColumn]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
+        (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
         class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
-        <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
+        <app-page-size-selector [pageSize]="pageSize"
+          (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
         <div class="flex-1 w-full">
           <app-paginator [totalItems]="productionTotal()" [pageSize]="pageSize" [currentPage]="productionPage()"
             (pageChange)="onProductionPageChange($event)"></app-paginator>
@@ -157,7 +152,8 @@
         class="h-12 w-12 sm:h-16 w-16 rounded-2xl sm:rounded-[1.5rem] bg-background shadow-sm flex items-center justify-center border border-border text-muted-foreground/30">
         <lucide-angular [img]="icons.CLOCK" class="h-6 w-6 sm:h-7 w-7"></lucide-angular>
       </div>
-      <p class="text-[10px] sm:text-sm font-black text-muted-foreground uppercase tracking-widest px-4 leading-relaxed">{{ labels.EMPTY_ACTIVE }}</p>
+      <p class="text-[10px] sm:text-sm font-black text-muted-foreground uppercase tracking-widest px-4 leading-relaxed">
+        {{ labels.EMPTY_ACTIVE }}</p>
     </div>
     }
   </div>
@@ -177,7 +173,8 @@
         </h2>
       </div>
       <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
-      <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest hidden sm:block">{{ labels.HISTORY_SUBTITLE }}</p>
+      <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest hidden sm:block">{{
+        labels.HISTORY_SUBTITLE }}</p>
     </div>
     <div
       class="bg-white/30 dark:bg-zinc-950/10 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-2 sm:p-6 backdrop-blur-[2px] relative min-h-[200px] overflow-hidden">
@@ -186,11 +183,13 @@
       }
       <app-orders-table [orders]="sortedArchived()" [sortKey]="sortKey()" [sortDir]="sortDir()" [hideTypeColumn]="true"
         [hideUrgency]="true" [hideDelivery]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
+        (viewClick)="goToDetail($event)"></app-orders-table>
 
       <div
         class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
-        <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
+        <app-page-size-selector [pageSize]="pageSize"
+          (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
         <div class="flex-1 w-full">
           <app-paginator [totalItems]="archivedTotal()" [pageSize]="pageSize" [currentPage]="archivedPage()"
             (pageChange)="onArchivedPageChange($event)"></app-paginator>
@@ -202,4 +201,4 @@
 
   <app-order-status-modal [order]="selectedOrder()" [isOpen]="isModalOpen()" [employees]="employees()"
     (onClose)="isModalOpen.set(false)" (onSave)="loadData()"></app-order-status-modal>
-</div>
+</div>

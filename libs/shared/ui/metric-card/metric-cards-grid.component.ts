@@ -32,7 +32,7 @@ export class MetricCardsGridComponent {
     };
 
     return cn(
-      'w-full max-w-full overflow-x-hidden',
+      'w-full max-w-full overflow-visible px-4 py-6',
       specificCols[this.columns()] || defaultCols,
       gaps[this.gap()]
     );

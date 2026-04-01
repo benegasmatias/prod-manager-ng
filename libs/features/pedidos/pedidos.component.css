@@ -1,2 +1,14 @@
 /* Component specific styles if needed */
 .active-link {}
+
+.metric-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+:host {
+    display: block;
+    width: 100%;
+}

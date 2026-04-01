@@ -190,12 +190,13 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
       0% { transform: translateX(-100%) skewX(-12deg); }
       100% { transform: translateX(200%) skewX(-12deg); }
     }
+      
   `]
 })
 export class ReportesPageComponent implements OnInit {
   private reportsApi = inject(ReportsApiService);
   private session = inject(SessionService);
-  
+
   data = signal<ReportsSummary | null>(null);
   loading = signal(true);
 
@@ -213,7 +214,7 @@ export class ReportesPageComponent implements OnInit {
   pieData = computed(() => {
     const d = this.data();
     if (!d) return [];
-    
+
     const total = this.totalProductQty();
     if (total === 0) return [];
 
@@ -223,7 +224,7 @@ export class ReportesPageComponent implements OnInit {
       const dashArray = `${percentage} ${100 - percentage}`;
       const offset = 100 - currentOffset + 25; // 25 is to start from top
       currentOffset += percentage;
-      
+
       return {
         ...item,
         color: this.colors[i % this.colors.length],
