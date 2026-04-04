@@ -115,28 +115,34 @@
               <!-- TECH SPECS -->
               <div class="space-y-3" [ngClass]="!isCompact() ? 'pt-4 border-t border-zinc-50 dark:border-zinc-800' : ''">
                 <div class="flex flex-wrap gap-x-4 gap-y-2">
-                  <div class="flex items-center gap-2 min-w-0">
-                     <lucide-angular [img]="icons.Monitor" class="h-3 w-3 text-zinc-300 shrink-0"></lucide-angular>
+                  <!-- MACHINE PICKER -->
+                  <div (click)="openPicker(job, 'MACHINE')" 
+                       class="flex items-center gap-2 min-w-0 p-1 hover:bg-primary/5 rounded-lg cursor-pointer transition-colors group/picker">
+                     <lucide-angular [img]="icons.Monitor" class="h-3 w-3 text-zinc-300 shrink-0 group-hover/picker:text-primary"></lucide-angular>
                      <div class="text-left overflow-hidden">
                        <p class="text-[8px] font-black uppercase tracking-widest text-zinc-400 leading-none mb-0.5" *ngIf="!isCompact()">Máquina</p>
-                       <p class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 truncate">{{ job.machine?.name || '--' }}</p>
+                       <p class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 truncate group-hover/picker:text-primary transition-colors">{{ job.machine?.name || '---' }}</p>
                      </div>
                   </div>
-                  <div class="flex items-center gap-2 min-w-0">
-                    <lucide-angular [img]="icons.User" class="h-3 w-3 text-zinc-300 shrink-0"></lucide-angular>
+
+                  <!-- OPERATOR PICKER -->
+                  <div (click)="openPicker(job, 'OPERATOR')" 
+                       class="flex items-center gap-2 min-w-0 p-1 hover:bg-primary/5 rounded-lg cursor-pointer transition-colors group/picker">
+                    <lucide-angular [img]="icons.User" class="h-3 w-3 text-zinc-300 shrink-0 group-hover/picker:text-primary"></lucide-angular>
                     <div class="text-left overflow-hidden">
                       <p class="text-[8px] font-black uppercase tracking-widest text-zinc-400 leading-none mb-0.5" *ngIf="!isCompact()">Operario</p>
-                      <p class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 truncate">{{ job.responsable?.firstName || '---' }}</p>
+                      <p class="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 truncate group-hover/picker:text-primary transition-colors">{{ job.responsable?.firstName || '---' }}</p>
                     </div>
                  </div>
                 </div>
 
-                <div class="flex items-center justify-between gap-4 p-2 bg-[#fafbfc] dark:bg-zinc-950/30 rounded-xl border border-zinc-50 dark:border-zinc-800">
+                <div (click)="openPicker(job, 'STAGE')" 
+                     class="flex items-center justify-between gap-4 p-2 bg-[#fafbfc] dark:bg-zinc-950/30 rounded-xl border border-zinc-50 dark:border-zinc-800 hover:bg-primary/5 cursor-pointer transition-colors group/stage">
                     <div class="flex items-center gap-2">
-                       <lucide-angular [img]="icons.Activity" class="h-3 w-3 text-primary/50"></lucide-angular>
-                       <span class="text-[9px] font-black uppercase tracking-widest"
-                             [ngClass]="job.currentStage ? 'text-primary' : 'text-zinc-300 italic'">
-                         {{ job.currentStage || 'Sin etapa definida' }}
+                       <lucide-angular [img]="icons.Activity" class="h-3 w-3 text-primary/50 group-hover/stage:text-primary transition-colors"></lucide-angular>
+                       <span class="text-[9px] font-black uppercase tracking-widest group-hover/stage:text-primary transition-colors"
+                             [ngClass]="job.currentStage ? 'text-primary' : 'text-zinc-300 italic text-[8px]'">
+                         {{ job.currentStage || 'Definir etapa' }}
                        </span>
                     </div>
                     @if (!isCompact()) {
@@ -183,3 +189,15 @@
 
   </div>
 </div>
+
+<!-- QUICK RESOURCE PICKER -->
+@if (activePickerJob()) {
+  <app-quick-resource-picker
+    [title]="pickerTitle()"
+    [titleIcon]="pickerIcon()"
+    [items]="pickerItems()"
+    [activeId]="pickerActiveId()"
+    (close)="activePickerJob.set(null); pickerType.set(null)"
+    (select)="handleSelection($event)"
+  ></app-quick-resource-picker>
+}

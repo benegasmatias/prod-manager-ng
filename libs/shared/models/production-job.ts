@@ -24,7 +24,7 @@ export interface ProductionJob {
     orderItemId: string;
     status: ProductionJobStatus;
     priority: ProductionJobPriority;
-    currentStage: string;
+    currentStage?: string;
     sequence: number;
     machineId?: string;
     operatorId?: string;
