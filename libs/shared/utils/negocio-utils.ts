@@ -9,7 +9,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
   switch (rubro) {
     case 'IMPRESION_3D':
       return {
-        sidebarItems: ['/dashboard', '/pedidos', '/stock', '/clientes', '/personal', '/maquinas', '/materiales', '/reportes', '/ajustes'],
+        sidebarItems: ['/dashboard', '/pedidos', '/produccion', '/stock', '/clientes', '/personal', '/maquinas', '/materiales', '/reportes', '/ajustes'],
         labels: {
           produccion: 'Producción',
           items: 'Modelos a Imprimir',
@@ -86,7 +86,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
 
     case 'METALURGICA':
       return {
-        sidebarItems: ['/dashboard', '/visitas', '/presupuestos', '/pedidos', '/stock', '/clientes', '/personal', '/materiales', '/maquinas', '/reportes', '/ajustes'],
+        sidebarItems: ['/dashboard', '/visitas', '/presupuestos', '/pedidos', '/produccion', '/stock', '/clientes', '/personal', '/materiales', '/maquinas', '/reportes', '/ajustes'],
         labels: {
           produccion: 'Monitor de Taller',
           items: 'Planos y Estructuras',

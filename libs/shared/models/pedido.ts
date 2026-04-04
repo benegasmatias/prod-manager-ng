@@ -5,6 +5,17 @@ export type OrderStatus =
   | 'ARMADO' | 'BARNIZADO' | 'RE_WORK' | 'READY';
 
 import { Employee } from './employee';
+import { ProductionJob } from './production-job';
+
+export enum OrderItemStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  READY = 'READY',
+  DONE = 'DONE',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED'
+}
+
 export type { Employee };
 
 export const ORDER_STATUS = {
@@ -64,6 +75,10 @@ export interface ItemPedido {
   hora_visita?: string;
   direccion_obra?: string;
   observaciones_visita?: string;
+
+  // Phase 6.1: Industrial Data
+  status: OrderItemStatus;
+  job?: ProductionJob;
 }
 
 export interface Pedido {
@@ -90,6 +105,7 @@ export interface Pedido {
   urgencia: Priority;
   responsableGeneral?: Employee;
   payments: Payment[];
+  jobs?: ProductionJob[];
   // History & Metadata
   statusHistory?: StatusHistoryEntry[];
   metadata?: Record<string, any>;

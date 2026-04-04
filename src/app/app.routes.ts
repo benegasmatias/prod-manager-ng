@@ -57,6 +57,10 @@ export const routes: Routes = [
         loadChildren: () => import('@features/materiales/materiales.routes').then(m => m.MATERIALES_ROUTES)
       },
       {
+        path: 'produccion',
+        loadChildren: () => import('../../libs/features/produccion/produccion.routes').then(m => m.PRODUCCION_ROUTES)
+      },
+      {
         path: 'maquinas',
         loadChildren: () => import('@features/maquinas/maquinas.routes').then(m => m.MAQUINAS_ROUTES)
       },

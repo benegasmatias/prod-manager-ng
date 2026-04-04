@@ -1,0 +1,28 @@
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+@keyframes industrial-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.2); border-color: rgba(79, 70, 229, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(79, 70, 229, 0); border-color: rgba(79, 70, 229, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); border-color: rgba(79, 70, 229, 0.4); }
+}
+
+.industrial-pulse {
+  animation: industrial-pulse 2s infinite;
+  border-color: rgba(79, 70, 229, 0.4) !important;
+  background: white;
+}
+
+.dark .industrial-pulse {
+  background: #09090b;
+}
+
+:host {
+  display: block;
+}
