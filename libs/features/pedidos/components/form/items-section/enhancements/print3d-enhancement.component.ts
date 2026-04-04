@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Upload, Loader2, FileCheck, X } from 'lucide-angular';
+import { LucideAngularModule, Upload, Loader2, FileCheck, X, Image, FileSearch } from 'lucide-angular';
 import { FilesApiService } from '@core/api/files.api.service';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
@@ -11,15 +11,38 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
   imports: [CommonModule, FormsModule, LucideAngularModule],
   template: `
     <div class="flex flex-col gap-3">
-      <input type="file" #fileInput class="hidden" accept=".stl" (change)="onFileSelected($event)">
-      
-      <div class="flex items-center gap-3">
-        <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
-        <span class="text-[9px] font-black text-zinc-300 uppercase tracking-widest">Insumos y Archivos</span>
-        <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+      <!-- Manual URL Input (Always available as fallback) -->
+      <div class="relative group">
+        @if (isImage()) {
+          <input 
+            type="text" 
+            [(ngModel)]="item.reference_image" 
+            (ngModelChange)="onUpdate.emit()"
+            placeholder="URL de imagen (Pinterest, etc)..."
+            class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-950/20 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 transition-all"
+          >
+        } @else {
+          <input 
+            type="text" 
+            [(ngModel)]="item.url_stl" 
+            (ngModelChange)="onUpdate.emit()"
+            placeholder="URL del modelo (Thingiverse, Printables)..."
+            class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-950/20 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 transition-all"
+          >
+        }
       </div>
 
-      @if (!item.stlFile) {
+      <input type="file" #fileInput class="hidden" [accept]="isImage() ? 'image/*' : '.stl'" (change)="onFileSelected($event)">
+      
+      @if (fieldKey === 'url_stl') {
+        <div class="flex items-center ">
+          <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+          <span class="text-[9px] font-black text-zinc-300 uppercase tracking-widest">Insumos y Archivos</span>
+          <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+        </div>
+      }
+
+      @if (!currentFile()) {
         <button
           type="button"
           (click)="fileInput.click()"
@@ -29,22 +52,30 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
           @if (isUploading()) {
             <lucide-angular [img]="icons.Loader2" class="h-4 w-4 animate-spin"></lucide-angular>
           } @else {
-            <lucide-angular [img]="icons.Upload" class="h-4 w-4"></lucide-angular>
-            Adjuntar Archivo .STL
+            <lucide-angular [img]="isImage() ? icons.Image : icons.Upload" class="h-4 w-4"></lucide-angular>
+            {{ isImage() ? 'Adjuntar Imagen Referencia' : 'Adjuntar Archivo .STL' }}
           }
         </button>
       } @else {
         <div class="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10">
           <div class="flex items-center gap-3 overflow-hidden">
-            <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-black text-[9px]">STL</div>
+            @if (isImage()) {
+              <div class="h-12 w-12 rounded-lg bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                <img [src]="currentFile().url" class="w-full h-full object-cover">
+              </div>
+            } @else {
+              <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-black text-[9px]">STL</div>
+            }
             <div class="flex flex-col overflow-hidden">
-              <span class="text-[11px] font-black text-primary truncate">{{ item.stlFile.fileName }}</span>
-              <span class="text-[9px] font-bold text-primary/50 uppercase tracking-tighter">{{ (item.stlFile.size / 1024 / 1024) | number:'1.1-1' }} MB</span>
+              <span class="text-[11px] font-black text-primary truncate">{{ currentFile().fileName }}</span>
+              <span class="text-[9px] font-bold text-primary/50 uppercase tracking-tighter">{{ (currentFile().size / 1024 / 1024) | number:'1.1-1' }} MB</span>
             </div>
           </div>
-          <button type="button" (click)="clearFile()" class="h-8 w-8 rounded-lg hover:bg-rose-500 hover:text-white text-zinc-300 transition-all flex items-center justify-center">
-            <lucide-angular [img]="icons.X" class="h-3.5 w-3.5"></lucide-angular>
-          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="clearFile()" class="h-8 w-8 rounded-lg hover:bg-rose-500 hover:text-white text-zinc-300 transition-all flex items-center justify-center">
+              <lucide-angular [img]="icons.X" class="h-3.5 w-3.5"></lucide-angular>
+            </button>
+          </div>
         </div>
       }
     </div>
@@ -53,14 +84,23 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
 })
 export class Print3dItemEnhancementComponent {
   @Input({ required: true }) item: any;
-  @Output() onFileUpload = new EventEmitter<string>();
-  @Output() onFileDelete = new EventEmitter<string>();
+  @Input() fieldKey: string = 'url_stl';
+  @Output() onFileUpload = new EventEmitter<any>();
+  @Output() onFileDelete = new EventEmitter<any>();
   @Output() onUpdate = new EventEmitter<void>();
 
   private filesApi = inject(FilesApiService);
   private confirm = inject(ConfirmService);
   isUploading = signal(false);
-  readonly icons = { Upload, Loader2, FileCheck, X };
+  readonly icons = { Upload, Loader2, FileCheck, X, Image, FileSearch };
+
+  isImage() {
+    return this.fieldKey === 'reference_image';
+  }
+
+  currentFile() {
+    return this.isImage() ? this.item.referenceImages?.[0] : this.item.stlFile;
+  }
 
   async onFileSelected(event: any) {
     const file = event.target.files?.[0];
@@ -69,8 +109,14 @@ export class Print3dItemEnhancementComponent {
     this.isUploading.set(true);
     try {
       const res = await this.filesApi.uploadFile(file);
-      this.item.stlFile = res;
-      this.onFileUpload.emit(res.path);
+      if (this.isImage()) {
+        this.item.referenceImages = [res];
+        this.item.reference_image = res.url; // Shadow field for tracking
+      } else {
+        this.item.stlFile = res;
+        this.item.url_stl = res.url; // Shadow field for tracking
+      }
+      this.onFileUpload.emit({ fieldKey: this.fieldKey, file: res });
       this.onUpdate.emit();
     } catch (error) {
       console.error('Upload failed', error);
@@ -94,9 +140,18 @@ export class Print3dItemEnhancementComponent {
     if (confirmed) {
       this.isUploading.set(true);
       try {
-        await this.filesApi.deleteFile(this.item.stlFile.path);
-        this.onFileDelete.emit(this.item.stlFile.path);
-        this.item.stlFile = undefined;
+        const fileToDelete = this.currentFile();
+        await this.filesApi.deleteFile(fileToDelete.path);
+
+        if (this.isImage()) {
+          this.item.referenceImages = [];
+          this.item.reference_image = '';
+        } else {
+          this.item.stlFile = undefined;
+          this.item.url_stl = '';
+        }
+
+        this.onFileDelete.emit({ fieldKey: this.fieldKey, path: fileToDelete.path });
         this.onUpdate.emit();
       } catch (error) {
         console.error('Delete failed', error);

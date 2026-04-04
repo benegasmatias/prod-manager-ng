@@ -69,7 +69,7 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
               <div [class]="cn('grid gap-6', section.name === 'OPCIONALES' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2')">
                 @for (f of section.fields; track f.key) {
                   @if (isFieldVisible(f)) {
-                    <div [class]="cn('space-y-2', (f.key === 'nombreProducto' || f.tipo === 'textarea') ? 'sm:col-span-2' : '')">
+                    <div [class]="cn('space-y-2', (f.key === 'nombreProducto' || f.tipo === 'textarea' || f.key === 'url_stl' || f.key === 'reference_image') ? 'sm:col-span-2' : '')">
                       <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">
                         {{ f.label }} @if (f.required) { <span class="text-rose-500">*</span> }
                       </label>
@@ -124,9 +124,10 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
                          </div>
                       } @else {
                         <!-- ITEM SPECIFIC ENHANCEMENTS PLUGINS -->
-                        @if (f.key === 'url_stl' && rubro() === 'IMPRESION_3D') {
+                        @if ((f.key === 'url_stl' || f.key === 'reference_image') && rubro() === 'IMPRESION_3D') {
                           <app-print3d-item-enhancement
                             [item]="item"
+                            [fieldKey]="f.key"
                             (onFileUpload)="onFileUpload.emit($event)"
                             (onFileDelete)="onFileDelete.emit($event)"
                             (onUpdate)="onUpdate.emit()"
