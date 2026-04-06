@@ -124,6 +124,15 @@ export class PedidoDetalleComponent implements OnInit {
     try {
       this.loading.set(true);
       const res = await this.api.findOne(id);
+      
+      // Phase 6.1: Map Jobs to Items for easy display
+      if (res && res.items && res.jobs) {
+        res.items = res.items.map(item => ({
+          ...item,
+          job: res.jobs?.find(j => j.orderItemId === item.id)
+        }));
+      }
+
       this.pedido.set(res);
     } catch (error) {
       console.error('Error fetching order detail:', error);

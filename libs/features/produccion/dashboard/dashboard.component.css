@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes origin-left {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.origin-left {
+  animation: origin-left 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: left;
+}

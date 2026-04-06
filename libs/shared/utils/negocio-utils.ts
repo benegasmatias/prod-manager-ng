@@ -9,7 +9,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
   switch (rubro) {
     case 'IMPRESION_3D':
       return {
-        sidebarItems: ['/dashboard', '/pedidos', '/stock', '/clientes', '/personal', '/maquinas', '/materiales', '/reportes', '/ajustes'],
+        sidebarItems: ['/dashboard', '/pedidos', '/produccion', '/stock', '/clientes', '/personal', '/maquinas', '/materiales', '/reportes', '/ajustes'],
         labels: {
           produccion: 'Producción',
           items: 'Modelos a Imprimir',
@@ -64,6 +64,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'seDiseñaSTL', label: '¿Se diseña el STL?', tipo: 'boolean', section: 'INFORMACIÓN DEL TRABAJO' },
           { key: 'precioDiseno', label: 'Costo de diseño ($)', tipo: 'money', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'Ej. 2500' },
           { key: 'url_stl', label: 'URL STL', tipo: 'url', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'https://...' },
+          { key: 'reference_image', label: 'Imagen de Referencia', tipo: 'url', section: 'INFORMACIÓN DEL TRABAJO' },
           { key: 'cantidad', label: 'Cantidad', tipo: 'number', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: '1' },
           { key: 'peso_gramos', label: 'Peso estimado (G)', tipo: 'number', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej. 150' },
           { key: 'duracion_estimada_minutos', label: 'Duración (MIN)', tipo: 'number', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej. 120' },
@@ -85,7 +86,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
 
     case 'METALURGICA':
       return {
-        sidebarItems: ['/dashboard', '/visitas', '/presupuestos', '/pedidos', '/stock', '/clientes', '/personal', '/materiales', '/maquinas', '/reportes', '/ajustes'],
+        sidebarItems: ['/dashboard', '/visitas', '/presupuestos', '/pedidos', '/produccion', '/stock', '/clientes', '/personal', '/materiales', '/maquinas', '/reportes', '/ajustes'],
         labels: {
           produccion: 'Monitor de Taller',
           items: 'Planos y Estructuras',
@@ -153,12 +154,12 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'nombreProducto', label: 'Descripción / Nombre', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: 'Ej: Portón principal frente' },
           { key: 'medidas', label: 'Medidas (Ancho x Alto)', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'Ej: 3.50 x 2.10 m' },
           { key: 'cantidad', label: 'Cantidad', tipo: 'number', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: '1' },
-          
+
           { key: 'material_estructura', label: 'Material Estructura', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Tubo 40x40' },
           { key: 'revestimiento', label: 'Revestimiento (Machimbre/Chapa)', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Machimbre de Pino / Chapa N°18' },
           { key: 'terminacion', label: 'Terminación / Proceso', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Pintura epoxi al horno' },
           { key: 'color', label: 'Color Final', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Negro microtexturado' },
-          
+
           { key: 'incluye_motor', label: 'Incluye Motor', tipo: 'boolean', section: 'OPCIONALES' },
           { key: 'instalacion', label: 'Requiere Instalación', tipo: 'boolean', section: 'OPCIONALES' },
           { key: 'incluye_guias', label: 'Incluye Guías/Rieles', tipo: 'boolean', section: 'OPCIONALES' },
@@ -367,17 +368,17 @@ export function getStatusStyles(status: string, rubro?: Rubro): string {
 
 export function mapCategoryToRubro(category: string): Rubro {
   const normalized = (category || '').toUpperCase().trim();
-  
+
   if (normalized === 'IMPRESION_3D' || normalized === 'IMPRESIONES_3D') {
     return 'IMPRESION_3D';
   }
-  
+
   const map: Record<string, Rubro> = {
     'METALURGICA': 'METALURGICA',
     'CARPINTERIA': 'CARPINTERIA',
     'GENERICO': 'GENERICO'
   };
-  
+
   return map[normalized] as Rubro || 'GENERICO';
 }
 

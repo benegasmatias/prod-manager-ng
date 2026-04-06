@@ -1,0 +1,138 @@
+<div class="reporting-container">
+  <div class="reporting-header">
+    <div class="title-section">
+      <h1>Reportes de Productividad</h1>
+      <p>Análisis en tiempo real de la planta y rendimiento del equipo</p>
+    </div>
+    <div class="period-picker">
+      <button class="period-btn active">Mes Actual</button>
+      <button class="period-btn">Últimos 3 Meses</button>
+      <button class="period-btn">Histórico</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="spinner-container">
+      <div class="custom-spinner"></div>
+      <p>Generando analítica industrial...</p>
+    </div>
+  } @else {
+    @if (report(); as data) {
+      <div class="stats-grid">
+        <div class="kpi-card">
+          <div class="icon-box blue">
+            <lucide-angular [img]="icons.Briefcase"></lucide-angular>
+          </div>
+          <div class="kpi-info">
+            <span class="label">Total Trabajos</span>
+            <span class="value">{{ data.summary.totalJobs }}</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="icon-box indigo">
+            <lucide-angular [img]="icons.Clock"></lucide-angular>
+          </div>
+          <div class="kpi-info">
+            <span class="label">Tiempo Prod. (Minutos)</span>
+            <span class="value">{{ data.summary.totalMinutes }}</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="icon-box emerald">
+            <lucide-angular [img]="icons.Target"></lucide-angular>
+          </div>
+          <div class="kpi-info">
+            <span class="label">Éxito en Producción</span>
+            <span class="value">{{ 100 - (data.summary.failedJobs / (data.summary.totalJobs || 1) * 100) | number:'1.1-1' }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="reports-layout">
+        <div class="report-section">
+          <div class="section-header">
+            <lucide-angular [img]="icons.Users" size="20"></lucide-angular>
+            <h2>Ranking Operarios (Tiempo Real)</h2>
+          </div>
+          <div class="ranking-list">
+            @for (op of data.topOperators; track op.operatorId) {
+              <div class="ranking-item">
+                <div class="item-meta">
+                  <span class="item-name">{{ op.operatorName }}</span>
+                  <span class="item-val">{{ op.totalMinutes }} min ({{ op.jobCount }} trabajos)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" 
+                       role="progressbar" 
+                       [style.width.%]="(op.totalMinutes / (data.summary.totalMinutes || 1) * 100)" 
+                       [style.background]="'linear-gradient(90deg, #38bdf8, #818cf8)'">
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="report-section">
+          <div class="section-header">
+            <lucide-angular [img]="icons.Zap" size="20"></lucide-angular>
+            <h2>Eficiencia por Etapa</h2>
+          </div>
+          <div class="stage-list">
+            @for (stage of data.avgTimeByStage; track stage.stage) {
+              <div class="stage-row">
+                <div class="stage-name">
+                  <span class="dot"></span>
+                  <span>{{ stage.stage || 'Sin definir' }}</span>
+                </div>
+                <span class="stage-time">~{{ stage.avgMinutes.toFixed(1) }} min</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="report-section critical-jobs">
+        <div class="section-header">
+          <lucide-angular [img]="icons.AlertTriangle" size="20" color="#ef4444"></lucide-angular>
+          <h2>Trabajos Críticos o Demorados</h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Job ID</th>
+                <th>Operario</th>
+                <th>Máquina</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (job of data.topPerformanceJobs; track job.id) {
+                <tr>
+                  <td>#{{ job.id.slice(0,8) }}</td>
+                  <td>{{ job.operator?.name || '---' }}</td>
+                  <td>{{ job.machine?.name || '---' }}</td>
+                  <td>
+                    <span class="status-badge" [class]="job.status.toLowerCase()">
+                      {{ job.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="period-btn active" style="padding: 4px 12px; font-size: 12px;">Ver detalles</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    } @else {
+      <div class="spinner-container">
+        <lucide-angular [img]="icons.Database" size="48" color="#334155"></lucide-angular>
+        <p>No hay datos suficientes para generar el reporte corporativo.</p>
+      </div>
+    }
+  }
+</div>

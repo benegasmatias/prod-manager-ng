@@ -282,13 +282,15 @@ export class OrderFormComponent implements OnDestroy {
     }
   }
 
-  trackPendingFile(path: string) {
-    if (!this.pendingFiles.includes(path)) {
+  trackPendingFile(data: any) {
+    const path = typeof data === 'string' ? data : data.file?.path;
+    if (path && !this.pendingFiles.includes(path)) {
       this.pendingFiles.push(path);
     }
   }
 
-  untrackFile(path: string) {
+  untrackFile(data: any) {
+    const path = typeof data === 'string' ? data : data.path;
     this.pendingFiles = this.pendingFiles.filter(p => p !== path);
   }
 
@@ -410,6 +412,7 @@ export class OrderFormComponent implements OnDestroy {
             hora_visita: it.hora_visita,
             observaciones_visita: it.observaciones_visita,
             description: it.description,
+            referenceImages: it.referenceImages || [],
             // Move rubric-specific fields to metadata
             metadata: {
               ...it.metadata,
@@ -419,6 +422,7 @@ export class OrderFormComponent implements OnDestroy {
                   stlUrl: it.url_stl,
                   designPrice: it.precioDiseno,
                   stlFile: it.stlFile,
+                  referenceImages: it.referenceImages,
                   tipo_filamento: it.tipo_filamento,
                   peso_gramos: it.peso_gramos,
                   duracion_estimada_minutos: it.duracion_estimada_minutos

@@ -59,6 +59,14 @@ export const API_ENDPOINTS = {
   FILES: {
     UPLOAD: '/files/upload',
     DELETE: '/files/delete'
+  },
+  PRODUCTION: {
+    LIST: '/production-jobs',
+    ONE: (id: string) => `/production-jobs/${id}`,
+    STATUS: (id: string) => `/production-jobs/${id}/status`,
+    RESOURCES: (id: string) => `/production-jobs/${id}/resources`,
+    PRIORITY: (id: string) => `/production-jobs/${id}/priority`,
+    STAGE: (id: string) => `/production-jobs/${id}/stage`,
   }
 } as const;
 
