@@ -1,5 +1,8 @@
 import { Employee } from './employee';
 import { Machine } from './machine';
+import { Order } from './order';
+import { OrderItem } from './order-item';
+import { Material } from './material';
 
 export enum ProductionJobStatus {
     QUEUED = 'QUEUED',
@@ -17,6 +20,16 @@ export enum ProductionJobPriority {
     URGENT = 'URGENT'
 }
 
+export interface ProductionJobMaterial {
+    id: string;
+    jobId: string;
+    materialId: string;
+    material?: Material;
+    quantity: number;
+    consumedQuantity: number;
+    isReserved: boolean;
+}
+
 export interface ProductionJob {
     id: string;
     businessId: string;
@@ -32,9 +45,13 @@ export interface ProductionJob {
     responsable?: Employee;
     order?: any; // Context for the board
     orderItem?: any; // Context for the board
+    jobMaterials?: ProductionJobMaterial[];
     notes?: string;
     createdAt: string;
     updatedAt: string;
+    actualMinutes?: number;
+    estimatedMinutes?: number;
     startedAt?: string;
     completedAt?: string;
+    lastStartedAt?: string;
 }

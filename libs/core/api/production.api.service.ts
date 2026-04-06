@@ -48,4 +48,9 @@ export class ProductionApiService {
   async updateStage(id: string, stage: string): Promise<ProductionJob> {
     return firstValueFrom(this.http.patch<ProductionJob>(API_ENDPOINTS.PRODUCTION.STAGE(id), { stage }));
   }
+
+  async assignMaterial(businessId: string, jobId: string, data: { materialId: string, quantity: number }): Promise<ProductionJob> {
+    const url = `${this.baseUrl}/${businessId}/production-jobs/${jobId}/materials`;
+    return lastValueFrom(this.http.post<ProductionJob>(url, data));
+  }
 }
