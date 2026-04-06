@@ -1,6 +1,5 @@
 import { Employee } from './employee';
 import { Machine } from './machine';
-import { Pedido as Order, PedidoItem as OrderItem } from './pedido';
 import { Material } from './material';
 
 export enum ProductionJobStatus {
