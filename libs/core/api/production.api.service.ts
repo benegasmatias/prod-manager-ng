@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { ProductionJob, ProductionJobStatus, ProductionJobPriority } from '../../shared/models/production-job';
 import { API_ENDPOINTS } from '@shared/config/api-endpoints.config';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -50,7 +51,12 @@ export class ProductionApiService {
   }
 
   async assignMaterial(businessId: string, jobId: string, data: { materialId: string, quantity: number }): Promise<ProductionJob> {
-    const url = `${this.baseUrl}/${businessId}/production-jobs/${jobId}/materials`;
-    return lastValueFrom(this.http.post<ProductionJob>(url, data));
+    const url = `${environment.apiUrl}/businesses/${businessId}/production-jobs/${jobId}/materials`;
+    return firstValueFrom(this.http.post<ProductionJob>(url, data));
+  }
+
+  async getProductivityReport(businessId: string, days: number = 30): Promise<any> {
+    const url = `${environment.apiUrl}/businesses/${businessId}/production-jobs/report/productivity`;
+    return firstValueFrom(this.http.get<any>(url, { params: { days } }));
   }
 }

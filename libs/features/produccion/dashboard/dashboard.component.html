@@ -33,9 +33,9 @@
           <span class="text-[10px] font-bold text-zinc-400">TRABAJOS</span>
        </div>
        <div class="mt-6 pt-6 border-t border-zinc-50 dark:border-zinc-800 flex items-center justify-between">
-          <span class="text-[10px] font-black uppercase tracking-widest text-primary">{{ stats().inProgress }} EN PROCESO</span>
+          <span class="text-[10px] font-black uppercase tracking-widest text-primary">{{ stats().progress }} EN PROCESO</span>
           <div class="h-1 w-24 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-             <div class="h-full bg-primary" [style.width.%]="getPercentage(stats().inProgress)"></div>
+             <div class="h-full bg-primary" [style.width.%]="getPercentage(stats().progress)"></div>
           </div>
        </div>
     </a>

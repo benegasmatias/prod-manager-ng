@@ -17,6 +17,10 @@ export const PRODUCCION_ROUTES: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard.component').then(m => m.ProduccionDashboardComponent)
+      },
+      {
+        path: 'reportes',
+        loadComponent: () => import('./reportes/reportes.component').then(m => m.ProduccionReportesComponent)
       }
     ]
   }

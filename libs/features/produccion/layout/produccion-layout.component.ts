@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { LucideAngularModule, LayoutGrid, BarChart3, Clock, MoreHorizontal } from 'lucide-angular';
+import { LucideAngularModule, LayoutGrid, BarChart3, Clock, MoreHorizontal, TrendingUp } from 'lucide-angular';
 import { SessionService } from '../../../core/session/session.service';
 
 @Component({
@@ -22,8 +22,14 @@ import { SessionService } from '../../../core/session/session.service';
            <a routerLink="./dashboard" routerLinkActive="bg-white dark:bg-zinc-800 text-primary shadow-sm ring-1 ring-zinc-100 dark:ring-zinc-700" 
              class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all no-underline">
               <lucide-angular [img]="icons.BarChart3" class="h-4 w-4"></lucide-angular>
-              <span class="hidden sm:inline">Supervisión / Dashboard</span>
+              <span class="hidden sm:inline">KPIs / Supervisión</span>
               <span class="sm:hidden">KPIs</span>
+           </a>
+           <a routerLink="./reportes" routerLinkActive="bg-white dark:bg-zinc-800 text-primary shadow-sm ring-1 ring-zinc-100 dark:ring-zinc-700" 
+             class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all no-underline">
+              <lucide-angular [img]="icons.TrendingUp" class="h-4 w-4"></lucide-angular>
+              <span class="hidden sm:inline">Productividad</span>
+              <span class="sm:hidden">Reports</span>
            </a>
         </div>
 
@@ -54,7 +60,7 @@ export class ProduccionLayoutComponent {
   currentTime = signal(new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }));
 
   icons = {
-    LayoutGrid, BarChart3, Clock, MoreHorizontal
+    LayoutGrid, BarChart3, Clock, MoreHorizontal, TrendingUp
   };
 
   constructor() {
