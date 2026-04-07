@@ -1,0 +1,67 @@
+<div class="min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+  <!-- Dynamic Aura -->
+  <div class="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] bg-primary/5 blur-[140px] rounded-full"></div>
+  <div class="absolute -bottom-[20%] -left-[10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full"></div>
+
+  <div class="w-full max-w-xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-4 tracking-tighter uppercase leading-none">
+        Selecciona tu Negocio
+      </h1>
+      <p class="text-zinc-500 dark:text-zinc-400 text-sm font-medium">
+        Tienes múltiples cuentas. Elige con cuál deseas trabajar hoy.
+      </p>
+    </div>
+
+    <!-- Business Cards List -->
+    <div class="grid gap-4 mb-10 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
+      @for (negocio of negocios(); track negocio.id) {
+        <button 
+          (click)="selectBusiness(negocio.id)"
+          class="group w-full bg-white dark:bg-zinc-900/50 border border-border hover:border-primary/50 rounded-3xl p-6 flex items-center gap-5 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 hover:translate-y-[-2px] text-left active:scale-[0.98]"
+        >
+          <div class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-zinc-800 flex items-center justify-center shrink-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+            <lucide-angular [img]="icons.Building2" class="h-7 w-7 opacity-70"></lucide-angular>
+          </div>
+          
+          <div class="flex-1 truncate">
+            <h3 class="text-lg font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tight">{{ negocio.nombre }}</h3>
+            <div class="flex items-center gap-2 mt-1">
+               <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[9px] font-black uppercase text-zinc-500 tracking-widest">
+                 {{ negocio.rubro }}
+               </span>
+               <span class="text-xs text-zinc-400 font-medium lowercase">
+                 {{ negocio.id.substring(0, 8) }}
+               </span>
+            </div>
+          </div>
+
+          <div class="w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-4 transition-all duration-300 bg-primary/10 text-primary">
+            <lucide-angular [img]="icons.ChevronRight" class="h-5 w-5"></lucide-angular>
+          </div>
+        </button>
+      }
+
+      <!-- Add New Business Option -->
+      <button 
+        (click)="createNew()"
+        class="w-full border-2 border-dashed border-zinc-200 dark:border-zinc-800/50 rounded-3xl p-6 flex items-center justify-center gap-3 text-zinc-400 hover:text-primary hover:border-primary/30 transition-all hover:bg-white/50 dark:hover:bg-zinc-900/40"
+      >
+        <lucide-angular [img]="icons.Plus" class="h-5 w-5"></lucide-angular>
+        <span class="text-xs font-black uppercase tracking-widest">Crear un nuevo negocio</span>
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-center gap-6 animate-in fade-in duration-1000 delay-300">
+      <button 
+        (click)="logout()"
+        class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-danger hover:underline transition-all"
+      >
+        <lucide-angular [img]="icons.LogOut" class="h-4 w-4"></lucide-angular>
+        <span>Cerrar Sesión</span>
+      </button>
+    </div>
+  </div>
+</div>

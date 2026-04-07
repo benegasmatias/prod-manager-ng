@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from '@core/layout';
 import { authGuard, publicGuard } from '../../libs/core/auth/auth.guard';
+import { businessGuard } from '../../libs/core/auth/business.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -22,7 +23,7 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, businessGuard],
     children: [
       {
         path: 'dashboard',
@@ -81,4 +82,14 @@ export const routes: Routes = [
       // Resto de páginas protegidas...
     ]
   },
+  {
+    path: 'onboarding',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../libs/features/auth/pages/onboarding/onboarding.component').then(m => m.OnboardingComponent)
+  },
+  {
+    path: 'select-business',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../libs/features/auth/pages/select-business/select-business.component').then(m => m.SelectBusinessComponent)
+  }
 ];

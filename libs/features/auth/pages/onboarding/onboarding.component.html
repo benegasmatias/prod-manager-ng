@@ -1,0 +1,113 @@
+<div class="min-h-screen bg-slate-50 dark:bg-zinc-950 flex items-center justify-center p-6 relative overflow-hidden">
+  <!-- Subtle gradient Backgrounds -->
+  <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-pulse"></div>
+  <div class="absolute -bottom-[10%] -right-[10%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full"></div>
+
+  <div class="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-700">
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-zinc-900 border border-border rounded-3xl shadow-2xl p-8 sm:p-10 mb-6 backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80">
+      <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 mx-auto sm:mx-0 shadow-inner">
+        <lucide-angular [img]="icons.Rocket" class="h-8 w-8 text-primary"></lucide-angular>
+      </div>
+
+      <h1 class="text-3xl font-black text-zinc-900 dark:text-zinc-50 mb-3 tracking-tight leading-none uppercase">Crea tu Negocio</h1>
+      <p class="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mb-10">
+        Comienza configurando tu entorno de trabajo profesional.
+      </p>
+
+      <!-- Error State -->
+      @if (error()) {
+        <div class="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 p-4 rounded-2xl mb-6 flex items-start gap-3">
+          <lucide-angular [img]="icons.AlertCircle" class="h-5 w-5 shrink-0"></lucide-angular>
+          <div class="text-xs font-bold leading-tight flex-1">
+            <p>{{ error() }}</p>
+            <button (click)="loadTemplates()" class="mt-2 text-[10px] uppercase tracking-widest underline underline-offset-4">Reintentar</button>
+          </div>
+        </div>
+      }
+
+      <!-- Loading Configuration -->
+      @if (isLoadingTemplates()) {
+        <div class="py-12 flex flex-col items-center justify-center gap-4 text-zinc-400">
+          <lucide-angular [img]="icons.Loader2" class="h-8 w-8 animate-spin"></lucide-angular>
+          <span class="text-[10px] font-black uppercase tracking-[0.2em]">Cargando plantillas...</span>
+        </div>
+      } @else if (templates().length === 0 && !error()) {
+        <div class="py-12 text-center text-zinc-400 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl">
+          <p class="text-xs font-bold uppercase tracking-widest">No hay tipos de negocio configurados</p>
+        </div>
+      } @else if (!isLoadingTemplates()) {
+        <form (ngSubmit)="onSubmit()" class="space-y-6">
+          <!-- Business Name -->
+          <div class="space-y-2">
+            <label for="nombre" class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-600 block pl-1">
+              Nombre de tu Negocio
+            </label>
+            <div class="relative group">
+              <div class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-primary">
+                <lucide-angular [img]="icons.Building2" class="h-5 w-5"></lucide-angular>
+              </div>
+              <input 
+                type="text" 
+                id="nombre" 
+                [(ngModel)]="nombre" 
+                name="nombre" 
+                required
+                placeholder="Ej: Manufactura Central"
+                class="w-full bg-slate-50 dark:bg-zinc-800/50 border-none rounded-2xl py-4 pl-12 pr-4 text-sm font-medium text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
+              />
+            </div>
+          </div>
+
+          <!-- Template Selection -->
+          <div class="space-y-3">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-600 block pl-1">
+              Tipo de Industria
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+              @for (template of templates(); track template.key) {
+                <button 
+                  type="button" 
+                  (click)="selectedRubro.set(template.key)"
+                  [disabled]="!template.isAvailable || (template.isComingSoon && !template.accessible)"
+                  [class.bg-primary]="selectedRubro() === template.key"
+                  [class.text-white]="selectedRubro() === template.key"
+                  [class.bg-slate-50]="selectedRubro() !== template.key"
+                  [class.dark:bg-zinc-800/50]="selectedRubro() !== template.key"
+                  [class.text-zinc-500]="selectedRubro() !== template.key"
+                  class="relative rounded-2xl p-4 text-xs font-bold uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-95 border border-transparent shadow-sm disabled:opacity-40 disabled:cursor-not-allowed group overflow-hidden"
+                >
+                  <span class="relative z-10">{{ template.name }}</span>
+                  @if (template.isComingSoon && !template.accessible) {
+                    <span class="absolute right-[-20px] top-[-10px] rotate-[30deg] bg-amber-400 text-zinc-900 text-[8px] px-4 py-3 font-black">SOON</span>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <app-button-spinner
+            [loading]="isSubmitting()"
+            [disabled]="!nombre || !selectedRubro()"
+            class="block w-full"
+          >
+            <button 
+              type="submit" 
+              [disabled]="!nombre || !selectedRubro()"
+              class="w-full bg-primary text-white rounded-2xl py-5 font-black uppercase tracking-[0.15em] text-sm flex items-center justify-center gap-2 shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all hover:translate-y-[-2px] active:translate-y-0 disabled:opacity-50 disabled:grayscale disabled:translate-y-0"
+            >
+              <span>Crear Negocio</span>
+              <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4"></lucide-angular>
+            </button>
+          </app-button-spinner>
+        </form>
+      }
+    </div>
+
+    <!-- Footer note -->
+    <p class="text-center text-zinc-400 dark:text-zinc-600 text-[10px] uppercase font-bold tracking-[0.2em] animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-500">
+      Podrás cambiar estos datos o crear más negocios más adelante en Ajustes.
+    </p>
+  </div>
+</div>

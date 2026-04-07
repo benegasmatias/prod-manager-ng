@@ -78,9 +78,11 @@ export class SessionService {
         
         if (defaultId && mapped.find(n => n.id === defaultId)) {
           this.setActiveId(defaultId);
-        } else if (mapped.length > 0) {
+        } else if (mapped.length === 1) {
+          // Si solo hay uno, lo seteamos automáticamente
           this.setActiveId(mapped[0].id);
         }
+        // Si hay más de uno y no hay default, el BusinessGuard se encargará de redirigir
       }
 
       this.isInitialized.set(true);

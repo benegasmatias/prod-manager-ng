@@ -1,5 +1,15 @@
 export type Rubro = 'IMPRESION_3D' | 'METALURGICA' | 'CARPINTERIA' | 'GENERICO';
 
+export interface BusinessTemplate {
+  key: Rubro;
+  name: string;
+  description: string;
+  imageKey: string;
+  isAvailable: boolean;
+  isComingSoon: boolean;
+  accessible: boolean;
+}
+
 export interface Negocio {
   id: string;
   nombre: string;
