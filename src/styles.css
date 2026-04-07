@@ -92,8 +92,8 @@
 }
 
 /* Discovery paths */
-@source "../**/*.{html,ts}";
 @source "./**/*.{html,ts}";
+@source "../libs/**/*.{html,ts}";
 
 /* Dark mode strategy */
 @variant dark (&:where(.dark, .dark *));
