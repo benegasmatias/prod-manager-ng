@@ -18,9 +18,13 @@ export class AccessControlService {
   currentRubro = computed(() => this.sessionService.rubro());
 
   /**
-   * Current user role from auth metadata.
+   * Current user role from the active business session.
+   * Fallback to OWNER if no business is active or perms are missing (legacy compatibility).
    */
-  userRole = computed(() => (this.authService.user()?.user_metadata?.['role'] as UserRole) || 'OWNER');
+  userRole = computed(() => {
+    const activeRole = this.sessionService.activeNegocio()?.userRole as UserRole;
+    return activeRole || (this.authService.user()?.user_metadata?.['role'] as UserRole) || 'OWNER';
+  });
 
   /**
    * Check if a feature is enabled for the current business type.

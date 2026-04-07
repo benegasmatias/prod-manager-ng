@@ -26,6 +26,11 @@ export const routes: Routes = [
     loadComponent: () => import('../../libs/features/auth/pages/onboarding/onboarding.component').then(m => m.OnboardingComponent)
   },
   {
+    path: 'invitaciones/aceptar',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../libs/features/auth/pages/invitacion-aceptar/invitacion-aceptar.component').then(m => m.InvitacionAceptarComponent)
+  },
+  {
     path: 'select-business',
     canActivate: [authGuard],
     loadComponent: () => import('../../libs/features/auth/pages/select-business/select-business.component').then(m => m.SelectBusinessComponent)

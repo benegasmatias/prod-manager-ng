@@ -24,6 +24,22 @@ export class ApiService {
     }
   }
 
+  get<T>(url: string): Promise<T> {
+    return this.request<T>('GET', url);
+  }
+
+  post<T>(url: string, body: any): Promise<T> {
+    return this.request<T>('POST', url, body);
+  }
+
+  put<T>(url: string, body: any): Promise<T> {
+    return this.request<T>('PUT', url, body);
+  }
+
+  delete<T>(url: string): Promise<T> {
+    return this.request<T>('DELETE', url);
+  }
+
   businesses = {
     getAll: () => this.request<any[]>('GET', API_ENDPOINTS.BUSINESSES.LIST),
     getTemplates: () => this.request<any[]>('GET', API_ENDPOINTS.BUSINESSES.TEMPLATES),

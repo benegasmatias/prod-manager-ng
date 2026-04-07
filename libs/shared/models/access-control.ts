@@ -37,9 +37,10 @@ export type PermissionAction =
  */
 export type UserRole =
   | 'OWNER'
-  | 'ADMIN'
-  | 'EMPLOYEE'
-  | 'SALES';
+  | 'BUSINESS_ADMIN'
+  | 'SALES'
+  | 'OPERATOR'
+  | 'VIEWER';
 
 /**
  * Configuration that links a Business Type (Rubro) to its supported features.

@@ -42,18 +42,19 @@ export const ROLE_PERMISSIONS: RolePermissionsConfig = {
     MACHINERY: ['VIEW', 'MANAGE'],
     TEAM: ['VIEW', 'MANAGE']
   },
-  ADMIN: {
+  BUSINESS_ADMIN: {
     DASHBOARD: ['VIEW'],
     CLIENTS: ['VIEW', 'CREATE', 'EDIT'],
     ORDERS: ['VIEW', 'CREATE', 'EDIT'],
     STOCK: ['VIEW', 'EDIT'],
     SETTINGS: ['VIEW'],
-    REPORTS: ['VIEW']
+    REPORTS: ['VIEW'],
+    TEAM: ['VIEW', 'MANAGE']
   },
-  EMPLOYEE: {
+  OPERATOR: {
     DASHBOARD: ['VIEW'],
     ORDERS: ['VIEW', 'EDIT'],
-    PRINT_QUEUE: ['VIEW', 'EDIT'],
+    ORDERS_PRODUCTION: ['VIEW', 'EDIT'],
     STOCK: ['VIEW']
   },
   SALES: {
@@ -62,5 +63,10 @@ export const ROLE_PERMISSIONS: RolePermissionsConfig = {
     QUOTES: ['VIEW', 'CREATE'],
     ORDERS: ['VIEW', 'CREATE'],
     REPORTS: ['VIEW']
+  },
+  VIEWER: {
+    DASHBOARD: ['VIEW'],
+    ORDERS: ['VIEW'],
+    STOCK: ['VIEW']
   }
 };

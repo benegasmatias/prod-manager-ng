@@ -1,153 +1,80 @@
-<div class="lg:hidden flex items-center relative">
-  <button (click)="toggleDropdown($event)"
-    class="h-9 w-9 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 transition-colors active:scale-90 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm overflow-hidden group">
-    @if (sessionService.activeNegocio(); as active) {
-    <div
-      class="flex items-center justify-center h-full w-full bg-primary/10 text-primary group-active:bg-primary group-active:text-white transition-colors">
-      <span class="text-[10px] font-black uppercase">{{ active.nombre?.charAt(0) || '?' }}</span>
+<div class="relative inline-block text-left" *ngIf="sessionService.activeNegocio() as active">
+  <button
+    type="button"
+    (click)="toggleDropdown($event)"
+    class="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-all active:scale-[0.98] group"
+    [class.bg-zinc-100]="dropdownOpen()"
+    [class.dark:bg-zinc-800/50]="dropdownOpen()"
+  >
+    <!-- Business Avatar -->
+    <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary/20 transition-colors">
+      <lucide-angular [img]="icons.Building2" class="h-4.5 w-4.5 text-primary"></lucide-angular>
     </div>
-    } @else {
-    <lucide-angular [img]="icons.Building2" class="h-4 w-4 text-zinc-400"></lucide-angular>
-    }
+
+    <!-- Active Text -->
+    <div class="hidden sm:flex flex-col items-start leading-none gap-1">
+      <span class="text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50">{{ active.nombre }}</span>
+      <div class="flex items-center gap-1.5">
+        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">{{ active.rubro }}</span>
+        <div class="w-1 h-1 rounded-full bg-zinc-300"></div>
+        <span class="text-[9px] font-black uppercase tracking-widest text-primary/80">{{ active.userRole }}</span>
+      </div>
+    </div>
+
+    <lucide-angular [img]="icons.ChevronDown" class="h-4 w-4 text-zinc-400 transition-transform duration-300" [class.rotate-180]="dropdownOpen()"></lucide-angular>
   </button>
 
-  @if (dropdownOpen()) {
+  <!-- Dropdown Menu -->
   <div
-    class="fixed top-16 left-4 right-4 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-    <div class="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-zinc-400">Mis Negocios</div>
-    <div class="h-px bg-zinc-100 dark:bg-zinc-800 my-1"></div>
+    *ngIf="dropdownOpen()"
+    class="absolute left-0 mt-3 w-72 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden"
+  >
+    <div class="p-4 space-y-1">
+      <div class="px-2 pb-3 pt-1">
+        <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Mis Negocios</h3>
+      </div>
 
-    <div class="max-h-[300px] overflow-y-auto no-scrollbar space-y-1">
-      @for (negocio of sessionService.negocios(); track negocio.id) {
-      <button (click)="sessionService.setActiveId(negocio.id); layoutService.activeDropdown.set(null)"
-        class="w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all cursor-pointer text-left"
-        [class.bg-primary/5]="sessionService.activeId() === negocio.id"
-        [class.text-primary]="sessionService.activeId() === negocio.id"
-        [class.hover:bg-zinc-50]="sessionService.activeId() !== negocio.id"
-        [class.dark:hover:bg-zinc-900]="sessionService.activeId() !== negocio.id">
-        <div class="flex flex-col">
-          <span class="text-xs font-black tracking-tight">{{ negocio.nombre }}</span>
-          <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter">{{ negocio.rubro }}</span>
-        </div>
-        @if (sessionService.activeId() === negocio.id) {
-        <lucide-angular [img]="icons.CheckCircle2" class="h-3.5 w-3.5 animate-in zoom-in duration-200"></lucide-angular>
-        }
-      </button>
-      }
-    </div>
-  </div>
-  <!-- Backdrop for mobile dropdown -->
-  <div class="fixed inset-0 z-[90] bg-zinc-950/20 backdrop-blur-[2px]" (click)="layoutService.activeDropdown.set(null)"></div>
-  }
-</div>
+      <div class="max-h-[300px] overflow-y-auto space-y-1 custom-scrollbar">
+        @for (negocio of sessionService.negocios(); track negocio.id) {
+          <button
+            (click)="handleSelect(negocio.id)"
+            class="w-full flex items-center gap-4 p-3 rounded-2xl transition-all group relative overflow-hidden text-left"
+            [class.bg-primary/5]="active.id === negocio.id"
+            [class.border-l-4]="active.id === negocio.id"
+            [class.border-primary]="active.id === negocio.id"
+            [class.hover:bg-zinc-50]="active.id !== negocio.id"
+            [class.dark:hover:bg-zinc-800/80]="active.id !== negocio.id"
+          >
+            <!-- Badge for active -->
+            <div *ngIf="active.id === negocio.id" class="absolute right-4 top-1/2 -translate-y-1/2">
+              <lucide-angular [img]="icons.CheckCircle2" class="h-4 w-4 text-primary"></lucide-angular>
+            </div>
 
-<!-- DESKTOP VERSION -->
-<div class="hidden lg:flex items-center gap-2 relative">
-  <button (click)="toggleDropdown($event)"
-    class="h-9 gap-2 border-none bg-zinc-100 hover:bg-zinc-200/70 transition-colors font-bold text-[10px] uppercase tracking-widest px-3 rounded-xl dark:bg-zinc-900 dark:hover:bg-zinc-800 flex items-center">
-    <lucide-angular [img]="icons.Building2" class="h-4 w-4 text-primary"></lucide-angular>
-    @if (sessionService.activeNegocio(); as active) {
-    <span class="max-w-[150px] truncate">{{ active.nombre }}</span>
-    } @else {
-    <span class="max-w-[150px] truncate">Seleccionar Negocio</span>
-    }
-    <lucide-angular [img]="icons.ChevronDown" class="h-3 w-3 text-zinc-400"
-      [class.rotate-180]="dropdownOpen()"></lucide-angular>
-  </button>
+            <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-sm">
+              <span class="text-xs font-black text-zinc-400 group-hover:text-primary transition-colors">{{ negocio.nombre.charAt(0) }}</span>
+            </div>
 
-  <!-- Business Dropdown -->
-  @if (dropdownOpen()) {
-  <div
-    class="absolute top-11 left-0 w-[280px] bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-    <div class="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-zinc-400">Mis Negocios</div>
-    <div class="h-px bg-zinc-100 dark:bg-zinc-800 my-1"></div>
-
-    <div class="max-h-[300px] overflow-y-auto no-scrollbar space-y-1">
-      @for (negocio of sessionService.negocios(); track negocio.id) {
-      <div class="group relative flex items-center">
-        <button (click)="sessionService.setActiveId(negocio.id); layoutService.activeDropdown.set(null)"
-          class="w-full flex flex-col items-start gap-0.5 px-3 py-2.5 rounded-xl transition-all cursor-pointer text-left"
-          [class.bg-primary/5]="sessionService.activeId() === negocio.id"
-          [class.text-primary]="sessionService.activeId() === negocio.id"
-          [class.hover:bg-zinc-50]="sessionService.activeId() !== negocio.id"
-          [class.dark:hover:bg-zinc-900]="sessionService.activeId() !== negocio.id">
-          <span class="text-xs font-black tracking-tight">{{ negocio.nombre }}</span>
-          <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">{{ negocio.rubro }}</span>
-        </button>
-
-        <div class="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button (click)="handleOpenEdit($event, negocio)"
-            class="h-7 w-7 rounded-lg hover:bg-primary/10 hover:text-primary flex items-center justify-center transition-colors">
-            <lucide-angular [img]="icons.Settings" class="h-3.5 w-3.5"></lucide-angular>
+            <div class="flex flex-col items-start leading-tight">
+              <span class="text-xs font-black uppercase text-zinc-700 dark:text-zinc-200">{{ negocio.nombre }}</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">{{ negocio.rubro }}</span>
+                <span class="text-[9px] font-black uppercase tracking-widest text-primary/60">{{ negocio.userRole }}</span>
+              </div>
+            </div>
           </button>
-        </div>
+        }
       </div>
-      }
     </div>
 
-    <div class="h-px bg-zinc-100 dark:bg-zinc-800 my-1"></div>
-    <button (click)="handleOpenAdd()"
-      class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-primary hover:bg-primary/5 transition-all group">
-      <lucide-angular [img]="icons.Plus"
-        class="h-4 w-4 transition-transform group-hover:rotate-90 duration-200"></lucide-angular>
-      <span class="text-[10px] font-black uppercase tracking-widest">Crear nuevo negocio</span>
-    </button>
+    <!-- Actions Section -->
+    <div class="p-3 bg-zinc-50 dark:bg-zinc-950/40 border-t border-zinc-100 dark:border-zinc-800 space-y-1">
+      <button
+        (click)="handleLogout()"
+        class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-500 transition-colors group"
+      >
+        <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
+        <span class="text-[10px] font-black uppercase tracking-widest">Cerrar Sesión</span>
+      </button>
+    </div>
   </div>
-  }
 </div>
-
-<!-- Business Dialog (Add/Edit) -->
-<dialog #businessDialog
-  class="bg-transparent backdrop:bg-zinc-950/60 backdrop:backdrop-blur-sm p-0 border-none outline-none overflow-visible">
-  @if (isDialogOpen()) {
-  <div
-    class="bg-white dark:bg-zinc-950 w-[95vw] sm:w-[90vw] max-w-md rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 pointer-events-auto"
-    (click)="$event.stopPropagation()">
-    <div
-      class="p-6 sm:p-8 border-b border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/10 flex items-center gap-4">
-      <div
-        class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-        <lucide-angular [img]="icons.Building2" class="h-5 w-5 sm:h-6 sm:w-6"></lucide-angular>
-      </div>
-      <div class="space-y-1">
-        <h3 class="text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ editingId() ? 'Editar Espacio' : 'Nuevo Negocio' }}
-        </h3>
-        <p class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-          {{ editingId() ? 'Ajusta los detalles operativos' : 'Comienza una nueva línea' }}
-        </p>
-      </div>
-    </div>
-
-    <div class="p-6 sm:p-8 space-y-4 sm:space-y-6">
-      <div class="space-y-2 sm:space-y-3">
-        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Nombre Comercial</label>
-        <input [ngModel]="formNombre()" (ngModelChange)="formNombre.set($event)"
-          class="w-full h-11 sm:h-12 px-4 sm:px-5 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-primary/20 rounded-xl sm:rounded-2xl font-black outline-none transition-all"
-          placeholder="Ej: Taller Phoenix">
-      </div>
-      <div class="space-y-2 sm:space-y-3">
-        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Rubro de Operación</label>
-        <select [ngModel]="formRubro()" (ngModelChange)="formRubro.set($event)"
-          class="w-full h-11 sm:h-12 px-4 sm:px-5 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-primary/20 rounded-xl sm:rounded-2xl font-bold outline-none appearance-none cursor-pointer transition-all">
-          <option value="GENERICO">📦 Genérico</option>
-          <option value="IMPRESION_3D">🖨️ Impresión 3D</option>
-          <option value="CARPINTERIA">🪚 Carpintería</option>
-          <option value="METALURGICA">⚙️ Metalúrgica</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="p-6 sm:p-8 pt-0 flex flex-col gap-3">
-      <button (click)="handleSave()" [disabled]="isSaving() || !formNombre()"
-        class="w-full h-11 sm:h-12 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest text-[10px] sm:text-xs bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50">
-        {{ isSaving() ? 'Procesando...' : (editingId() ? 'Actualizar Ajustes' : 'Activar Negocio') }}
-      </button>
-
-      <button (click)="closeDialog()"
-        class="w-full h-10 rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-[10px] text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all">
-        Cancelar
-      </button>
-    </div>
-  </div>
-  }
-</dialog>

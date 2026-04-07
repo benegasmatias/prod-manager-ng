@@ -1,0 +1,122 @@
+<div class="min-h-screen bg-slate-50 dark:bg-zinc-950 flex items-center justify-center p-6 relative overflow-hidden">
+  <!-- Backdrop Gradients -->
+  <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full"></div>
+  <div class="absolute -bottom-[10%] -right-[10%] w-[35%] h-[35%] bg-blue-500/10 blur-[100px] rounded-full"></div>
+
+  <div class="w-full max-w-lg relative z-10">
+    <div class="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] shadow-2xl overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-500">
+      
+      <!-- HEADER / ICON -->
+      <div class="p-8 pb-0 text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner ring-4 ring-primary/5">
+          <lucide-angular [img]="icons.Mail" class="h-10 w-10 text-primary animate-pulse"></lucide-angular>
+        </div>
+        <h1 class="text-3xl font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tight mb-2">Invitación Recibida</h1>
+        <p class="text-zinc-500 text-sm font-medium">Te han invitado a colaborar en un negocio</p>
+      </div>
+
+      <div class="p-8 pt-6">
+        
+        <!-- LOADING STATE -->
+        @if (loading()) {
+          <div class="py-12 flex flex-col items-center justify-center gap-4 text-zinc-400">
+            <lucide-angular [img]="icons.Loader2" class="h-8 w-8 animate-spin"></lucide-angular>
+            <span class="text-[10px] font-black uppercase tracking-[0.2em]">Validando invitación...</span>
+          </div>
+        }
+
+        <!-- ERROR STATE -->
+        @if (error()) {
+          <div class="bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 p-6 rounded-3xl text-center space-y-4">
+            <div class="w-12 h-12 bg-rose-100 dark:bg-rose-900/50 rounded-2xl flex items-center justify-center mx-auto">
+              <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6 text-rose-500"></lucide-angular>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-sm font-black text-rose-600 uppercase tracking-widest">Lo sentimos</h3>
+              <p class="text-xs text-rose-500/80 leading-relaxed">{{ error() }}</p>
+            </div>
+            <button (click)="loadInvitation()" class="text-[10px] uppercase font-black tracking-widest text-zinc-400 hover:text-zinc-600 transition-colors">Intentar de nuevo</button>
+          </div>
+        }
+
+        <!-- SUCCESS STATE -->
+        @if (success()) {
+          <div class="py-12 text-center space-y-6">
+            <div class="w-24 h-24 bg-emerald-100 dark:bg-emerald-950/50 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50 dark:ring-emerald-900/20">
+              <lucide-angular [img]="icons.CheckCircle" class="h-12 w-12 text-emerald-500"></lucide-angular>
+            </div>
+            <div class="space-y-2">
+              <h2 class="text-2xl font-black text-emerald-600 uppercase">¡Bienvenido!</h2>
+              <p class="text-zinc-500 text-sm uppercase tracking-widest font-bold">Redirigiendo a tu nuevo panel...</p>
+            </div>
+          </div>
+        }
+
+        <!-- MAIN CONTENT (Valid Invitation) -->
+        @if (invitation() && !error() && !success() && !loading()) {
+          <div class="space-y-8">
+            
+            <!-- BUSINESS CARD -->
+            <div class="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 flex items-center gap-5 group">
+              <div class="w-16 h-16 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm flex items-center justify-center shrink-0">
+                <span class="text-2xl font-black text-primary">{{ invitation().businessName?.charAt(0) }}</span>
+              </div>
+              <div>
+                <h3 class="text-xl font-black text-zinc-900 dark:text-zinc-50 leading-tight uppercase">{{ invitation().businessName }}</h3>
+                <span class="text-[10px] font-black text-primary/70 uppercase tracking-widest">{{ invitation().businessCategory }}</span>
+              </div>
+            </div>
+
+            <!-- DETAILS -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50">
+                <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest block mb-1">Rol Propuesto</span>
+                <span class="text-xs font-black uppercase text-zinc-700 dark:text-zinc-300">{{ invitation().role }}</span>
+              </div>
+              <div class="p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50">
+                <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest block mb-1">Invitado por</span>
+                <span class="text-xs font-black uppercase text-zinc-700 dark:text-zinc-300 truncate block">{{ invitation().invitedBy }}</span>
+              </div>
+            </div>
+
+            <div class="text-center px-4">
+              <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed tracking-widest">
+                Al aceptar esta invitación, te convertirás en miembro activo de <span class="text-zinc-600 dark:text-zinc-200">{{ invitation().businessName }}</span>.
+              </p>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="flex flex-col gap-3 pt-2">
+              <button 
+                (click)="accept()" 
+                [disabled]="processing()"
+                class="w-full py-5 bg-primary hover:bg-primary/90 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-sm shadow-xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50"
+              >
+                @if (processing()) {
+                  <lucide-angular [img]="icons.Loader2" class="h-5 w-5 animate-spin"></lucide-angular>
+                  Procesando...
+                } @else {
+                  Aceptar Invitación
+                  <lucide-angular [img]="icons.CheckCircle" class="h-4 w-4"></lucide-angular>
+                }
+              </button>
+              
+              <button 
+                (click)="reject()"
+                [disabled]="processing()" 
+                class="w-full py-4 text-[10px] font-black text-zinc-400 hover:text-rose-500 uppercase tracking-widest transition-colors disabled:opacity-50"
+              >
+                Rechazar invitación
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- FOOTER -->
+      <div class="bg-zinc-50 dark:bg-zinc-950/40 p-6 text-center border-t border-zinc-100 dark:border-zinc-800">
+        <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">ProdManager &copy; 2026. Sistema de Gestión Industrial Multi-Tenant.</p>
+      </div>
+    </div>
+  </div>
+</div>

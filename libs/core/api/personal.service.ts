@@ -1,16 +1,19 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { PersonalApiService } from './personal.api.service';
 import { SessionService } from '../session/session.service';
+import { InvitationsService } from './invitaciones.service';
 import { Employee } from '@shared/models';
 
 @Injectable({ providedIn: 'root' })
 export class PersonalService {
   private api = inject(PersonalApiService);
   private session = inject(SessionService);
+  private invitationsService = inject(InvitationsService);
 
   loading = signal(false);
   saving = signal(false);
   items = signal<Employee[]>([]);
+  invitations = signal<any[]>([]);
   loadedBusinessId = signal<string | null>(null);
 
   stats = computed(() => {
@@ -29,8 +32,13 @@ export class PersonalService {
 
     this.loading.set(true);
     try {
-      const data = await this.api.getAll(businessId);
-      this.items.set(data || []);
+      const [employees, invites] = await Promise.all([
+        this.api.getAll(businessId),
+        this.invitationsService.getInvitations(businessId)
+      ]);
+      
+      this.items.set(employees || []);
+      this.invitations.set(invites || []);
       this.loadedBusinessId.set(businessId);
     } catch (e) {
       console.error('Error loadPersonal:', e);

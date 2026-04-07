@@ -59,7 +59,7 @@ export class SessionService {
     });
   }
 
-  private async initialize() {
+  public async initialize() {
     console.log('[SessionService] Initializing...');
     try {
       const data = await this.api.businesses.getAll();
