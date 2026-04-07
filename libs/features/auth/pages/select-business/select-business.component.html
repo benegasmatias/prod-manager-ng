@@ -7,15 +7,17 @@
     <!-- Header -->
     <div class="text-center mb-10">
       <h1 class="text-4xl font-black text-zinc-900 dark:text-zinc-50 mb-4 tracking-tighter uppercase leading-none">
-        Selecciona tu Negocio
+        {{ negocios().length > 0 ? 'Selecciona tu Negocio' : 'Comienza tu Viaje' }}
       </h1>
       <p class="text-zinc-500 dark:text-zinc-400 text-sm font-medium">
-        Tienes múltiples cuentas. Elige con cuál deseas trabajar hoy.
+        {{ negocios().length > 0 
+           ? 'Tienes múltiples cuentas. Elige con cuál deseas trabajar hoy.' 
+           : 'Aún no tienes un espacio de trabajo configurado. Crea uno para comenzar.' }}
       </p>
     </div>
 
     <!-- Business Cards List -->
-    <div class="grid gap-4 mb-10 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
+    <div class="grid gap-4 mb-10 max-h-[60vh] overflow-y-auto no-scrollbar pr-1 pt-2">
       @for (negocio of negocios(); track negocio.id) {
         <button 
           (click)="selectBusiness(negocio.id)"

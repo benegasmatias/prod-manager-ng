@@ -38,13 +38,16 @@ export class SessionService {
   private lastUserId: string | null = null;
 
   constructor() {
+    console.log('[SessionService] Constructor started');
     // Reaccionar al cambio de sesión
     effect(() => {
       const session = this.auth.session();
+      console.log('[SessionService] Session changed:', !!session);
       if (session) {
         // Solo inicializar si el usuario cambió o si no está inicializado
         if (this.lastUserId !== session.user.id) {
           this.lastUserId = session.user.id;
+          this.isInitialized.set(false); // Reset initialization state for new user
           this.initialize();
         }
       } else {
@@ -57,8 +60,10 @@ export class SessionService {
   }
 
   private async initialize() {
+    console.log('[SessionService] Initializing...');
     try {
       const data = await this.api.businesses.getAll();
+      console.log('[SessionService] Fetched businesses:', data?.length);
       const mapped: Negocio[] = (data || []).map((b: any) => ({
           id: b.id,
           nombre: b.name,
@@ -66,7 +71,8 @@ export class SessionService {
           moneda: b.currency || APP_CONFIG.DEFAULT_CURRENCY,
           status: b.status,
           subscriptionExpiresAt: b.subscriptionExpiresAt,
-          createdAt: b.createdAt
+          createdAt: b.createdAt,
+          userRole: b.userRole
       }));
 
       this._negocios.set(mapped);
@@ -85,6 +91,7 @@ export class SessionService {
         // Si hay más de uno y no hay default, el BusinessGuard se encargará de redirigir
       }
 
+      console.log('[SessionService] Initialized successful');
       this.isInitialized.set(true);
     } catch (error) {
       console.error('[SessionService] Initialization error:', error);
@@ -101,15 +108,16 @@ export class SessionService {
 
   async addNegocio(nombre: string, rubro: Rubro) {
     try {
-      const b = await this.api.businesses.create({ name: nombre, category: rubro });
+      const b = await this.api.businesses.create({ name: nombre, templateKey: rubro });
       const newNegocio: Negocio = {
-        id: b.id,
-        nombre: b.name,
-        rubro: mapCategoryToRubro(b.category),
-        moneda: b.currency || 'ARS',
+        id: b.businessId,
+        nombre: nombre,
+        rubro: rubro,
+        moneda: 'ARS',
         status: b.status,
         subscriptionExpiresAt: b.subscriptionExpiresAt,
-        createdAt: b.createdAt
+        createdAt: new Date().toISOString(),
+        userRole: 'OWNER'
       };
       this._negocios.update(list => [...list, newNegocio]);
       return newNegocio;
@@ -142,9 +150,15 @@ export class SessionService {
     try {
       await this.api.businesses.delete(id);
       this._negocios.update(list => list.filter(n => n.id !== id));
+      
+      const currentList = this._negocios();
       if (this.activeId() === id) {
-        const next = this._negocios()[0];
-        if (next) this.setActiveId(next.id);
+        if (currentList.length > 0) {
+          this.setActiveId(currentList[0].id);
+        } else {
+          this._activeId.set(null);
+          localStorage.removeItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID);
+        }
       }
     } catch (error) {
       console.error('[SessionService] Error removing business:', error);

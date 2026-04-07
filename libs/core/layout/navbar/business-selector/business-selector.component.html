@@ -4,7 +4,7 @@
     @if (sessionService.activeNegocio(); as active) {
     <div
       class="flex items-center justify-center h-full w-full bg-primary/10 text-primary group-active:bg-primary group-active:text-white transition-colors">
-      <span class="text-[10px] font-black uppercase">{{ active.nombre.charAt(0) }}</span>
+      <span class="text-[10px] font-black uppercase">{{ active.nombre?.charAt(0) || '?' }}</span>
     </div>
     } @else {
     <lucide-angular [img]="icons.Building2" class="h-4 w-4 text-zinc-400"></lucide-angular>
@@ -110,7 +110,7 @@
         <lucide-angular [img]="icons.Building2" class="h-5 w-5 sm:h-6 sm:w-6"></lucide-angular>
       </div>
       <div class="space-y-1">
-        <h3 class="text-lg sm:text-xl font-bold tracking-tight">{{ editingId() ? 'Editar Espacio' : 'Nuevo Negocio' }}
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ editingId() ? 'Editar Espacio' : 'Nuevo Negocio' }}
         </h3>
         <p class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
           {{ editingId() ? 'Ajusta los detalles operativos' : 'Comienza una nueva línea' }}
@@ -120,15 +120,15 @@
 
     <div class="p-6 sm:p-8 space-y-4 sm:space-y-6">
       <div class="space-y-2 sm:space-y-3">
-        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Nombre Comercial</label>
+        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Nombre Comercial</label>
         <input [ngModel]="formNombre()" (ngModelChange)="formNombre.set($event)"
-          class="w-full h-11 sm:h-12 px-4 sm:px-5 bg-zinc-50 dark:bg-zinc-900 focus:ring-2 focus:ring-primary/20 rounded-xl sm:rounded-2xl font-black outline-none transition-all"
+          class="w-full h-11 sm:h-12 px-4 sm:px-5 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-primary/20 rounded-xl sm:rounded-2xl font-black outline-none transition-all"
           placeholder="Ej: Taller Phoenix">
       </div>
       <div class="space-y-2 sm:space-y-3">
-        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Rubro de Operación</label>
+        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Rubro de Operación</label>
         <select [ngModel]="formRubro()" (ngModelChange)="formRubro.set($event)"
-          class="w-full h-11 sm:h-12 px-4 sm:px-5 bg-zinc-50 dark:bg-zinc-900 focus:ring-2 focus:ring-primary/20 rounded-xl sm:rounded-2xl font-bold outline-none appearance-none cursor-pointer transition-all">
+          class="w-full h-11 sm:h-12 px-4 sm:px-5 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-primary/20 rounded-xl sm:rounded-2xl font-bold outline-none appearance-none cursor-pointer transition-all">
           <option value="GENERICO">📦 Genérico</option>
           <option value="IMPRESION_3D">🖨️ Impresión 3D</option>
           <option value="CARPINTERIA">🪚 Carpintería</option>

@@ -21,6 +21,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
   },
   {
+    path: 'onboarding',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../libs/features/auth/pages/onboarding/onboarding.component').then(m => m.OnboardingComponent)
+  },
+  {
+    path: 'select-business',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../libs/features/auth/pages/select-business/select-business.component').then(m => m.SelectBusinessComponent)
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard, businessGuard],
@@ -78,18 +88,6 @@ export const routes: Routes = [
         loadChildren: () => import('../../libs/features/ajustes/ajustes.routes').then(m => m.AJUSTES_ROUTES)
       },
       { path: '**', redirectTo: 'dashboard' }
-
-      // Resto de páginas protegidas...
     ]
-  },
-  {
-    path: 'onboarding',
-    canActivate: [authGuard],
-    loadComponent: () => import('../../libs/features/auth/pages/onboarding/onboarding.component').then(m => m.OnboardingComponent)
-  },
-  {
-    path: 'select-business',
-    canActivate: [authGuard],
-    loadComponent: () => import('../../libs/features/auth/pages/select-business/select-business.component').then(m => m.SelectBusinessComponent)
   }
 ];

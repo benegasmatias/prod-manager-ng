@@ -119,21 +119,21 @@
             <lucide-angular [img]="icons.Trash2" class="h-5 w-5 text-rose-500"></lucide-angular>
           </div>
           <div class="text-center sm:text-left">
-            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-rose-500">Zona de Peligro</h3>
-            <p class="text-xs font-medium text-rose-400">Acciones irreversibles sobre este negocio.</p>
+            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-rose-500">Gestión Crítica</h3>
+            <p class="text-xs font-medium text-rose-400">Borrado irreversible de este espacio de trabajo.</p>
           </div>
         </div>
         
-        @if (sessionService.negocios().length > 1) {
+        @if (negocioActivo()?.userRole === 'OWNER' || negocioActivo()?.userRole === 'ADMIN') {
           <button
             (click)="handleDelete()"
-            class="px-6 h-12 rounded-xl text-xs font-black uppercase tracking-widest text-rose-500 hover:bg-rose-500 hover:text-white border-2 border-rose-500/20 transition-all active:scale-95 whitespace-nowrap"
+            class="px-8 h-12 rounded-xl text-xs font-black uppercase tracking-widest bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:bg-rose-600 transition-all active:scale-95 whitespace-nowrap"
           >
             Eliminar este Negocio
           </button>
         } @else {
-          <p class="text-[10px] font-bold text-rose-400 bg-rose-500/5 px-4 py-2 rounded-lg italic">
-            No puedes eliminar tu único espacio de trabajo.
+          <p class="text-[10px] font-bold text-rose-400 bg-rose-500/5 px-4 py-2 rounded-lg italic text-right">
+            Solo el dueño del negocio puede realizar eliminaciones.
           </p>
         }
       </div>

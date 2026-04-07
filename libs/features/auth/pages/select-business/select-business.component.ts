@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SessionService } from '@core/session/session.service';
@@ -6,7 +6,7 @@ import { LucideAngularModule, Building2, ChevronRight, LogOut, Plus } from 'luci
 import { AuthService } from '@core/auth/auth.service';
 
 @Component({
-  selector: 'app-business-selector',
+  selector: 'app-auth-select-business',
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './select-business.component.html',
@@ -19,6 +19,15 @@ export class SelectBusinessComponent {
 
   negocios = computed(() => this.session.negocios());
   readonly icons = { Building2, ChevronRight, LogOut, Plus };
+
+  constructor() {
+    effect(() => {
+      if (this.session.isInitialized() && this.negocios().length === 0) {
+        console.log(this.negocios().length + " negocios" + this.session.negocios())
+        //  this.router.navigate(['/onboarding']);
+      }
+    });
+  }
 
   selectBusiness(id: string) {
     this.session.setActiveId(id);

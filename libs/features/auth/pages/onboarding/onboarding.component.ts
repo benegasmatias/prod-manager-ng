@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -32,7 +32,14 @@ export class OnboardingComponent implements OnInit {
 
   readonly icons = { Building2, Rocket, ArrowRight, AlertCircle, Loader2 };
 
+  negocios = computed(() => this.session.negocios());
+
   ngOnInit() {
+    // Si ya tiene negocios, redirigir al selector o dashboard
+    if (this.session.isInitialized() && this.negocios().length > 0) {
+      this.router.navigate([this.negocios().length === 1 ? '/dashboard' : '/select-business']);
+      return;
+    }
     this.loadTemplates();
   }
 
@@ -62,6 +69,8 @@ export class OnboardingComponent implements OnInit {
     this.isSubmitting.set(true);
     try {
       const newNegocio = await this.session.addNegocio(this.nombre, rubro);
+      // Activar el negocio para que deje de estar en DRAFT y permita ver el dashboard
+      await this.api.businesses.activate(newNegocio.id);
       this.session.setActiveId(newNegocio.id);
       this.router.navigate(['/dashboard']);
     } catch (err) {
@@ -69,5 +78,9 @@ export class OnboardingComponent implements OnInit {
     } finally {
       this.isSubmitting.set(false);
     }
+  }
+
+  goBack() {
+    this.router.navigate(['/select-business']);
   }
 }

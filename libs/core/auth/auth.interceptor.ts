@@ -1,21 +1,32 @@
-import { HttpInterceptorFn, HttpHeaders } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { catchError, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const router = inject(Router);
   const session = authService.session();
   const token = session?.access_token;
 
-  // Solo interceptamos peticiones a nuestra API
-  // Podríamos verificar req.url.startsWith(environment.apiUrl)
+  let request = req;
   
   if (token) {
-    const authReq = req.clone({
+    request = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${token}`)
     });
-    return next(authReq);
   }
 
-  return next(req);
+  return next(request).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        // Token expiado o inválido
+        authService.logout().then(() => {
+          router.navigate(['/login']);
+        });
+      }
+      return throwError(() => error);
+    })
+  );
 };

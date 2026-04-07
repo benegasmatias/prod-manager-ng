@@ -18,6 +18,7 @@ export interface Negocio {
   status: 'ACTIVE' | 'SUSPENDED' | 'TRIAL';
   subscriptionExpiresAt?: string;
   createdAt: string;
+  userRole?: 'OWNER' | 'ADMIN' | 'OPERATOR' | 'VIEWER';
 }
 
 export interface CampoItem {

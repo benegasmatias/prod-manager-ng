@@ -24,12 +24,14 @@ export class AuthService {
     );
 
     this.supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[AuthService] Initial session:', !!session);
       this._session.set(session);
       this._user.set(session?.user ?? null);
       this._loading.set(false);
     });
 
     this.supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('[AuthService] Auth state changed:', _event, !!session);
       this._session.set(session);
       this._user.set(session?.user ?? null);
       this._loading.set(false);
