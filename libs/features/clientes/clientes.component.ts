@@ -9,6 +9,7 @@ import { SessionService } from '../../core/session/session.service';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { ClienteFormDialogComponent } from '../../shared/ui/clientes/cliente-form-dialog/cliente-form-dialog.component';
 import { PaginatorComponent } from '../../shared/ui/paginator/paginator.component';
+import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-clientes',
@@ -29,6 +30,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   private clientesService = inject(ClientesService);
   private sessionService = inject(SessionService);
   private router = inject(Router);
+  private confirmService = inject(ConfirmService);
 
   // Icons
   readonly icons = { Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2 };
@@ -105,17 +107,24 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.isFormOpen.set(true);
   }
 
-  handleDelete(event: Event, client: Cliente): void {
+  async handleDelete(event: Event, client: Cliente): Promise<void> {
     event.stopPropagation();
-    if (window.confirm(`¿Estás seguro de eliminar a ${client.name}? Esta acción no se puede deshacer.`)) {
-      this.clientesService.delete(client.id).subscribe({
-        next: () => {
-          const id = this.activeNegocioId();
-          if (id) this.clientesService.loadClientes(id, this.searchTerm(), this.page(), this.pageSize());
-        },
-        error: (e) => console.error('Falló la eliminación', e)
-      });
-    }
+    const confirmed = await this.confirmService.confirm({
+      title: 'Eliminar cliente',
+      message: `¿Estás seguro de eliminar a ${client.name}? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger'
+    });
+    if (!confirmed) return;
+
+    this.clientesService.delete(client.id).subscribe({
+      next: () => {
+        const id = this.activeNegocioId();
+        if (id) this.clientesService.loadClientes(id, this.searchTerm(), this.page(), this.pageSize());
+      },
+      error: (e) => console.error('Falló la eliminación', e)
+    });
   }
 
   handleSaveCliente(data: Partial<Cliente>): void {

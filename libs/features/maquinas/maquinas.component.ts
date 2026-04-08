@@ -8,6 +8,7 @@ import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { Machine, Pedido, Material } from '@shared/models';
 import { LucideAngularModule, Plus, ChevronDown, Cpu } from 'lucide-angular';
 import { cn } from '@shared/utils/cn';
+import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
 import { MachineCardComponent } from './components/machine-card.component';
 import { MachineFormDialogComponent } from './components/machine-form-dialog.component';
@@ -34,6 +35,7 @@ export class MaquinasPageComponent {
   private sessionService = inject(SessionService);
   private materialesService = inject(MaterialesService);
   private pedidosApi = inject(PedidosApiService);
+  private confirmService = inject(ConfirmService);
 
   // States from service
   loading = this.maquinasService.loading;
@@ -113,7 +115,15 @@ export class MaquinasPageComponent {
   }
 
   async handleDelete(machineId: string) {
-    if (!confirm(`¿Estás seguro de desactivar esta ${this.config().labels.maquinas.slice(0, -1).toLowerCase()}?`)) return;
+    const label = this.config().labels.maquinas.slice(0, -1).toLowerCase();
+    const confirmed = await this.confirmService.confirm({
+      title: `Desactivar ${label}`,
+      message: `¿Estás seguro de desactivar esta ${label}? Podrás reactivarla más adelante.`,
+      confirmLabel: 'Desactivar',
+      cancelLabel: 'Cancelar',
+      type: 'warning'
+    });
+    if (!confirmed) return;
     await this.maquinasService.remove(machineId);
     this.isDetailSheetOpen.set(false);
   }

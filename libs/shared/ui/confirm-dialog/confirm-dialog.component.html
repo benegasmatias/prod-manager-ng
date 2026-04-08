@@ -1,0 +1,63 @@
+@if (service.data(); as data) {
+<div
+  class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+  (click)="service.close(false)"
+>
+  <div
+    class="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Icon + Content -->
+    <div class="px-6 sm:px-8 pt-8 pb-6 text-center">
+      <!-- Animated Icon -->
+      <div
+        class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl mb-5 transition-all"
+        [ngClass]="{
+          'bg-gradient-to-br from-red-50 to-red-100 text-red-500 dark:from-red-500/10 dark:to-red-400/5 dark:text-red-400 shadow-lg shadow-red-500/10': data.type === 'danger',
+          'bg-gradient-to-br from-amber-50 to-amber-100 text-amber-500 dark:from-amber-500/10 dark:to-amber-400/5 dark:text-amber-400 shadow-lg shadow-amber-500/10': data.type === 'warning',
+          'bg-gradient-to-br from-primary/10 to-primary/5 text-primary dark:from-primary/10 dark:to-primary/5 shadow-lg shadow-primary/10': data.type === 'info' || !data.type
+        }"
+      >
+        @if (data.type === 'danger') {
+          <lucide-angular [img]="icons.AlertTriangle" class="h-7 w-7"></lucide-angular>
+        } @else if (data.type === 'warning') {
+          <lucide-angular [img]="icons.AlertTriangle" class="h-7 w-7"></lucide-angular>
+        } @else {
+          <lucide-angular [img]="icons.Info" class="h-7 w-7"></lucide-angular>
+        }
+      </div>
+
+      <!-- Title -->
+      <h3 class="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-2 tracking-tight">
+        {{ data.title }}
+      </h3>
+
+      <!-- Message -->
+      <p class="text-zinc-500 dark:text-zinc-400 leading-relaxed text-sm max-w-xs mx-auto">
+        {{ data.message }}
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="px-6 sm:px-8 pb-6 sm:pb-8 flex flex-col-reverse sm:flex-row gap-3">
+      <button
+        (click)="service.close(false)"
+        class="flex-1 h-12 px-4 text-sm font-bold text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl transition-all active:scale-[0.97]"
+      >
+        {{ data.cancelLabel || 'Cancelar' }}
+      </button>
+      <button
+        (click)="service.close(true)"
+        class="flex-1 h-12 px-4 text-sm font-bold text-white rounded-xl shadow-lg transition-all active:scale-[0.97]"
+        [ngClass]="{
+          'bg-red-500 hover:bg-red-600 shadow-red-500/25': data.type === 'danger',
+          'bg-amber-500 hover:bg-amber-600 shadow-amber-500/25': data.type === 'warning',
+          'bg-primary hover:bg-primary/90 shadow-primary/25': data.type === 'info' || !data.type
+        }"
+      >
+        {{ data.confirmLabel || 'Confirmar' }}
+      </button>
+    </div>
+  </div>
+</div>
+}

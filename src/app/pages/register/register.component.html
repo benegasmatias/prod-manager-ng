@@ -46,6 +46,13 @@
                             <h2 class="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
                                 Registrate
                             </h2>
+
+                            @if (isInvitation) {
+                                <div class="flex items-center gap-3 rounded-2xl bg-primary/5 p-4 text-xs font-bold text-primary border border-primary/20">
+                                    <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    <span>Creá tu cuenta para aceptar la invitación al equipo.</span>
+                                </div>
+                            }
                             
                             @if (error()) {
                                 <div class="flex items-center gap-3 rounded-2xl bg-red-50 p-4 text-xs font-bold text-red-600 dark:bg-red-900/20 dark:text-red-400">
@@ -183,7 +190,7 @@
                         <div class="pt-4 text-center">
                             <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest">
                                 ¿Ya tenés cuenta? 
-                                <a routerLink="/login" class="ml-2 text-primary hover:underline">
+                                <a [routerLink]="'/login'" [queryParams]="returnUrl ? { returnUrl: returnUrl } : {}" class="ml-2 text-primary hover:underline">
                                     Iniciá Sesión
                                 </a>
                             </p>

@@ -92,7 +92,7 @@
                             </button>
 
                             <div class="pt-2 text-center">
-                                <a routerLink="/register" class="text-sm font-bold text-primary hover:underline">
+                                <a [routerLink]="'/register'" [queryParams]="{ returnUrl: returnUrl !== '/dashboard' ? returnUrl : null }" class="text-sm font-bold text-primary hover:underline">
                                     Crear cuenta
                                 </a>
                             </div>

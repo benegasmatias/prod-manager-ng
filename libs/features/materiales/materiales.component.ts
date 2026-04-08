@@ -6,6 +6,7 @@ import { MaterialesService } from '../../core/api/materiales.service';
 import { SessionService } from '../../core/session/session.service';
 import { Material } from '../../shared/models/material';
 import { ButtonSpinnerComponent } from '../../shared/ui/button-spinner/button-spinner.component';
+import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { cn } from '../../shared/utils/cn';
 
 @Component({
@@ -18,6 +19,7 @@ import { cn } from '../../shared/utils/cn';
 export class MaterialesPageComponent implements OnInit {
   private service = inject(MaterialesService);
   public session = inject(SessionService);
+  private confirmService = inject(ConfirmService);
 
   readonly icons = { Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus };
 
@@ -119,7 +121,14 @@ export class MaterialesPageComponent implements OnInit {
   }
 
   async handleDelete(id: string) {
-    if (!confirm('¿Estás seguro de eliminar este recurso?')) return;
+    const confirmed = await this.confirmService.confirm({
+      title: 'Eliminar recurso',
+      message: '¿Estás seguro de eliminar este recurso? Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger'
+    });
+    if (!confirmed) return;
     try {
       await this.service.deleteMaterial(id);
     } catch(e) {

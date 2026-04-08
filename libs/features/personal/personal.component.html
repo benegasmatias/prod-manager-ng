@@ -1,22 +1,20 @@
-<div class="space-y-12 pb-10 px-8 pt-8 animate-in fade-in duration-500">
+<div class="space-y-8 sm:space-y-12 pb-10 px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 animate-in fade-in duration-500">
   <!-- Header Area -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
     <div class="flex flex-col gap-1">
       <div class="flex items-center gap-2 mb-1">
         <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
         <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Recursos Humanos</span>
       </div>
-      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 text-left">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 text-left">
         Equipo <span class="text-primary italic">de Trabajo</span>
       </h1>
       <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed text-left">
         Administración de operarios, roles de producción y seguimiento de desempeño del personal operativo.
       </p>
     </div>
-    <button
-      (click)="openNew()"
-      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2"
-    >
+    <button (click)="openNew()"
+      class="flex items-center justify-center w-full sm:w-auto h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2">
       <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Invitar Integrante
     </button>
   </div>
@@ -24,48 +22,80 @@
 
   <!-- PENDING INVITATIONS SECTION -->
   @if (invitations().length > 0) {
-    <div class="space-y-6 animate-in fade-in slide-in-from-top-4 duration-700">
-      <div class="flex items-center gap-3 px-1">
-        <div class="h-8 w-1 bg-amber-400 rounded-full"></div>
-        <h2 class="text-xs font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Invitaciones Pendientes</h2>
-        <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-[9px] font-black text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">{{ invitations().length }}</span>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (invite of invitations(); track invite.id) {
-          <div class="group relative bg-white dark:bg-zinc-900/40 p-6 rounded-[2rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-start justify-between mb-4">
-              <div class="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                <lucide-angular [img]="icons.Mail" class="h-5 w-5"></lucide-angular>
-              </div>
-              <div class="flex flex-col items-end gap-1">
-                 <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Pendiente</span>
-                 <span class="text-[8px] text-zinc-400 font-medium italic">{{ invite.createdAt | date:'short' }}</span>
-              </div>
-            </div>
-            
-            <div class="space-y-1 text-left">
-              <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate pr-4">{{ invite.email }}</h3>
-              <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                Rol: {{ invite.role }}
-              </p>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-zinc-50 dark:border-zinc-800/50 flex items-center justify-between">
-               <div class="flex items-center gap-2">
-                  <div class="h-6 w-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-400 uppercase">
-                    {{ invite.invitedByUser?.fullName?.charAt(0) || 'A' }}
-                  </div>
-                  <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter truncate max-w-24">Por {{ invite.invitedByUser?.fullName || 'Admin' }}</span>
-               </div>
-               <button class="h-8 w-8 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/20 text-zinc-400 hover:text-rose-500 flex items-center justify-center transition-all">
-                  <lucide-angular [img]="icons.Trash2" class="h-3.5 w-3.5"></lucide-angular>
-               </button>
-            </div>
-          </div>
-        }
-      </div>
+  <div class="space-y-6 animate-in fade-in slide-in-from-top-4 duration-700">
+    <div class="flex items-center gap-3 px-1">
+      <div class="h-8 w-1 bg-amber-400 rounded-full"></div>
+      <h2 class="text-xs font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Invitaciones Pendientes
+      </h2>
+      <span
+        class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-[9px] font-black text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">{{
+        invitations().length }}</span>
     </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      @for (invite of invitations(); track invite.id) {
+      <div
+        class="group relative bg-white dark:bg-zinc-900/40 p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-4">
+          <div
+            class="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <lucide-angular [img]="icons.Mail" class="h-5 w-5"></lucide-angular>
+          </div>
+          <div class="flex flex-col items-end gap-1">
+            <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Pendiente</span>
+            <span class="text-[8px] text-zinc-400 font-medium italic">{{ invite.createdAt | date:'short' }}</span>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-left min-w-0">
+          <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{{ invite.email }}</h3>
+          <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+            Rol: {{ invite.role }}
+          </p>
+        </div>
+
+        <div class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-zinc-50 dark:border-zinc-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+          <div class="flex items-center gap-2">
+            <div
+              class="h-6 w-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-400 uppercase flex-shrink-0">
+              {{ invite.invitedByUser?.fullName?.charAt(0) || 'A' }}
+            </div>
+            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter truncate max-w-24">Por {{
+              invite.invitedByUser?.fullName || 'Admin' }}</span>
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <!-- Resend Button -->
+            <button
+              (click)="handleResend(invite)"
+              [disabled]="!canResend(invite) || resendingId() === invite.id"
+              [class]="cn(
+                'h-8 px-3 rounded-xl flex items-center justify-center gap-1.5 text-[9px] font-bold uppercase tracking-wider transition-all border',
+                canResend(invite) && resendingId() !== invite.id
+                  ? 'bg-primary/5 text-primary border-primary/20 hover:bg-primary/10 hover:border-primary/40'
+                  : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-zinc-100 dark:border-zinc-800 cursor-not-allowed opacity-70'
+              )">
+              @if (resendingId() === invite.id) {
+                <lucide-angular [img]="icons.Loader2" class="h-3 w-3 animate-spin"></lucide-angular>
+              } @else if (!canResend(invite)) {
+                <lucide-angular [img]="icons.Clock" class="h-3 w-3"></lucide-angular>
+                <span>{{ getResendLabel(invite) }}</span>
+              } @else {
+                <lucide-angular [img]="icons.RefreshCw" class="h-3 w-3"></lucide-angular>
+                <span>Reenviar</span>
+              }
+            </button>
+            <!-- Delete Button -->
+            <button
+              (click)="handleDeleteInvitation(invite)"
+              class="h-8 w-8 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/20 text-zinc-400 hover:text-rose-500 flex items-center justify-center transition-all">
+              <lucide-angular [img]="icons.Trash2" class="h-3.5 w-3.5"></lucide-angular>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
   }
 
   <!-- ACTIVE STAFF SECTION -->
@@ -76,21 +106,20 @@
     </div>
 
     <!-- Search and Filters Section -->
-    <div class="flex flex-col md:flex-row gap-4 items-center bg-white/70 dark:bg-zinc-900/40 p-4 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm">
+    <div
+      class="flex flex-col md:flex-row gap-4 items-center bg-white/70 dark:bg-zinc-900/40 p-3 sm:p-4 rounded-2xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm">
       <div class="relative flex-1 w-full group">
-        <lucide-angular [img]="icons.Search" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors duration-200"></lucide-angular>
-        <input
-          type="search"
-          [ngModel]="searchTerm()"
-          (ngModelChange)="searchTerm.set($event)"
+        <lucide-angular [img]="icons.Search"
+          class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors duration-200"></lucide-angular>
+        <input type="search" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
           placeholder="Buscar por nombre o especialidad..."
-          class="h-11 w-full rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-950"
-        >
+          class="h-11 w-full rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-950">
       </div>
     </div>
 
     <!-- Desktop Table View -->
-    <div class="hidden lg:block overflow-hidden bg-white dark:bg-zinc-900/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm">
+    <div
+      class="hidden lg:block overflow-hidden bg-white dark:bg-zinc-900/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm">
       <table class="w-full text-left">
         <thead>
           <tr class="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800/50">
@@ -99,124 +128,121 @@
             <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Especialidad</th>
             <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Canal de Contacto</th>
             <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 text-center">Estado</th>
-            <th class="h-16 px-8 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 text-right">Acciones</th>
+            <th class="h-16 px-8 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 text-right">Acciones
+            </th>
           </tr>
         </thead>
         <tbody>
           @for (staff of filteredStaff(); track staff.id) {
-            <tr
-              [class]="cn(
+          <tr [class]="cn(
                 'group transition-colors hover:bg-zinc-50/30 dark:hover:bg-zinc-900/40 border-b border-zinc-50 dark:border-zinc-800/30',
                 !staff.active && 'opacity-60 grayscale-[0.5]'
-              )"
-            >
-              <td class="px-8 py-5">
-                <div class="flex items-center gap-4">
-                  <div [class]="cn(
+              )">
+            <td class="px-8 py-5">
+              <div class="flex items-center gap-4">
+                <div [class]="cn(
                     'h-12 w-12 rounded-2xl flex items-center justify-center font-bold transition-all duration-300',
                     staff.active 
                       ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary'
                       : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300'
                   )">
-                    {{ staff.firstName.charAt(0).toUpperCase() }}
-                  </div>
-                  <div class="flex flex-col gap-0.5">
-                    <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-primary transition-colors">
-                      {{ staff.firstName }} {{ staff.lastName }}
-                    </span>
-                    <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-tight text-left">
-                      ID {{ staff.id.slice(0, 8) }}
-                    </span>
-                  </div>
+                  {{ staff.firstName.charAt(0).toUpperCase() }}
                 </div>
-              </td>
-              <td class="px-6 py-5">
-                <span [class]="cn(
+                <div class="flex flex-col gap-0.5">
+                  <span
+                    class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-primary transition-colors">
+                    {{ staff.firstName }} {{ staff.lastName }}
+                  </span>
+                  <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-tight text-left">
+                    ID {{ staff.id.slice(0, 8) }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <span [class]="cn(
                   'px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border',
                   staff.role === 'OWNER' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                   staff.role === 'BUSINESS_ADMIN' ? 'bg-amber-50 text-amber-600 border-amber-100' :
                   staff.role === 'SALES' ? 'bg-blue-50 text-blue-600 border-blue-100' :
                   'bg-zinc-100 text-zinc-600 border-zinc-200'
                 )">
-                  {{ staff.role }}
-                </span>
-              </td>
-              <td class="px-6 py-5">
-                <div class="inline-flex items-center px-3 py-1 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 border border-zinc-100 dark:border-zinc-800 uppercase tracking-widest">
-                  {{ staff.specialties || 'General' }}
+                {{ staff.role }}
+              </span>
+            </td>
+            <td class="px-6 py-5">
+              <div
+                class="inline-flex items-center px-3 py-1 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 border border-zinc-100 dark:border-zinc-800 uppercase tracking-widest">
+                {{ staff.specialties || 'General' }}
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                  <lucide-angular [img]="icons.Mail" class="h-3 w-3 text-zinc-400"></lucide-angular>
+                  {{ staff.email || 'Sin email' }}
                 </div>
-              </td>
-              <td class="px-6 py-5">
-                <div class="space-y-1.5">
-                  <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                    <lucide-angular [img]="icons.Mail" class="h-3 w-3 text-zinc-400"></lucide-angular>
-                    {{ staff.email || 'Sin email' }}
-                  </div>
-                  <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                    <lucide-angular [img]="icons.Phone" class="h-3 w-3 text-zinc-400"></lucide-angular>
-                    {{ staff.phone || 'Sin teléfono' }}
-                  </div>
+                <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                  <lucide-angular [img]="icons.Phone" class="h-3 w-3 text-zinc-400"></lucide-angular>
+                  {{ staff.phone || 'Sin teléfono' }}
                 </div>
-              </td>
-              <td class="px-6 py-5">
-                <div class="flex justify-center">
-                  <span [class]="cn(
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <div class="flex justify-center">
+                <span [class]="cn(
                     'inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border transform transition-transform group-hover:scale-105',
                     staff.active
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10'
                       : 'bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700'
                   )">
-                    <span [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
-                    {{ staff.active ? 'ACTIVO' : 'INACTIVO' }}
-                  </span>
-                </div>
-              </td>
-              <td class="px-8 py-5 text-right">
-                <div class="flex items-center justify-end gap-2 transition-all">
-                  <button
-                    (click)="handleEdit(staff)"
-                    class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-800 hover:text-primary shadow-sm transition-all border border-transparent hover:border-zinc-200 flex items-center justify-center text-zinc-500"
-                  >
-                    <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
-                  </button>
+                  <span
+                    [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
+                  {{ staff.active ? 'ACTIVO' : 'INACTIVO' }}
+                </span>
+              </div>
+            </td>
+            <td class="px-8 py-5 text-right">
+              <div class="flex items-center justify-end gap-2 transition-all">
+                <button (click)="handleEdit(staff)"
+                  class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-800 hover:text-primary shadow-sm transition-all border border-transparent hover:border-zinc-200 flex items-center justify-center text-zinc-500">
+                  <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+                </button>
 
-                  <button
-                    (click)="handleToggleStatus(staff)"
-                    [class]="cn(
+                <button (click)="handleToggleStatus(staff)" [class]="cn(
                       'h-10 w-10 rounded-xl transition-all shadow-sm border border-transparent hover:border-zinc-200 flex items-center justify-center text-zinc-500',
                       staff.active
                         ? 'hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-500'
                         : 'hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-500'
-                    )"
-                  >
-                    <lucide-angular [img]="icons.Power" class="h-4 w-4"></lucide-angular>
-                  </button>
+                    )">
+                  <lucide-angular [img]="icons.Power" class="h-4 w-4"></lucide-angular>
+                </button>
 
-                  <button
-                    (click)="handleDelete(staff)"
-                    class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-rose-900/20 hover:text-rose-500 shadow-sm transition-all border border-transparent hover:border-rose-100 flex items-center justify-center text-zinc-500"
-                  >
-                    <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
-                  </button>
-                </div>
-              </td>
-            </tr>
+                <button (click)="handleDelete(staff)"
+                  class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-rose-900/20 hover:text-rose-500 shadow-sm transition-all border border-transparent hover:border-rose-100 flex items-center justify-center text-zinc-500">
+                  <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+                </button>
+              </div>
+            </td>
+          </tr>
           } @empty {
-            <tr>
-              <td colSpan="5" class="h-64 text-center">
-                <div class="flex flex-col items-center justify-center gap-4">
-                  <div class="h-16 w-16 rounded-3xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800">
-                    <lucide-angular [img]="icons.HardHat" class="h-8 w-8 text-zinc-200 dark:text-zinc-800"></lucide-angular>
-                  </div>
-                  <div class="space-y-1">
-                    <p class="text-sm font-bold text-zinc-400 uppercase tracking-widest">
-                      {{ loading() ? 'Sincronizando equipo...' : 'Sin registros encontrados' }}
-                    </p>
-                    <p class="text-xs text-zinc-400 italic">Probá ajustando los términos de búsqueda</p>
-                  </div>
+          <tr>
+            <td colSpan="5" class="h-64 text-center">
+              <div class="flex flex-col items-center justify-center gap-4">
+                <div
+                  class="h-16 w-16 rounded-3xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800">
+                  <lucide-angular [img]="icons.HardHat"
+                    class="h-8 w-8 text-zinc-200 dark:text-zinc-800"></lucide-angular>
                 </div>
-              </td>
-            </tr>
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-zinc-400 uppercase tracking-widest">
+                    {{ loading() ? 'Sincronizando equipo...' : 'Sin registros encontrados' }}
+                  </p>
+                  <p class="text-xs text-zinc-400 italic">Probá ajustando los términos de búsqueda</p>
+                </div>
+              </div>
+            </td>
+          </tr>
           }
         </tbody>
       </table>
@@ -225,78 +251,77 @@
     <!-- Mobile Cards View -->
     <div class="grid grid-cols-1 gap-6 lg:hidden">
       @for (staff of filteredStaff(); track staff.id) {
-        <div [class]="cn(
-          'group relative p-8 rounded-[2.5rem] border transition-all hover:shadow-xl animate-slide-up text-left',
+      <div [class]="cn(
+          'group relative p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border transition-all hover:shadow-xl animate-slide-up text-left',
           staff.active 
             ? 'bg-white dark:bg-zinc-900/40 border-zinc-100 dark:border-zinc-800/50 shadow-sm'
             : 'bg-zinc-50/50 dark:bg-zinc-950/20 border-zinc-100 dark:border-zinc-800/30 opacity-70'
         )">
-          <div class="flex items-start justify-between mb-8">
-            <div class="flex items-center gap-4">
-              <div [class]="cn(
-                'h-14 w-14 rounded-2xl flex items-center justify-center font-bold transition-all duration-300 shadow-sm',
+        <div class="flex items-start justify-between mb-5 sm:mb-8">
+          <div class="flex items-center gap-4">
+            <div [class]="cn(
+                'h-11 w-11 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl flex items-center justify-center font-bold transition-all duration-300 shadow-sm text-sm sm:text-base',
                 staff.active 
                   ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary'
                   : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300'
               )">
-                {{ staff.firstName.charAt(0).toUpperCase() }}
-              </div>
-              <div class="space-y-1">
-                <p class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight group-hover:text-primary transition-colors text-base">
-                  {{ staff.firstName }} {{ staff.lastName }}
+              {{ staff.firstName.charAt(0).toUpperCase() }}
+            </div>
+            <div class="space-y-1">
+              <p
+                class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight group-hover:text-primary transition-colors text-base">
+                {{ staff.firstName }} {{ staff.lastName }}
+              </p>
+              <div class="flex items-center gap-2">
+                <span
+                  [class]="cn('h-1.5 w-1.5 rounded-full', staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest text-left">
+                  {{ staff.active ? 'Activo' : 'Inactivo' }}
                 </p>
-                <div class="flex items-center gap-2">
-                  <span [class]="cn('h-1.5 w-1.5 rounded-full', staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
-                  <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest text-left">
-                    {{ staff.active ? 'Activo' : 'Inactivo' }}
-                  </p>
-                </div>
               </div>
             </div>
-            <button 
-              (click)="handleEdit(staff)"
-              class="h-10 w-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-transparent shadow-sm flex items-center justify-center flex-shrink-0 text-zinc-500"
-            >
-              <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
-            </button>
           </div>
+          <button (click)="handleEdit(staff)"
+            class="h-10 w-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-transparent shadow-sm flex items-center justify-center flex-shrink-0 text-zinc-500">
+            <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+          </button>
+        </div>
 
-          <div class="grid grid-cols-1 gap-4 pb-8 mb-8 border-b border-zinc-50 dark:border-zinc-800/50">
-            <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-transparent dark:border-zinc-800/50">
-              <lucide-angular [img]="icons.Award" class="h-4 w-4 text-primary"></lucide-angular>
-              <span class="uppercase tracking-widest font-bold text-[10px]">{{ staff.specialties || 'General' }}</span>
-            </div>
-            <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-transparent dark:border-zinc-800/50">
-              <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-zinc-400"></lucide-angular>
-              <span class="truncate">{{ staff.email || '—' }}</span>
-            </div>
-            <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-transparent dark:border-zinc-800/50">
-              <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-zinc-400"></lucide-angular>
-              <span>{{ staff.phone || '—' }}</span>
-            </div>
+        <div class="grid grid-cols-1 gap-3 sm:gap-4 pb-5 sm:pb-8 mb-5 sm:mb-8 border-b border-zinc-50 dark:border-zinc-800/50">
+          <div
+            class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-transparent dark:border-zinc-800/50">
+            <lucide-angular [img]="icons.Award" class="h-4 w-4 text-primary"></lucide-angular>
+            <span class="uppercase tracking-widest font-bold text-[10px]">{{ staff.specialties || 'General' }}</span>
           </div>
+          <div
+            class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-transparent dark:border-zinc-800/50 min-w-0">
+            <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-zinc-400"></lucide-angular>
+            <span class="truncate">{{ staff.email || '—' }}</span>
+          </div>
+          <div
+            class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-transparent dark:border-zinc-800/50">
+            <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-zinc-400"></lucide-angular>
+            <span>{{ staff.phone || '—' }}</span>
+          </div>
+        </div>
 
-          <div class="flex items-center justify-between gap-4">
-            <button
-              (click)="handleToggleStatus(staff)"
-              [class]="cn(
+        <div class="flex items-center justify-between gap-4">
+          <button (click)="handleToggleStatus(staff)" [class]="cn(
                 'flex-1 h-11 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] border shadow-sm transition-all active:scale-95 flex items-center justify-center',
                 staff.active
                   ? 'text-rose-600 border-rose-100 bg-white hover:bg-rose-500 hover:text-white hover:border-rose-500'
                   : 'text-emerald-600 border-emerald-100 bg-white hover:bg-emerald-500 hover:text-white hover:border-emerald-500'
-              )"
-            >
-              <lucide-angular [img]="icons.Power" class="h-3.5 w-3.5 mr-2"></lucide-angular> {{ staff.active ? 'Baja' : 'Alta' }}
-            </button>
-            
-            <button
-              (click)="handleDelete(staff)"
-              class="h-11 w-11 rounded-2xl bg-rose-50 dark:bg-rose-900/20 text-rose-500 border-transparent hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center flex-shrink-0"
-            >
-              <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
-            </button>
-          </div>
+              )">
+            <lucide-angular [img]="icons.Power" class="h-3.5 w-3.5 mr-2"></lucide-angular> {{ staff.active ? 'Baja' :
+            'Alta' }}
+          </button>
+
+          <button (click)="handleDelete(staff)"
+            class="h-11 w-11 rounded-2xl bg-rose-50 dark:bg-rose-900/20 text-rose-500 border-transparent hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center flex-shrink-0">
+            <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+          </button>
         </div>
+      </div>
       }
     </div>
   </div>
@@ -304,200 +329,198 @@
 
 <!-- Modal: Invitar Integrante -->
 @if (isFormOpen()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-    <div class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-4 slide-in-from-bottom-4 animate-in duration-300">
-      
-      <!-- Header -->
-      <div class="p-8 border-b border-zinc-100 dark:border-zinc-800/50 text-left relative bg-zinc-50/20 dark:bg-zinc-900/10">
-          <div class="flex items-center gap-4">
-              <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
-                <lucide-angular [img]="icons.Mail" class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
-              </div>
-              <div class="space-y-1">
-                  <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                    {{ editingStaffId() ? 'Editar integrante' : 'Invitar integrante' }}
-                  </h2>
-                  <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
-                    {{ editingStaffId() ? 'Gestión de Permisos' : 'Identity & Membership' }}
-                  </p>
-              </div>
-          </div>
-          <button (click)="isFormOpen.set(false)" class="absolute right-8 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors">
-            <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
-          </button>
-      </div>
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+  <div
+    class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-2xl sm:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-2 sm:m-4 max-h-[95vh] slide-in-from-bottom-4 animate-in duration-300">
 
-      <!-- Content -->
-      <div class="p-8 space-y-6">
-        
-        <!-- STEP 1: Input -->
-        @if (modalState() === 'INPUT' || modalState() === 'CHECKING') {
-          <div class="space-y-4">
-            <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest text-left leading-relaxed">
-              Ingresá el email de la persona para enviarle una invitación a este negocio.
-            </p>
-            
-            <div class="relative group">
-              <lucide-angular [img]="icons.Mail" class="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
-              <input
-                  [ngModel]="formEmail()"
-                  (ngModelChange)="formEmail.set($event)"
-                  type="email"
-                  placeholder="ejemplo@correo.com"
-                  [disabled]="modalState() === 'CHECKING'"
-                  class="w-full h-14 rounded-2xl border-none bg-zinc-50 dark:bg-zinc-900 px-14 text-sm font-bold focus:ring-4 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-800 focus:outline-none disabled:opacity-50"
-                  (keyup.enter)="handleVerifyEmail()"
-              />
-              @if (modalState() === 'CHECKING') {
-                <lucide-angular [img]="icons.Loader2" class="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary animate-spin"></lucide-angular>
-              }
+    <!-- Header -->
+    <div
+      class="p-5 sm:p-8 border-b border-zinc-100 dark:border-zinc-800/50 text-left relative bg-zinc-50/20 dark:bg-zinc-900/10">
+      <div class="flex items-center gap-4">
+        <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
+          <lucide-angular [img]="icons.Mail"
+            class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
+        </div>
+        <div class="space-y-1">
+          <h2 class="text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            {{ editingStaffId() ? 'Editar integrante' : 'Invitar integrante' }}
+          </h2>
+          <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
+            {{ editingStaffId() ? 'Gestión de Permisos' : 'Identity & Membership' }}
+          </p>
+        </div>
+      </div>
+      <button (click)="isFormOpen.set(false)"
+        class="absolute right-5 sm:right-8 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors">
+        <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="p-5 sm:p-8 space-y-6 overflow-y-auto">
+
+      <!-- STEP 1: Input -->
+      @if (modalState() === 'INPUT' || modalState() === 'CHECKING') {
+      <div class="space-y-4">
+        <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest text-left leading-relaxed">
+          Ingresá el email de la persona para enviarle una invitación a este negocio.
+        </p>
+
+        <div class="relative group">
+          <lucide-angular [img]="icons.Mail"
+            class="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
+          <input [ngModel]="formEmail()" (ngModelChange)="formEmail.set($event)" type="email"
+            placeholder="ejemplo@correo.com" [disabled]="modalState() === 'CHECKING'"
+            class="w-full h-14 rounded-2xl border-none bg-zinc-50 dark:bg-zinc-900 px-14 text-sm font-bold focus:ring-4 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-800 focus:outline-none disabled:opacity-50"
+            (keyup.enter)="handleVerifyEmail()" />
+          @if (modalState() === 'CHECKING') {
+          <lucide-angular [img]="icons.Loader2"
+            class="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary animate-spin"></lucide-angular>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- STEP 2: Result -->
+      @if (modalState() === 'RESULT' && checkResult(); as res) {
+      <div class="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
+
+        @if (!editingStaffId()) {
+        <!-- Already Member -->
+        @if (res.alreadyMember) {
+        <div class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-rose-50 border border-rose-100 flex items-center gap-3 sm:gap-4 text-rose-600">
+          <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
+          <div>
+            <h4 class="text-xs font-black uppercase">¡Atención!</h4>
+            <p class="text-[11px] font-bold tracking-tight mt-1">Esta persona ya forma parte de este negocio.</p>
+          </div>
+        </div>
+        }
+
+        <!-- Pending Invitation -->
+        @else if (res.pendingInvitation) {
+        <div class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-amber-50 border border-amber-100 flex items-center gap-3 sm:gap-4 text-amber-600">
+          <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
+          <div>
+            <h4 class="text-xs font-black uppercase">Invitación Pendiente</h4>
+            <p class="text-[11px] font-bold tracking-tight mt-1">Ya existe una invitación pendiente para este email.</p>
+          </div>
+        </div>
+        }
+
+        <!-- User Exists -->
+        @else if (res.userExists) {
+        <div class="space-y-4">
+          <div class="p-6 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center gap-5 text-emerald-600">
+            <div
+              class="h-14 w-14 rounded-2xl bg-emerald-100 flex items-center justify-center font-black text-xl shadow-inner uppercase">
+              {{ res.user?.firstName?.charAt(0) }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-xs font-black uppercase truncate">{{ res.user?.firstName }} {{ res.user?.lastName }}</h4>
+              <p class="text-[10px] font-bold opacity-80 uppercase mt-0.5">Usuario encontrado en la plataforma</p>
             </div>
           </div>
+          <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest px-1">
+            Esta persona ya tiene una cuenta en ProdManager. Está lista para recibir la invitación.
+          </p>
+        </div>
         }
 
-        <!-- STEP 2: Result -->
-              @if (modalState() === 'RESULT' && checkResult(); as res) {
-                <div class="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
-                   
-                   @if (!editingStaffId()) {
-                     <!-- Already Member -->
-                     @if (res.alreadyMember) {
-                        <div class="p-6 rounded-3xl bg-rose-50 border border-rose-100 flex items-center gap-4 text-rose-600">
-                          <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
-                          <div>
-                            <h4 class="text-xs font-black uppercase">¡Atención!</h4>
-                            <p class="text-[11px] font-bold tracking-tight mt-1">Esta persona ya forma parte de este negocio.</p>
-                          </div>
-                        </div>
-                     }
-        
-                     <!-- Pending Invitation -->
-                     @else if (res.pendingInvitation) {
-                        <div class="p-6 rounded-3xl bg-amber-50 border border-amber-100 flex items-center gap-4 text-amber-600">
-                          <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
-                          <div>
-                            <h4 class="text-xs font-black uppercase">Invitación Pendiente</h4>
-                            <p class="text-[11px] font-bold tracking-tight mt-1">Ya existe una invitación pendiente para este email.</p>
-                          </div>
-                        </div>
-                     }
-        
-                     <!-- User Exists -->
-                     @else if (res.userExists) {
-                        <div class="space-y-4">
-                          <div class="p-6 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center gap-5 text-emerald-600">
-                            <div class="h-14 w-14 rounded-2xl bg-emerald-100 flex items-center justify-center font-black text-xl shadow-inner uppercase">
-                              {{ res.user?.firstName?.charAt(0) }}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                              <h4 class="text-xs font-black uppercase truncate">{{ res.user?.firstName }} {{ res.user?.lastName }}</h4>
-                              <p class="text-[10px] font-bold opacity-80 uppercase mt-0.5">Usuario encontrado en la plataforma</p>
-                            </div>
-                          </div>
-                          <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest px-1">
-                            Esta persona ya tiene una cuenta en ProdManager. Está lista para recibir la invitación.
-                          </p>
-                        </div>
-                     }
-        
-                     <!-- User New -->
-                     @else {
-                        <div class="space-y-4">
-                          <div class="p-6 rounded-3xl bg-blue-50 border border-blue-100 flex items-center gap-4 text-blue-600">
-                            <lucide-angular [img]="icons.User" class="h-6 w-6"></lucide-angular>
-                            <p class="text-xs font-bold uppercase tracking-tight">Email no registrado</p>
-                          </div>
-                          <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest px-1 leading-relaxed">
-                            Al enviar la invitación, se le notificará para que pueda registrarse y unirse automáticamente.
-                          </p>
-                        </div>
-                     }
-                   } @else {
-                     <!-- EDIT MODE HEADER (Simpler) -->
-                     <div class="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/50 flex items-center gap-4">
-                        <div class="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black">
-                         {{ res.user?.firstName?.charAt(0) }}
-                        </div>
-                        <div class="text-left">
-                          <h4 class="text-xs font-black uppercase text-zinc-900 dark:text-zinc-100">{{ res.user?.firstName }} {{ res.user?.lastName }}</h4>
-                          <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">{{ formEmail() }}</p>
-                        </div>
-                     </div>
-                   }
-
-             <!-- ROLE SELECTION -->
-             <div class="space-y-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 text-left">
-               <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Nivel de Acceso (Rol)</label>
-               <div class="grid grid-cols-2 gap-3">
-                 <button 
-                   (click)="formRole.set('OPERATOR')"
-                   [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'OPERATOR' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')"
-                 >
-                    <div class="flex items-center justify-between mb-1">
-                       <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Operario</span>
-                       <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'OPERATOR'" [class.bg-zinc-200]="formRole() !== 'OPERATOR'"></div>
-                    </div>
-                    <p class="text-[9px] text-zinc-500 font-medium leading-tight">Acceso a producción, órdenes y stock.</p>
-                 </button>
-
-                 <button 
-                   (click)="formRole.set('SALES')"
-                   [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'SALES' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')"
-                 >
-                    <div class="flex items-center justify-between mb-1">
-                       <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Ventas</span>
-                       <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'SALES'" [class.bg-zinc-200]="formRole() !== 'SALES'"></div>
-                    </div>
-                    <p class="text-[9px] text-zinc-500 font-medium leading-tight">Gestión de clientes, presupuestos y pedidos.</p>
-                 </button>
-
-                 <button 
-                   (click)="formRole.set('BUSINESS_ADMIN')"
-                   [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'BUSINESS_ADMIN' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')"
-                 >
-                    <div class="flex items-center justify-between mb-1">
-                       <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Admin</span>
-                       <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'BUSINESS_ADMIN'" [class.bg-zinc-200]="formRole() !== 'BUSINESS_ADMIN'"></div>
-                    </div>
-                    <p class="text-[9px] text-zinc-500 font-medium leading-tight">Configuración de equipo y maquinaria.</p>
-                 </button>
-
-                 <button 
-                   (click)="formRole.set('OWNER')"
-                   [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'OWNER' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')"
-                 >
-                    <div class="flex items-center justify-between mb-1">
-                       <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Owner</span>
-                       <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'OWNER'" [class.bg-zinc-200]="formRole() !== 'OWNER'"></div>
-                    </div>
-                    <p class="text-[9px] text-zinc-500 font-medium leading-tight">Control total y ajustes del negocio.</p>
-                 </button>
-               </div>
-             </div>
+        <!-- User New -->
+        @else {
+        <div class="space-y-4">
+          <div class="p-6 rounded-3xl bg-blue-50 border border-blue-100 flex items-center gap-4 text-blue-600">
+            <lucide-angular [img]="icons.User" class="h-6 w-6"></lucide-angular>
+            <p class="text-xs font-bold uppercase tracking-tight">Email no registrado</p>
           </div>
+          <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest px-1 leading-relaxed">
+            Al enviar la invitación, se le notificará para que pueda registrarse y unirse automáticamente.
+          </p>
+        </div>
         }
-      </div>
+        } @else {
+        <!-- EDIT MODE HEADER (Simpler) -->
+        <div
+          class="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/50 flex items-center gap-4">
+          <div class="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black">
+            {{ res.user?.firstName?.charAt(0) }}
+          </div>
+          <div class="text-left">
+            <h4 class="text-xs font-black uppercase text-zinc-900 dark:text-zinc-100">{{ res.user?.firstName }} {{
+              res.user?.lastName }}</h4>
+            <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">{{ formEmail() }}</p>
+          </div>
+        </div>
+        }
 
-      <!-- Footer -->
-      <div class="p-8 pt-0 flex flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
-        <button
-            (click)="isFormOpen.set(false)"
-            [disabled]="invitationSaving()"
-            class="text-[11px] font-black uppercase tracking-widest px-6 h-12 text-zinc-400 hover:text-zinc-600 transition-colors"
-        >
-            Cancelar
-        </button>
+        <!-- ROLE SELECTION -->
+        <div class="space-y-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 text-left">
+          <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Nivel de Acceso
+            (Rol)</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button (click)="formRole.set('OPERATOR')"
+              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'OPERATOR' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Operario</span>
+                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'OPERATOR'"
+                  [class.bg-zinc-200]="formRole() !== 'OPERATOR'"></div>
+              </div>
+              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Acceso a producción, órdenes y stock.</p>
+            </button>
 
-        <app-button-spinner
-            [loading]="modalState() === 'CHECKING' || invitationSaving()"
-            [disabled]="modalState() === 'RESULT' && !!(checkResult()?.alreadyMember || checkResult()?.pendingInvitation) || !formEmail()"
-            [loadingText]="modalState() === 'CHECKING' ? 'Verificando...' : 'Guardando...'"
-            btnClass="flex items-center justify-center rounded-2xl font-black uppercase tracking-[0.1em] text-[11px] h-12 px-10 bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
-            (onClick)="modalState() === 'RESULT' ? handleSendInvitation() : handleVerifyEmail()"
-        >
-          {{ editingStaffId() ? 'Guardar cambios' : 'Enviar invitación' }}
-        </app-button-spinner>
+            <button (click)="formRole.set('SALES')"
+              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'SALES' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Ventas</span>
+                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'SALES'"
+                  [class.bg-zinc-200]="formRole() !== 'SALES'"></div>
+              </div>
+              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Gestión de clientes, presupuestos y pedidos.
+              </p>
+            </button>
+
+            <button (click)="formRole.set('BUSINESS_ADMIN')"
+              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'BUSINESS_ADMIN' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Admin</span>
+                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'BUSINESS_ADMIN'"
+                  [class.bg-zinc-200]="formRole() !== 'BUSINESS_ADMIN'"></div>
+              </div>
+              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Configuración de equipo y maquinaria.</p>
+            </button>
+
+            <button (click)="formRole.set('OWNER')"
+              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'OWNER' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Owner</span>
+                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'OWNER'"
+                  [class.bg-zinc-200]="formRole() !== 'OWNER'"></div>
+              </div>
+              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Control total y ajustes del negocio.</p>
+            </button>
+          </div>
+        </div>
       </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="p-5 sm:p-8 pt-0 flex flex-col-reverse sm:flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
+      <button (click)="isFormOpen.set(false)" [disabled]="invitationSaving()"
+        class="text-[11px] font-black uppercase tracking-widest px-6 h-12 text-zinc-400 hover:text-zinc-600 transition-colors">
+        Cancelar
+      </button>
+
+      <app-button-spinner [loading]="modalState() === 'CHECKING' || invitationSaving()"
+        [disabled]="modalState() === 'RESULT' && !!(checkResult()?.alreadyMember || checkResult()?.pendingInvitation) || !formEmail()"
+        [loadingText]="modalState() === 'CHECKING' ? 'Verificando...' : 'Guardando...'"
+        btnClass="flex items-center justify-center rounded-2xl font-black uppercase tracking-[0.1em] text-[11px] h-12 px-10 w-full sm:w-auto bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
+        (onClick)="modalState() === 'RESULT' ? handleSendInvitation() : handleVerifyEmail()">
+        {{ editingStaffId() ? 'Guardar cambios' : 'Enviar invitación' }}
+      </app-button-spinner>
     </div>
   </div>
+</div>
 }

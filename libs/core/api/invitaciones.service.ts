@@ -13,6 +13,12 @@ export interface InvitationCheckResult {
   };
 }
 
+export interface ResendResult {
+  message: string;
+  resendCount: number;
+  nextResendAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,6 +31,14 @@ export class InvitationsService {
 
   async invite(businessId: string, email: string, role: string) {
     return this.api.post(`/businesses/${businessId}/invitations`, { email, role });
+  }
+
+  async resend(businessId: string, invitationId: string): Promise<ResendResult> {
+    return this.api.post<ResendResult>(`/businesses/${businessId}/invitations/${invitationId}/resend`, {});
+  }
+
+  async cancel(businessId: string, invitationId: string) {
+    return this.api.delete(`/businesses/${businessId}/invitations/${invitationId}`);
   }
 
   getInvitations(businessId: string) {

@@ -1,7 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@core/auth';
 
 @Component({
@@ -14,12 +14,19 @@ import { AuthService } from '@core/auth';
 export class LoginComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
+
+  returnUrl = '';
 
   email = signal('');
   password = signal('');
   loading = signal(false);
   googleLoading = signal(false);
   error = signal<string | null>(null);
+
+  constructor() {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+  }
 
   async handleSubmit() {
     console.log('Login attempt started:', this.email());
@@ -34,8 +41,8 @@ export class LoginComponent {
         this.error.set(error.message);
         this.loading.set(false);
       } else {
-        console.log('Login successful, navigating to dashboard...');
-        this.router.navigate(['/dashboard']);
+        console.log('Login successful, navigating to:', this.returnUrl);
+        this.router.navigateByUrl(this.returnUrl);
       }
     } catch (err: any) {
       console.error('Unexpected error during login:', err);
