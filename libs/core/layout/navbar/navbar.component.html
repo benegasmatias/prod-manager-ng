@@ -16,6 +16,11 @@
           class="h-5 w-5 transition-all"
         ></lucide-angular>
       </button>
+
+      <!-- Mobile Logo -->
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
+        <img src="assets/logo.png" alt="Logo" class="h-6 w-6 object-contain" onerror="this.style.display='none'" />
+      </div>
     } @else {
       <button 
         (click)="layoutService.togglePinned()"
