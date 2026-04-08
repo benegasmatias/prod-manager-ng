@@ -6,11 +6,12 @@ import { Client } from '@shared/models';
 import { ClientesApiService } from '@core/api/clientes.api.service';
 import { SessionService } from '@core/session/session.service';
 import { cn } from '@shared/utils/cn';
+import { ClienteFormDialogComponent } from './cliente-form-dialog/cliente-form-dialog.component';
 
 @Component({
   selector: 'app-client-selector',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, ClienteFormDialogComponent],
   template: `
     <div class="space-y-2 relative" #container>
       @if (label) {
@@ -140,6 +141,14 @@ import { cn } from '@shared/utils/cn';
         </div>
       }
     </div>
+
+    <!-- Dialogo de creación -->
+    <app-cliente-form-dialog
+      [open]="showForm()"
+      [isSaving]="isSaving()"
+      (onOpenChange)="showForm.set($event)"
+      (onSave)="onSaveClient($event)"
+    ></app-cliente-form-dialog>
   `
 })
 export class ClientSelectorComponent implements OnInit {
@@ -164,11 +173,20 @@ export class ClientSelectorComponent implements OnInit {
   loading = signal(false);
   isOpen = signal(false);
   searchTerm = signal('');
+  showForm = signal(false);
+  isSaving = signal(false);
 
   // Computed
   filteredClients = computed(() => {
-    const search = this.searchTerm().toLowerCase();
-    return this.clients().filter(c => 
+    const search = this.searchTerm().trim().toLowerCase();
+    const all = this.clients();
+    
+    // Si no hay búsqueda, solo mostramos los primeros 5 como sugirió el usuario
+    if (!search) {
+      return all.slice(0, 5);
+    }
+
+    return all.filter(c => 
       c.name.toLowerCase().includes(search) || 
       (c.email && c.email.toLowerCase().includes(search))
     );
@@ -235,10 +253,28 @@ export class ClientSelectorComponent implements OnInit {
 
   createNew(event: Event) {
     event.stopPropagation();
-    // For now, just a placeholder or emit event
+    this.showForm.set(true);
     this.isOpen.set(false);
-    this.searchTerm.set('');
-    // TODO: Open ClienteFormDialog
+  }
+
+  async onSaveClient(data: Partial<Client>) {
+    if (!this.businessId()) return;
+    
+    this.isSaving.set(true);
+    try {
+      const newClient = await this.api.create(this.businessId(), data);
+      
+      // Forzar recarga de la lista
+      await this.loadClients();
+      
+      // Seleccionar el nuevo cliente automáticamente
+      this.selectClient(newClient);
+      this.showForm.set(false);
+    } catch (error) {
+      console.error('Error al crear cliente:', error);
+    } finally {
+      this.isSaving.set(false);
+    }
   }
 
   cn = cn;

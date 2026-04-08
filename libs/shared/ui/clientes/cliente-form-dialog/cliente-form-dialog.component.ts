@@ -11,7 +11,7 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
   imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
   template: `
     @if (open) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
+      <div class="fixed inset-0 z-[9999] flex items-start justify-center p-4 sm:pt-24 overflow-y-auto">
         <div class="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity" (click)="close()"></div>
         
         <div class="relative w-full max-w-lg bg-white dark:bg-zinc-950 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -20,7 +20,7 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
             <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">
               {{ initialData ? 'Editar Cliente' : 'Nuevo Cliente' }}
             </h2>
-            <button class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors" (click)="close()">
+            <button type="button" class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors" (click)="close()">
               <lucide-angular [img]="icons.X" class="h-5 w-5 text-zinc-500"></lucide-angular>
             </button>
           </div>
@@ -52,7 +52,7 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
 
           <!-- Footer -->
           <div class="px-8 py-6 bg-zinc-50/50 dark:bg-zinc-900/20 border-t border-zinc-100 dark:border-zinc-900 flex justify-end gap-3">
-            <button class="px-6 py-2.5 rounded-xl text-sm font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors" (click)="close()" [disabled]="isSaving">
+            <button type="button" class="px-6 py-2.5 rounded-xl text-sm font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors" (click)="close()" [disabled]="isSaving">
               Cancelar
             </button>
             <app-button-spinner

@@ -54,7 +54,8 @@
           </p>
         </div>
 
-        <div class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-zinc-50 dark:border-zinc-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+        <div
+          class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-zinc-50 dark:border-zinc-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
           <div class="flex items-center gap-2">
             <div
               class="h-6 w-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-400 uppercase flex-shrink-0">
@@ -65,9 +66,7 @@
           </div>
           <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
             <!-- Resend Button -->
-            <button
-              (click)="handleResend(invite)"
-              [disabled]="!canResend(invite) || resendingId() === invite.id"
+            <button (click)="handleResend(invite)" [disabled]="!canResend(invite) || resendingId() === invite.id"
               [class]="cn(
                 'h-8 px-3 rounded-xl flex items-center justify-center gap-1.5 text-[9px] font-bold uppercase tracking-wider transition-all border',
                 canResend(invite) && resendingId() !== invite.id
@@ -75,18 +74,17 @@
                   : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-zinc-100 dark:border-zinc-800 cursor-not-allowed opacity-70'
               )">
               @if (resendingId() === invite.id) {
-                <lucide-angular [img]="icons.Loader2" class="h-3 w-3 animate-spin"></lucide-angular>
+              <lucide-angular [img]="icons.Loader2" class="h-3 w-3 animate-spin"></lucide-angular>
               } @else if (!canResend(invite)) {
-                <lucide-angular [img]="icons.Clock" class="h-3 w-3"></lucide-angular>
-                <span>{{ getResendLabel(invite) }}</span>
+              <lucide-angular [img]="icons.Clock" class="h-3 w-3"></lucide-angular>
+              <span>{{ getResendLabel(invite) }}</span>
               } @else {
-                <lucide-angular [img]="icons.RefreshCw" class="h-3 w-3"></lucide-angular>
-                <span>Reenviar</span>
+              <lucide-angular [img]="icons.RefreshCw" class="h-3 w-3"></lucide-angular>
+              <span>Reenviar</span>
               }
             </button>
             <!-- Delete Button -->
-            <button
-              (click)="handleDeleteInvitation(invite)"
+            <button (click)="handleDeleteInvitation(invite)"
               class="h-8 w-8 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/20 text-zinc-400 hover:text-rose-500 flex items-center justify-center transition-all">
               <lucide-angular [img]="icons.Trash2" class="h-3.5 w-3.5"></lucide-angular>
             </button>
@@ -287,7 +285,8 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-1 gap-3 sm:gap-4 pb-5 sm:pb-8 mb-5 sm:mb-8 border-b border-zinc-50 dark:border-zinc-800/50">
+        <div
+          class="grid grid-cols-1 gap-3 sm:gap-4 pb-5 sm:pb-8 mb-5 sm:mb-8 border-b border-zinc-50 dark:border-zinc-800/50">
           <div
             class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-transparent dark:border-zinc-800/50">
             <lucide-angular [img]="icons.Award" class="h-4 w-4 text-primary"></lucide-angular>
@@ -369,7 +368,7 @@
 
         <div class="relative group">
           <lucide-angular [img]="icons.Mail"
-            class="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
+            class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
           <input [ngModel]="formEmail()" (ngModelChange)="formEmail.set($event)" type="email"
             placeholder="ejemplo@correo.com" [disabled]="modalState() === 'CHECKING'"
             class="w-full h-14 rounded-2xl border-none bg-zinc-50 dark:bg-zinc-900 px-14 text-sm font-bold focus:ring-4 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-800 focus:outline-none disabled:opacity-50"
@@ -389,7 +388,8 @@
         @if (!editingStaffId()) {
         <!-- Already Member -->
         @if (res.alreadyMember) {
-        <div class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-rose-50 border border-rose-100 flex items-center gap-3 sm:gap-4 text-rose-600">
+        <div
+          class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-rose-50 border border-rose-100 flex items-center gap-3 sm:gap-4 text-rose-600">
           <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
           <div>
             <h4 class="text-xs font-black uppercase">¡Atención!</h4>
@@ -400,7 +400,8 @@
 
         <!-- Pending Invitation -->
         @else if (res.pendingInvitation) {
-        <div class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-amber-50 border border-amber-100 flex items-center gap-3 sm:gap-4 text-amber-600">
+        <div
+          class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-amber-50 border border-amber-100 flex items-center gap-3 sm:gap-4 text-amber-600">
           <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
           <div>
             <h4 class="text-xs font-black uppercase">Invitación Pendiente</h4>
@@ -507,7 +508,8 @@
     </div>
 
     <!-- Footer -->
-    <div class="p-5 sm:p-8 pt-0 flex flex-col-reverse sm:flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
+    <div
+      class="p-5 sm:p-8 pt-0 flex flex-col-reverse sm:flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
       <button (click)="isFormOpen.set(false)" [disabled]="invitationSaving()"
         class="text-[11px] font-black uppercase tracking-widest px-6 h-12 text-zinc-400 hover:text-zinc-600 transition-colors">
         Cancelar
