@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Cliente } from '../../../../core/models/cliente.model';
-import { LucideAngularModule, X, Save } from 'lucide-angular';
+import { LucideAngularModule, X, Save, Mail, Phone, User, StickyNote } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.component';
+import { cn } from '@shared/utils/cn';
 
 @Component({
   selector: 'app-cliente-form-dialog',
@@ -17,7 +18,7 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
         <div class="relative w-full max-w-lg bg-white dark:bg-zinc-950 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <!-- Header -->
           <div class="px-8 py-6 border-b border-zinc-100 dark:border-zinc-900 flex items-center justify-between">
-            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+            <h2 class="text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">
               {{ initialData ? 'Editar Cliente' : 'Nuevo Cliente' }}
             </h2>
             <button type="button" class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors" (click)="close()">
@@ -27,25 +28,79 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
           
           <!-- Body -->
           <div class="p-8 space-y-6">
-            <div class="space-y-4">
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Nombre / Razón Social <span class="text-rose-500">*</span></label>
-                <input type="text" [(ngModel)]="formData.name" class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Ej: Juan Pérez">
+            <div class="space-y-5">
+              
+              <!-- Input: Nombre -->
+              <div class="group/input space-y-1.5">
+                <label class="text-[11px] font-black uppercase tracking-widest text-zinc-400 group-focus-within/input:text-primary transition-colors ml-1">
+                  Nombre / Razón Social <span class="text-rose-500">*</span>
+                </label>
+                <div class="relative flex items-center">
+                  <div class="absolute left-4 flex items-center justify-center">
+                    <lucide-angular [img]="icons.User" class="h-4 w-4 text-zinc-400 group-focus-within/input:text-primary transition-all"></lucide-angular>
+                  </div>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="formData.name" 
+                    class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all" 
+                    placeholder="Ej: Juan Pérez"
+                  >
+                </div>
               </div>
               
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Email</label>
-                <input type="email" [(ngModel)]="formData.email" class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="ejemplo@correo.com">
-              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Input: Email -->
+                <div class="group/input space-y-1.5">
+                  <label class="text-[11px] font-black uppercase tracking-widest text-zinc-400 group-focus-within/input:text-primary transition-colors ml-1">
+                    Email
+                  </label>
+                  <div class="relative flex items-center">
+                    <div class="absolute left-4 flex items-center justify-center">
+                      <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-zinc-400 group-focus-within/input:text-primary transition-all"></lucide-angular>
+                    </div>
+                    <input 
+                      type="email" 
+                      [(ngModel)]="formData.email" 
+                      class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all" 
+                      placeholder="ejemplo@correo.com"
+                    >
+                  </div>
+                </div>
 
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Teléfono</label>
-                <input type="tel" [(ngModel)]="formData.phone" class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="+54 9 11 1234-5678">
+                <!-- Input: Teléfono -->
+                <div class="group/input space-y-1.5">
+                  <label class="text-[11px] font-black uppercase tracking-widest text-zinc-400 group-focus-within/input:text-primary transition-colors ml-1">
+                    Teléfono
+                  </label>
+                  <div class="relative flex items-center">
+                    <div class="absolute left-4 flex items-center justify-center">
+                      <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-zinc-400 group-focus-within/input:text-primary transition-all"></lucide-angular>
+                    </div>
+                    <input 
+                      type="tel" 
+                      [(ngModel)]="formData.phone" 
+                      class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all" 
+                      placeholder="+54 9 11..."
+                    >
+                  </div>
+                </div>
               </div>
               
-              <div class="space-y-1.5">
-                <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Notas Opcionales</label>
-                <textarea [(ngModel)]="formData.notes" class="h-20 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none" placeholder="Notas adicionales sobre este cliente..."></textarea>
+              <!-- Input: Notas -->
+              <div class="group/input space-y-1.5">
+                <label class="text-[11px] font-black uppercase tracking-widest text-zinc-400 group-focus-within/input:text-primary transition-colors ml-1">
+                  Notas Opcionales
+                </label>
+                <div class="relative">
+                  <div class="absolute left-4 top-4 flex items-center justify-center">
+                    <lucide-angular [img]="icons.StickyNote" class="h-4 w-4 text-zinc-400 group-focus-within/input:text-primary transition-all"></lucide-angular>
+                  </div>
+                  <textarea 
+                    [(ngModel)]="formData.notes" 
+                    class="min-h-[100px] w-full rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 pl-11 pr-4 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all resize-none" 
+                    placeholder="Notas adicionales sobre este cliente..."
+                  ></textarea>
+                </div>
               </div>
             </div>
           </div>
@@ -59,7 +114,7 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
               [loading]="isSaving"
               [disabled]="!formData.name"
               [loadingText]="initialData ? 'Guardando...' : 'Registrando...'"
-              btnClass="px-6 py-2.5 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 min-w-[140px]"
+              btnClass="px-8 py-3 rounded-2xl text-[11px] uppercase tracking-widest font-black bg-primary text-primary-foreground hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 min-w-[160px]"
               (onClick)="save()"
             >
               <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
@@ -69,16 +124,23 @@ import { ButtonSpinnerComponent } from '../../button-spinner/button-spinner.comp
         </div>
       </div>
     }
-  `
+  `,
+  styles: [`
+    :host { display: block; }
+    input::placeholder, textarea::placeholder {
+      font-weight: 500;
+      opacity: 0.5;
+    }
+  `]
 })
-export class ClienteFormDialogComponent {
+export class ClienteFormDialogComponent implements OnChanges {
   @Input() open = false;
   @Input() initialData: Cliente | null = null;
   @Input() isSaving = false;
   @Output() onOpenChange = new EventEmitter<boolean>();
   @Output() onSave = new EventEmitter<Partial<Cliente>>();
 
-  readonly icons = { X, Save };
+  readonly icons = { X, Save, Mail, Phone, User, StickyNote };
 
   formData: Partial<Cliente> = {
     name: '',
