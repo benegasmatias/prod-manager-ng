@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, untracked } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { MaquinasApiService } from './maquinas.api.service';
 import { SessionService } from '../session/session.service';
@@ -27,8 +27,9 @@ export class MaquinasService {
     const businessId = this.session.activeNegocio()?.id;
     if (!businessId) return;
 
-    // Solo mostramos spinner si no hay items
-    if (this.items().length === 0) {
+    // Solo mostramos spinner si no hay items (untracked para evitar ciclos)
+    const hasNoItems = untracked(() => this.items().length === 0);
+    if (hasNoItems) {
       this.loading.set(true);
     }
 

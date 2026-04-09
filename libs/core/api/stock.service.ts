@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, untracked } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { PedidosApiService } from './pedidos.api.service';
 import { SessionService } from '../session/session.service';
@@ -23,24 +23,41 @@ export class StockService {
 
   async loadStock(force = false) {
     const businessId = this.session.activeNegocio()?.id;
-    if (!businessId) return;
+    if (!businessId) {
+      console.warn('[StockService] Intento de carga sin businessId activo');
+      return;
+    }
 
-    if (this.activeOrders().length === 0 && this.inStockOrders().length === 0) {
+    // Usamos untracked para evitar que este método cree dependencias circulares si se llama desde un effect
+    const shouldShowLoading = untracked(() => 
+      this.activeOrders().length === 0 && this.inStockOrders().length === 0
+    );
+
+    if (shouldShowLoading) {
       this.loading.set(true);
     }
+
+    // Safety Timeout
+    const timeoutId = setTimeout(() => {
+      if (untracked(() => this.loading())) {
+        console.error('[StockService] TIMEOUT alcanzado. Forzando cierre.');
+        this.loading.set(false);
+      }
+    }, 15000);
 
     try {
       const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
         enabled: true,
-        ttl: 120000, // 2 minutos de cache para stock
+        ttl: 120000, 
         forceRefresh: force
       });
 
-      // Traemos un lote grande porque el NextJS original los procesaba todos del lado del cliente
       const res = await this.api.getListing({ businessId, type: 'STOCK', pageSize: 1000 }, context);
-      const stockOrders = res.data;
+      console.log('[StockService] API respondió con:', res);
+      
+      const stockOrders = res?.data || [];
+      console.log('[StockService] Procesando n items:', stockOrders.length);
 
-      // Filtrado basado en la lógica de page.tsx (Next.js)
       const activos = stockOrders.filter(o => o.status !== 'IN_STOCK' && o.status !== 'CANCELLED');
       const inStock = stockOrders.filter(o => o.status === 'IN_STOCK');
 
@@ -53,8 +70,10 @@ export class StockService {
         activeOrdersCount: activos.length
       });
     } catch (e) {
-      console.error('Error loadStock:', e);
+      console.error('[StockService] Error crítico cargando stock:', e);
     } finally {
+      clearTimeout(timeoutId);
+      console.log('[StockService] loadStock finalizado');
       this.loading.set(false);
     }
   }

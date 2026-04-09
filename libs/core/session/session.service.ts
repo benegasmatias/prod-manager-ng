@@ -3,6 +3,7 @@ import { ApiService } from '../api/api.service';
 import { AuthService } from '../auth/auth.service';
 import { CacheService } from '../cache/cache.service';
 import { Negocio, Rubro, NegocioConfig } from '../../shared/models';
+import { BusinessContextService } from './business-context.service';
 import { getNegocioConfig, mapCategoryToRubro } from '../../shared/utils';
 import { STORAGE_KEYS, APP_CONFIG } from '../../shared/constants';
 
@@ -13,6 +14,7 @@ export class SessionService {
   private api = inject(ApiService);
   private auth = inject(AuthService);
   private cache = inject(CacheService);
+  private context = inject(BusinessContextService);
 
   private _negocios = signal<Negocio[]>([]);
   negocios = computed(() => this._negocios());
@@ -41,6 +43,8 @@ export class SessionService {
 
   constructor() {
     console.log('[SessionService] Constructor started');
+    // Sincronización inicial del contexto atómico para el caché
+    this.context.setBusinessId(this._activeId());
     // Reaccionar al cambio de sesión
     effect(() => {
       const session = this.auth.session();
@@ -56,6 +60,7 @@ export class SessionService {
         this.lastUserId = null;
         this._negocios.set([]);
         this._activeId.set(null);
+        this.context.setBusinessId(null);
         this.isInitialized.set(true);
       }
     });
@@ -104,6 +109,7 @@ export class SessionService {
   setActiveId(id: string) {
     this._activeId.set(id);
     localStorage.setItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID, id);
+    this.context.setBusinessId(id);
     this.cache.clearAll(); // Limpieza total al cambiar de contexto
     // Intentar persistir en el servidor en background
     this.api.users.setDefaultBusiness(id).catch(() => {});
@@ -156,12 +162,13 @@ export class SessionService {
       
       const currentList = this._negocios();
       if (this.activeId() === id) {
-        if (currentList.length > 0) {
-          this.setActiveId(currentList[0].id);
-        } else {
-          this._activeId.set(null);
-          localStorage.removeItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID);
-        }
+          if (currentList.length > 0) {
+            this.setActiveId(currentList[0].id);
+          } else {
+            this._activeId.set(null);
+            this.context.setBusinessId(null);
+            localStorage.removeItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID);
+          }
       }
     } catch (error) {
       console.error('[SessionService] Error removing business:', error);

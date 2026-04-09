@@ -1,6 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { SessionService } from '../session/session.service';
 
 interface CacheEntry {
   response: HttpResponse<unknown>;
@@ -9,7 +8,6 @@ interface CacheEntry {
 
 @Injectable({ providedIn: 'root' })
 export class CacheService {
-  private session = inject(SessionService);
   private cache = new Map<string, CacheEntry>();
   private readonly MAX_ITEMS = 100; // Límite para evitar memory leaks
 
@@ -17,8 +15,7 @@ export class CacheService {
    * Genera una clave robusta para multi-tenant
    * Formato: [METODO]::BUSINESS_ID::full_url_con_params
    */
-  createKey(method: string, url: string): string {
-    const businessId = this.session.activeId() || 'global';
+  createKey(method: string, url: string, businessId: string): string {
     return `[${method}]::${businessId}::${url}`;
   }
 
@@ -52,25 +49,12 @@ export class CacheService {
   }
 
   /**
-   * Invalida todas las entradas que contengan la URL base del recurso.
-   * Útil para limpiar la lista desactualizada tras un POST/PUT/DELETE
+   * Invalida todas las entradas que coincidan con el patrón parcial.
+   * El patrón suele ser ::businessId::urlBase
    */
-  invalidateByPrefix(urlPart: string): void {
-    const businessId = this.session.activeId() || 'global';
-    const pattern = `::${businessId}::${urlPart}`;
-    
+  invalidateByPrefix(pattern: string): void {
     for (const key of this.cache.keys()) {
       if (key.includes(pattern)) {
-        this.cache.delete(key);
-      }
-    }
-  }
-
-  invalidateBusinessCache(businessId?: string): void {
-    const bId = businessId || this.session.activeId();
-    const prefix = `::${bId}::`;
-    for (const key of this.cache.keys()) {
-      if (key.includes(prefix)) {
         this.cache.delete(key);
       }
     }

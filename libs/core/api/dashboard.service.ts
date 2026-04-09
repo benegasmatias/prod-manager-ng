@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, untracked } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { SessionService } from '../session/session.service';
@@ -29,8 +29,8 @@ export class DashboardService {
     const businessId = this.session.activeId();
     if (!businessId) return;
 
-    // Solo mostramos spinner si no tenemos data previa
-    if (!this._summary()) {
+    // Solo mostramos spinner si no tenemos data previa (untracked para evitar ciclos)
+    if (!untracked(() => this._summary())) {
       this._loading.set(true);
     }
     

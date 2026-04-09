@@ -9,7 +9,7 @@ import { SessionService } from '../../core/session/session.service';
 import { Pedido, OrderStatus, PedidoSummary, Employee, ORDER_STATUS } from '../../shared/models';
 import { LucideAngularModule } from 'lucide-angular';
 import { OrderStatusModalComponent } from './status-modal/status-modal.component';
-import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, PageSizeSelectorComponent, FilterOptions, FilterValues, LoadingSpinnerComponent, MetricCardComponent, MetricCardsGridComponent } from '../../shared/ui';
+import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, PaginatorComponent, PageSizeSelectorComponent, FilterOptions, FilterValues, LoadingSpinnerComponent } from '../../shared/ui';
 import { PedidoSortKey, PedidoSortDir } from '../../shared/models/pedido';
 import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
@@ -28,8 +28,6 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
     PaginatorComponent, 
     LoadingSpinnerComponent, 
     PageSizeSelectorComponent, 
-    MetricCardComponent, 
-    MetricCardsGridComponent,
     PageShellComponent
   ],
   templateUrl: './pedidos.component.html',
