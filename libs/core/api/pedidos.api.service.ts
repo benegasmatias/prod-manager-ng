@@ -98,7 +98,7 @@ export class PedidosApiService {
     /**
      * Registra un pago para un pedido.
      */
-    async addPayment(orderId: string, payment: { amount: number; method: string; note?: string }): Promise<Pedido> {
+    async addPayment(orderId: string, payment: { businessId?: string; amount: number; method: string; note?: string }): Promise<Pedido> {
       return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.PAYMENTS(orderId), payment));
     }
 
@@ -106,6 +106,7 @@ export class PedidosApiService {
     * Reporta un fallo en un pedido (específicamente Impresión 3D o general).
     */
    async reportFailure(orderId: string, data: { 
+     businessId?: string;
      reason: string; 
      action?: 'REDO' | 'DISCARD' | 'KEEP'; 
      targetStatus?: string;
