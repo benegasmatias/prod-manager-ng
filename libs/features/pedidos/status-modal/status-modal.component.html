@@ -1,11 +1,20 @@
 @if (isOpen() && order()) {
-<div
-  class="fixed inset-0 z-[110] flex items-start justify-center p-4 pt-12 sm:pt-[12vh] bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-300">
-  <!-- Modal container -->
+<!-- Overlay Container: Centrado activo con scroll de emergencia -->
+<div 
+  class="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto"
+  (click)="onClose.emit()"
+>
+  <!-- Modal container: Altura máxima controlada aquí, no adentro. flex-col es la clave. -->
   <div
-    class="w-[95%] sm:max-w-[500px] bg-background rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden border border-border animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]">
-    <!-- Premium Header -->
-    <div [class]="cn('p-4 sm:p-6 pb-3 relative overflow-hidden ring-1 ring-inset ring-black/[0.03]', 
+    [class]="cn(
+      'w-full bg-background rounded-[2.5rem] shadow-2xl overflow-hidden border border-border flex flex-col animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 ease-[out-expo] max-h-[92vh] sm:max-h-[85vh]',
+      isMetalurgica() ? 'sm:max-w-4xl' : 'sm:max-w-[540px]'
+    )"
+    (click)="$event.stopPropagation()"
+  >
+    
+    <!-- 1. Header (Estructura Rígida / No scrolleable) -->
+    <header [class]="cn('p-5 sm:p-7 pb-4 relative overflow-hidden shrink-0 border-b border-border/10', 
         isFailureMode() ? 'bg-red-50/50 dark:bg-red-950/20' : 
         isPaymentMode() ? 'bg-emerald-50/50 dark:bg-emerald-950/20' : 
         'bg-muted/30')">
@@ -17,7 +26,7 @@
 
       <div class="flex items-center gap-4 relative z-10">
         <div
-          [class]="cn('h-12 w-12 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner ring-1', 
+          [class]="cn('h-12 w-12 sm:h-14 sm:w-14 rounded-2xl flex items-center justify-center shadow-inner ring-1', 
             isFailureMode() ? 'bg-red-100/50 text-red-600 ring-red-200/50' : 
             isPaymentMode() ? 'bg-emerald-100/50 text-emerald-600 ring-emerald-200/50' : 'bg-primary/10 text-primary ring-primary/20')">
           <lucide-angular
@@ -44,185 +53,173 @@
           </div>
         </div>
         <button (click)="onClose.emit()"
-          class="ml-auto h-10 w-10 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all active:scale-90 border border-transparent hover:border-border">
+          class="ml-auto h-11 w-11 flex items-center justify-center rounded-2xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all active:scale-90 border border-transparent hover:border-border">
           <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
         </button>
       </div>
-    </div>
+    </header>
 
-    <!-- Main Content -->
-    <div [class]="cn('p-4 sm:p-6 pt-5 space-y-4 overflow-y-auto custom-scrollbar transition-all duration-500', 
-                  isMetalurgica() ? 'max-h-[85vh] sm:max-w-4xl' : 'max-h-[75vh]')">
+    <!-- 2. Main Body (EL ÚNICO QUE SCROLLEA) -->
+    <main class="flex-1 overflow-y-auto custom-scrollbar">
+      <div class="p-5 sm:p-7 space-y-6">
+        
+        @if (isPaymentMode()) {
+          <app-payment-module [order]="order()!" [amount]="paymentAmount"
+            [selectedMethod]="paymentMethod"></app-payment-module>
+        } @else if (isFailureMode()) {
+          <app-failure-module [order]="order()!" [rubro]="rubro()" [reason]="failureReason" [action]="failureAction"
+            [wastedTime]="wastedTime" [wastedMaterial]="wastedMaterial"></app-failure-module>
+        } @else {
+          <!-- VISTA PRINCIPAL (CONTROL DE PRODUCCIÓN) -->
+          <div class="space-y-6 animate-in fade-in duration-500">
+            
+            <!-- Quick Info / Status Change -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              @for (stage of stages(); track stage.key) {
+                <button (click)="status.set(stage.key)" [class]="cn(
+                              'relative p-4 rounded-[1.5rem] text-left transition-all duration-300 border bg-background group overflow-hidden',
+                              status() === stage.key 
+                                ? 'border-primary shadow-[0_8px_30px_-12px_rgba(var(--color-primary),0.3)] ring-1 ring-primary/20' 
+                                : 'border-border hover:bg-muted/50'
+                            )">
 
-      @if (isPaymentMode()) {
-      <app-payment-module [order]="order()!" [amount]="paymentAmount"
-        [selectedMethod]="paymentMethod"></app-payment-module>
-      } @else if (isFailureMode()) {
-      <app-failure-module [order]="order()!" [rubro]="rubro()" [reason]="failureReason" [action]="failureAction"
-        [wastedTime]="wastedTime" [wastedMaterial]="wastedMaterial"></app-failure-module>
-      } @else {
-      <!-- VISTA PRINCIPAL (CONTROL DE PRODUCCIÓN) -->
-      <div class="space-y-4 animate-in fade-in duration-500">
-        <!-- Pipeline Navigation -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          @for (stage of stages(); track stage.key) {
-          <button (click)="status.set(stage.key)" [class]="cn(
-                         'relative p-3 rounded-[1.2rem] text-left transition-all duration-300 border bg-background group overflow-hidden',
-                         status() === stage.key 
-                          ? 'border-primary shadow-[0_8px_30px_-12px_rgba(var(--color-primary),0.3)] ring-1 ring-primary/20' 
-                          : 'border-border hover:bg-muted/50'
-                       )">
+                  @if (status() === stage.key) {
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none animate-pulse"></div>
+                  }
 
-            @if (status() === stage.key) {
-            <!-- Glow Effect -->
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none animate-pulse">
+                  <div class="flex items-center gap-3 relative z-10">
+                    <div [class]="cn(
+                          'h-9 w-9 rounded-full flex items-center justify-center transition-all',
+                          status() === stage.key ? 'bg-primary text-white scale-110' : 'bg-muted text-muted-foreground group-hover:bg-zinc-200'
+                        )">
+                      <div [class]="cn('h-2.5 w-2.5 rounded-full', status() === stage.key ? 'bg-white' : 'bg-muted-foreground/30')"></div>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                      <span [class]="cn('text-[11px] font-black uppercase tracking-widest truncate', status() === stage.key ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground')">
+                        {{ stage.label }}
+                      </span>
+                      @if (order()?.status === stage.key) {
+                        <span class="text-[8px] font-bold text-primary/60 italic uppercase mt-0.5 tracking-wider">Estado Actual</span>
+                      }
+                    </div>
+                  </div>
+                </button>
+              }
             </div>
-            }
 
-            <div class="flex items-center gap-3 relative z-10">
-              <div [class]="cn(
-                    'h-8 w-8 rounded-full flex items-center justify-center transition-all',
-                    status() === stage.key ? 'bg-primary text-white scale-110' : 'bg-muted text-muted-foreground group-hover:bg-zinc-200'
-                  )">
-                <div
-                  [class]="cn('h-2 w-2 rounded-full', status() === stage.key ? 'bg-white' : 'bg-muted-foreground/30')">
+            <!-- Forms Container -->
+            <div class="space-y-6">
+              <!-- Responsable & Date -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 bg-muted/30 p-5 rounded-[2rem] border border-border/50">
+                <div class="space-y-2.5">
+                  <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
+                    <lucide-angular [img]="icons.User" class="h-[14px] w-[14px] text-primary/40"></lucide-angular>
+                    Operador Asignado
+                  </label>
+                  <div class="relative group">
+                    <select [ngModel]="responsableId()" (ngModelChange)="responsableId.set($event)"
+                      class="w-full h-13 pl-5 pr-12 rounded-2xl border border-border bg-background text-xs font-bold text-foreground focus:border-primary focus:ring-0 appearance-none transition-all outline-none">
+                      <option value="">Sin Asignar</option>
+                      @for (emp of employees(); track emp.id) {
+                        <option [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }}</option>
+                      }
+                    </select>
+                    <lucide-angular [img]="icons.ChevronDown" class="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors"></lucide-angular>
+                  </div>
+                </div>
+
+                <app-date-picker label="Fecha de Entrega" [value]="order()?.dueDate || ''"
+                  (valueChange)="order()!.dueDate = $event" [readOnly]="status() !== 'DELIVERED'"
+                  class="w-full"></app-date-picker>
+              </div>
+
+              <!-- Content Sections (Specialized) -->
+              @if (isMetalurgica()) {
+                <app-metalurgica-section [order]="order()!" [status]="status()" [totalPrice]="totalPrice()"
+                  (totalPriceChange)="totalPrice.set($event)" [tipoTrabajo]="tipoTrabajo()"
+                  (tipoTrabajoChange)="tipoTrabajo.set($event)" [itemName]="itemName()" (itemNameChange)="itemName.set($event)"
+                  [measurements]="measurements()" (measurementsChange)="measurements.set($event)"
+                  [visitAddress]="visitAddress()" (visitAddressChange)="visitAddress.set($event)" [visitDate]="visitDate()"
+                  (visitDateChange)="visitDate.set($event)" [visitTime]="visitTime()" (visitTimeChange)="visitTime.set($event)"
+                  [visitObservations]="visitObservations()" (visitObservationsChange)="visitObservations.set($event)"
+                  [isPriceReadOnly]="isPriceReadOnly()"></app-metalurgica-section>
+              }
+
+              @if (is3D() && status() === 'IN_PROGRESS') {
+                <app-impresion-3d-section [status]="status()" [machines]="machines()" [materials]="materials()"
+                  [selectedMachineId]="selectedMachineId()" [multiMaterials]="multiMaterials()"
+                  (machineChange)="selectedMachineId.set($event)"
+                  (multiMaterialsChange)="multiMaterials.set($event)"></app-impresion-3d-section>
+              }
+
+              <!-- Notes Area -->
+              <div class="space-y-2.5">
+                <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
+                  <lucide-angular [img]="icons.MessageSquare" class="h-[14px] w-[14px] text-muted-foreground/40"></lucide-angular>
+                  Observaciones Internas
+                </label>
+                <textarea [ngModel]="notes()" (ngModelChange)="notes.set($event)" rows="3"
+                  placeholder="Ej: El cliente solicitó cambio de color en el marco..."
+                  class="w-full p-4 rounded-2xl border border-border bg-muted/20 text-sm font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-0 transition-all outline-none resize-none min-h-[100px]"></textarea>
+              </div>
+
+              <!-- Quick Operations -->
+              <div class="pt-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button (click)="isPaymentMode.set(true)"
+                    class="h-18 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-4 px-6 hover:bg-emerald-500/10 transition-all group overflow-hidden relative active:scale-[0.98]">
+                    <div class="h-11 w-11 rounded-2xl bg-emerald-600 text-white shrink-0 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                      <lucide-angular [img]="icons.DollarSign" class="h-5 w-5"></lucide-angular>
+                    </div>
+                    <div class="flex flex-col text-left">
+                      <span class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600">Cobrar Saldo</span>
+                      <span class="text-base font-black text-emerald-950 dark:text-emerald-50 mt-0.5">$ {{ paymentAmount() }}</span>
+                    </div>
+                  </button>
+
+                  <button (click)="isFailureMode.set(true)"
+                    class="h-18 rounded-3xl bg-rose-500/5 border border-rose-500/10 flex items-center gap-4 px-6 hover:bg-rose-500/10 transition-all group active:scale-[0.98]">
+                    <div class="h-11 w-11 rounded-2xl bg-rose-600 text-white shrink-0 flex items-center justify-center shadow-lg shadow-rose-500/20">
+                      <lucide-angular [img]="icons.AlertOctagon" class="h-5 w-5"></lucide-angular>
+                    </div>
+                    <div class="flex flex-col text-left">
+                      <span class="text-[9px] font-black uppercase tracking-[0.2em] text-rose-600">Reportar Fallo</span>
+                      <p class="text-[10px] font-bold text-rose-950 dark:text-rose-50 uppercase opacity-60 mt-0.5">Descartes / Error</p>
+                    </div>
+                  </button>
                 </div>
               </div>
-              <div class="flex flex-col min-w-0">
-                <span
-                  [class]="cn('text-[11px] font-black uppercase tracking-widest truncate', status() === stage.key ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground')">
-                  {{ stage.label }}
-                </span>
-                @if (order()?.status === stage.key) {
-                <span class="text-[8px] font-bold text-primary/60 italic uppercase leading-none mt-0.5">Estado
-                  Actual</span>
-                }
-              </div>
-            </div>
-          </button>
-          }
-        </div>
-
-        <!-- Responsable Section -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/20 p-4 sm:p-5 rounded-[1.5rem] border border-border">
-          <div class="space-y-2">
-            <label
-              class="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
-              <lucide-angular [img]="icons.User" class="h-[14px] w-[14px] text-primary/40"></lucide-angular>
-              Operador Asignado
-            </label>
-            <div class="relative group">
-              <select [ngModel]="responsableId()" (ngModelChange)="responsableId.set($event)"
-                class="w-full h-12 pl-4 pr-10 rounded-xl border border-border bg-background text-xs font-bold text-foreground focus:border-primary focus:ring-0 appearance-none transition-all outline-none">
-                <option value="">Sin Asignar</option>
-                @for (emp of employees(); track emp.id) {
-                <option [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }}</option>
-                }
-              </select>
-              <lucide-angular [img]="icons.ChevronDown"
-                class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors"></lucide-angular>
             </div>
           </div>
-
-          <app-date-picker label="Fecha de Entrega" [value]="order()?.dueDate || ''"
-            (valueChange)="order()!.dueDate = $event" [readOnly]="status() !== 'DELIVERED'"
-            class="w-full"></app-date-picker>
-        </div>
-
-        <!-- Metalurgica Specific Section -->
-        @if (isMetalurgica()) {
-        <app-metalurgica-section [order]="order()!" [status]="status()" [totalPrice]="totalPrice()"
-          (totalPriceChange)="totalPrice.set($event)" [tipoTrabajo]="tipoTrabajo()"
-          (tipoTrabajoChange)="tipoTrabajo.set($event)" [itemName]="itemName()" (itemNameChange)="itemName.set($event)"
-          [measurements]="measurements()" (measurementsChange)="measurements.set($event)"
-          [visitAddress]="visitAddress()" (visitAddressChange)="visitAddress.set($event)" [visitDate]="visitDate()"
-          (visitDateChange)="visitDate.set($event)" [visitTime]="visitTime()" (visitTimeChange)="visitTime.set($event)"
-          [visitObservations]="visitObservations()" (visitObservationsChange)="visitObservations.set($event)"
-          [isPriceReadOnly]="isPriceReadOnly()"></app-metalurgica-section>
         }
-
-        <!-- Impresion 3D Specific Section -->
-        @if (is3D() && status() === 'IN_PROGRESS') {
-        <app-impresion-3d-section [status]="status()" [machines]="machines()" [materials]="materials()"
-          [selectedMachineId]="selectedMachineId()" [multiMaterials]="multiMaterials()"
-          (machineChange)="selectedMachineId.set($event)"
-          (multiMaterialsChange)="multiMaterials.set($event)"></app-impresion-3d-section>
-        }
-
-        <!-- Notes -->
-        <div class="space-y-2">
-          <label
-            class="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1 flex items-center gap-2">
-            <lucide-angular [img]="icons.MessageSquare"
-              class="h-[14px] w-[14px] text-muted-foreground/40"></lucide-angular>
-            Observaciones Internas
-          </label>
-          <textarea [ngModel]="notes()" (ngModelChange)="notes.set($event)" rows="2"
-            placeholder="Ej: El cliente solicitó cambio de color en el marco..."
-            class="w-full p-3 rounded-xl border-2 border-border bg-muted/20 text-sm font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-0 transition-all outline-none resize-none"></textarea>
-        </div>
-
-        <!-- Quick Actions Grid -->
-        <div class="pt-5 border-t border-zinc-100 dark:border-zinc-800">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <!-- Cobrar Saldo -->
-            <button (click)="isPaymentMode.set(true)"
-              class="h-16 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-4 px-5 hover:bg-emerald-500/10 transition-all group overflow-hidden relative active:scale-[0.98]">
-              <div
-                class="h-10 w-10 rounded-2xl bg-emerald-600 text-white shrink-0 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <lucide-angular [img]="icons.DollarSign" class="h-5 w-5"></lucide-angular>
-              </div>
-              <div class="flex flex-col text-left">
-                <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Cobrar
-                  Saldo</span>
-                <span class="text-sm font-black text-emerald-950 dark:text-emerald-50 mt-0.5">$ {{
-                  paymentAmount() }}</span>
-              </div>
-            </button>
-
-            <!-- Reportar Fallo -->
-            <button (click)="isFailureMode.set(true)"
-              class="h-16 rounded-3xl bg-rose-500/5 border border-rose-500/10 flex items-center gap-4 px-5 hover:bg-rose-500/10 transition-all group active:scale-[0.98]">
-              <div
-                class="h-10 w-10 rounded-2xl bg-rose-600 text-white shrink-0 flex items-center justify-center shadow-lg shadow-rose-500/20">
-                <lucide-angular [img]="icons.AlertOctagon" class="h-5 w-5"></lucide-angular>
-              </div>
-              <div class="flex flex-col text-left">
-                <span class="text-[9px] font-black uppercase tracking-widest text-rose-600">Reportar
-                  Fallo</span>
-                <p
-                  class="text-[9px] font-bold text-rose-950 dark:text-rose-50 leading-tight mt-0.5 uppercase opacity-60">
-                  Descartes</p>
-              </div>
-            </button>
-          </div>
-        </div>
       </div>
-      }
-    </div>
+    </main>
 
-    <!-- Footer Actions -->
-    <div
-      class="p-4 sm:p-6 pt-4 bg-zinc-50 dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-      <button (click)="isPaymentMode() || isFailureMode() ? resetForm() : onClose.emit()"
-        class="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-95"
-        [disabled]="isSaving()">
-        {{ isPaymentMode() || isFailureMode() ? 'Volver al Control' : 'Cancelar' }}
-      </button>
+    <!-- 3. Footer (Estructura Rígida / No scrolleable) -->
+    <footer class="p-5 sm:p-7 bg-zinc-50 dark:bg-zinc-900/50 border-t border-border shrink-0">
+      <div class="flex flex-col sm:flex-row items-center gap-3">
+        <button (click)="isPaymentMode() || isFailureMode() ? resetForm() : onClose.emit()"
+          class="w-full sm:flex-1 h-13 rounded-2xl text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-95 disabled:opacity-50"
+          [disabled]="isSaving()">
+          {{ isPaymentMode() || isFailureMode() ? '← Volver al Control' : 'Cancelar' }}
+        </button>
 
-      <app-button-spinner class="flex-[2]" [loading]="isSaving()" [disabled]="isSaving()" (onClick)="handleSave()"
-        [btnClass]="cn('w-full h-12 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 group shadow-xl', 
-              isPaymentMode() ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' : 
-              isFailureMode() ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/20' : 
-              'bg-primary dark:bg-white text-primary-foreground dark:text-zinc-950 shadow-primary/10 hover:opacity-90')">
-        <span class="text-[10px] font-black uppercase tracking-widest">
-          {{ isPaymentMode() ? 'Confirmar Pago' : isFailureMode() ? 'Someter Reporte' : 'Guardar Cambios' }}
-        </span>
-        <lucide-angular [img]="icons.CheckCircle2"
-          class="h-4 w-4 group-hover:translate-x-1 transition-transform"></lucide-angular>
-      </app-button-spinner>
-    </div>
+        <app-button-spinner class="w-full sm:flex-[1.5]" [loading]="isSaving()" [disabled]="isSaving()" (onClick)="handleSave()"
+          [btnClass]="cn('w-full h-13 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-3 group shadow-xl', 
+                isPaymentMode() ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' : 
+                isFailureMode() ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/20' : 
+                'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 shadow-black/10 hover:opacity-90')">
+          <span class="text-[11px] font-black uppercase tracking-widest">
+            {{ isPaymentMode() ? 'Confirmar Pago' : isFailureMode() ? 'Someter Reporte' : 'Guardar Cambios' }}
+          </span>
+          <lucide-angular [img]="icons.CheckCircle2" class="h-4.5 w-4.5 group-hover:translate-x-1 transition-transform"></lucide-angular>
+        </app-button-spinner>
+      </div>
+      
+      <!-- Safe area offset for mobile -->
+      <div class="h-2 sm:hidden"></div>
+    </footer>
+    
   </div>
 </div>
 }

@@ -1,6 +1,6 @@
 import {
   Component, computed, inject, signal, input, Output,
-  EventEmitter, OnInit, effect
+  EventEmitter, OnInit, effect, HostListener, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -221,6 +221,29 @@ export class OrderStatusModalComponent implements OnInit {
       this.resetForm();
     }
   }, { allowSignalWrites: true });
+
+  // Body Scroll Lock & Setup
+  _scrollLock = effect(() => {
+    if (this.isOpen()) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift if possible
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+  });
+
+  @HostListener('document:keydown.escape')
+  onKeydownHandler() {
+    if (this.isOpen() && !this.isSaving()) {
+      this.onClose.emit();
+    }
+  }
+
+  ngOnDestroy() {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  }
 
   async handleSave() {
     const order = this.order();
