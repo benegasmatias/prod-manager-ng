@@ -162,6 +162,7 @@ export class ClientSelectorComponent implements OnInit {
 
   value = input<string>('');
   valueChange = output<string>();
+  @Output() clientSelected = new EventEmitter<Client>();
 
   @Input() label?: string;
   @Input() placeholder: string = 'Seleccionar cliente...';
@@ -242,6 +243,7 @@ export class ClientSelectorComponent implements OnInit {
 
   selectClient(client: Client) {
     this.valueChange.emit(client.id);
+    this.clientSelected.emit(client);
     this.isOpen.set(false);
     this.searchTerm.set('');
   }

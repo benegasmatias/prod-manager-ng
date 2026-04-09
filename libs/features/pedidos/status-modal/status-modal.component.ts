@@ -187,16 +187,23 @@ export class OrderStatusModalComponent implements OnInit {
         this.measurements.set((firstItem as any).medidas || '');
         this.tipoTrabajo.set((firstItem as any).tipo_trabajo || '');
       }
-
-      if (this.is3D()) {
-        this.load3DData();
-      }
     }
   }
+
+  // Lazy load 3D assets only when user enters a production phase
+  _onProductionPhase = effect(() => {
+    const currentStatus = this.status();
+    if (this.is3D() && ['IN_PROGRESS', 'IN_PRODUCTION'].includes(currentStatus)) {
+      this.load3DData();
+    }
+  });
 
   async load3DData() {
     const businessId = this.session.activeNegocio()?.id;
     if (!businessId) return;
+
+    // Cache guard: prevent redundant API fetches when clicking multiple orders
+    if (this.machines().length > 0) return;
 
     try {
       const resp = await this.maquinasApi.getAll(businessId);
@@ -289,7 +296,7 @@ export class OrderStatusModalComponent implements OnInit {
             this.selectedMachineId(),
             order.id,
             firstMaterialId,
-            order.negocioId,
+            order.businessId,
             metadata
           );
         }

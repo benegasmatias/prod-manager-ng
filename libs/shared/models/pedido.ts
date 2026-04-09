@@ -83,9 +83,9 @@ export interface ItemPedido {
 
 export interface Pedido {
   id: string;
-  negocioId: string;
+  businessId: string;
   code: string;
-  type: 'CUSTOMER' | 'STOCK';
+  type: 'CLIENT' | 'STOCK';
   clienteId: string;
   clientName: string;
   clientPhone?: string;
@@ -143,4 +143,4 @@ export interface PedidoSummary {
   activeCount: number;
 }
 
-export type PedidoType = 'CUSTOMER' | 'STOCK';
+export type PedidoType = 'CLIENT' | 'STOCK';

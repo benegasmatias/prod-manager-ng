@@ -53,7 +53,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
                 
                 <td *ngIf="!hideTypeColumn" class="px-6 py-5 border-y border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
                    <div [class]="'inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter ' + (order.type === 'STOCK' ? 'bg-purple-100 text-purple-600' : 'bg-zinc-100 text-zinc-500')">
-                      {{ order.type === 'STOCK' ? labels.ORDER_TYPES.STOCK : labels.ORDER_TYPES.CUSTOMER }}
+                      {{ order.type === 'STOCK' ? labels.ORDER_TYPES.STOCK : labels.ORDER_TYPES.CLIENT }}
                    </div>
                 </td>
 

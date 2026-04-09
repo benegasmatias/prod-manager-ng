@@ -44,9 +44,23 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
               <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 text-left block">Modelo / Marca</label>
               <input
                 [(ngModel)]="form.model"
+                list="machine-brands"
                 placeholder="Especificación técnica o modelo"
                 class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
               />
+              @if (config().features.hasNozzle) {
+                <datalist id="machine-brands">
+                  <option value="Bambu Lab"></option>
+                  <option value="Creality"></option>
+                  <option value="Prusa"></option>
+                  <option value="Anycubic"></option>
+                  <option value="Elegoo"></option>
+                  <option value="Artillery"></option>
+                  <option value="Voron"></option>
+                  <option value="Flashforge"></option>
+                  <option value="Qidi"></option>
+                </datalist>
+              }
             </div>
           </div>
 

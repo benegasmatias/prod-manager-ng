@@ -15,7 +15,7 @@ export const UI_LABELS = {
   },
   ORDER_TYPES: {
     STOCK: '📦 Inventario',
-    CUSTOMER: '👤 Cliente'
+    CLIENT: '👤 Cliente'
   },
   CURRENCY: {
     CODE: 'ARS',

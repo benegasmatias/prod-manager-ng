@@ -1,17 +1,17 @@
-import { 
-  Component, 
-  Input, 
-  Output, 
-  EventEmitter, 
-  inject, 
-  computed, 
-  input, 
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  computed,
+  input,
   signal,
-  ChangeDetectionStrategy 
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Trash2, Zap, Check } from 'lucide-angular';
 import { MoneyInputComponent } from '@shared/ui/money-input/money-input.component';
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
@@ -25,9 +25,9 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
   selector: 'app-item-details-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    LucideAngularModule, 
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
     MoneyInputComponent,
     MetalurgicaItemEnhancementComponent,
     Print3dItemEnhancementComponent,
@@ -152,15 +152,60 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
       </div>
 
       <!-- PREMIUM ITEM FOOTER -->
-      <div class="px-8 pb-8 pt-4">
+      <div class="px-8 pb-8 pt-4 space-y-4">
+        
+        <!-- 3D PRINTING CALCULATOR BANNER -->
+        @if (rubro() === 'IMPRESION_3D') {
+          <div class="p-5 rounded-[1.8rem] bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100/50 dark:border-indigo-900/30 flex flex-col sm:flex-row sm:items-center gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 shadow-sm">
+            <div class="flex items-center gap-4 w-full sm:w-auto">
+              <div class="h-12 w-12 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <lucide-angular [img]="icons.Zap" class="h-6 w-6"></lucide-angular>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900 dark:text-indigo-400 whitespace-nowrap">Calculadora 3D</span>
+                <span class="text-[9px] font-bold text-indigo-500/70 uppercase tracking-widest whitespace-nowrap">Base P/Gr x 3</span>
+              </div>
+            </div>
+
+            <div class="flex-1 w-full sm:max-w-xs">
+              <app-money-input
+                label="Costo Bobina 1Kg ($)"
+                [(value)]="item.precioBobinaKg"
+                (valueChange)="onUpdate.emit()"
+                inputClassName="h-12 text-sm bg-white dark:bg-zinc-900 shadow-sm border-indigo-100 dark:border-indigo-900/50"
+                placeholder="Ej: 20000"
+              ></app-money-input>
+            </div>
+
+            <div class="flex flex-col items-start sm:items-end w-full sm:w-auto sm:ml-auto min-w-[160px]">
+              <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-2 ml-1">Precio Sugerido</span>
+              <button 
+                type="button" 
+                (click)="applySuggestedPrice()"
+                [disabled]="getSuggestedPrice() <= 0"
+                class="h-12 px-6 w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base tabular-nums tracking-tight shadow-xl shadow-indigo-600/20 transition-all disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none flex items-center justify-center gap-2 group/btn relative overflow-hidden"
+              >
+                <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+                <span>{{ getSuggestedPrice() || 0 | currency }}</span>
+                @if (getSuggestedPrice() > 0) {
+                  <lucide-angular [img]="icons.Check" class="h-4 w-4 opacity-0 -ml-4 group-hover/btn:opacity-100 group-hover/btn:ml-0 transition-all"></lucide-angular>
+                }
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- STANDARD FOOTER TOTALS -->
         <div class="p-6 rounded-[2rem] bg-zinc-50/50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/50 backdrop-blur-sm flex flex-col md:flex-row items-center gap-8">
           <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
-            <app-money-input
-              [label]="orderType() === 'STOCK' ? 'Precio Venta Est. ($)' : 'Precio Unitario ($)'"
-              [(value)]="item.precioUnitario"
-              (valueChange)="onUpdate.emit()"
-              inputClassName="h-12 text-sm shadow-sm"
-            ></app-money-input>
+            <div class="relative group">
+              <app-money-input
+                [label]="orderType() === 'STOCK' ? 'Precio Venta Est. ($)' : 'Precio Unitario ($)'"
+                [(value)]="item.precioUnitario"
+                (valueChange)="onUpdate.emit()"
+                inputClassName="h-12 text-sm shadow-sm"
+              ></app-money-input>
+            </div>
 
             @if (orderType() !== 'STOCK') {
               <app-money-input
@@ -193,7 +238,7 @@ export class ItemDetailsFormComponent {
   config = input.required<NegocioConfig>();
   canRemove = input(false);
   rubro = input.required<Rubro>();
-  orderType = input<'CUSTOMER' | 'STOCK'>('CUSTOMER');
+  orderType = input<'CLIENT' | 'STOCK'>('CLIENT');
 
   private calculator = inject(OrderCalculatorService);
 
@@ -206,7 +251,23 @@ export class ItemDetailsFormComponent {
     return this.calculator.calculateItem(this.item, this.rubro()).total;
   }
 
-  readonly icons = { Trash2 };
+  getSuggestedPrice(): number {
+    const costoKg = Number(this.item.precioBobinaKg) || 0;
+    const gramos = Number(this.item.peso_gramos) || 0;
+    if (costoKg <= 0 || gramos <= 0) return 0;
+    // (Costo de 1 gramo) * gramos * 3 (Multiplicador de ganancia base)
+    return (costoKg / 1000) * gramos * 3;
+  }
+
+  applySuggestedPrice() {
+    const suggested = this.getSuggestedPrice();
+    if (suggested > 0) {
+      this.item.precioUnitario = Math.round(suggested);
+      this.onUpdate.emit();
+    }
+  }
+
+  readonly icons = { Trash2, Zap, Check };
 
   sectionedFields = computed(() => {
     const sections: { name: string, fields: any[] }[] = [];

@@ -55,7 +55,7 @@ export class StockService {
   async sellStock(orderId: string, data: { price: number; clientName: string; date: string; notes: string }) {
     await this.api.update(orderId, {
       status: 'DELIVERED',
-      type: 'CUSTOMER',
+      type: 'CLIENT',
       clientName: data.clientName,
       totalPrice: data.price,
       dueDate: new Date(data.date).toISOString(),
