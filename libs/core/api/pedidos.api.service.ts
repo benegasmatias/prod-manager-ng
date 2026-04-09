@@ -27,7 +27,7 @@ export class PedidosApiService {
   /**
    * Obtiene el listado de pedidos para un negocio con filtros opcionales.
    */
-  async getListing(params: ListingParams): Promise<PedidosResponse> {
+  async getListing(params: ListingParams, context?: any): Promise<PedidosResponse> {
     let httpParams = new HttpParams()
       .set('businessId', params.businessId)
       .set('page', (params.page || 1).toString())
@@ -42,43 +42,30 @@ export class PedidosApiService {
     if (params.endDate) httpParams = httpParams.set('endDate', params.endDate.toString());
       if (params.responsableId) httpParams = httpParams.set('responsableId', params.responsableId);
   
-      return firstValueFrom(this.http.get<PedidosResponse>(API_ENDPOINTS.ORDERS.LISTING, { params: httpParams }));
+      return firstValueFrom(this.http.get<PedidosResponse>(API_ENDPOINTS.ORDERS.LISTING, { params: httpParams, context }));
     }
   
     /**
      * Obtiene el resumen de pedidos (totales, saldos, etc) para el dashboard.
      */
-    async getSummary(businessId: string): Promise<PedidoSummary> {
+    async getSummary(businessId: string, context?: any): Promise<PedidoSummary> {
       const params = new HttpParams().set('businessId', businessId);
-      return firstValueFrom(this.http.get<PedidoSummary>(API_ENDPOINTS.ORDERS.SUMMARY, { params }));
+      return firstValueFrom(this.http.get<PedidoSummary>(API_ENDPOINTS.ORDERS.SUMMARY, { params, context }));
     }
   
-    private cachedEmployees: Employee[] = [];
-    private empLastBusinessId: string | null = null;
-
-    /**
-     * Obtiene los empleados de un negocio.
-     */
-    async getEmployees(businessId: string, activeOnly = true): Promise<Employee[]> {
-      if (businessId === this.empLastBusinessId && this.cachedEmployees.length > 0) {
-        return this.cachedEmployees;
-      }
-
+    async getEmployees(businessId: string, activeOnly = true, context?: any): Promise<Employee[]> {
       const params = new HttpParams()
         .set('businessId', businessId)
         .set('active', activeOnly.toString());
       
-      const res = await firstValueFrom(this.http.get<Employee[]>(API_ENDPOINTS.EMPLOYEES.LIST, { params }));
-      this.cachedEmployees = res || [];
-      this.empLastBusinessId = businessId;
-      return this.cachedEmployees;
+      return firstValueFrom(this.http.get<Employee[]>(API_ENDPOINTS.EMPLOYEES.LIST, { params, context }));
     }
   
     /**
      * Obtiene un pedido por su ID.
      */
-    async findOne(id: string): Promise<Pedido> {
-      return firstValueFrom(this.http.get<Pedido>(API_ENDPOINTS.ORDERS.ONE(id)));
+    async findOne(id: string, context?: any): Promise<Pedido> {
+      return firstValueFrom(this.http.get<Pedido>(API_ENDPOINTS.ORDERS.ONE(id), { context }));
     }
 
     /**

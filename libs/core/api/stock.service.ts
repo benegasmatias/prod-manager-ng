@@ -1,7 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { PedidosApiService } from './pedidos.api.service';
 import { SessionService } from '../session/session.service';
 import { Pedido } from '../../shared/models';
+import { HTTP_CACHE_CONFIG } from '../cache/cache.context';
 
 export interface StockStats {
   totalInvestment: number;
@@ -18,17 +20,24 @@ export class StockService {
   activeOrders = signal<Pedido[]>([]);
   inStockOrders = signal<Pedido[]>([]);
   stockStats = signal<StockStats>({ totalInvestment: 0, pendingProfit: 0, activeOrdersCount: 0 });
-  loadedBusinessId = signal<string | null>(null);
 
   async loadStock(force = false) {
     const businessId = this.session.activeNegocio()?.id;
     if (!businessId) return;
-    if (!force && this.loadedBusinessId() === businessId) return;
 
-    this.loading.set(true);
+    if (this.activeOrders().length === 0 && this.inStockOrders().length === 0) {
+      this.loading.set(true);
+    }
+
     try {
+      const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
+        enabled: true,
+        ttl: 120000, // 2 minutos de cache para stock
+        forceRefresh: force
+      });
+
       // Traemos un lote grande porque el NextJS original los procesaba todos del lado del cliente
-      const res = await this.api.getListing({ businessId, type: 'STOCK', pageSize: 1000 });
+      const res = await this.api.getListing({ businessId, type: 'STOCK', pageSize: 1000 }, context);
       const stockOrders = res.data;
 
       // Filtrado basado en la lógica de page.tsx (Next.js)
@@ -43,8 +52,6 @@ export class StockService {
         pendingProfit: stockOrders.reduce((acc, o) => acc + (Number(o.profit || 0)), 0),
         activeOrdersCount: activos.length
       });
-      
-      this.loadedBusinessId.set(businessId);
     } catch (e) {
       console.error('Error loadStock:', e);
     } finally {

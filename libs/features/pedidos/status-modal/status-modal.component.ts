@@ -1,6 +1,6 @@
 import {
   Component, computed, inject, signal, input, Output,
-  EventEmitter, OnInit, effect, HostListener, OnDestroy, ViewChild, ElementRef, AfterViewInit
+  EventEmitter, OnInit, effect, HostListener, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,8 @@ import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { MaquinasApiService } from '@core/api/maquinas.api.service';
 import { MaterialesApiService } from '@core/api/materiales.api.service';
 import { SessionService } from '@core/session/session.service';
+import { MaquinasService } from '@core/api/maquinas.service';
+import { MaterialesService } from '@core/api/materiales.service';
 import { getNegocioConfig, getStatusLabel, getStatusStyles } from '@shared/utils/negocio-utils';
 import { cn } from '@shared/utils/cn';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
@@ -49,6 +51,9 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit {
   private maquinasApi = inject(MaquinasApiService);
   private materialesApi = inject(MaterialesApiService);
   private session = inject(SessionService);
+  private maquinasService = inject(MaquinasService);
+  private materialesService = inject(MaterialesService);
+  private cdr = inject(ChangeDetectorRef);
 
   order = input<Pedido | null>(null);
   isOpen = input<boolean>(false);
@@ -409,6 +414,12 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit {
         }
 
         await this.api.update(order.id, updateData);
+      }
+
+      // Sync global state
+      if (this.is3D()) {
+        await this.maquinasService.loadMaquinas(true);
+        await this.materialesService.loadMateriales(true);
       }
 
       this.onSave.emit();

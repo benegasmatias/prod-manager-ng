@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { ApiService } from '../api/api.service';
 import { AuthService } from '../auth/auth.service';
+import { CacheService } from '../cache/cache.service';
 import { Negocio, Rubro, NegocioConfig } from '../../shared/models';
 import { getNegocioConfig, mapCategoryToRubro } from '../../shared/utils';
 import { STORAGE_KEYS, APP_CONFIG } from '../../shared/constants';
@@ -11,6 +12,7 @@ import { STORAGE_KEYS, APP_CONFIG } from '../../shared/constants';
 export class SessionService {
   private api = inject(ApiService);
   private auth = inject(AuthService);
+  private cache = inject(CacheService);
 
   private _negocios = signal<Negocio[]>([]);
   negocios = computed(() => this._negocios());
@@ -102,6 +104,7 @@ export class SessionService {
   setActiveId(id: string) {
     this._activeId.set(id);
     localStorage.setItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID, id);
+    this.cache.clearAll(); // Limpieza total al cambiar de contexto
     // Intentar persistir en el servidor en background
     this.api.users.setDefaultBusiness(id).catch(() => {});
   }
