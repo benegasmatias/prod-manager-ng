@@ -34,7 +34,7 @@ export const API_ENDPOINTS = {
     CREATE: '/machines',
     UPDATE: (id: string) => `/machines/${id}`,
     REMOVE: (id: string) => `/machines/${id}`,
-    ASSIGN: (id: string) => `/machines/${id}/assign`,
+    ASSIGN: (id: string) => `/machines/${id}/assign-order`,
     RELEASE: (id: string) => `/machines/${id}/release`
   },
   REPORTS: {

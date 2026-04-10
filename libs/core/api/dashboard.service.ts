@@ -1,7 +1,9 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, untracked } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { SessionService } from '../session/session.service';
 import { DashboardSummary, Rubro } from '../../shared/models';
+import { HTTP_CACHE_CONFIG } from '../cache/cache.context';
 
 @Injectable({
   providedIn: 'root'
@@ -21,28 +23,31 @@ export class DashboardService {
 
   /**
    * Refreshes dashboard data. 
-   * Uses simple caching to avoid multiple calls on route navigation
-   * unless 'force' is passed or business context changed.
+   * La lógica de cache ahora vive en el interceptor, simplificando este servicio.
    */
   async refresh(force = false) {
-    // If not forced and we already have data, skip
-    if (!force && this._summary()) return;
-
     const businessId = this.session.activeId();
     if (!businessId) return;
 
-    this._loading.set(true);
+    // Solo mostramos spinner si no tenemos data previa (untracked para evitar ciclos)
+    if (!untracked(() => this._summary())) {
+      this._loading.set(true);
+    }
+    
     this._error.set(null);
 
     try {
-      const data = await this.api.businesses.getDashboardSummary(businessId);
-      const rubro = this.session.rubro();
-      
-      // Ensure the summary has a normalized structure based on what backend returns
+      const context = new HttpContext().set(HTTP_CACHE_CONFIG, { 
+        enabled: true, 
+        ttl: 60000, // 1 minuto de cache para el dashboard
+        forceRefresh: force 
+      });
+
+      const data = await this.api.businesses.getDashboardSummary(businessId, context);
       this._summary.set(this.normalizeData(data));
     } catch (err: any) {
       console.error('[DashboardService] Error fetching summary:', err);
-      this._error.set(err.message || 'Error al cargar dashboard');
+      if (!this._summary()) this._error.set(err.message || 'Error al cargar dashboard');
     } finally {
       this._loading.set(false);
     }

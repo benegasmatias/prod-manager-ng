@@ -3,6 +3,8 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../libs/core/auth/auth.interceptor';
 import { apiInterceptor } from '../../libs/core/api/api.interceptor';
+import { cacheInterceptor } from '../../libs/core/cache/cache.interceptor';
+
 import { 
   LucideAngularModule, 
   LayoutDashboard, 
@@ -56,7 +58,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([apiInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([cacheInterceptor, apiInterceptor, authInterceptor])),
     importProvidersFrom(
       LucideAngularModule.pick({
         LayoutDashboard,

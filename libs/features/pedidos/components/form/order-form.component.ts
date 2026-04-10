@@ -11,6 +11,7 @@ import { ClientSelectorComponent } from '@shared/ui/clientes/client-selector.com
 import { EmployeeSelectorComponent } from '@shared/ui/employees/employee-selector.component';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 import { ItemDetailsFormComponent } from './items-section/item-details-form.component';
+import { FloatingCalculatorComponent } from './floating-calculator.component';
 import { FilesApiService } from '@core/api/files.api.service';
 import { cn } from '@shared/utils/cn';
 import { OrderCalculatorService } from '../../services/order-calculator.service';
@@ -26,7 +27,8 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
     ClientSelectorComponent,
     EmployeeSelectorComponent,
     AppDatePickerComponent,
-    ItemDetailsFormComponent
+    ItemDetailsFormComponent,
+    FloatingCalculatorComponent
   ],
   template: `
     <form (submit)="handleSave($event)" class="space-y-10 pb-20 relative max-w-6xl mx-auto animate-in fade-in duration-700 px-4 sm:px-6">
@@ -49,9 +51,9 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
               </span>
             </div>
             <h1 class="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 uppercase leading-none">
-              {{ forcedStatus === 'QUOTATION' ? 'Nuevo' : (orderType() === 'CUSTOMER' ? 'Nuevo' : 'Producción de') }} 
+              {{ forcedStatus === 'QUOTATION' ? 'Nuevo' : (orderType() === 'CLIENT' ? 'Nuevo' : 'Producción de') }} 
               <span [class]="cn('italic', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
-                {{ forcedStatus === 'QUOTATION' ? 'Presupuesto' : (orderType() === 'CUSTOMER' ? 'Pedido' : 'Stock') }}
+                {{ forcedStatus === 'QUOTATION' ? 'Presupuesto' : (orderType() === 'CLIENT' ? 'Pedido' : 'Stock') }}
               </span>
             </h1>
           </div>
@@ -75,17 +77,18 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                   <div class="sm:col-span-2 space-y-3">
                     <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Tipo de Operación</label>
                     <div class="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
-                      <button type="button" (click)="orderType.set('CUSTOMER')" [class]="cn('h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all', orderType() === 'CUSTOMER' ? 'bg-white dark:bg-zinc-800 shadow-sm text-primary' : 'text-zinc-400 hover:text-zinc-600')">Externo (Cliente)</button>
+                      <button type="button" (click)="orderType.set('CLIENT')" [class]="cn('h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all', orderType() === 'CLIENT' ? 'bg-white dark:bg-zinc-800 shadow-sm text-primary' : 'text-zinc-400 hover:text-zinc-600')">Externo (Cliente)</button>
                       <button type="button" (click)="orderType.set('STOCK')" [class]="cn('h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all', orderType() === 'STOCK' ? 'bg-white dark:bg-zinc-800 shadow-sm text-primary' : 'text-zinc-400 hover:text-zinc-600')">Stock (Depósito)</button>
                     </div>
                   </div>
                 }
 
-                @if (orderType() === 'CUSTOMER') {
+                @if (orderType() === 'CLIENT') {
                   <app-client-selector
                     label="Target de Cliente"
                     [value]="clienteId"
-                    (valueChange)="onClientChange($event)"
+                    (valueChange)="clienteId = $event"
+                    (clientSelected)="selectedClientName = $event.name"
                     [error]="vErrors['clienteId']"
                     class="sm:col-span-2"
                   ></app-client-selector>
@@ -135,6 +138,32 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                 ></app-item-details-form>
               }
             </div>
+
+            <!-- BOTÓN AÑADIDO ABAJO PARA FOMULARIOS LARGOS -->
+            <div class="pt-8 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 border-t border-zinc-100 dark:border-zinc-800/50">
+               <div class="flex items-center gap-2">
+                 <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Total a Cobrar</span>
+                 <span class="text-xl font-black text-zinc-900 dark:text-zinc-50">{{ totales().total | currency }}</span>
+               </div>
+               
+               <button
+                  type="submit"
+                  [disabled]="isSaving()"
+                  [class]="cn(
+                    'h-16 px-10 rounded-[2rem] text-white font-black uppercase tracking-wider text-[11px] shadow-2xl transition-all flex items-center justify-center gap-2 group relative overflow-hidden active:scale-95 whitespace-nowrap',
+                    forcedStatus === 'QUOTATION' ? 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700' : 'bg-zinc-950 shadow-zinc-950/20 hover:bg-black'
+                  )"
+                >
+                  @if (isSaving()) {
+                    <lucide-angular [img]="icons.RefreshCw" class="h-5 w-5 animate-spin"></lucide-angular>
+                  } @else {
+                    <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span class="relative z-10">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : 'Confirmar Orden' }}</span>
+                    <lucide-angular [img]="icons.CheckCircle2" class="h-4 w-4 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all relative z-10 shrink-0"></lucide-angular>
+                  }
+               </button>
+            </div>
+            
           </div>
         </div>
 
@@ -183,7 +212,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                         type="submit"
                         [disabled]="isSaving()"
                         [class]="cn(
-                          'w-full h-20 rounded-[2.2rem] text-white font-black uppercase tracking-[0.25em] shadow-2xl transition-all flex items-center justify-center gap-4 group relative overflow-hidden active:scale-95',
+                          'w-full h-16 sm:h-20 rounded-3xl text-white font-black uppercase tracking-wider text-[11px] shadow-2xl transition-all flex items-center justify-center gap-2 group relative overflow-hidden active:scale-95 px-4',
                           forcedStatus === 'QUOTATION' ? 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700' : 'bg-zinc-950 shadow-zinc-950/20 hover:bg-black'
                         )"
                       >
@@ -191,8 +220,8 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                           <lucide-angular [img]="icons.RefreshCw" class="h-6 w-6 animate-spin"></lucide-angular>
                         } @else {
                           <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                          <span class="relative z-10">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : 'Confirmar Registro' }}</span>
-                          <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all relative z-10"></lucide-angular>
+                          <span class="relative z-10 whitespace-nowrap">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : 'Confirmar Orden' }}</span>
+                          <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all relative z-10 shrink-0"></lucide-angular>
                         }
                       </button>
                     </div>
@@ -207,6 +236,8 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
         </div>
       </div>
     </form>
+    
+    <app-floating-calculator></app-floating-calculator>
   `
 })
 export class OrderFormComponent implements OnDestroy {
@@ -219,7 +250,7 @@ export class OrderFormComponent implements OnDestroy {
 
   readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw };
 
-  @Input() set forcedType(val: 'CUSTOMER' | 'STOCK' | undefined) {
+  @Input() set forcedType(val: 'CLIENT' | 'STOCK' | undefined) {
     if (val) this.orderType.set(val);
   }
 
@@ -228,7 +259,7 @@ export class OrderFormComponent implements OnDestroy {
   @Input() returnUrl: string = '/pedidos';
 
   // State
-  orderType = signal<'CUSTOMER' | 'STOCK'>('CUSTOMER');
+  orderType = signal<'CLIENT' | 'STOCK'>('CLIENT');
   items = signal<any[]>([]);
   clienteId = '';
   selectedClientName = '';
@@ -308,7 +339,10 @@ export class OrderFormComponent implements OnDestroy {
       ]);
       this.employees.set(emps);
       this.clients.set(cls);
-      if (this.clienteId) this.updateClientName(this.clienteId);
+      if (this.clienteId) {
+        const client = cls.find(c => c.id === this.clienteId);
+        this.selectedClientName = client?.name || '';
+      }
     } catch (e) { console.error('Error loading data', e); }
   }
 
@@ -333,16 +367,6 @@ export class OrderFormComponent implements OnDestroy {
     this.totales.set(this.calculator.calculateOrder(this.items(), this.rubro()));
   }
 
-  onClientChange(id: string) {
-    this.clienteId = id;
-    this.updateClientName(id);
-  }
-
-  updateClientName(id: string) {
-    const client = this.clients().find(c => c.id === id);
-    this.selectedClientName = client?.name || '';
-  }
-
   goBack() {
     this.router.navigate([this.returnUrl]);
   }
@@ -350,7 +374,7 @@ export class OrderFormComponent implements OnDestroy {
   async handleSave(e: Event) {
     e.preventDefault();
     if (this.isSaving()) return;
-    if (this.orderType() === 'CUSTOMER' && !this.clienteId) {
+    if (this.orderType() === 'CLIENT' && !this.clienteId) {
       alert('Debe seleccionar un cliente');
       return;
     }
@@ -359,8 +383,8 @@ export class OrderFormComponent implements OnDestroy {
       const payload: any = {
         type: this.orderType(),
         businessId: this.negocioId(),
-        customerId: this.orderType() === 'CUSTOMER' ? this.clienteId : undefined,
-        clientName: this.orderType() === 'CUSTOMER' ? this.selectedClientName : 'STOCK',
+        customerId: this.orderType() === 'CLIENT' ? this.clienteId : undefined,
+        clientName: this.orderType() === 'CLIENT' ? this.selectedClientName : 'STOCK',
         dueDate: this.fechaEntrega ? new Date(this.fechaEntrega).toISOString() : undefined,
         notes: this.observaciones,
         priority: 4,

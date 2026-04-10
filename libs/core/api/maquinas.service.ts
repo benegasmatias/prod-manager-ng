@@ -1,7 +1,9 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, untracked } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { MaquinasApiService } from './maquinas.api.service';
 import { SessionService } from '../session/session.service';
 import { Machine } from '@shared/models';
+import { HTTP_CACHE_CONFIG } from '../cache/cache.context';
 
 @Injectable({ providedIn: 'root' })
 export class MaquinasService {
@@ -11,7 +13,6 @@ export class MaquinasService {
   loading = signal(false);
   saving = signal(false);
   items = signal<Machine[]>([]);
-  loadedBusinessId = signal<string | null>(null);
 
   stats = computed(() => {
     const machines = this.items();
@@ -25,13 +26,22 @@ export class MaquinasService {
   async loadMaquinas(force = false) {
     const businessId = this.session.activeNegocio()?.id;
     if (!businessId) return;
-    if (!force && this.loadedBusinessId() === businessId) return;
 
-    this.loading.set(true);
+    // Solo mostramos spinner si no hay items (untracked para evitar ciclos)
+    const hasNoItems = untracked(() => this.items().length === 0);
+    if (hasNoItems) {
+      this.loading.set(true);
+    }
+
     try {
-      const res = await this.api.getAll(businessId);
+      const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
+        enabled: true,
+        ttl: 30000, // 30 segundos de cache para las máquinas
+        forceRefresh: force
+      });
+
+      const res = await this.api.getAll(businessId, context);
       this.items.set(res.data || []);
-      this.loadedBusinessId.set(businessId);
     } catch (e) {
       console.error('Error loadMaquinas:', e);
     } finally {

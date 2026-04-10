@@ -1,13 +1,13 @@
 import {
   Component, computed, inject, signal, input, Output,
-  EventEmitter, OnInit, effect
+  EventEmitter, OnInit, effect, HostListener, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
   DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
-  RefreshCw, ChevronDown, ChevronLeft
+  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight
 } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui';
 import { Pedido, Employee, OrderStatus } from '@shared/models/pedido';
@@ -15,6 +15,8 @@ import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { MaquinasApiService } from '@core/api/maquinas.api.service';
 import { MaterialesApiService } from '@core/api/materiales.api.service';
 import { SessionService } from '@core/session/session.service';
+import { MaquinasService } from '@core/api/maquinas.service';
+import { MaterialesService } from '@core/api/materiales.service';
 import { getNegocioConfig, getStatusLabel, getStatusStyles } from '@shared/utils/negocio-utils';
 import { cn } from '@shared/utils/cn';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
@@ -24,7 +26,8 @@ import { Machine, Material } from '@shared/models';
 import { PaymentModuleComponent } from './sections/payment-module.component';
 import { FailureModuleComponent } from './sections/failure-module.component';
 import { MetalurgicaSectionComponent } from './sections/metalurgica-section.component';
-import { Impresion3dSectionComponent, MultiMaterial } from './sections/impresion-3d-section.component';
+import { Impresion3dSectionComponent } from './sections/impresion-3d-section.component';
+import { MultiMaterial } from '@shared/models/material-consumption';
 
 @Component({
   selector: 'app-order-status-modal',
@@ -43,11 +46,14 @@ import { Impresion3dSectionComponent, MultiMaterial } from './sections/impresion
   templateUrl: './status-modal.component.html',
   styleUrls: ['./status-modal.component.css']
 })
-export class OrderStatusModalComponent implements OnInit {
+export class OrderStatusModalComponent implements OnInit, AfterViewInit {
   private api = inject(PedidosApiService);
   private maquinasApi = inject(MaquinasApiService);
   private materialesApi = inject(MaterialesApiService);
   private session = inject(SessionService);
+  private maquinasService = inject(MaquinasService);
+  private materialesService = inject(MaterialesService);
+  private cdr = inject(ChangeDetectorRef);
 
   order = input<Pedido | null>(null);
   isOpen = input<boolean>(false);
@@ -57,9 +63,16 @@ export class OrderStatusModalComponent implements OnInit {
 
   // UI State
   status = signal<string>('');
-  responsableId = signal<string>('');
+  responsableGeneralId = signal<string>('');
   notes = signal<string>('');
   isSaving = signal(false);
+
+  // Scroller State
+  @ViewChild('stepperViewport') stepperViewport?: ElementRef<HTMLElement>;
+  canScrollLeft = signal(false);
+  canScrollRight = signal(false);
+  private scrollInterval?: any;
+  private isJumping = signal(false);
 
   // Modes State
   isPaymentMode = signal(false);
@@ -95,7 +108,7 @@ export class OrderStatusModalComponent implements OnInit {
   // Icons for Template (Senior standard: [img] syntax)
   icons = {
     Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2,
-    User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu
+    User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, ChevronRight
   };
 
   // Derived Values
@@ -156,11 +169,83 @@ export class OrderStatusModalComponent implements OnInit {
     this.resetForm();
   }
 
+  ngAfterViewInit() {
+    this.checkStepperOverflow();
+  }
+
+  scrollStepper(direction: 'left' | 'right') {
+    this.stopContinuousScroll(); // Clear interval to avoid conflict with smooth scroll
+    
+    const el = this.stepperViewport?.nativeElement;
+    if (!el) return;
+
+    const amount = Math.max(el.clientWidth * 0.7, 240);
+    const left = direction === 'left' ? -amount : amount;
+    
+    console.log('[Stepper Jump]', {
+      direction,
+      amount,
+      clientWidth: el.clientWidth,
+      scrollLeft_before: el.scrollLeft,
+      scrollWidth: el.scrollWidth
+    });
+
+    el.scrollBy({ left, behavior: 'smooth' });
+
+    // Update overflow and reset flag after jump completes
+    this.isJumping.set(true);
+    setTimeout(() => {
+      this.isJumping.set(false);
+      this.checkStepperOverflow();
+      // Resume scroll if user is still hovering? 
+      // Actually, if we stopped it, developer should decide if it auto-resumes.
+      // For now, let's keep it clean. Stop on click is safer.
+    }, 600);
+  }
+
+  startContinuousScroll(direction: 'left' | 'right') {
+    if (this.scrollInterval || this.isJumping()) return;
+    this.scrollInterval = setInterval(() => {
+      const el = this.stepperViewport?.nativeElement;
+      if (!el) return;
+      el.scrollBy({ left: direction === 'left' ? -5 : 5, behavior: 'auto' });
+      this.checkStepperOverflow();
+    }, 16);
+  }
+
+  stopContinuousScroll() {
+    if (this.scrollInterval) {
+      clearInterval(this.scrollInterval);
+      this.scrollInterval = undefined;
+    }
+  }
+
+  checkStepperOverflow() {
+    const el = this.stepperViewport?.nativeElement;
+    if (!el) return;
+    this.canScrollLeft.set(el.scrollLeft > 10);
+    this.canScrollRight.set(el.scrollLeft + el.clientWidth < el.scrollWidth - 10);
+  }
+
+  private autoCenterActiveStep() {
+    setTimeout(() => {
+      const el = this.stepperViewport?.nativeElement;
+      if (!el) return;
+
+      const activeBtn = el.querySelector('.bg-primary') as HTMLElement;
+      if (activeBtn) {
+        const scrollOffset = activeBtn.offsetLeft - (el.clientWidth / 2) + (activeBtn.clientWidth / 2);
+        el.scrollTo({ left: scrollOffset, behavior: 'smooth' });
+      }
+      this.checkStepperOverflow();
+    }, 100);
+  }
+
   public resetForm() {
     const order = this.order();
     if (order) {
       this.status.set(order.status);
-      this.responsableId.set(order.responsableGeneral?.id || '');
+      this.responsableGeneralId.set(order.responsableGeneral?.id || '');
       this.notes.set(order.notes || '');
       this.isPaymentMode.set(false);
       this.isFailureMode.set(false);
@@ -187,16 +272,23 @@ export class OrderStatusModalComponent implements OnInit {
         this.measurements.set((firstItem as any).medidas || '');
         this.tipoTrabajo.set((firstItem as any).tipo_trabajo || '');
       }
-
-      if (this.is3D()) {
-        this.load3DData();
-      }
     }
   }
+
+  // Lazy load 3D assets only when user enters a production phase
+  _onProductionPhase = effect(() => {
+    const currentStatus = this.status();
+    if (this.is3D() && ['IN_PROGRESS', 'IN_PRODUCTION'].includes(currentStatus)) {
+      this.load3DData();
+    }
+  });
 
   async load3DData() {
     const businessId = this.session.activeNegocio()?.id;
     if (!businessId) return;
+
+    // Cache guard: prevent redundant API fetches when clicking multiple orders
+    if (this.machines().length > 0) return;
 
     try {
       const resp = await this.maquinasApi.getAll(businessId);
@@ -212,8 +304,32 @@ export class OrderStatusModalComponent implements OnInit {
   _onOrderChange = effect(() => {
     if (this.order() && this.isOpen()) {
       this.resetForm();
+      this.autoCenterActiveStep();
     }
   }, { allowSignalWrites: true });
+
+  // Body Scroll Lock & Setup
+  _scrollLock = effect(() => {
+    if (this.isOpen()) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift if possible
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+  });
+
+  @HostListener('document:keydown.escape')
+  onKeydownHandler() {
+    if (this.isOpen() && !this.isSaving()) {
+      this.onClose.emit();
+    }
+  }
+
+  ngOnDestroy() {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  }
 
   async handleSave() {
     const order = this.order();
@@ -223,22 +339,25 @@ export class OrderStatusModalComponent implements OnInit {
     try {
       if (this.isPaymentMode()) {
         await this.api.addPayment(order.id, {
+          businessId: order.businessId,
           amount: this.paymentAmount(),
           method: this.paymentMethod()
         });
       } else if (this.isFailureMode()) {
         const targetStatus = this.failureAction() === 'DISCARD' ? 'FAILED' : (this.rubro() === 'IMPRESION_3D' ? 'REPRINT_PENDING' : 'RE_WORK');
         await this.api.reportFailure(order.id, {
+          businessId: order.businessId,
           reason: this.failureReason(),
           action: this.failureAction(),
           targetStatus
         });
       } else {
-        const selectedEmployee = this.employees().find(e => e.id === this.responsableId());
+        const selectedEmployee = this.employees().find(e => e.id === this.responsableGeneralId());
 
         const updateData: any = {
+          businessId: order.businessId,
           status: this.status() as OrderStatus,
-          responsableGeneralId: this.responsableId() || null,
+          responsableGeneralId: this.responsableGeneralId() || null,
           notes: this.notes(),
           totalPrice: Number(this.totalPrice()) || 0,
         };
@@ -289,12 +408,18 @@ export class OrderStatusModalComponent implements OnInit {
             this.selectedMachineId(),
             order.id,
             firstMaterialId,
-            order.negocioId,
+            order.businessId,
             metadata
           );
         }
 
         await this.api.update(order.id, updateData);
+      }
+
+      // Sync global state
+      if (this.is3D()) {
+        await this.maquinasService.loadMaquinas(true);
+        await this.materialesService.loadMateriales(true);
       }
 
       this.onSave.emit();

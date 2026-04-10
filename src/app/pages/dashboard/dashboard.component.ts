@@ -150,14 +150,16 @@ export class DashboardComponent {
   };
 
   constructor() {
-    // Initial fetch (Service handles caching internally)
-    this.dashboardService.refresh();
+    // Note: No manual refresh() here. The effect handles both 
+    // initial load and business context switches.
     
-    // Auto-refresh ONLY if business identity changes
     effect(() => {
       const activeId = this.session.activeId();
       if (activeId) {
-        this.dashboardService.refresh(true); // Forced on business switch
+        // Only force if we don't have data yet. 
+        // The service's refresh(false) will skip if data exists.
+        // If we want a switch-business force, we should compare IDs.
+        this.dashboardService.refresh(); 
       }
     }, { allowSignalWrites: true });
   }

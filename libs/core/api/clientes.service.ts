@@ -1,8 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpContext } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Cliente } from '../models/cliente.model';
 import { environment } from '../../../src/environments/environment';
+import { HTTP_CACHE_CONFIG } from '../cache/cache.context';
 
 export interface PaginatedClientesResponse {
   items: Cliente[];
@@ -28,10 +29,14 @@ export class ClientesService {
   private _loading = signal<boolean>(false);
   public loading = this._loading.asReadonly();
 
-  loadClientes(businessId: string, search: string = '', page: number = 1, limit: number = 10): void {
+  loadClientes(businessId: string, search: string = '', page: number = 1, limit: number = 10, force = false): void {
     if (!businessId) return;
     
-    this._loading.set(true);
+    // Pattern Senior: Solo mostramos loading global si no hay datos previos (Evita parpadeos)
+    if (this._clientes().length === 0) {
+      this._loading.set(true);
+    }
+
     let params = new HttpParams()
       .set('businessId', businessId)
       .set('page', page.toString())
@@ -41,7 +46,13 @@ export class ClientesService {
       params = params.set('q', search);
     }
 
-    this.http.get<PaginatedClientesResponse>(this.apiUrl, { params }).pipe(
+    const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
+      enabled: true,
+      ttl: 600000, // 10 minutos para clientes (es una lista poco volátil)
+      forceRefresh: force
+    });
+
+    this.http.get<PaginatedClientesResponse>(this.apiUrl, { params, context }).pipe(
       tap(res => {
         this._clientes.set(res.items || []);
         this._total.set(res.total || 0);
@@ -56,7 +67,8 @@ export class ClientesService {
   }
 
   getById(id: string): Observable<Cliente> {
-    return this.http.get<Cliente>(`${this.apiUrl}/${id}`);
+    const context = new HttpContext().set(HTTP_CACHE_CONFIG, { enabled: true, ttl: 300000 });
+    return this.http.get<Cliente>(`${this.apiUrl}/${id}`, { context });
   }
 
   create(businessId: string, data: Partial<Cliente>): Observable<Cliente> {

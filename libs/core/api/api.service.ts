@@ -10,9 +10,10 @@ import { API_ENDPOINTS } from '@shared/config/api-endpoints.config';
 export class ApiService {
   private http = inject(HttpClient);
 
-  private async request<T>(method: string, url: string, body?: any): Promise<T> {
+  private async request<T>(method: string, url: string, body?: any, context?: any): Promise<T> {
     const request$ = this.http.request<T>(method, url, {
       body,
+      context,
       headers: { 'Content-Type': 'application/json' }
     });
 
@@ -44,7 +45,7 @@ export class ApiService {
     getAll: () => this.request<any[]>('GET', API_ENDPOINTS.BUSINESSES.LIST),
     getTemplates: () => this.request<any[]>('GET', API_ENDPOINTS.BUSINESSES.TEMPLATES),
     getOne: (id: string) => this.request<any>('GET', API_ENDPOINTS.BUSINESSES.ONE(id)),
-    getDashboardSummary: (id: string) => this.request<DashboardSummary>('GET', API_ENDPOINTS.BUSINESSES.DASHBOARD(id)),
+    getDashboardSummary: (id: string, context?: any) => this.request<DashboardSummary>('GET', API_ENDPOINTS.BUSINESSES.DASHBOARD(id), null, context),
     create: (data: any) => this.request<any>('POST', API_ENDPOINTS.BUSINESSES.LIST, data),
     activate: (id: string) => this.request<any>('POST', `${API_ENDPOINTS.BUSINESSES.LIST}/${id}/activate`),
     update: (id: string, data: any) => this.request<any>('PATCH', API_ENDPOINTS.BUSINESSES.ONE(id), data),

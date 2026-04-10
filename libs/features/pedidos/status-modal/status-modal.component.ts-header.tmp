@@ -1,0 +1,30 @@
+import {
+  Component, computed, inject, signal, input, Output,
+  EventEmitter, OnInit, effect, HostListener, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
+  DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
+  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight
+} from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui';
+import { Pedido, Employee, OrderStatus } from '@shared/models/pedido';
+import { PedidosApiService } from '@core/api/pedidos.api.service';
+import { MaquinasApiService } from '@core/api/maquinas.api.service';
+import { MaterialesApiService } from '@core/api/materiales.api.service';
+import { SessionService } from '@core/session/session.service';
+import { MaquinasService } from '@core/api/maquinas.service';
+import { MaterialesService } from '@core/api/materiales.service';
+import { getNegocioConfig, getStatusLabel, getStatusStyles } from '@shared/utils/negocio-utils';
+import { cn } from '@shared/utils/cn';
+import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
+import { Machine, Material } from '@shared/models';
+
+// Sections
+import { PaymentModuleComponent } from './sections/payment-module.component';
+import { FailureModuleComponent } from './sections/failure-module.component';
+import { MetalurgicaSectionComponent } from './sections/metalurgica-section.component';
+import { Impresion3dSectionComponent } from './sections/impresion-3d-section.component';
+import { MultiMaterial } from '@shared/models/material-consumption';

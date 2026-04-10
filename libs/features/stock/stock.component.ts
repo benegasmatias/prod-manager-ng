@@ -6,13 +6,13 @@ import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, W
 import { StockService } from '../../core/api/stock.service';
 import { SessionService } from '../../core/session/session.service';
 import { Pedido } from '../../shared/models';
-import { OrdersTableComponent, MetricCardComponent, MetricCardsGridComponent } from '../../shared/ui';
+import { OrdersTableComponent } from '../../shared/ui';
 import { StockSaleDialogComponent } from '../../shared/ui/stock/stock-sale-dialog/stock-sale-dialog.component';
 
 @Component({
   selector: 'app-stock-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, OrdersTableComponent, StockSaleDialogComponent, MetricCardComponent, MetricCardsGridComponent],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, OrdersTableComponent, StockSaleDialogComponent],
   templateUrl: './stock.component.html',
   styles: [`:host { display: block; }`]
 })
