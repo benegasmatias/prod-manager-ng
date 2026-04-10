@@ -10,7 +10,8 @@ import {
   Activity, 
   UserCog, 
   Clock, 
-  FileText 
+  FileText,
+  Calendar
 } from 'lucide-angular';
 import { MenuGroupMetadata } from '../models/access-control';
 
@@ -38,6 +39,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
     title: 'Operaciones',
     items: [
       { label: 'Producción', href: '/produccion', icon: Activity, requiredFeature: 'ORDERS_PRODUCTION' },
+      { label: 'Calendario', href: '/produccion/calendario', icon: Calendar, requiredFeature: 'ORDERS_PRODUCTION' },
       { label: 'Inventario', href: '/stock', icon: Grid, requiredFeature: 'STOCK' },
     ]
   },

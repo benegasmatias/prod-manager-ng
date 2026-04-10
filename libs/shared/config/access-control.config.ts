@@ -6,19 +6,19 @@ import { Rubro, FeatureCode, UserRole, BusinessFeatureConfig, RolePermissionsCon
  */
 export const BUSINESS_FEATURES: Record<Rubro, BusinessFeatureConfig> = {
   IMPRESION_3D: {
-    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'MATERIALS', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'ORDERS_PRODUCTION', 'MATERIALS', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   METALURGICA: {
-    features: ['DASHBOARD', 'CLIENTS', 'VISITS', 'QUOTES', 'ORDERS', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'VISITS', 'QUOTES', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   CARPINTERIA: {
-    features: ['DASHBOARD', 'CLIENTS', 'QUOTES', 'ORDERS', 'STOCK', 'TEAM', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'QUOTES', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   GENERICO: {
-    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'STOCK', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   }
 };
@@ -38,6 +38,7 @@ export const ROLE_PERMISSIONS: RolePermissionsConfig = {
     REPORTS: ['VIEW', 'MANAGE'],
     VISITS: ['VIEW', 'MANAGE'],
     QUOTES: ['VIEW', 'MANAGE'],
+    ORDERS_PRODUCTION: ['VIEW', 'MANAGE'],
     MATERIALS: ['VIEW', 'MANAGE'],
     MACHINERY: ['VIEW', 'MANAGE'],
     TEAM: ['VIEW', 'MANAGE']
@@ -49,6 +50,7 @@ export const ROLE_PERMISSIONS: RolePermissionsConfig = {
     STOCK: ['VIEW', 'EDIT'],
     SETTINGS: ['VIEW'],
     REPORTS: ['VIEW'],
+    ORDERS_PRODUCTION: ['VIEW', 'EDIT'],
     TEAM: ['VIEW', 'MANAGE']
   },
   OPERATOR: {

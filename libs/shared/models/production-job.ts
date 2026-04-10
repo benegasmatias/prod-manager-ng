@@ -25,6 +25,7 @@ export interface ProductionJobMaterial {
     material?: Material;
     quantity: number;
     consumedQuantity: number;
+    gramsPerUnit?: number;
     isReserved: boolean;
 }
 

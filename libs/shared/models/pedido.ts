@@ -103,9 +103,14 @@ export interface Pedido {
   saldo: number;
   paid?: number;
   urgencia: Priority;
+  responsableId?: string;
+  operatorId?: string;
+  costoEstimado?: number;
   responsableGeneral?: Employee;
   payments: Payment[];
   jobs?: ProductionJob[];
+  totalUnits?: number;
+  files?: any[]; // For backwards compatibility or simplified access
   // History & Metadata
   statusHistory?: StatusHistoryEntry[];
   metadata?: Record<string, any>;

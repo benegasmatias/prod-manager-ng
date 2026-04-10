@@ -9,23 +9,66 @@ import {
   ChevronRight, Edit3, AlertCircle, TrendingUp, Mail, Phone, Zap
 } from 'lucide-angular';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
-import { OrderStatusModalComponent } from '../status-modal/status-modal.component';
+import { ClientDetailComponent } from './components/client-detail.component';
+import { StockDetailComponent } from '../../stock/components/stock-detail/stock-detail.component';
 import { SessionService } from '@core/session/session.service';
-import { OrderTimelineComponent } from './components/order-timeline.component';
-import { OrderFinancialWidgetComponent } from './components/order-financial-widget.component';
-import { OrderItemsWidgetComponent } from './components/order-items-widget.component';
-import { OrderFilesWidgetComponent } from './components/order-files-widget.component';
-import { OrderProgressStepperComponent } from './components/order-progress-stepper.component';
 
 @Component({
   selector: 'app-pedido-detalle',
   standalone: true,
   imports: [
     CommonModule, RouterLink, LucideAngularModule, 
-    OrderStatusModalComponent, OrderTimelineComponent, OrderFinancialWidgetComponent,
-    OrderItemsWidgetComponent, OrderFilesWidgetComponent, OrderProgressStepperComponent
+    ClientDetailComponent, StockDetailComponent
   ],
-  templateUrl: './pedido-detalle.component.html',
+  template: `
+    <div class="min-h-screen bg-[#fafbfc] dark:bg-zinc-950 p-6 md:p-10 animate-in fade-in duration-500">
+      
+      @if (loading()) {
+        <div class="flex flex-col items-center justify-center py-40 space-y-6">
+          <div class="h-16 w-16 rounded-[2rem] border-4 border-primary/20 border-t-primary animate-spin shadow-xl"></div>
+          <div class="text-center">
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Levantando Expediente</p>
+            <p class="text-xs font-bold text-zinc-300 mt-2 italic">Procesando metadatos y activos...</p>
+          </div>
+        </div>
+      } @else if (pedido()) {
+        
+        <!-- Orchestrator: CLIENT vs STOCK -->
+        @if (pedido()?.type === 'STOCK') {
+          <app-stock-detail 
+            [pedido]="pedido()" 
+            (onSaved)="loadData()">
+          </app-stock-detail>
+        } @else {
+          <app-client-detail 
+            [pedido]="pedido()" 
+            [age]="tiempoTranscurrido()"
+            [totalPaid]="totalPagado()"
+            [balance]="saldoPendiente()"
+            [hasPendingPayment]="hasPendingPayment()"
+            [employees]="employees()"
+            (onSaved)="loadData()"
+            (onEdit)="handleEdit()">
+          </app-client-detail>
+        }
+
+      } @else {
+        <!-- Error State -->
+        <div class="flex flex-col items-center justify-center py-40 text-center space-y-10">
+          <div class="h-32 w-32 rounded-[3.5rem] bg-rose-50 dark:bg-rose-950/20 flex items-center justify-center text-rose-500">
+            <lucide-angular [img]="icons.AlertCircle" class="h-14 w-14"></lucide-angular>
+          </div>
+          <div class="max-w-md space-y-4">
+            <h2 class="text-3xl font-black text-zinc-900 dark:text-zinc-50 uppercase">Orden No Encontrada</h2>
+            <p class="text-zinc-400 text-sm italic leading-relaxed">La referencia que intentas consultar no existe o ha sido archivada.</p>
+          </div>
+          <button routerLink="/pedidos" class="h-14 px-12 rounded-3xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20">
+            Retornar a Operaciones
+          </button>
+        </div>
+      }
+    </div>
+  `,
   styleUrls: ['./pedido-detalle.component.css']
 })
 export class PedidoDetalleComponent implements OnInit {

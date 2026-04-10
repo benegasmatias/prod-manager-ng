@@ -80,6 +80,9 @@
             clientLabel="Referencia"
             fallbackClientName="STOCK"
             [rubro]="session.rubro()"
+            (statusClick)="openStatusModal($event)"
+            (manageClick)="openStatusModal($event)"
+            (viewClick)="goToDetail($event)"
           ></app-orders-table>
         </div>
       } @else {
@@ -139,4 +142,13 @@
     (onClose)="isSellModalOpen.set(false)" 
     (onConfirm)="handleSellConfirm($event)">
   </app-stock-sale-dialog>
+
+  <!-- Production Control Modal (Inventory Focused) -->
+  <app-stock-status-modal 
+    *ngIf="selectedOrderForStatus()"
+    [order]="selectedOrderForStatus()!" 
+    [isOpen]="isStatusModalOpen()" 
+    (onClose)="isStatusModalOpen.set(false)"
+    (onSaved)="stockService.loadStock()">
+  </app-stock-status-modal>
 </div>

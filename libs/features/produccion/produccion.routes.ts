@@ -21,6 +21,10 @@ export const PRODUCCION_ROUTES: Routes = [
       {
         path: 'reportes',
         loadComponent: () => import('./reportes/reportes.component').then(m => m.ProduccionReportesComponent)
+      },
+      {
+        path: 'calendario',
+        loadComponent: () => import('./calendario/calendario-page.component').then(m => m.CalendarioPageComponent)
       }
     ]
   }
