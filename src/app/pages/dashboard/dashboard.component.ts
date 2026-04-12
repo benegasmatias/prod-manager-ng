@@ -55,16 +55,16 @@ import { cn } from '@shared/utils/cn';
       </div>
 
       <!-- DASHBOARD CONTENT LAYER -->
-      <div class="space-y-12 pb-20">
+      <div class="space-y-16 pb-20">
         
         <!-- DYNAMIC SECTIONS ENGINE -->
         @for (section of activeConfig().sections; track section.widgetId) {
-          <section [class]="cn('space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700', section.fullWidth ? 'col-span-full' : '')">
+          <section [class]="cn('space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000', section.fullWidth ? 'col-span-full' : '')">
             
-            @if (section.title && section.widgetId !== 'hero-summary') {
+            @if (section.title && section.widgetId !== 'hero-summary' && section.widgetId !== 'primary-metrics') {
               <div class="flex items-center justify-between px-2">
-                 <h3 class="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 flex items-center gap-2">
-                   <div class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+                 <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 flex items-center gap-3">
+                   <div class="w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary/40"></div>
                    {{ section.title }}
                  </h3>
               </div>
@@ -86,20 +86,25 @@ import { cn } from '@shared/utils/cn';
                 ></app-kpi-grid>
               }
               @case ('secondary-metrics') {
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-                  <div class="p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white/50 flex items-center justify-between group overflow-hidden relative">
-                    <div class="space-y-1 z-10">
-                      <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Máquinas Produciendo</span>
-                      <p class="text-2xl font-black">{{ summary()?.activeMachines || 0 }} UNIDADES</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div class="p-10 rounded-[2.5rem] border border-zinc-100/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-xl hover:border-zinc-200">
+                    <div class="space-y-2 z-10">
+                      <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 opacity-80">Máquinas Produciendo</span>
+                      <p class="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">{{ summary()?.activeMachines || 0 }} UNIDADES</p>
                     </div>
-                    <lucide-angular [img]="icons.Printer" class="h-8 w-8 text-zinc-200 group-hover:text-primary transition-colors"></lucide-angular>
+                    <div class="h-14 w-14 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-primary/30 group-hover:text-primary group-hover:bg-primary/5 transition-all duration-500">
+                      <lucide-angular [img]="icons.Printer" class="h-6 w-6"></lucide-angular>
+                    </div>
                   </div>
-                  <div class="p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white/50 flex items-center justify-between group overflow-hidden relative">
-                    <div class="space-y-1 z-10">
-                      <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Captación Mensual</span>
-                      <p class="text-2xl font-black text-emerald-600">+{{ summary()?.newCustomers || 0 }} CLIENTES</p>
+                  
+                  <div class="p-10 rounded-[2.5rem] border border-zinc-100/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-xl hover:border-zinc-200">
+                    <div class="space-y-2 z-10">
+                      <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 opacity-80">Captación Mensual</span>
+                      <p class="text-3xl font-black text-emerald-500 tracking-tighter">+{{ summary()?.newCustomers || 0 }} CLIENTES</p>
                     </div>
-                    <lucide-angular [img]="icons.Users" class="h-8 w-8 text-zinc-200 group-hover:text-emerald-500 transition-colors"></lucide-angular>
+                    <div class="h-14 w-14 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 group-hover:text-zinc-400 group-hover:bg-zinc-100 transition-all duration-500">
+                      <lucide-angular [img]="icons.Users" class="h-6 w-6"></lucide-angular>
+                    </div>
                   </div>
                 </div>
               }
