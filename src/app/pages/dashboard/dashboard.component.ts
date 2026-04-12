@@ -55,11 +55,11 @@ import { cn } from '@shared/utils/cn';
       </div>
 
       <!-- DASHBOARD CONTENT LAYER -->
-      <div class="space-y-16 pb-20">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-16 pb-20">
         
         <!-- DYNAMIC SECTIONS ENGINE -->
         @for (section of activeConfig().sections; track section.widgetId) {
-          <section [class]="cn('space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000', section.fullWidth ? 'col-span-full' : '')">
+          <section [class]="cn('space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000', section.fullWidth ? 'lg:col-span-2' : '')">
             
             @if (section.title && section.widgetId !== 'hero-summary' && section.widgetId !== 'primary-metrics') {
               <div class="flex items-center justify-between px-2">

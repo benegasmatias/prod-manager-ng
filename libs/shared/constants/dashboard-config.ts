@@ -18,10 +18,9 @@ export const DASHBOARD_CONFIG: Record<string, DashboardConfig> = {
       { label: 'Gestionar Stock', icon: 'Layers', url: '/stock', color: 'zinc' }
     ],
     sections: [
-      { title: 'Resumen Ejecutivo', type: 'custom', widgetId: 'hero-summary', fullWidth: true },
-      { title: 'Alarmas Operativas', type: 'custom', widgetId: 'alerts-priority', fullWidth: true },
-      { title: 'Métricas Principales', type: 'grid', widgetId: 'primary-metrics', fullWidth: true },
-      { title: 'Estado de Planta', type: 'grid', widgetId: 'secondary-metrics' },
+      { widgetId: 'primary-metrics', fullWidth: true },
+      { title: 'Alarmas Operativas', type: 'custom', widgetId: 'alerts-priority' },
+      { title: 'Carga de Máquinas', type: 'grid', widgetId: 'secondary-metrics' },
       { title: 'Pedidos Recientes', type: 'list', widgetId: 'recent-orders', fullWidth: true }
     ],
     kpiTitles: {
