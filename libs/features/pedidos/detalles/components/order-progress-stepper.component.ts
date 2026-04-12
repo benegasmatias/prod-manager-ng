@@ -106,6 +106,8 @@ export class OrderProgressStepperComponent {
   status = input.required<OrderStatus>();
   age = input<string | null>();
   dueDate = input<string | null>();
+  rubro = input<string | null>(null);
+  isStock = input<boolean>(false);
 
   icons = { TrendingUp, CheckCircle, Clock };
 

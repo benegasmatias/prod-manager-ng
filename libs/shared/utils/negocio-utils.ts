@@ -322,7 +322,19 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
   }
 }
 
-export function getStatusLabel(status: string, rubro?: Rubro): string {
+export function getStatusLabel(status: string, rubro?: Rubro, orderType?: 'CLIENT' | 'STOCK'): string {
+  // Overrides for Stock context
+  if (orderType === 'STOCK') {
+    const stockLabels: Record<string, string> = {
+      'DONE': 'Producido / Listo',
+      'DELIVERED': 'Ingresado a Stock',
+      'IN_STOCK': 'Disponible / Inventario',
+      'READY_FOR_DELIVERY': 'Pendiente Ingreso',
+      'SURVEY_DESIGN': 'Diseño Técnico'
+    };
+    if (stockLabels[status]) return stockLabels[status];
+  }
+
   const config = getNegocioConfig(rubro || 'GENERICO');
   const stage = config.productionStages.find((s) => s.key === status);
   if (stage) return stage.label;

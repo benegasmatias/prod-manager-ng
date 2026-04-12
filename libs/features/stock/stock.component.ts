@@ -1,24 +1,26 @@
 import { Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, Wallet } from 'lucide-angular';
 import { StockService } from '../../core/api/stock.service';
 import { SessionService } from '../../core/session/session.service';
 import { Pedido } from '../../shared/models';
 import { OrdersTableComponent } from '../../shared/ui';
 import { StockSaleDialogComponent } from '../../shared/ui/stock/stock-sale-dialog/stock-sale-dialog.component';
+import { StockStatusModalComponent } from './components/stock-status-modal/stock-status-modal.component';
 
 @Component({
   selector: 'app-stock-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, OrdersTableComponent, StockSaleDialogComponent],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, OrdersTableComponent, StockSaleDialogComponent, StockStatusModalComponent],
   templateUrl: './stock.component.html',
   styles: [`:host { display: block; }`]
 })
 export class StockPageComponent implements OnInit {
-  private stockService = inject(StockService);
+  public stockService = inject(StockService);
   public session = inject(SessionService);
+  private router = inject(Router);
 
   icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet };
 
@@ -40,6 +42,10 @@ export class StockPageComponent implements OnInit {
   selectedOrder = signal<Pedido | null>(null);
   isSellModalOpen = signal(false);
   isSelling = signal(false);
+
+  // Status Modal State
+  selectedOrderForStatus = signal<Pedido | null>(null);
+  isStatusModalOpen = signal(false);
 
   // Computeds for filtering and sorting
   filteredActive = computed(() => this.filterAndSort(this.activeOrders()));
@@ -108,6 +114,15 @@ export class StockPageComponent implements OnInit {
   openSellModal(order: Pedido) {
     this.selectedOrder.set(order);
     this.isSellModalOpen.set(true);
+  }
+
+  openStatusModal(order: Pedido) {
+    this.selectedOrderForStatus.set(order);
+    this.isStatusModalOpen.set(true);
+  }
+
+  goToDetail(order: Pedido) {
+    this.router.navigate(['/pedidos', order.id]);
   }
 
   async handleSellConfirm(data: { price: number; clientName: string; date: string; notes: string }) {

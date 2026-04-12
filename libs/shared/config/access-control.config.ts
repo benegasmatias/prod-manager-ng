@@ -6,19 +6,19 @@ import { Rubro, FeatureCode, UserRole, BusinessFeatureConfig, RolePermissionsCon
  */
 export const BUSINESS_FEATURES: Record<Rubro, BusinessFeatureConfig> = {
   IMPRESION_3D: {
-    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'MATERIALS', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'MATERIALS', 'STOCK', 'CALENDAR', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   METALURGICA: {
-    features: ['DASHBOARD', 'CLIENTS', 'VISITS', 'QUOTES', 'ORDERS', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'VISITS', 'QUOTES', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'MACHINERY', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   CARPINTERIA: {
-    features: ['DASHBOARD', 'CLIENTS', 'QUOTES', 'ORDERS', 'STOCK', 'TEAM', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'QUOTES', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   },
   GENERICO: {
-    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'STOCK', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   }
 };
@@ -38,6 +38,8 @@ export const ROLE_PERMISSIONS: RolePermissionsConfig = {
     REPORTS: ['VIEW', 'MANAGE'],
     VISITS: ['VIEW', 'MANAGE'],
     QUOTES: ['VIEW', 'MANAGE'],
+    ORDERS_PRODUCTION: ['VIEW', 'MANAGE'],
+    CALENDAR: ['VIEW', 'MANAGE'],
     MATERIALS: ['VIEW', 'MANAGE'],
     MACHINERY: ['VIEW', 'MANAGE'],
     TEAM: ['VIEW', 'MANAGE']
@@ -49,12 +51,15 @@ export const ROLE_PERMISSIONS: RolePermissionsConfig = {
     STOCK: ['VIEW', 'EDIT'],
     SETTINGS: ['VIEW'],
     REPORTS: ['VIEW'],
+    ORDERS_PRODUCTION: ['VIEW', 'EDIT'],
+    CALENDAR: ['VIEW', 'EDIT'],
     TEAM: ['VIEW', 'MANAGE']
   },
   OPERATOR: {
     DASHBOARD: ['VIEW'],
     ORDERS: ['VIEW', 'EDIT'],
     ORDERS_PRODUCTION: ['VIEW', 'EDIT'],
+    CALENDAR: ['VIEW', 'EDIT'],
     STOCK: ['VIEW']
   },
   SALES: {
@@ -62,11 +67,13 @@ export const ROLE_PERMISSIONS: RolePermissionsConfig = {
     CLIENTS: ['VIEW', 'CREATE'],
     QUOTES: ['VIEW', 'CREATE'],
     ORDERS: ['VIEW', 'CREATE'],
+    CALENDAR: ['VIEW', 'EDIT'],
     REPORTS: ['VIEW']
   },
   VIEWER: {
     DASHBOARD: ['VIEW'],
     ORDERS: ['VIEW'],
-    STOCK: ['VIEW']
+    STOCK: ['VIEW'],
+    CALENDAR: ['VIEW'],
   }
 };
