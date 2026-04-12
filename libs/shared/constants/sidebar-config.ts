@@ -1,15 +1,15 @@
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Users, 
-  Wrench, 
-  BarChart3, 
-  Settings, 
-  Package, 
-  Grid, 
-  Activity, 
-  UserCog, 
-  Clock, 
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Users,
+  Wrench,
+  BarChart3,
+  Settings,
+  Package,
+  Grid,
+  Activity,
+  UserCog,
+  Clock,
   FileText,
   Calendar
 } from 'lucide-angular';
@@ -39,24 +39,24 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
     title: 'Operaciones',
     items: [
       { label: 'Producción', href: '/produccion', icon: Activity, requiredFeature: 'ORDERS_PRODUCTION' },
-      { label: 'Calendario', href: '/produccion/calendario', icon: Calendar, requiredFeature: 'ORDERS_PRODUCTION' },
+      { label: 'Calendario', href: '/produccion/calendario', icon: Calendar, requiredFeature: 'CALENDAR' },
       { label: 'Inventario', href: '/stock', icon: Grid, requiredFeature: 'STOCK' },
     ]
   },
   {
     title: 'Mi Taller',
     items: [
-      { 
+      {
         label: 'Maquinaria', // Labels can be dynamically overridden in SidebarComponent
-        href: '/maquinas', 
-        icon: Wrench, 
+        href: '/maquinas',
+        icon: Wrench,
         requiredFeature: 'MACHINERY',
-        configKey: 'maquinas' 
+        configKey: 'maquinas'
       },
-      { 
-        label: 'Materiales', 
-        href: '/materiales', 
-        icon: Package, 
+      {
+        label: 'Materiales',
+        href: '/materiales',
+        icon: Package,
         requiredFeature: 'MATERIALS',
         configKey: 'materiales'
       },

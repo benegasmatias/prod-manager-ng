@@ -1,9 +1,13 @@
-import { ApplicationConfig, provideZonelessChangeDetection, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection, importProvidersFrom, LOCALE_ID } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../libs/core/auth/auth.interceptor';
 import { apiInterceptor } from '../../libs/core/api/api.interceptor';
 import { cacheInterceptor } from '../../libs/core/cache/cache.interceptor';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+
+registerLocaleData(localeEs);
 
 import { 
   LucideAngularModule, 
@@ -59,6 +63,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([cacheInterceptor, apiInterceptor, authInterceptor])),
+    { provide: LOCALE_ID, useValue: 'es' },
     importProvidersFrom(
       LucideAngularModule.pick({
         LayoutDashboard,

@@ -1,4 +1,4 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, input, output, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Info } from 'lucide-angular';
 import { CalendarOrderEvent, DayColumn } from '../models/calendar.models';
@@ -9,7 +9,66 @@ import { CalendarEventCardComponent, CardDensity } from './calendar-event-card.c
   standalone: true,
   imports: [CommonModule, LucideAngularModule, CalendarEventCardComponent],
   template: `
-    <div class="grid grid-cols-1 md:grid-cols-7 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-[2.5rem] overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl">
+    <!-- MOBILE VIEW: Horizontal Day Picker + Selected Day List -->
+    <div *ngIf="isMobile()" class="space-y-6 animate-in fade-in duration-500">
+      <!-- Sticky Day Picker -->
+      <div class="sticky top-0 z-30 -mx-3 px-3 py-4 bg-[#fafbfc]/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50">
+        <div class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+          @for (day of columns(); track day.date) {
+            <button 
+              (click)="selectedMobileDay.set(day.date)"
+              [class]="cn(
+                'flex flex-col items-center justify-center min-w-[4.5rem] h-20 rounded-2xl transition-all duration-300 relative',
+                isSameDay(selectedMobileDay(), day.date) 
+                  ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105 z-10' 
+                  : 'bg-white dark:bg-zinc-900 text-zinc-400 border border-zinc-100 dark:border-zinc-800'
+              )"
+            >
+              <span class="text-[10px] font-black uppercase tracking-tighter opacity-60">{{ day.date | date:'EEE' }}</span>
+              <span class="text-xl font-black tracking-tighter">{{ day.date | date:'dd' }}</span>
+              
+              @if (day.events.length > 0 && !isSameDay(selectedMobileDay(), day.date)) {
+                <div class="absolute bottom-2 h-1 w-1 rounded-full bg-primary/50"></div>
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Events for Selected Day -->
+      <div class="space-y-4 px-1 min-h-[400px]">
+        @let activeDay = getSelectedDayColumn();
+        @if (activeDay) {
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tight">
+              {{ activeDay.date | date:'EEEE, d MMMM' }}
+            </h3>
+            <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{{ activeDay.events.length }} compromisos</span>
+          </div>
+
+          @for (event of activeDay.events; track event.id) {
+            <app-calendar-event-card 
+              [event]="event" 
+              density="AGENDA"
+              (onClick)="onEventClick.emit($event)"
+              class="animate-in slide-in-from-bottom-4 duration-500"
+            ></app-calendar-event-card>
+          }
+
+          @if (activeDay.events.length === 0) {
+            <div class="flex flex-col items-center justify-center py-20 opacity-30">
+              <div class="h-16 w-16 bg-zinc-100 dark:bg-zinc-900 rounded-[2rem] flex items-center justify-center text-zinc-300 mb-4">
+                <lucide-angular [img]="icons.Info" class="h-8 w-8"></lucide-angular>
+              </div>
+              <p class="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Día sin programaciones</p>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- DESKTOP VIEW: 7 Column Grid -->
+    <div *ngIf="!isMobile()" class="grid grid-cols-1 md:grid-cols-7 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-[2.5rem] overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl">
       
       @for (day of columns(); track day.date) {
         <div 
@@ -86,8 +145,10 @@ export class CalendarWeekViewComponent {
   events = input.required<CalendarOrderEvent[]>();
   currentDate = input.required<Date>();
   density = input<CardDensity>('FULL');
+  isMobile = input<boolean>(false);
   onEventClick = output<CalendarOrderEvent>();
 
+  selectedMobileDay = signal<Date>(new Date());
   icons = { Info };
 
   columns = computed(() => {
@@ -117,10 +178,20 @@ export class CalendarWeekViewComponent {
     return days;
   });
 
+  getSelectedDayColumn = computed(() => {
+    return this.columns().find(c => this.isSameDay(c.date, this.selectedMobileDay()));
+  });
+
   private getStartOfWeek(d: Date): Date {
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Lunes inicio
     return new Date(new Date(d).setDate(diff));
+  }
+
+  isSameDay(d1: Date, d2: Date): boolean {
+    return d1.getDate() === d2.getDate() && 
+           d1.getMonth() === d2.getMonth() && 
+           d1.getFullYear() === d2.getFullYear();
   }
 
   private sortEvents(events: CalendarOrderEvent[]): CalendarOrderEvent[] {

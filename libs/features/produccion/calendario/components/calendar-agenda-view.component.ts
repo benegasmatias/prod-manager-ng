@@ -9,26 +9,30 @@ import { CalendarEventCardComponent } from './calendar-event-card.component';
   standalone: true,
   imports: [CommonModule, LucideAngularModule, CalendarEventCardComponent],
   template: `
-    <div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div [class]="cn('space-y-6 lg:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700', isMobile() ? 'px-1' : '')">
       
       @for (day of columns(); track day.date) {
         @if (day.events.length > 0) {
           <div class="space-y-4">
             <!-- Day Header Sticky -->
-            <div class="sticky top-0 z-20 bg-[#fafbfc]/80 dark:bg-zinc-950/80 backdrop-blur-md py-3 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800/50 px-2 lg:px-4">
+            <div [class]="cn(
+               'sticky z-20 bg-[#fafbfc]/90 dark:bg-zinc-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/50 px-2 lg:px-4',
+               isMobile() ? 'top-0 -mx-4 px-6' : 'top-0'
+            )">
               <div class="flex items-center gap-4">
                  <div [class]="cn(
-                   'h-12 w-12 rounded-2xl flex flex-col items-center justify-center shadow-sm border transition-all',
-                   day.isToday ? 'bg-primary border-primary text-white scale-110 shadow-lg shadow-primary/20' : 'bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800'
+                   'rounded-2xl flex flex-col items-center justify-center shadow-sm border transition-all',
+                   isMobile() ? 'h-14 w-14' : 'h-12 w-12',
+                   day.isToday ? 'bg-primary border-primary text-white scale-105 shadow-lg shadow-primary/20' : 'bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800'
                  )">
-                    <span class="text-[10px] font-black uppercase tracking-tighter opacity-60">{{ day.date | date:'EEE' }}</span>
-                    <span class="text-lg font-black tracking-tighter leading-none">{{ day.date | date:'dd' }}</span>
+                    <span class="text-[10px] font-black uppercase tracking-tighter opacity-70">{{ day.date | date:'EEE' }}</span>
+                    <span [class]="cn('font-black tracking-tighter leading-none', isMobile() ? 'text-xl' : 'text-lg')">{{ day.date | date:'dd' }}</span>
                  </div>
                  <div>
                     <h3 class="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tight">{{ day.date | date:'MMMM, yyyy' }}</h3>
                     <div class="flex items-center gap-2">
                        <span *ngIf="day.isToday" class="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Entrega Hoy</span>
-                       <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{{ day.events.length }} compromisos</span>
+                       <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{{ day.events.length }} ítems programados</span>
                     </div>
                  </div>
               </div>
@@ -74,6 +78,7 @@ import { CalendarEventCardComponent } from './calendar-event-card.component';
 export class CalendarAgendaViewComponent {
   events = input.required<CalendarOrderEvent[]>();
   currentDate = input.required<Date>();
+  isMobile = input<boolean>(false);
   onEventClick = output<CalendarOrderEvent>();
 
   icons = { CalendarIcon, ArrowRight };

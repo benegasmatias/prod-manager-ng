@@ -10,8 +10,8 @@ import { SessionService } from '../../../core/session/session.service';
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
     <div class="min-h-screen bg-[#fafbfc] dark:bg-zinc-950 flex flex-col">
-      <!-- TACTICAL TAB NAVIGATION -->
-      <div class="sticky top-0 z-30 p-2 sm:p-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-800 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <!-- TACTICAL TAB NAVIGATION - Hidden for Calendar-only businesses -->
+      <div *ngIf="showTabs()" class="sticky top-0 z-30 p-2 sm:p-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-800 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-1.5 p-1 bg-zinc-100/50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-50 dark:border-zinc-800">
            <a routerLink="./monitor" routerLinkActive="bg-white dark:bg-zinc-800 text-primary shadow-sm ring-1 ring-zinc-100 dark:ring-zinc-700" 
              class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all no-underline">
@@ -57,7 +57,14 @@ import { SessionService } from '../../../core/session/session.service';
 })
 export class ProduccionLayoutComponent {
   private router = inject(Router);
+  private session = inject(SessionService);
+  
   currentTime = signal(new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }));
+
+  showTabs = computed(() => {
+    const rubro = this.session.rubro();
+    return rubro !== 'IMPRESION_3D';
+  });
 
   icons = {
     LayoutGrid, BarChart3, Clock, MoreHorizontal, TrendingUp

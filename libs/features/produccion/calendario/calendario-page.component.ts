@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, OnInit, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { LucideAngularModule, AlertCircle, RefreshCw, Layers, Filter, X } from 'lucide-angular';
+import { LucideAngularModule, Filter, X, ChevronDown, User, Cpu, AlertCircle, Sparkles, RefreshCw, Layers, TrendingUp, AlertOctagon, Clock, Settings2 } from 'lucide-angular';
 import { CalendarService } from './services/calendar.service';
 import { CalendarStoreService } from './services/calendar-store.service';
 import { SessionService } from '@core/session/session.service';
@@ -28,118 +28,135 @@ import { getNegocioConfig } from '@shared/utils';
     CalendarFiltersComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#fafbfc] dark:bg-zinc-950 p-4 lg:p-10 space-y-6 lg:space-y-10 animate-in fade-in duration-700 relative overflow-x-hidden">
+    <div class="min-h-screen bg-[#fafbfc] dark:bg-zinc-950 p-3 sm:p-4 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-10 animate-in fade-in duration-700 relative overflow-x-hidden">
       
-      <!-- Toolbar Orchestrator (Adaptive) -->
+      <!-- DASHBOARD HIGHLIGHTS: 3-Card Metrics Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <!-- CARD 1: Volumen Total -->
+        <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 shadow-sm border border-zinc-100 dark:border-zinc-800 relative group overflow-hidden">
+          <div class="absolute top-6 right-6 h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-500">
+            <lucide-angular [img]="icons.TrendingUp" class="h-6 w-6"></lucide-angular>
+          </div>
+          <div class="space-y-4">
+            <span class="text-xs font-black uppercase tracking-widest text-zinc-400">Volumen Total</span>
+            <div class="flex flex-col">
+              <p class="text-5xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter tabular-nums">{{ filteredEvents().length }}</p>
+              <div class="flex items-center gap-1.5 mt-2">
+                 <lucide-angular [img]="icons.TrendingUp" class="h-3 w-3 text-emerald-500"></lucide-angular>
+                 <span class="text-[10px] font-bold text-emerald-500">+12% <span class="text-zinc-400 lowercase italic ml-1">vs mes anterior</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: En Riesgo -->
+        <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 shadow-sm border border-zinc-100 dark:border-zinc-800 relative group overflow-hidden">
+          <div class="absolute top-6 right-6 h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-950/30 flex items-center justify-center text-rose-500">
+            <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
+          </div>
+          <div class="space-y-4">
+            <span class="text-xs font-black uppercase tracking-widest text-zinc-400">En Riesgo</span>
+            <div class="flex flex-col">
+              <p class="text-5xl font-black text-rose-500 tracking-tighter tabular-nums">{{ riskyCount() }}</p>
+              <div class="flex items-center gap-1.5 mt-2">
+                 <span class="text-[10px] font-black uppercase tracking-widest text-rose-400/80">! Requiere atención</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3: Vencidos -->
+        <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 shadow-sm border border-zinc-100 dark:border-zinc-800 relative group overflow-hidden">
+          <div class="absolute top-6 right-6 h-12 w-12 rounded-2xl bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500">
+            <lucide-angular [img]="icons.AlertOctagon" class="h-6 w-6"></lucide-angular>
+          </div>
+          <div class="space-y-4">
+            <span class="text-xs font-black uppercase tracking-widest text-zinc-400">Vencidos</span>
+            <div class="flex flex-col">
+              <p class="text-5xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter tabular-nums">
+                {{ overdueCount() < 10 ? '0' + overdueCount() : overdueCount() }}
+              </p>
+              <div class="flex items-center gap-1.5 mt-2 text-rose-500">
+                 <lucide-angular [img]="icons.Clock" class="h-3 w-3"></lucide-angular>
+                 <span class="text-[10px] font-black uppercase tracking-widest italic">Items vencidos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPERATIONAL FILTERS ROW: Pill styled -->
+      <div class="mb-12">
+         <app-calendar-filters 
+           [employees]="employees()"
+           [statusOptions]="statusOptions()"
+           [layout]="'HORIZONTAL'"
+           (onFiltersChange)="handleFilterChange($event)">
+         </app-calendar-filters>
+      </div>
+
+      <!-- TOOLBAR: Now closer to the calendar -->
       <app-calendar-toolbar 
         [currentRangeLabel]="displayDateRange()"
         [currentView]="viewMode()"
+        [isMobile]="isMobile()"
         (onPrev)="navigateRange(-1)"
         (onNext)="navigateRange(1)"
         (onToday)="setToday()"
         (onViewChange)="setViewMode($event)">
       </app-calendar-toolbar>
 
-      <div class="flex flex-col lg:flex-row gap-8 items-start relative">
-        
-        <!-- Collapsible Sidebar Toggle (Mobile/Tablet) -->
-        <button 
-          (click)="showFilters.set(!showFilters())"
-          class="lg:hidden fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center active:scale-90 transition-all">
-          <lucide-angular [img]="showFilters() ? icons.X : icons.Filter" class="h-6 w-6"></lucide-angular>
-        </button>
-
-        <!-- Left: Context Filters (Adaptive Drawer on Mobile/Tablet) -->
-        <aside [class]="cn(
-          'w-full lg:w-80 space-y-8 lg:sticky lg:top-10 transition-all duration-500 ease-in-out',
-          'fixed lg:relative inset-0 lg:inset-auto z-40 bg-[#fafbfc]/90 dark:bg-zinc-950/90 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none p-6 lg:p-0 overflow-y-auto lg:overflow-visible',
-          showFilters() ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        )">
-           <div class="flex items-center justify-between lg:hidden mb-6">
-              <h2 class="text-xl font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tighter">Filtros</h2>
-              <button (click)="showFilters.set(false)" class="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800">
-                 <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
-              </button>
-           </div>
-
-           <app-calendar-filters 
-             [employees]="employees()"
-             [statusOptions]="statusOptions()"
-             (onFiltersChange)="handleFilterChange($event)">
-           </app-calendar-filters>
-
-           <!-- Quick Summary Card -->
-           <div class="p-8 rounded-[2.5rem] bg-zinc-900 text-white shadow-2xl relative overflow-hidden group">
-              <div class="absolute -top-10 -right-10 h-32 w-32 bg-primary/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
-              <div class="relative z-10 flex flex-col gap-6">
-                 <div class="flex flex-col">
-                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Volumen en Rango</span>
-                    <p class="text-4xl font-black tabular-nums tracking-tighter">{{ filteredEvents().length }} <span class="text-xs text-primary italic lowercase">u.</span></p>
-                 </div>
-                 <div class="grid grid-cols-2 gap-4">
-                    <div class="flex flex-col">
-                       <span class="text-[8px] font-black uppercase tracking-widest text-zinc-500">En Riesgo</span>
-                       <p class="text-xl font-black text-red-500">{{ riskyCount() }}</p>
-                    </div>
-                    <div class="flex flex-col">
-                       <span class="text-[8px] font-black uppercase tracking-widest text-zinc-500">Vencidos</span>
-                       <p class="text-xl font-black text-zinc-400">{{ overdueCount() }}</p>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </aside>
-
-        <!-- Right: The Operational Grid (Adaptive) -->
-        <main class="flex-1 min-w-0 space-y-8 w-full">
-           @if (loading()) {
-              <div class="flex flex-col items-center justify-center py-40 gap-4">
-                 <lucide-angular [img]="icons.RefreshCw" class="h-10 w-10 text-primary animate-spin"></lucide-angular>
-                 <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Analizando Producción...</p>
-              </div>
-           } @else if (filteredEvents().length === 0) {
-              <div class="py-24 lg:py-40 text-center space-y-6 bg-white dark:bg-zinc-950 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-[2.5rem] lg:rounded-[3rem]">
-                 <div class="h-16 w-16 bg-zinc-50 dark:bg-zinc-900 rounded-3xl mx-auto flex items-center justify-center text-zinc-200">
-                    <lucide-angular [img]="icons.Layers" class="h-8 w-8"></lucide-angular>
-                 </div>
-                 <div class="space-y-1">
-                    <h3 class="text-base font-black text-zinc-400 tracking-tight">Zona Despejada</h3>
-                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-6">No hay órdenes programadas para este rango.</p>
-                 </div>
-              </div>
-           } @else {
-              <!-- Dynamic View Dispatcher -->
-              @if (viewMode() === 'WEEK') {
-                 <div class="overflow-x-auto lg:overflow-visible no-scrollbar -mx-4 px-4 lg:-mx-0 lg:px-0">
-                    <app-calendar-week-view 
-                      class="min-w-[800px] lg:min-w-0"
-                      [events]="filteredEvents()"
-                      [currentDate]="currentDate()"
-                      [density]="cardDensity()"
-                      (onEventClick)="goToDetail($event)">
-                    </app-calendar-week-view>
-                 </div>
-              } @else if (viewMode() === 'AGENDA') {
-                 <app-calendar-agenda-view
-                   [events]="filteredEvents()"
-                   [currentDate]="currentDate()"
-                   (onEventClick)="goToDetail($event)">
-                 </app-calendar-agenda-view>
-              } @else if (viewMode() === 'MONTH') {
-                 <app-calendar-month-view
-                   [events]="filteredEvents()"
-                   [currentDate]="currentDate()"
-                   (onEventClick)="goToDetail($event)">
-                 </app-calendar-month-view>
-              } @else {
-                 <div class="py-40 text-center bg-zinc-50 dark:bg-zinc-900/50 rounded-[3rem] border border-zinc-100 dark:border-zinc-800">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400 font-mono">Implementando Vista Avanzada {{ viewMode() }}...</p>
-                 </div>
-              }
-           }
-        </main>
-
-      </div>
+      <!-- MAIN CONTENT -->
+      <main class="flex-1 mt-6 w-full space-y-6 sm:space-y-8 pb-20 lg:pb-0 min-h-[60vh] relative">
+         @if (loading()) {
+            <div class="flex flex-col items-center justify-center py-40 gap-4">
+               <div class="relative">
+                  <div class="h-16 w-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                  <lucide-angular [img]="icons.RefreshCw" class="absolute inset-0 m-auto h-6 w-6 text-primary"></lucide-angular>
+               </div>
+               <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400 animate-pulse">Analizando Producción...</p>
+            </div>
+         } @else if (filteredEvents().length === 0) {
+            <div class="py-24 lg:py-40 text-center space-y-6 bg-white dark:bg-zinc-950 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-[2.5rem] lg:rounded-[3rem] mx-1">
+               <div class="h-20 w-20 bg-zinc-50 dark:bg-zinc-900 rounded-[2rem] mx-auto flex items-center justify-center text-zinc-200 dark:text-zinc-700">
+                  <lucide-angular [img]="icons.Layers" class="h-10 w-10"></lucide-angular>
+               </div>
+               <div class="space-y-1">
+                  <h3 class="text-lg font-black text-zinc-900 dark:text-zinc-100 tracking-tight">Zona Despejada</h3>
+                  <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-8">No hay órdenes programadas para este rango de fecha.</p>
+               </div>
+            </div>
+         } @else {
+            <!-- Dynamic View Dispatcher -->
+            @if (viewMode() === 'WEEK') {
+               <div [class]="cn(isMobile() ? '' : 'overflow-x-auto lg:overflow-visible no-scrollbar -mx-4 px-4 lg:-mx-0 lg:px-0 text-zinc-900')">
+                  <app-calendar-week-view 
+                    [class]="isMobile() ? '' : 'min-w-[800px] lg:min-w-0'"
+                    [events]="filteredEvents()"
+                    [currentDate]="currentDate()"
+                    [density]="cardDensity()"
+                    [isMobile]="isMobile()"
+                    (onEventClick)="goToDetail($event)">
+                  </app-calendar-week-view>
+               </div>
+            } @else if (viewMode() === 'AGENDA') {
+               <app-calendar-agenda-view
+                 [events]="filteredEvents()"
+                 [currentDate]="currentDate()"
+                 [isMobile]="isMobile()"
+                 (onEventClick)="goToDetail($event)">
+               </app-calendar-agenda-view>
+            } @else if (viewMode() === 'MONTH') {
+               <app-calendar-month-view
+                 [events]="filteredEvents()"
+                 [currentDate]="currentDate()"
+                 [isMobile]="isMobile()"
+                 (onEventClick)="goToDetail($event)">
+               </app-calendar-month-view>
+            }
+         }
+      </main>
     </div>
   `,
   styles: [`
@@ -165,8 +182,9 @@ export class CalendarioPageComponent implements OnInit {
   employees = signal<Employee[]>([]);
   showFilters = signal(false);
   windowWidth = signal(window.innerWidth);
+  isMobile = computed(() => this.windowWidth() < 768);
 
-  icons = { RefreshCw, Layers, AlertCircle, Filter, X };
+  icons = { RefreshCw, Layers, AlertCircle, AlertOctagon, TrendingUp, Clock, Filter, X };
 
   // Computeds
   displayDateRange = computed(() => {
@@ -175,12 +193,12 @@ export class CalendarioPageComponent implements OnInit {
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
     
-    const options: any = { month: 'long', year: 'numeric' };
-    const month = d.toLocaleDateString('es-ES', options);
+    // Formateo manual para asegurar estilo premium y control total sobre el texto
+    const month = d.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
     
-    if (this.viewMode() === 'MONTH') return month;
+    if (this.viewMode() === 'MONTH') return month.charAt(0).toUpperCase() + month.slice(1);
     if (this.viewMode() === 'AGENDA') return `Agenda ${month}`;
-    return `Semana ${d.getDate()} al ${end.getDate()} de ${month}`;
+    return `Semana del ${start.getDate()} al ${end.getDate()} de ${month}`;
   });
 
   statusOptions = computed(() => {
@@ -227,10 +245,7 @@ export class CalendarioPageComponent implements OnInit {
   }
 
   private adjustViewForScreen() {
-    const width = this.windowWidth();
-    if (width < 1024 && this.viewMode() === 'WEEK') {
-      this.store.setViewMode('AGENDA');
-    }
+    // We no longer force Agenda, we let WeekView adapt to its own mobile layout
   }
 
   private async loadEmployees() {
@@ -241,6 +256,8 @@ export class CalendarioPageComponent implements OnInit {
   }
 
   async loadBatch() {
+    if (this.store.loading()) return;
+    
     const bId = this.session.activeNegocio()?.id;
     if (!bId) return;
 
@@ -253,12 +270,15 @@ export class CalendarioPageComponent implements OnInit {
        return; 
     }
 
-    this.loading.set(true);
+    this.store.setLoading(true);
+    this.loading.set(true); // Keep local for internal UI logic if needed
+    
     try {
       const items = await this.calendarService.getEvents(bId, start, end);
-      this.store.setEvents(items, { bId, start: start.toISOString(), end: end.toISOString() });
+      this.store.setEvents(items, bId, start, end);
     } catch (err) {
       console.error('Error loading calendar:', err);
+      this.store.setLoading(false);
     } finally {
       this.loading.set(false);
     }
@@ -298,7 +318,10 @@ export class CalendarioPageComponent implements OnInit {
   private getStartOfWeek(d: Date): Date {
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
-    return new Date(new Date(d).setDate(diff));
+    const start = new Date(d);
+    start.setDate(diff);
+    start.setHours(0, 0, 0, 0);
+    return start;
   }
 
   cn(...args: any[]) { return args.filter(Boolean).join(' '); }

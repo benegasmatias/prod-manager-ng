@@ -87,30 +87,43 @@ export type CardDensity = 'FULL' | 'COMPACT' | 'AGENDA';
         <!-- 3. AGENDA DENSITY (Mobile List) -->
         <ng-container *ngSwitchCase="'AGENDA'">
            <!-- Indicator -->
-           <div [class]="cn('w-1 h-10 rounded-full shrink-0', getRiskCircleClass())"></div>
+           <div [class]="cn('w-1.5 h-12 rounded-full shrink-0', getRiskCircleClass())"></div>
            
            <!-- Content -->
-           <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
-                 <span class="text-[10px] font-black text-zinc-400">#{{ event().code }}</span>
-                 <p class="text-[11px] font-black text-zinc-900 dark:text-white uppercase truncate">{{ eventName() }}</p>
+           <div class="flex-1 min-w-0 py-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                 <span class="text-[10px] sm:text-[11px] font-black text-zinc-400">#{{ event().code }}</span>
+                 <p class="text-[13px] sm:text-sm font-black text-zinc-900 dark:text-white uppercase truncate">{{ eventName() }}</p>
               </div>
               <div class="flex items-center gap-3">
-                 <div class="flex items-center gap-1.5 text-zinc-500">
-                    <lucide-angular [img]="icons.User" class="h-3 w-3"></lucide-angular>
-                    <span class="text-[10px] font-bold">{{ operatorName() }}</span>
+                 <div class="flex items-center gap-2 text-zinc-500">
+                    <div class="h-6 w-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                       <lucide-angular [img]="icons.User" class="h-3 w-3"></lucide-angular>
+                    </div>
+                    <span class="text-[11px] sm:text-xs font-bold truncate max-w-[80px] sm:max-w-none">{{ operatorName() }}</span>
                  </div>
-                 <div class="px-2 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-widest" [class]="getStatusClass()">
+                 <div class="px-3 py-1 rounded-lg border text-[9px] sm:text-[10px] font-black uppercase tracking-widest" [class]="getStatusClass()">
                     {{ getLabel() }}
                  </div>
               </div>
            </div>
 
-           <!-- Progress Circle or Percentage -->
-           <div class="flex flex-col items-end gap-1 shrink-0">
-              <span class="text-xs font-black tabular-nums text-zinc-900 dark:text-white">{{ event().completionPercentage }}%</span>
-              <lucide-angular *ngIf="isRisk()" [img]="icons.AlertCircle" class="h-4 w-4 text-red-500"></lucide-angular>
-              <lucide-angular *ngIf="isDone()" [img]="icons.CheckCircle2" class="h-4 w-4 text-emerald-500"></lucide-angular>
+           <!-- Right Actions / Progress -->
+           <div class="flex flex-col items-end gap-1.5 shrink-0 pr-1">
+              <div class="flex items-center gap-1.5">
+                 <span class="text-sm font-black tabular-nums text-zinc-900 dark:text-white">{{ event().completionPercentage }}%</span>
+                 <div class="h-8 w-8 rounded-full border-2 border-zinc-100 dark:border-zinc-800 flex items-center justify-center relative">
+                    <svg class="h-8 w-8 -rotate-90 absolute">
+                       <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-100 dark:text-zinc-800"/>
+                       <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5" 
+                          [attr.stroke-dasharray]="88" 
+                          [attr.stroke-dashoffset]="88 - (88 * event().completionPercentage / 100)"
+                          class="text-primary"/>
+                    </svg>
+                    <lucide-angular *ngIf="isRisk()" [img]="icons.AlertCircle" class="h-3 w-3 text-red-500 z-10 animate-pulse"></lucide-angular>
+                    <lucide-angular *ngIf="isDone()" [img]="icons.CheckCircle2" class="h-3 w-3 text-emerald-500 z-10"></lucide-angular>
+                 </div>
+              </div>
            </div>
         </ng-container>
 
