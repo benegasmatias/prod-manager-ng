@@ -146,7 +146,15 @@ export class DashboardComponent {
 
   activeConfig = computed(() => {
     const rubro = this.session.rubro();
-    return DASHBOARD_CONFIG[rubro] || DEFAULT_DASHBOARD;
+    const caps = this.session.activeCapabilities();
+    const baseConfig = DASHBOARD_CONFIG[rubro] || DEFAULT_DASHBOARD;
+    
+    return {
+      ...baseConfig,
+      metrics: baseConfig.metrics.filter(m => !m.requiredCapability || caps.includes(m.requiredCapability)),
+      sections: baseConfig.sections.filter(s => !s.requiredCapability || caps.includes(s.requiredCapability)),
+      quickActions: baseConfig.quickActions.filter(a => !a.requiredCapability || caps.includes(a.requiredCapability))
+    };
   });
 
   readonly icons = {

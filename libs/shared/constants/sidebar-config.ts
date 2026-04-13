@@ -56,8 +56,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
         label: 'Inventario', 
         href: '/stock', 
         icon: Grid, 
-        requiredFeature: 'STOCK',
-        requiredCapability: 'INVENTORY_RAW'
+        requiredFeature: 'STOCK'
       },
     ]
   },

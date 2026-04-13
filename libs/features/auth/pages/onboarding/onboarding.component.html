@@ -1,67 +1,150 @@
-<div class="min-h-screen bg-slate-50 dark:bg-zinc-950 flex items-center justify-center p-6 relative overflow-hidden">
-  <!-- Subtle gradient Backgrounds -->
-  <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-pulse"></div>
-  <div class="absolute -bottom-[10%] -right-[10%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full"></div>
+<div class="min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+  <!-- Dynamic Background Aura -->
+  <div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full animate-pulse"></div>
+  <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[100px] rounded-full"></div>
 
-  <div class="w-full max-w-lg relative z-10 animate-in fade-in zoom-in-95 duration-700 text-center">
+  <div class="w-full max-w-2xl relative z-10 animate-in fade-in zoom-in-95 duration-700">
     
-    <!-- ACCESS RESTRICTED CARD -->
-    <div class="bg-white dark:bg-zinc-900 border border-border rounded-[3rem] shadow-2xl p-10 backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 space-y-8">
-      
-      <div class="w-24 h-24 bg-zinc-100 dark:bg-zinc-800 rounded-[2rem] flex items-center justify-center mx-auto shadow-inner relative group">
-        <lucide-angular [img]="icons.Building2" class="h-10 w-10 text-zinc-400 group-hover:text-primary transition-colors"></lucide-angular>
-        <div class="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full border-4 border-white dark:border-zinc-900 flex items-center justify-center">
-          <lucide-angular [img]="icons.AlertCircle" class="h-2.5 w-2.5 text-white"></lucide-angular>
+    <!-- STEP 1: WELCOME / SIN ACCESO -->
+    @if (step() === 'WELCOME') {
+      <div class="bg-white dark:bg-zinc-900 border border-border rounded-[3rem] shadow-2xl p-10 text-center space-y-8 backdrop-blur-xl">
+        <div class="w-24 h-24 bg-zinc-100 dark:bg-zinc-800 rounded-[2rem] flex items-center justify-center mx-auto shadow-inner relative">
+          <lucide-angular [img]="icons.Building2" class="h-10 w-10 text-zinc-400"></lucide-angular>
+          <div class="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 rounded-full border-4 border-white dark:border-zinc-900 flex items-center justify-center">
+            <lucide-angular [img]="icons.AlertCircle" class="h-2.5 w-2.5 text-white"></lucide-angular>
+          </div>
         </div>
-      </div>
 
-      <div class="space-y-3">
-        <h1 class="text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-none uppercase">Sin acceso operativo</h1>
-        <p class="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed max-w-sm mx-auto">
-          Todavía no pertenecés a ningún negocio en ProdManager. Necesitás que un administrador te invite para comenzar.
-        </p>
-      </div>
+        <div class="space-y-3">
+          <h1 class="text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-none uppercase">Sin acceso operativo</h1>
+          <p class="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed max-w-sm mx-auto uppercase">
+            Todavía no pertenecés a ningún negocio en ProdManager.
+          </p>
+        </div>
 
-      <!-- INSTRUCTIONS -->
-      <div class="bg-zinc-50 dark:bg-zinc-950/40 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 text-left space-y-4">
-        <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">¿Cómo empezar?</h4>
-        <div class="space-y-4">
-          <div class="flex gap-4">
-            <div class="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 border border-border flex items-center justify-center shrink-0 text-[10px] font-black">1</div>
-            <div>
-              <span class="text-xs font-black text-zinc-700 dark:text-zinc-300 uppercase block leading-tight">Recibe una invitación</span>
-              <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Tu administrador debe enviarte un mail con el link de acceso.</p>
+        <div class="grid md:grid-cols-2 gap-4 text-left">
+          <!-- Option A: Invitation -->
+          <div class="bg-zinc-50 dark:bg-zinc-950/40 p-6 rounded-3xl border border-border space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm">
+                <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-primary"></lucide-angular>
+              </div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Tengo Invitación</span>
+            </div>
+            <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Si ya te invitaron, revisa tu correo electrónico para aceptar el link de acceso.</p>
+          </div>
+
+          <!-- Option B: Create -->
+          <button 
+            (click)="startOnboarding()"
+            class="bg-primary/5 hover:bg-primary/10 border border-primary/20 p-6 rounded-3xl space-y-4 text-left transition-all active:scale-[0.98] group"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                <lucide-angular [img]="icons.Zap" class="h-4 w-4"></lucide-angular>
+              </div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-primary">Crear Negocio</span>
+            </div>
+            <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Empieza tu propio espacio de trabajo industrial y gestiona tu producción.</p>
+          </button>
+        </div>
+
+        <div class="pt-6 border-t border-border flex items-center justify-between">
+          <div class="flex items-center gap-3 opacity-60">
+            <div class="text-left">
+              <span class="text-[8px] font-black text-zinc-400 uppercase tracking-widest block">Registrado como:</span>
+              <span class="text-[10px] font-black text-zinc-700 dark:text-zinc-200 uppercase truncate block">{{ userEmail() }}</span>
             </div>
           </div>
-          <div class="flex gap-4">
-            <div class="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 border border-border flex items-center justify-center shrink-0 text-[10px] font-black">2</div>
-            <div>
-              <span class="text-xs font-black text-zinc-700 dark:text-zinc-300 uppercase block leading-tight">Acepta el rol</span>
-              <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Haz click en el link para unirte al equipo operativo.</p>
+          <button (click)="logout()" class="text-[9px] font-black text-zinc-400 hover:text-rose-500 uppercase tracking-[0.2em] transition-all">
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- STEP 2: CHOOSE TEMPLATE -->
+    @if (step() === 'CHOOSE_TEMPLATE') {
+      <div class="space-y-8 animate-in slide-in-from-right-8 duration-500">
+        <div class="flex items-center justify-between">
+          <button (click)="back()" class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors">
+            <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4 rotate-180"></lucide-angular>
+            Volver
+          </button>
+          <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-primary/10 px-4 py-2 rounded-full">Paso 01/02</span>
+        </div>
+
+        <div class="text-center space-y-2">
+          <h2 class="text-4xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter">Elige tu Rubro</h2>
+          <p class="text-zinc-500 text-sm uppercase font-bold tracking-widest">Configuraremos el sistema a medida según tu negocio.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          @if (loadingTemplates()) {
+            <div class="col-span-2 py-32 flex flex-col items-center justify-center gap-4 text-zinc-400">
+              <lucide-angular [img]="icons.Loader2" class="h-10 w-10 animate-spin opacity-20"></lucide-angular>
+              <span class="text-[10px] font-black uppercase tracking-widest">Cargando templates industriales...</span>
             </div>
-          </div>
+          }
+
+          @for (temp of templates(); track temp.key) {
+            <button 
+              (click)="selectTemplate(temp)"
+              [class.ring-4]="selectedTemplate()?.key === temp.key"
+              class="group relative bg-white dark:bg-zinc-900 border border-border rounded-[2.5rem] p-8 text-left transition-all duration-300 hover:shadow-2xl active:scale-[0.98] ring-primary/20"
+            >
+              <div class="w-14 h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                @if (temp.key === 'IMPRESION_3D') { <lucide-angular [img]="icons.Target" class="h-7 w-7"></lucide-angular> }
+                @else if (temp.key === 'METALURGICA') { <lucide-angular [img]="icons.Hammer" class="h-7 w-7"></lucide-angular> }
+                @else { <lucide-angular [img]="icons.ShoppingCart" class="h-7 w-7"></lucide-angular> }
+              </div>
+
+              <h3 class="text-xl font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tight mb-2">{{ temp.name }}</h3>
+              <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">{{ temp.description }}</p>
+
+              <div class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <lucide-angular [img]="icons.ChevronRight" class="h-5 w-5 text-primary"></lucide-angular>
+              </div>
+            </button>
+          }
         </div>
-      </div>
 
-      <!-- FOOTER ACTIONS -->
-      <div class="pt-4 flex flex-col gap-4">
-        <div class="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center gap-3">
-          <lucide-angular [img]="icons.Mail" class="h-5 w-5 text-primary"></lucide-angular>
-          <div class="text-left">
-            <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest block">Registrado como:</span>
-            <span class="text-[11px] font-black text-zinc-700 dark:text-zinc-200 uppercase truncate block">{{ userEmail() }}</span>
+        @if (selectedTemplate()) {
+          <div class="bg-zinc-900 dark:bg-zinc-100 rounded-[2.5rem] p-8 text-white dark:text-zinc-900 flex flex-col md:flex-row items-center gap-6 animate-in slide-in-from-bottom-8 duration-500">
+            <div class="flex-1 space-y-1">
+              <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Nombre del Espacio</span>
+              <input 
+                type="text" 
+                [value]="businessName()" 
+                (input)="businessName.set($any($event.target).value)"
+                class="bg-transparent border-none text-xl font-black uppercase tracking-tight focus:ring-0 w-full p-0"
+              >
+            </div>
+            
+            <app-button-spinner 
+              [loading]="isCreating()"
+              (click)="createBusiness()"
+              class="w-full md:w-auto h-14 px-8 bg-primary hover:bg-primary-dark text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 transition-all"
+            >
+              Crear Sistema
+            </app-button-spinner>
           </div>
-        </div>
-
-        <button (click)="logout()" class="w-full py-4 text-[10px] font-black text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 uppercase tracking-[0.3em] transition-all">
-          Cerrar Sesión
-        </button>
+        }
       </div>
-    </div>
+    }
 
-    <!-- Legal note -->
-    <p class="mt-8 text-center text-zinc-400 dark:text-zinc-600 text-[9px] uppercase font-bold tracking-[0.2em] max-w-xs mx-auto">
-      ProdManager es una plataforma industrial multi-negocio con acceso restringido por membresía.
-    </p>
+    <!-- STEP 3: CREATING / SUCCESS -->
+    @if (step() === 'CREATING') {
+       <div class="bg-white dark:bg-zinc-900 border border-border rounded-[3rem] shadow-2xl p-20 text-center space-y-8 animate-in zoom-in-95 duration-700">
+          <div class="w-32 h-32 bg-emerald-500 rounded-[3rem] flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/40 animate-bounce">
+            <lucide-angular [img]="icons.CheckCircle2" class="h-16 w-16 text-white"></lucide-angular>
+          </div>
+          <div class="space-y-3">
+             <h2 class="text-4xl font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tighter">¡Todo listo!</h2>
+             <p class="text-zinc-500 text-sm uppercase font-bold tracking-widest">Estamos configurando tu planta de producción...</p>
+          </div>
+       </div>
+    }
+
   </div>
-</div>
+</div>

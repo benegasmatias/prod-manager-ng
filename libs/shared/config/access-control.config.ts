@@ -20,6 +20,10 @@ export const BUSINESS_FEATURES: Record<Rubro, BusinessFeatureConfig> = {
   GENERICO: {
     features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
+  },
+  KIOSCO: {
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'STOCK', 'REPORTS', 'SETTINGS'],
+    defaultPath: '/dashboard'
   }
 };
 

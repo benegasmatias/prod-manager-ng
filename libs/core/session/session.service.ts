@@ -166,6 +166,7 @@ export class SessionService {
         userRole: 'OWNER'
       };
       this._negocios.update(list => [...list, newNegocio]);
+      this.setActiveId(newNegocio.id);
       return newNegocio;
     } catch (error) {
       console.error('[SessionService] Error adding business:', error);

@@ -81,7 +81,7 @@ export class AjustesComponent {
     if (confirmed) {
       try {
         await this.sessionService.removeNegocio(active.id);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/select-business']);
       } catch (error) {
         console.error('Error deleting business:', error);
       }

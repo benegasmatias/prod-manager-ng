@@ -11,7 +11,7 @@ export const DASHBOARD_CONFIG: Record<string, DashboardConfig> = {
       { id: 'sales', label: 'Ventas Totales', icon: 'BarChart3', color: 'indigo', dataKey: 'totalSales', unit: '$' },
       { id: 'pending', label: 'Saldo Pendiente', icon: 'Wallet', color: 'rose', dataKey: 'pendingBalance', unit: '$' },
       { id: 'active', label: 'Pedidos Activos', icon: 'LayoutGrid', color: 'primary', dataKey: 'activeOrders' },
-      { id: 'production', label: 'En Producción', icon: 'Activity', color: 'emerald', dataKey: 'productionOrders' }
+      { id: 'production', label: 'En Producción', icon: 'Activity', color: 'emerald', dataKey: 'productionOrders', requiredCapability: 'PRODUCTION_MANAGEMENT' }
     ],
     quickActions: [
       { label: 'Nuevo Pedido', icon: 'Plus', url: '/pedidos/nuevo', color: 'primary' },
@@ -19,8 +19,8 @@ export const DASHBOARD_CONFIG: Record<string, DashboardConfig> = {
     ],
     sections: [
       { title: 'Métricas', type: 'grid', widgetId: 'primary-metrics', fullWidth: true },
-      { title: 'Alarmas Operativas', type: 'custom', widgetId: 'alerts-priority' },
-      { title: 'Carga de Máquinas', type: 'grid', widgetId: 'secondary-metrics' },
+      { title: 'Alarmas Operativas', type: 'custom', widgetId: 'alerts-priority', requiredCapability: 'PRODUCTION_MANAGEMENT' },
+      { title: 'Carga de Máquinas', type: 'grid', widgetId: 'secondary-metrics', requiredCapability: 'PRODUCTION_MACHINES' },
       { title: 'Pedidos Recientes', type: 'list', widgetId: 'recent-orders', fullWidth: true }
     ],
     kpiTitles: {
@@ -73,8 +73,8 @@ export const DASHBOARD_CONFIG: Record<string, DashboardConfig> = {
       DELIVERED: 'Entregado'
     }
   },
-  RETAIL_KIOSCO: {
-    rubro: 'GENERICO',
+  KIOSCO: {
+    rubro: 'KIOSCO',
     category: 'Punto de Venta / Kiosco',
     title: 'Monitor de',
     titleAccent: 'Caja',

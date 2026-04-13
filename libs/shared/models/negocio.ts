@@ -1,4 +1,4 @@
-export type Rubro = 'IMPRESION_3D' | 'METALURGICA' | 'CARPINTERIA' | 'GENERICO';
+export type Rubro = 'IMPRESION_3D' | 'METALURGICA' | 'CARPINTERIA' | 'KIOSCO' | 'GENERICO';
 
 export interface BusinessTemplate {
   key: Rubro;
