@@ -18,7 +18,7 @@ export const DASHBOARD_CONFIG: Record<string, DashboardConfig> = {
       { label: 'Gestionar Stock', icon: 'Layers', url: '/stock', color: 'zinc' }
     ],
     sections: [
-      { widgetId: 'primary-metrics', fullWidth: true },
+      { title: 'Métricas', type: 'grid', widgetId: 'primary-metrics', fullWidth: true },
       { title: 'Alarmas Operativas', type: 'custom', widgetId: 'alerts-priority' },
       { title: 'Carga de Máquinas', type: 'grid', widgetId: 'secondary-metrics' },
       { title: 'Pedidos Recientes', type: 'list', widgetId: 'recent-orders', fullWidth: true }
@@ -89,8 +89,8 @@ export const DEFAULT_DASHBOARD: DashboardConfig = {
     { label: 'Nuevo Pedido', icon: 'Plus', url: '/pedidos/nuevo' }
   ],
   sections: [
-      { title: 'Métricas', type: 'grid', widgetId: 'primary-metrics', fullWidth: true },
-      { title: 'Actividad Reciente', type: 'list', widgetId: 'recent-orders', fullWidth: true }
+    { title: 'Métricas', type: 'grid', widgetId: 'primary-metrics', fullWidth: true },
+    { title: 'Actividad Reciente', type: 'list', widgetId: 'recent-orders', fullWidth: true }
   ],
   sectionTitles: {}
 };
