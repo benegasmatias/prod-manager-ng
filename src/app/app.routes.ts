@@ -96,6 +96,10 @@ export const routes: Routes = [
         path: 'ajustes',
         loadChildren: () => import('../../libs/features/ajustes/ajustes.routes').then(m => m.AJUSTES_ROUTES)
       },
+      {
+        path: 'kiosco',
+        loadChildren: () => import('./pages/retail/retail.routes').then(m => m.RETAIL_ROUTES)
+      },
       { path: '**', redirectTo: 'dashboard' }
     ]
   }

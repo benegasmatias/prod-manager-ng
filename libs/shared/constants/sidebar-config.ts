@@ -11,7 +11,9 @@ import {
   UserCog,
   Clock,
   FileText,
-  Calendar
+  Calendar,
+  Wallet,
+  Store
 } from 'lucide-angular';
 import { MenuGroupMetadata } from '../models/access-control';
 
@@ -24,6 +26,14 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
     title: 'Principal',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, requiredFeature: 'DASHBOARD' },
+    ]
+  },
+  {
+    title: 'Kiosco',
+    items: [
+      { label: 'Venta (POS)', href: '/kiosco/venta', icon: ShoppingCart, requiredFeature: 'ORDERS' },
+      { label: 'Caja', href: '/kiosco/caja', icon: Wallet, requiredFeature: 'ORDERS' },
+      { label: 'Productos', href: '/kiosco/productos', icon: Store, requiredFeature: 'STOCK' },
     ]
   },
   {

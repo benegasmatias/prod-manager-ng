@@ -53,7 +53,19 @@ import {
   PackageSearch,
   Landmark,
   Globe,
-  Save
+  Save,
+  Wallet,
+  Store,
+  Minus,
+  Lock,
+  Unlock,
+  History,
+  TrendingUp,
+  Edit2,
+  CreditCard,
+  Banknote,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -108,7 +120,19 @@ export const appConfig: ApplicationConfig = {
         PackageSearch,
         Landmark,
         Globe,
-        Save
+        Save,
+        Wallet,
+        Store,
+        Minus,
+        Lock,
+        Unlock,
+        History,
+        TrendingUp,
+        Edit2,
+        CreditCard,
+        Banknote,
+        CheckCircle2,
+        AlertCircle
       })
     )
   ]
