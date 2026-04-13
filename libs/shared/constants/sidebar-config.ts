@@ -38,19 +38,38 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
   {
     title: 'Operaciones',
     items: [
-      { label: 'Producción', href: '/produccion', icon: Activity, requiredFeature: 'ORDERS_PRODUCTION' },
-      { label: 'Calendario', href: '/produccion/calendario', icon: Calendar, requiredFeature: 'CALENDAR' },
-      { label: 'Inventario', href: '/stock', icon: Grid, requiredFeature: 'STOCK' },
+      { 
+        label: 'Producción', 
+        href: '/produccion', 
+        icon: Activity, 
+        requiredFeature: 'ORDERS_PRODUCTION',
+        requiredCapability: 'PRODUCTION_MANAGEMENT'
+      },
+      { 
+        label: 'Calendario', 
+        href: '/produccion/calendario', 
+        icon: Calendar, 
+        requiredFeature: 'CALENDAR',
+        requiredCapability: 'PRODUCTION_MANAGEMENT'
+      },
+      { 
+        label: 'Inventario', 
+        href: '/stock', 
+        icon: Grid, 
+        requiredFeature: 'STOCK',
+        requiredCapability: 'INVENTORY_RAW'
+      },
     ]
   },
   {
     title: 'Mi Taller',
     items: [
       {
-        label: 'Maquinaria', // Labels can be dynamically overridden in SidebarComponent
+        label: 'Maquinaria', 
         href: '/maquinas',
         icon: Wrench,
         requiredFeature: 'MACHINERY',
+        requiredCapability: 'PRODUCTION_MACHINES',
         configKey: 'maquinas'
       },
       {
@@ -58,6 +77,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
         href: '/materiales',
         icon: Package,
         requiredFeature: 'MATERIALS',
+        requiredCapability: 'INVENTORY_RAW',
         configKey: 'materiales'
       },
       { label: 'Equipo', href: '/personal', icon: UserCog, requiredFeature: 'TEAM' },

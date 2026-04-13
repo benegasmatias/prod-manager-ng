@@ -72,6 +72,31 @@ export const DASHBOARD_CONFIG: Record<string, DashboardConfig> = {
       INSTALLATION: 'En Obra',
       DELIVERED: 'Entregado'
     }
+  },
+  RETAIL_KIOSCO: {
+    rubro: 'GENERICO',
+    category: 'Punto de Venta / Kiosco',
+    title: 'Monitor de',
+    titleAccent: 'Caja',
+    description: 'Control de ventas rápidas, stock de mostrador y movimientos de efectivo.',
+    metrics: [
+      { id: 'sales', label: 'Caja del Día', icon: 'Wallet', color: 'emerald', dataKey: 'totalSales', unit: '$' },
+      { id: 'pending', label: 'Cuentas Corrientes', icon: 'Users', color: 'rose', dataKey: 'pendingBalance', unit: '$' },
+      { id: 'active', label: 'Ventas Realizadas', icon: 'ShoppingCart', color: 'indigo', dataKey: 'activeOrders' }
+    ],
+    quickActions: [
+      { label: 'Nueva Venta', icon: 'Plus', url: '/pedidos/nuevo', color: 'primary' },
+      { label: 'Abrir Caja', icon: 'Unlock', url: '#', color: 'emerald' }
+    ],
+    sections: [
+      { title: 'Resumen Diario', type: 'grid', widgetId: 'primary-metrics', fullWidth: true },
+      { title: 'Ventas Recientes', type: 'list', widgetId: 'recent-orders', fullWidth: true }
+    ],
+    statusLabels: {
+      PENDING: 'Por Cobrar',
+      DONE: 'Cobrado',
+      CANCELLED: 'Anulado'
+    }
   }
 };
 

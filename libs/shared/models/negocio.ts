@@ -19,6 +19,7 @@ export interface Negocio {
   subscriptionExpiresAt?: string;
   createdAt: string;
   userRole?: 'OWNER' | 'ADMIN' | 'OPERATOR' | 'VIEWER';
+  capabilities?: string[];
 }
 
 export interface CampoItem {

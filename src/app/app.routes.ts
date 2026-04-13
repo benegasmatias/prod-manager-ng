@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { MainLayoutComponent } from '@core/layout';
 import { authGuard, publicGuard } from '../../libs/core/auth/auth.guard';
 import { businessGuard } from '../../libs/core/auth/business.guard';
+import { capabilityGuard } from '../../libs/core';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -70,14 +71,17 @@ export const routes: Routes = [
       },
       {
         path: 'materiales',
+        canMatch: [capabilityGuard('INVENTORY_RAW')],
         loadChildren: () => import('@features/materiales/materiales.routes').then(m => m.MATERIALES_ROUTES)
       },
       {
         path: 'produccion',
+        canMatch: [capabilityGuard('PRODUCTION_MANAGEMENT')],
         loadChildren: () => import('../../libs/features/produccion/produccion.routes').then(m => m.PRODUCCION_ROUTES)
       },
       {
         path: 'maquinas',
+        canMatch: [capabilityGuard('PRODUCTION_MACHINES')],
         loadChildren: () => import('@features/maquinas/maquinas.routes').then(m => m.MAQUINAS_ROUTES)
       },
       {
