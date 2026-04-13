@@ -10,54 +10,38 @@ import { cn } from '@shared/utils/cn';
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
     @if (alerts().length > 0) {
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+      <div class="space-y-4">
         @for (alert of alerts(); track alert.message) {
           <div 
             [routerLink]="getRoute(alert)"
             [queryParams]="getQueryParams(alert)"
             [class]="cn(
-              'p-6 rounded-[2.5rem] border shadow-2xl relative overflow-hidden group transition-all duration-300',
-              (alert.orderId || alert.searchQuery) ? 'cursor-pointer hover:-translate-y-1 hover:shadow-primary/20 active:scale-[0.98]' : 'cursor-default',
-              alert.type === 'error' ? 'bg-rose-500 border-rose-400 text-white shadow-rose-500/20' : 'bg-amber-500 border-amber-400 text-white shadow-amber-500/20'
+              'p-6 rounded-[2rem] border transition-all duration-500 relative group overflow-hidden',
+              (alert.orderId || alert.searchQuery) ? 'cursor-pointer hover:shadow-xl hover:shadow-black/5 active:scale-[0.98]' : 'cursor-default',
+              alert.type === 'error' 
+                ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/40 text-zinc-900 dark:text-zinc-100' 
+                : 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/40 text-zinc-900 dark:text-zinc-100'
             )"
           >
-             <!-- Decorative Icon -->
-             <div class="absolute -right-8 -bottom-8 opacity-10 group-hover:scale-150 group-hover:rotate-12 transition-transform duration-700">
-               <lucide-angular [img]="alert.type === 'error' ? icons.AlertCircle : icons.AlertTriangle" class="h-40 w-40"></lucide-angular>
-             </div>
-             
-             <div class="relative z-10 flex items-start gap-4">
-               <!-- Status Icon -->
-               <div class="h-12 w-12 shrink-0 rounded-2xl bg-white/20 flex items-center justify-center">
-                 <lucide-angular [img]="alert.type === 'error' ? icons.AlertCircle : icons.AlertTriangle" class="h-6 w-6"></lucide-angular>
-               </div>
-               
-               <div class="flex-1 space-y-4">
-                 <div class="space-y-1">
-                   <div class="flex items-center justify-between">
-                     <span class="text-[9px] font-black uppercase tracking-[0.3em] opacity-80">{{ alert.timestamp }}</span>
-                     <div class="flex items-center gap-2">
-                        @if (alert.orderId || alert.searchQuery) {
-                          <lucide-angular [img]="alert.orderId ? icons.ExternalLink : icons.Search" class="h-3 w-3 opacity-50"></lucide-angular>
-                        }
-                        <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-black/10 rounded-lg">ALERTA CRÍTICA</span>
+             <div class="flex items-start gap-4">
+                <div [class]="cn(
+                  'h-2.5 w-2.5 rounded-full mt-2 shrink-0 animate-pulse',
+                  alert.type === 'error' ? 'bg-rose-500' : 'bg-amber-500 shadow-sm shadow-amber-500/30'
+                )"></div>
+                
+                <div class="flex-1 space-y-3">
+                   <div class="space-y-0.5">
+                      <p class="text-xs font-black tracking-tight leading-relaxed group-hover:text-primary transition-colors">{{ alert.message }}</p>
+                      <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{{ alert.timestamp }}</p>
+                   </div>
+                   
+                   @if (alert.orderId || alert.searchQuery) {
+                     <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-primary transition-all">
+                        <span>Ver detalle</span>
+                        <lucide-angular [img]="icons.ArrowRight" class="h-3 w-3 group-hover:translate-x-1 transition-transform"></lucide-angular>
                      </div>
-                   </div>
-                   <h4 class="text-base font-black tracking-tight leading-snug">{{ alert.message }}</h4>
-                 </div>
-                 
-                 @if (alert.orderId) {
-                   <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white/10 w-fit px-4 py-2 rounded-xl group-hover:bg-white/20 transition-colors">
-                     Gestionar Pedido #{{ alert.orderId }}
-                     <lucide-angular [img]="icons.ArrowRight" class="h-3 w-3 group-hover:translate-x-1 transition-transform"></lucide-angular>
-                   </div>
-                 } @else if (alert.searchQuery) {
-                   <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white/10 w-fit px-4 py-2 rounded-xl group-hover:bg-white/20 transition-colors">
-                     Buscar Pedido {{ alert.searchQuery }}
-                     <lucide-angular [img]="icons.ArrowRight" class="h-3 w-3 group-hover:translate-x-1 transition-transform"></lucide-angular>
-                   </div>
-                 }
-               </div>
+                   }
+                </div>
              </div>
           </div>
         }
