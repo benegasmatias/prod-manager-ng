@@ -41,6 +41,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
       { label: 'Compras', href: '/kiosco/compras', icon: ShoppingBag, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
       { label: 'Proveedores', href: '/kiosco/proveedores', icon: Truck, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
       { label: 'Gastos', href: '/kiosco/gastos', icon: Receipt, requiredFeature: 'ORDERS', requiredCapability: 'RETAIL' },
+      { label: 'Equipo', href: '/personal', icon: UserCog, requiredFeature: 'TEAM', requiredCapability: 'RETAIL' },
     ]
   },
   {
@@ -79,7 +80,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
     ]
   },
   {
-    title: 'Mi Taller',
+    title: 'Taller',
     items: [
       {
         label: 'Maquinaria', 
