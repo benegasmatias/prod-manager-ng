@@ -87,6 +87,36 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
         </div>
       }
 
+      <!-- Historial Reciente -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-gray-50 flex items-center gap-2">
+              <lucide-icon [name]="'History'" class="w-5 h-5 text-gray-400"></lucide-icon>
+              <h2 class="font-bold">Movimientos de la Caja Actual</h2>
+          </div>
+          <div class="p-0">
+              @for (m of movements(); track m.id) {
+                  <div class="flex items-center justify-between p-4 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition">
+                      <div class="flex items-center gap-4">
+                          <div [class]="'p-2 rounded-lg ' + (m.type === 'SALE_INCOME' ? 'bg-green-50 text-green-600' : m.type === 'MANUAL_IN' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600')">
+                              <lucide-icon [name]="m.type === 'MANUAL_OUT' ? 'Minus' : 'Plus'" class="w-4 h-4"></lucide-icon>
+                          </div>
+                          <div>
+                              <p class="font-bold text-sm text-gray-900">{{ m.type === 'SALE_INCOME' ? 'Venta exitosa' : m.note || 'Movimiento manual' }}</p>
+                              <p class="text-[10px] text-gray-400 uppercase font-black">{{ m.createdAt | date:'HH:mm' }} hs</p>
+                          </div>
+                      </div>
+                      <div class="text-right">
+                          <p [class]="'font-black ' + (m.type === 'MANUAL_OUT' ? 'text-red-600' : 'text-green-600')">
+                              {{ m.type === 'MANUAL_OUT' ? '-' : '+' }} {{ m.amount | currency:'ARS' }}
+                          </p>
+                      </div>
+                  </div>
+              } @empty {
+                  <div class="p-12 text-center text-gray-400 italic">No hay movimientos registrados en esta caja</div>
+              }
+          </div>
+      </div>
+
       <!-- Modales -->
       @if (openDrawerModal) {
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -146,6 +176,7 @@ export class RetailCajaComponent implements OnInit {
   private retailService = inject(RetailService);
   
   drawer = this.retailService.currentDrawer;
+  movements = signal<any[]>([]);
   loading = signal(false);
   
   openDrawerModal = false;
@@ -156,8 +187,14 @@ export class RetailCajaComponent implements OnInit {
   movementNote = '';
   selectedType: CashMovementType = CashMovementType.MANUAL_IN;
 
-  ngOnInit() {
-    this.retailService.getCurrentDrawer();
+  async ngOnInit() {
+    await this.retailService.getCurrentDrawer();
+    this.loadMovements();
+  }
+
+  async loadMovements() {
+    const list = await this.retailService.getMovements();
+    this.movements.set(list);
   }
 
   async confirmOpenDrawer() {
@@ -166,6 +203,7 @@ export class RetailCajaComponent implements OnInit {
         await this.retailService.openDrawer(this.openingBalance);
         this.openDrawerModal = false;
         this.openingBalance = 0;
+        this.loadMovements();
     } finally {
         this.loading.set(false);
     }
@@ -192,6 +230,7 @@ export class RetailCajaComponent implements OnInit {
   async confirmMovement() {
     await this.retailService.addManualMovement(this.movementAmount, this.selectedType, this.movementNote);
     await this.retailService.getCurrentDrawer(); // Refresh balance
+    this.loadMovements();
     this.movementModal = false;
   }
 }

@@ -88,4 +88,34 @@ export class RetailService {
       this.http.post<Sale>(`${this.apiUrl}/retail/sales/${businessId}`, { items, paymentMethod })
     );
   }
+
+  // Reports
+  async getDailySummary() {
+    const businessId = this.session.activeId();
+    return firstValueFrom(
+      this.http.get<any>(`${this.apiUrl}/retail/reports/${businessId}/daily-summary`)
+    );
+  }
+
+  async getTopProducts(limit: number = 5) {
+    const businessId = this.session.activeId();
+    return firstValueFrom(
+      this.http.get<any[]>(`${this.apiUrl}/retail/reports/${businessId}/top-products?limit=${limit}`)
+    );
+  }
+
+  async getLowStock(threshold: number = 5) {
+    const businessId = this.session.activeId();
+    return firstValueFrom(
+      this.http.get<RetailProduct[]>(`${this.apiUrl}/retail/reports/${businessId}/low-stock?threshold=${threshold}`)
+    );
+  }
+
+  async getMovements(drawerId?: string) {
+    const businessId = this.session.activeId();
+    const url = drawerId 
+        ? `${this.apiUrl}/retail/reports/${businessId}/movements?drawerId=${drawerId}`
+        : `${this.apiUrl}/retail/reports/${businessId}/movements`;
+    return firstValueFrom(this.http.get<any[]>(url));
+  }
 }

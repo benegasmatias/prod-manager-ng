@@ -5,6 +5,10 @@ export const RETAIL_ROUTES: Routes = [
     path: '',
     children: [
       {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.RetailDashboardComponent)
+      },
+      {
         path: 'caja',
         loadComponent: () => import('./caja/caja.component').then(m => m.RetailCajaComponent)
       },

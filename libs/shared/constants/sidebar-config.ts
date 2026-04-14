@@ -31,6 +31,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
   {
     title: 'Kiosco',
     items: [
+      { label: 'Resumen', href: '/kiosco/dashboard', icon: LayoutDashboard, requiredFeature: 'DASHBOARD' },
       { label: 'Venta (POS)', href: '/kiosco/venta', icon: ShoppingCart, requiredFeature: 'ORDERS' },
       { label: 'Caja', href: '/kiosco/caja', icon: Wallet, requiredFeature: 'ORDERS' },
       { label: 'Productos', href: '/kiosco/productos', icon: Store, requiredFeature: 'STOCK' },
