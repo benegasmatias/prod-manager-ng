@@ -10,6 +10,8 @@ import {
   Sale, 
   Supplier,
   Purchase,
+  RetailExpense,
+  RetailExpenseCategory,
   CashMovementType, 
   RetailStockMovementType 
 } from '@shared/models/retail/retail.models';
@@ -146,5 +148,16 @@ export class RetailService {
   async registerPurchase(dto: { supplierId: string, items: { productId: string, quantity: number, costPrice: number }[] }) {
     const businessId = this.session.activeId();
     return firstValueFrom(this.http.post<Purchase>(`${this.apiUrl}/retail/purchases/${businessId}`, dto));
+  }
+
+  // Expenses
+  async getExpenses() {
+    const businessId = this.session.activeId();
+    return firstValueFrom(this.http.get<RetailExpense[]>(`${this.apiUrl}/retail/expenses/${businessId}`));
+  }
+
+  async registerExpense(dto: { amount: number, category: RetailExpenseCategory, note: string }) {
+    const businessId = this.session.activeId();
+    return firstValueFrom(this.http.post<RetailExpense>(`${this.apiUrl}/retail/expenses/${businessId}`, dto));
   }
 }

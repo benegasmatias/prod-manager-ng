@@ -17,6 +17,17 @@ export enum RetailStockMovementType {
   PURCHASE = 'PURCHASE',
 }
 
+export type RetailExpenseCategory = 'RENT' | 'UTILITIES' | 'TAXES' | 'CLEANING' | 'OTHER';
+
+export interface RetailExpense {
+  id: string;
+  amount: number;
+  category: RetailExpenseCategory;
+  note: string;
+  drawerId: string;
+  createdAt: string;
+}
+
 export interface Supplier {
   id: string;
   name: string;

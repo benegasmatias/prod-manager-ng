@@ -15,7 +15,8 @@ import {
   Wallet,
   Store,
   ShoppingBag,
-  Truck
+  Truck,
+  Receipt
 } from 'lucide-angular';
 import { MenuGroupMetadata } from '../models/access-control';
 
@@ -39,6 +40,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
       { label: 'Productos', href: '/kiosco/productos', icon: Store, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
       { label: 'Compras', href: '/kiosco/compras', icon: ShoppingBag, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
       { label: 'Proveedores', href: '/kiosco/proveedores', icon: Truck, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
+      { label: 'Gastos', href: '/kiosco/gastos', icon: Receipt, requiredFeature: 'ORDERS', requiredCapability: 'RETAIL' },
     ]
   },
   {

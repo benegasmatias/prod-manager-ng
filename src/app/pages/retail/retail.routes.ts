@@ -28,6 +28,10 @@ export const RETAIL_ROUTES: Routes = [
         path: 'compras',
         loadComponent: () => import('./compras/compras.component').then(m => m.RetailComprasComponent)
       },
+      {
+        path: 'gastos',
+        loadComponent: () => import('./gastos/gastos.component').then(m => m.RetailGastosComponent)
+      },
       { path: '', redirectTo: 'venta', pathMatch: 'full' }
     ]
   }
