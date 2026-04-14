@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RetailService } from '@core/retail/retail.service';
 import { RetailProduct, SaleItem } from '@shared/models/retail/retail.models';
 import { LucideAngularModule, ShoppingCart, Search, Trash2, Plus, Minus, CreditCard, Banknote, CheckCircle2, AlertCircle } from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 
 interface CartItem extends RetailProduct {
   qty: number;
@@ -12,7 +13,7 @@ interface CartItem extends RetailProduct {
 @Component({
   selector: 'app-retail-venta',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
   template: `
     <div class="h-[calc(100vh-120px)] flex gap-6 p-6 overflow-hidden">
       <!-- Sección Izquierda: Búsqueda y Catálogo rápido -->
@@ -108,16 +109,15 @@ interface CartItem extends RetailProduct {
                 </button>
             </div>
 
-            <button (click)="finalizeSale()" 
-                    [disabled]="cart().length === 0 || loading()"
-                    [class]="'w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition shadow-xl ' + (cart().length === 0 ? 'bg-gray-200 text-gray-400' : 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-indigo-200')">
-                @if (loading()) {
-                    <div class="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    PROCESANDO...
-                } @else {
-                    FINALIZAR VENTA
-                }
-            </button>
+            <app-button-spinner
+                    [loading]="loading()"
+                    [disabled]="cart().length === 0"
+                    [btnClass]="'w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition shadow-xl ' + (cart().length === 0 ? 'bg-gray-200 text-gray-400' : 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-indigo-200')"
+                    [loadingText]="'PROCESANDO...'"
+                    (onClick)="finalizeSale()">
+                <lucide-icon [name]="'ShoppingCart'" class="w-6 h-6"></lucide-icon>
+                FINALIZAR VENTA
+            </app-button-spinner>
         </div>
       </div>
 

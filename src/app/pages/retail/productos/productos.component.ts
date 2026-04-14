@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RetailService } from '@core/retail/retail.service';
 import { RetailProduct, RetailStockMovementType } from '@shared/models/retail/retail.models';
 import { LucideAngularModule, Package, Plus, Search, Layers, Edit2, TrendingUp } from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 
 @Component({
   selector: 'app-retail-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
   template: `
     <div class="p-6 space-y-6">
       <header class="flex justify-between items-center">
@@ -118,7 +119,13 @@ import { LucideAngularModule, Package, Plus, Search, Layers, Edit2, TrendingUp }
                 </div>
                 <div class="flex gap-3 pt-4">
                     <button (click)="productModal = false" class="flex-1 p-4 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
-                    <button (click)="saveProduct()" class="flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">Guardar</button>
+                    <app-button-spinner
+                        [loading]="loading()"
+                        [btnClass]="'flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition'"
+                        (onClick)="saveProduct()"
+                        loadingText="GUARDANDO...">
+                        Guardar
+                    </app-button-spinner>
                 </div>
             </div>
         </div>
@@ -146,7 +153,13 @@ import { LucideAngularModule, Package, Plus, Search, Layers, Edit2, TrendingUp }
                     </label>
                     <div class="flex gap-3 pt-4">
                         <button (click)="stockModal = false" class="flex-1 p-4 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
-                        <button (click)="confirmStockAdjustment()" class="flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">Confirmar</button>
+                        <app-button-spinner
+                            [loading]="loading()"
+                            [btnClass]="'flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition'"
+                            (onClick)="confirmStockAdjustment()"
+                            loadingText="AJUSTANDO...">
+                            Confirmar
+                        </app-button-spinner>
                     </div>
                 </div>
             </div>
@@ -161,6 +174,7 @@ export class RetailProductsComponent implements OnInit {
   readonly StockType = RetailStockMovementType;
   
   products = signal<RetailProduct[]>([]);
+  loading = signal(false);
   searchTerm = '';
   
   productModal = false;
@@ -193,9 +207,14 @@ export class RetailProductsComponent implements OnInit {
   }
 
   async saveProduct() {
-    await this.retailService.createProduct(this.currentProduct);
-    this.productModal = false;
-    this.loadProducts();
+      this.loading.set(true);
+      try {
+        await this.retailService.createProduct(this.currentProduct);
+        this.productModal = false;
+        this.loadProducts();
+      } finally {
+        this.loading.set(false);
+      }
   }
 
   openStockModal(product: RetailProduct) {
@@ -207,9 +226,14 @@ export class RetailProductsComponent implements OnInit {
 
   async confirmStockAdjustment() {
     if (!this.selectedProductForStock) return;
-    await this.retailService.adjustStock(this.selectedProductForStock.id, this.stockAmount, this.stockAction, 'Ajuste manual desde catálogo');
-    this.stockModal = false;
-    this.loadProducts();
+    this.loading.set(true);
+    try {
+        await this.retailService.adjustStock(this.selectedProductForStock.id, this.stockAmount, this.stockAction, 'Ajuste manual desde catálogo');
+        this.stockModal = false;
+        this.loadProducts();
+    } finally {
+        this.loading.set(false);
+    }
   }
 
   openEditModal(product: RetailProduct) {

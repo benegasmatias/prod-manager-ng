@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RetailService } from '@core/retail/retail.service';
 import { CashDrawerStatus, CashMovementType } from '@shared/models/retail/retail.models';
 import { LucideAngularModule, Wallet, Plus, Minus, Lock, Unlock, History } from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 
 @Component({
   selector: 'app-retail-caja',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
   template: `
     <div class="p-6 max-w-4xl mx-auto space-y-6">
       <header class="flex justify-between items-center">
@@ -40,19 +41,21 @@ import { LucideAngularModule, Wallet, Plus, Minus, Lock, Unlock, History } from 
 
         <div class="flex items-center">
             @if (drawer()?.status !== 'OPEN') {
-                <button (click)="openDrawerModal = true" 
-                        [disabled]="loading()"
-                        class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                <app-button-spinner
+                    [loading]="loading()"
+                    [btnClass]="'w-full bg-indigo-600 text-white p-4 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200'"
+                    (onClick)="openDrawerModal = true">
                     <lucide-icon [name]="'Unlock'" class="w-5 h-5"></lucide-icon>
                     ABRIR CAJA
-                </button>
+                </app-button-spinner>
             } @else {
-                <button (click)="closeDrawer()" 
-                        [disabled]="loading()"
-                        class="w-full bg-red-600 text-white p-4 rounded-xl font-bold hover:bg-red-700 disabled:opacity-50 transition flex items-center justify-center gap-2 shadow-lg shadow-red-200">
+                <app-button-spinner
+                    [loading]="loading()"
+                    [btnClass]="'w-full bg-red-600 text-white p-4 rounded-xl font-bold hover:bg-red-700 disabled:opacity-50 transition flex items-center justify-center gap-2 shadow-lg shadow-red-200'"
+                    (onClick)="closeDrawer()">
                     <lucide-icon [name]="'Lock'" class="w-5 h-5"></lucide-icon>
                     CERRAR CAJA
-                </button>
+                </app-button-spinner>
             }
         </div>
       </div>
@@ -96,7 +99,13 @@ import { LucideAngularModule, Wallet, Plus, Minus, Lock, Unlock, History } from 
                     </label>
                     <div class="flex gap-3 pt-4">
                         <button (click)="openDrawerModal = false" class="flex-1 p-4 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
-                        <button (click)="confirmOpenDrawer()" class="flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">Confirmar</button>
+                        <app-button-spinner
+                            [loading]="loading()"
+                            [btnClass]="'flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition'"
+                            (onClick)="confirmOpenDrawer()"
+                            loadingText="ABRIENDO...">
+                            Confirmar
+                        </app-button-spinner>
                     </div>
                 </div>
             </div>
@@ -118,7 +127,13 @@ import { LucideAngularModule, Wallet, Plus, Minus, Lock, Unlock, History } from 
                     </label>
                     <div class="flex gap-3 pt-4">
                         <button (click)="movementModal = false" class="flex-1 p-4 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
-                        <button (click)="confirmMovement()" class="flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition">Procesar</button>
+                        <app-button-spinner
+                            [loading]="loading()"
+                            [btnClass]="'flex-1 p-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition'"
+                            (onClick)="confirmMovement()"
+                            loadingText="PROCESANDO...">
+                            Procesar
+                        </app-button-spinner>
                     </div>
                 </div>
             </div>
