@@ -162,10 +162,16 @@ export class RetailDashboardComponent implements OnInit {
   async loadData() {
     this.loading.set(true);
     try {
+        // Calculate boundaries in client timezone
+        const start = new Date();
+        start.setHours(0,0,0,0);
+        const end = new Date();
+        end.setHours(23,59,59,999);
+
         const [summary, top, low] = await Promise.all([
-            this.retailService.getDailySummary(),
+            this.retailService.getDailySummary(start.toISOString(), end.toISOString()),
             this.retailService.getTopProducts(10),
-            this.retailService.getLowStock(5)
+            this.retailService.getLowStock()
         ]);
 
         this.summary.set(summary);

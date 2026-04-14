@@ -90,11 +90,12 @@ export class RetailService {
   }
 
   // Reports
-  async getDailySummary() {
+  async getDailySummary(startDate?: string, endDate?: string) {
     const businessId = this.session.activeId();
-    return firstValueFrom(
-      this.http.get<any>(`${this.apiUrl}/retail/reports/${businessId}/daily-summary`)
-    );
+    let url = `${this.apiUrl}/retail/reports/${businessId}/daily-summary`;
+    if (startDate && endDate) url += `?startDate=${startDate}&endDate=${endDate}`;
+    
+    return firstValueFrom(this.http.get<any>(url));
   }
 
   async getTopProducts(limit: number = 5) {
@@ -104,10 +105,10 @@ export class RetailService {
     );
   }
 
-  async getLowStock(threshold: number = 5) {
+  async getLowStock() {
     const businessId = this.session.activeId();
     return firstValueFrom(
-      this.http.get<RetailProduct[]>(`${this.apiUrl}/retail/reports/${businessId}/low-stock?threshold=${threshold}`)
+      this.http.get<RetailProduct[]>(`${this.apiUrl}/retail/reports/${businessId}/low-stock`)
     );
   }
 
