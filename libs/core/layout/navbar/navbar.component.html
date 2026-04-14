@@ -1,5 +1,5 @@
 <header 
-  class="fixed top-0 right-0 z-[75] flex h-14 sm:h-16 items-center justify-between border-b border-border bg-background/80 px-3 sm:px-6 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+  class="fixed top-0 right-0 z-[var(--z-navbar)] flex h-14 sm:h-16 items-center justify-between border-b border-border bg-background/80 px-[var(--page-px)] backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
   [style.left.px]="layoutService.isMobile() ? 0 : (layoutService.isPinned() ? layoutService.constants.SIDEBAR_WIDTH_EXPANDED : layoutService.constants.SIDEBAR_WIDTH_COLLAPSED)"
 >
   <div class="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
