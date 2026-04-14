@@ -29,19 +29,28 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
     title: 'Principal',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, requiredFeature: 'DASHBOARD', requiredCapability: 'PRODUCTION' },
+      { label: 'Resumen', href: '/kiosco/dashboard', icon: LayoutDashboard, requiredFeature: 'DASHBOARD', requiredCapability: 'RETAIL' },
     ]
   },
   {
-    title: 'Kiosco',
+    title: 'Ventas',
     items: [
-      { label: 'Resumen', href: '/kiosco/dashboard', icon: LayoutDashboard, requiredFeature: 'DASHBOARD', requiredCapability: 'RETAIL' },
       { label: 'Venta (POS)', href: '/kiosco/venta', icon: ShoppingCart, requiredFeature: 'ORDERS', requiredCapability: 'RETAIL' },
       { label: 'Caja', href: '/kiosco/caja', icon: Wallet, requiredFeature: 'ORDERS', requiredCapability: 'RETAIL' },
+    ]
+  },
+  {
+    title: 'Inventario',
+    items: [
       { label: 'Productos', href: '/kiosco/productos', icon: Store, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
       { label: 'Compras', href: '/kiosco/compras', icon: ShoppingBag, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
       { label: 'Proveedores', href: '/kiosco/proveedores', icon: Truck, requiredFeature: 'STOCK', requiredCapability: 'RETAIL' },
+    ]
+  },
+  {
+    title: 'Finanzas',
+    items: [
       { label: 'Gastos', href: '/kiosco/gastos', icon: Receipt, requiredFeature: 'ORDERS', requiredCapability: 'RETAIL' },
-      { label: 'Equipo', href: '/personal', icon: UserCog, requiredFeature: 'TEAM', requiredCapability: 'RETAIL' },
     ]
   },
   {
@@ -71,7 +80,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
         requiredCapability: 'PRODUCTION'
       },
       { 
-        label: 'Stock de Producción', 
+        label: 'Stock de Taller', 
         href: '/stock', 
         icon: Grid, 
         requiredFeature: 'STOCK',
@@ -98,7 +107,12 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
         requiredCapability: 'PRODUCTION',
         configKey: 'materiales'
       },
-      { label: 'Equipo', href: '/personal', icon: UserCog, requiredFeature: 'TEAM', requiredCapability: 'PRODUCTION' },
+    ]
+  },
+  {
+    title: 'Equipo',
+    items: [
+      { label: 'Equipo', href: '/personal', icon: UserCog, requiredFeature: 'TEAM' },
     ]
   },
   {
