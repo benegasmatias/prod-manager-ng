@@ -65,7 +65,10 @@ import {
   CreditCard,
   Banknote,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Truck,
+  ShoppingBag,
+  Receipt
 } from 'lucide-angular';
 
 import { routes } from './app.routes';
@@ -132,7 +135,10 @@ export const appConfig: ApplicationConfig = {
         CreditCard,
         Banknote,
         CheckCircle2,
-        AlertCircle
+        AlertCircle,
+        Truck,
+        ShoppingBag,
+        Receipt
       })
     )
   ]

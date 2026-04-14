@@ -14,7 +14,36 @@ export enum RetailStockMovementType {
   INVENTORY_IN = 'INVENTORY_IN',
   INVENTORY_OUT = 'INVENTORY_OUT',
   ADJUST = 'ADJUST',
+  PURCHASE = 'PURCHASE',
 }
+
+export interface Supplier {
+  id: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
+  active: boolean;
+}
+
+export interface Purchase {
+  id: string;
+  supplierId: string;
+  supplier?: Supplier;
+  totalAmount: number;
+  operatorId?: string;
+  createdAt: string;
+  items?: PurchaseItem[];
+}
+
+export interface PurchaseItem {
+  id: string;
+  productId: string;
+  product?: RetailProduct;
+  quantity: number;
+  costPrice: number;
+}
+
 
 export interface CashDrawer {
   id: string;

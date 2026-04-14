@@ -8,6 +8,8 @@ import {
   CashMovement, 
   RetailProduct, 
   Sale, 
+  Supplier,
+  Purchase,
   CashMovementType, 
   RetailStockMovementType 
 } from '@shared/models/retail/retail.models';
@@ -118,5 +120,31 @@ export class RetailService {
         ? `${this.apiUrl}/retail/reports/${businessId}/movements?drawerId=${drawerId}`
         : `${this.apiUrl}/retail/reports/${businessId}/movements`;
     return firstValueFrom(this.http.get<any[]>(url));
+  }
+
+  // Sourcing & Purchases
+  async getSuppliers() {
+    const businessId = this.session.activeId();
+    return firstValueFrom(this.http.get<Supplier[]>(`${this.apiUrl}/retail/suppliers/${businessId}`));
+  }
+
+  async createSupplier(dto: Partial<Supplier>) {
+    const businessId = this.session.activeId();
+    return firstValueFrom(this.http.post<Supplier>(`${this.apiUrl}/retail/suppliers/${businessId}`, dto));
+  }
+
+  async updateSupplier(id: string, dto: Partial<Supplier>) {
+    const businessId = this.session.activeId();
+    return firstValueFrom(this.http.post<Supplier>(`${this.apiUrl}/retail/suppliers/${businessId}/${id}`, dto));
+  }
+
+  async getPurchases() {
+    const businessId = this.session.activeId();
+    return firstValueFrom(this.http.get<Purchase[]>(`${this.apiUrl}/retail/purchases/${businessId}`));
+  }
+
+  async registerPurchase(dto: { supplierId: string, items: { productId: string, quantity: number, costPrice: number }[] }) {
+    const businessId = this.session.activeId();
+    return firstValueFrom(this.http.post<Purchase>(`${this.apiUrl}/retail/purchases/${businessId}`, dto));
   }
 }

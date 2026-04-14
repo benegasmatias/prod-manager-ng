@@ -102,6 +102,16 @@ export class SessionService {
     });
   }
 
+  private resolveDefaultCapabilities(rubro: Rubro, existing: string[]): string[] {
+    const caps = new Set(existing);
+    if (rubro === 'KIOSCO') {
+      caps.add('RETAIL');
+    } else if (['IMPRESION_3D', 'METALURGICA', 'CARPINTERIA'].includes(rubro)) {
+      caps.add('PRODUCTION');
+    }
+    return Array.from(caps);
+  }
+
   public async initialize() {
     console.log('[SessionService] Initializing...');
     try {
@@ -116,7 +126,7 @@ export class SessionService {
           subscriptionExpiresAt: b.subscriptionExpiresAt,
           createdAt: b.createdAt,
           userRole: b.userRole,
-          capabilities: b.capabilities || []
+          capabilities: this.resolveDefaultCapabilities(mapCategoryToRubro(b.category), b.capabilities || [])
       }));
 
       this._negocios.set(mapped);

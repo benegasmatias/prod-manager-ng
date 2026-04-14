@@ -20,6 +20,14 @@ export const RETAIL_ROUTES: Routes = [
         path: 'venta',
         loadComponent: () => import('./venta/venta.component').then(m => m.RetailVentaComponent)
       },
+      {
+        path: 'proveedores',
+        loadComponent: () => import('./proveedores/proveedores.component').then(m => m.RetailProveedoresComponent)
+      },
+      {
+        path: 'compras',
+        loadComponent: () => import('./compras/compras.component').then(m => m.RetailComprasComponent)
+      },
       { path: '', redirectTo: 'venta', pathMatch: 'full' }
     ]
   }
