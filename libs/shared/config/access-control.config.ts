@@ -18,7 +18,11 @@ export const BUSINESS_FEATURES: Record<Rubro, BusinessFeatureConfig> = {
     defaultPath: '/dashboard'
   },
   GENERICO: {
-    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'REPORTS', 'SETTINGS'],
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'ORDERS_PRODUCTION', 'STOCK', 'TEAM', 'REPORTS', 'SETTINGS'],
+    defaultPath: '/dashboard'
+  },
+  KIOSCO: {
+    features: ['DASHBOARD', 'CLIENTS', 'ORDERS', 'STOCK', 'TEAM', 'REPORTS', 'SETTINGS'],
     defaultPath: '/dashboard'
   }
 };

@@ -13,6 +13,7 @@ import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, Pagi
 import { PedidoSortKey, PedidoSortDir } from '../../shared/models/pedido';
 import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
+import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-pedidos-page',
@@ -39,6 +40,7 @@ export class PedidosPageComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private confirm = inject(ConfirmService);
 
   // Labels and Icons for Template
   protected readonly labels = PEDIDOS_LABELS;
@@ -337,5 +339,28 @@ export class PedidosPageComponent implements OnInit {
 
   getStatusLabel(status: OrderStatus): string {
     return getStatusLabel(status, this.negocio()?.rubro);
+  }
+
+  async handleDelete(order: Pedido) {
+    const ok = await this.confirm.confirm({
+      title: 'Eliminar Pedido',
+      message: `¿Estás seguro de que deseas eliminar permanentemente el pedido #${order.code}? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar Ahora',
+      cancelLabel: 'Cancelar',
+      type: 'danger'
+    });
+
+    if (ok) {
+      this.loading.set(true);
+      try {
+        await this.api.delete(order.id, order.businessId);
+        await this.loadData();
+      } catch (err) {
+        console.error('Error deleting order:', err);
+        alert('No se pudo eliminar el pedido.');
+      } finally {
+        this.loading.set(false);
+      }
+    }
   }
 }

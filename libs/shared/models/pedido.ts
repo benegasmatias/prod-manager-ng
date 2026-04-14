@@ -60,15 +60,23 @@ export interface Payment {
 
 export interface ItemPedido {
   id: string;
-  nombreProducto: string;
-  descripcion?: string;
-  cantidad: number;
-  quantityProduced: number;
-  precioUnitario: number;
+  name: string;
+  nombreProducto?: string; // Legacy compatibility
+  description?: string;
+  descripcion?: string; // Legacy compatibility
+  qty: number;
+  cantidad?: number; // Legacy compatibility
+  doneQty: number;
+  quantityProduced?: number; // Legacy compatibility
+  price: number;
+  unitPrice?: number;
+  precioUnitario?: number; // Legacy compatibility
   senia: number;
   stlUrl?: string;
   weightGrams?: number;
   estimatedMinutes?: number;
+  deposit?: number;
+  referenceImages?: any[];
   metadata?: Record<string, any>;
   // Metalurgica site visit fields
   fecha_visita?: string;
@@ -87,6 +95,7 @@ export interface Pedido {
   code: string;
   type: 'CLIENT' | 'STOCK';
   clienteId: string;
+  customerId?: string;
   clientName: string;
   clientPhone?: string;
   fechaCreacion: string;
@@ -105,6 +114,7 @@ export interface Pedido {
   urgencia: Priority;
   responsableId?: string;
   operatorId?: string;
+  responsableGeneralId?: string;
   costoEstimado?: number;
   responsableGeneral?: Employee;
   payments: Payment[];
@@ -127,9 +137,15 @@ export interface StatusHistoryEntry {
   orderId: string;
   fromStatus: string;
   toStatus: string;
-  employee?: Employee;
-  notes?: string;
-  createdAt: string;
+  changedAt: string;
+  createdAt?: string; // fallback
+  note?: string;
+  notes?: string;   // fallback
+  performedBy?: {
+      id: string;
+      fullName: string;
+  };
+  employee?: Employee; // fallback
 }
 
 export type PedidoSortKey = 'code' | 'fechaCreacion' | 'dueDate' | 'fechaActualizacion' | 'saldo' | 'total' | string;

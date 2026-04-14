@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, ArrowUp, ArrowDown, ArrowUpDown, Eye, MessageCircle, TrendingUp, ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info } from 'lucide-angular';
+import { LucideAngularModule, ArrowUp, ArrowDown, ArrowUpDown, Eye, MessageCircle, TrendingUp, ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info, Trash2, Settings } from 'lucide-angular';
 import { Pedido } from '../../models/pedido';
 import { Rubro } from '../../models/negocio';
 import { getStatusLabel, getStatusStyles } from '../../utils/negocio-utils';
@@ -120,9 +120,28 @@ import { UI_LABELS } from '../../config/ui-labels.config';
                     <button (click)="viewClick.emit(order)" class="h-8 w-8 flex items-center justify-center rounded-xl text-zinc-400 hover:text-primary hover:bg-primary/5 transition-all active:scale-90">
                       <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
                     </button>
-                    <button (click)="_onManageClick(order)" class="h-8 w-8 flex items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-90">
-                      <lucide-angular [img]="icons.MoreVertical" class="h-4 w-4"></lucide-angular>
-                    </button>
+                    <div class="relative">
+                      <button (click)="_onManageClick(order)" class="h-8 w-8 flex items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-90">
+                        <lucide-angular [img]="icons.MoreVertical" class="h-4 w-4"></lucide-angular>
+                      </button>
+
+                      <!-- Dropdown Menu -->
+                      @if (activeMenuOrderId() === order.id) {
+                        <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-zinc-900 rounded-[1.5rem] border border-zinc-100 dark:border-zinc-800 shadow-2xl z-[50] py-2 animate-in fade-in zoom-in duration-200">
+                          <button (click)="openStatus(order)" class="w-full px-4 py-3 flex items-center gap-3 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 text-xs font-bold transition-colors">
+                            <lucide-angular [img]="icons.Settings" class="h-4 w-4 opacity-50"></lucide-angular>
+                            Gestionar Estados
+                          </button>
+                          <div class="h-px bg-zinc-100 dark:bg-zinc-800 mx-2 my-1"></div>
+                          <button (click)="openDelete(order)" class="w-full px-4 py-3 flex items-center gap-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-xs font-bold transition-colors">
+                            <lucide-angular [img]="icons.Trash2" class="h-4 w-4 opacity-70"></lucide-angular>
+                            Eliminar Pedido
+                          </button>
+                        </div>
+                        <!-- Backdrop to close -->
+                        <div (click)="activeMenuOrderId.set(null)" class="fixed inset-0 z-[-1]"></div>
+                      }
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -132,33 +151,33 @@ import { UI_LABELS } from '../../config/ui-labels.config';
       </div>
 
       <!-- CARD VIEW (Mobile) -->
-      <div class="md:hidden space-y-4">
+      <div class="md:hidden space-y-2">
         @for (order of orders; track order.id) {
-          <div class="bg-white dark:bg-zinc-900/40 rounded-[2rem] border border-zinc-100 dark:border-zinc-800 p-5 shadow-sm active:scale-[0.98] transition-all" (click)="viewClick.emit(order)">
-            <div class="flex items-start justify-between gap-4 mb-4">
-              <div class="flex flex-col gap-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <span class="text-[9px] font-black text-zinc-400 tabular-nums bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">#{{ order.code }}</span>
+          <div class="bg-white dark:bg-zinc-900/40 rounded-2xl md:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 p-4 shadow-sm active:scale-[0.98] transition-all" (click)="viewClick.emit(order)">
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <div class="flex flex-col gap-0.5 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[8px] font-black text-zinc-400 tabular-nums bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-full">#{{ order.code }}</span>
                   @if (!hideTypeColumn && order.type === 'STOCK') {
-                    <span class="text-[8px] font-black text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full uppercase">Stock</span>
+                    <span class="text-[7px] font-black text-purple-600 bg-purple-100 px-1.5 py-0.5 rounded-full uppercase">Stock</span>
                   }
                 </div>
-                <h3 class="text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">
+                <h3 class="text-xs md:text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">
                   {{ order.clientName || fallbackClientName || 'S/N' }}
                 </h3>
-                <p class="text-[10px] font-bold text-zinc-400 line-clamp-1 italic">
+                <p class="text-[9px] font-bold text-zinc-400 line-clamp-1 italic">
                   {{ order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
                   {{ order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
                 </p>
               </div>
 
-              <lucide-angular [img]="icons.Eye" class="h-4 w-4 text-zinc-300"></lucide-angular>
+              <lucide-angular [img]="icons.Eye" class="h-3.5 w-3.5 text-zinc-300"></lucide-angular>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 py-3 border-y border-zinc-100/50 dark:border-zinc-800/50">
+            <div class="flex flex-wrap items-center gap-2 py-2 border-y border-zinc-100/50 dark:border-zinc-800/50">
               <button 
                 (click)="$event.stopPropagation(); _onStatusClick(order)"
-                [class]="'text-[9px] font-black uppercase tracking-tight rounded-xl px-4 py-2 border shadow-sm transition-all ' + getStatusStyles(order.status)"
+                [class]="'text-[9px] font-black uppercase tracking-tight rounded-lg px-3 py-1.5 border shadow-sm transition-all ' + getStatusStyles(order.status)"
               >
                 {{ getStatusLabel(order.status) }}
               </button>
@@ -166,8 +185,8 @@ import { UI_LABELS } from '../../config/ui-labels.config';
               <div class="flex-1"></div>
 
               @if (order.responsableGeneral) {
-                <div class="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/40 px-2 py-1 rounded-full border border-zinc-200/50 dark:border-zinc-700/50">
-                  <div class="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center text-[8px] font-black text-primary uppercase">
+                <div class="flex items-center gap-1 bg-zinc-50 dark:bg-zinc-800/40 px-1.5 py-0.5 rounded-full border border-zinc-200/50 dark:border-zinc-700/50">
+                  <div class="h-4 w-4 rounded-full bg-primary/10 flex items-center justify-center text-[7px] font-black text-primary uppercase">
                     {{ order.responsableGeneral.firstName[0] }}{{ order.responsableGeneral.lastName ? order.responsableGeneral.lastName[0] : '' }}
                   </div>
                   <span class="text-[9px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-tighter truncate max-w-[60px]">
@@ -177,18 +196,18 @@ import { UI_LABELS } from '../../config/ui-labels.config';
               }
             </div>
 
-            <div class="flex items-center justify-between mt-4">
+            <div class="flex items-center justify-between mt-2">
               <div class="flex flex-col">
-                <span class="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Entrega</span>
-                <span class="text-[10px] font-black text-zinc-900 dark:text-zinc-50">
+                <span class="text-[7px] font-black text-zinc-400 uppercase tracking-widest">Entrega</span>
+                <span class="text-[9px] font-black text-zinc-900 dark:text-zinc-50">
                   {{ order.dueDate | date:'dd MMM, yyyy' }}
                 </span>
               </div>
 
               @if (!hideFinancials) {
                 <div class="flex flex-col items-end">
-                  <span class="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Saldo Pendiente</span>
-                  <span [class]="'text-xs font-black tabular-nums ' + (getBalance(order) > 0 ? 'text-rose-500' : 'text-emerald-500')">
+                  <span class="text-[7px] font-black text-zinc-400 uppercase tracking-widest">Saldo</span>
+                  <span [class]="'text-[10px] font-black tabular-nums ' + (getBalance(order) > 0 ? 'text-rose-500' : 'text-emerald-500')">
                     {{ getBalance(order) | currency:labels.CURRENCY.CODE:labels.CURRENCY.DISPLAY:labels.CURRENCY.DIGITS }}
                   </span>
                 </div>
@@ -196,9 +215,9 @@ import { UI_LABELS } from '../../config/ui-labels.config';
 
               <button 
                 (click)="$event.stopPropagation(); _onManageClick(order)" 
-                class="h-8 w-8 flex items-center justify-center rounded-xl text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
+                class="h-7 w-7 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
               >
-                <lucide-angular [img]="icons.MoreVertical" class="h-4 w-4"></lucide-angular>
+                <lucide-angular [img]="icons.MoreVertical" class="h-3.5 w-3.5"></lucide-angular>
               </button>
             </div>
           </div>
@@ -235,13 +254,16 @@ export class OrdersTableComponent {
   @Output() statusClick = new EventEmitter<Pedido>();
   @Output() viewClick = new EventEmitter<Pedido>();
   @Output() manageClick = new EventEmitter<Pedido>();
+  @Output() deleteClick = new EventEmitter<Pedido>();
 
   protected readonly labels = UI_LABELS;
 
   icons = {
     ArrowUp, ArrowDown, ArrowUpDown, Eye, MessageCircle, TrendingUp,
-    ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info
+    ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info, Trash2, Settings
   };
+
+  activeMenuOrderId = signal<string | null>(null);
 
   _onSort(key: string) {
     this.sortChange.emit(key);
@@ -252,7 +274,21 @@ export class OrdersTableComponent {
   }
 
   _onManageClick(order: Pedido) {
+    if (this.activeMenuOrderId() === order.id) {
+      this.activeMenuOrderId.set(null);
+    } else {
+      this.activeMenuOrderId.set(order.id);
+    }
+  }
+
+  openStatus(order: Pedido) {
+    this.activeMenuOrderId.set(null);
     this.manageClick.emit(order);
+  }
+
+  openDelete(order: Pedido) {
+    this.activeMenuOrderId.set(null);
+    this.deleteClick.emit(order);
   }
 
   protected getStatusLabel(status: string): string {

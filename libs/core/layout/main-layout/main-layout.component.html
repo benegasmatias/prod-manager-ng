@@ -11,7 +11,7 @@
   <!-- Mobile Overlay -->
   @if (layoutService.isMobile() && layoutService.isMobileMenuOpen()) {
     <div 
-      class="fixed inset-0 z-[45] bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
+      class="fixed inset-0 z-[var(--z-overlay)] bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
       (click)="layoutService.closeMobileMenu()"
     ></div>
   }
@@ -28,7 +28,7 @@
     <app-navbar></app-navbar>
 
     <!-- Main Page Content -->
-    <main class="flex-1 mt-14 sm:mt-16 p-3 sm:p-5 lg:p-8 relative z-10 overflow-visible">
+    <main class="flex-1 mt-14 sm:mt-16 p-[var(--page-px)] pt-3 sm:pt-5 lg:pt-8 relative z-10 overflow-visible">
       <div class="animate-in fade-in zoom-in-95 duration-500" style="height: 100%;">
         <router-outlet></router-outlet>
       </div>
@@ -45,6 +45,13 @@
         <div class="hidden sm:block h-3 w-px bg-border"></div>
         <span class="hidden lg:inline">Angular 21 + Tailwind 4</span>
       </div>
+
+      <!-- Developer Credit -->
+      <div class="hidden md:flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+        <span class="font-bold">By</span>
+        <span class="text-primary font-black">Shelter solutions digital</span>
+      </div>
+
       <div class="flex items-center gap-2">
         <span class="hidden sm:inline text-text-muted">Panel de Control: Matias Benegas</span>
         <div

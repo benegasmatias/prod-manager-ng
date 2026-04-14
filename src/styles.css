@@ -32,6 +32,37 @@
   --radius-3xl: 2rem;
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Z-Index Scale */
+  --z-navbar: 40;
+  --z-sidebar: 50;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-toast: 100;
+
+  /* Responsive Spacing Tokens */
+  --page-px: 1rem;
+  --page-py: 1rem;
+  --card-p: 1rem;
+  --section-gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --page-px: 1.5rem;
+    --page-py: 2rem;
+    --card-p: 1.5rem;
+    --section-gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-px: 2.5rem;
+    --page-py: 3rem;
+    --card-p: 2rem;
+    --section-gap: 3rem;
+  }
 }
 
 @layer base {

@@ -10,7 +10,7 @@
         Equipo <span class="text-primary italic">de Trabajo</span>
       </h1>
       <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed text-left">
-        Administración de operarios, roles de producción y seguimiento de desempeño del personal operativo.
+        Administración de integrantes, roles y gestión de acceso para el personal del negocio.
       </p>
     </div>
     <button (click)="openNew()"
@@ -229,7 +229,7 @@
               <div class="flex flex-col items-center justify-center gap-4">
                 <div
                   class="h-16 w-16 rounded-3xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800">
-                  <lucide-angular [img]="icons.HardHat"
+                  <lucide-angular [img]="icons.User"
                     class="h-8 w-8 text-zinc-200 dark:text-zinc-800"></lucide-angular>
                 </div>
                 <div class="space-y-1">
@@ -464,11 +464,11 @@
             <button (click)="formRole.set('OPERATOR')"
               [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'OPERATOR' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Operario</span>
+                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Operario / Staff</span>
                 <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'OPERATOR'"
                   [class.bg-zinc-200]="formRole() !== 'OPERATOR'"></div>
               </div>
-              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Acceso a producción, órdenes y stock.</p>
+              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Acceso a ventas, stock y operaciones diarias.</p>
             </button>
 
             <button (click)="formRole.set('SALES')"
@@ -485,11 +485,11 @@
             <button (click)="formRole.set('BUSINESS_ADMIN')"
               [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'BUSINESS_ADMIN' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Admin</span>
+                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Administrador</span>
                 <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'BUSINESS_ADMIN'"
                   [class.bg-zinc-200]="formRole() !== 'BUSINESS_ADMIN'"></div>
               </div>
-              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Configuración de equipo y maquinaria.</p>
+              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Configuración de equipo, precios y stock.</p>
             </button>
 
             <button (click)="formRole.set('OWNER')"

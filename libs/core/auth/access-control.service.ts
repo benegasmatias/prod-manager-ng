@@ -70,6 +70,11 @@ export class AccessControlService {
       return false;
     }
 
+    // New Capability-Based Modular Gating
+    if (item.requiredCapability && !this.sessionService.hasCapability(item.requiredCapability)) {
+      return false;
+    }
+
     if (item.requiredPermission && item.requiredFeature) {
       return this.hasPermission(item.requiredFeature, item.requiredPermission);
     }

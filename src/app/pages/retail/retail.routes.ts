@@ -1,0 +1,38 @@
+import { Routes } from '@angular/router';
+
+export const RETAIL_ROUTES: Routes = [
+  {
+    path: '',
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.RetailDashboardComponent)
+      },
+      {
+        path: 'caja',
+        loadComponent: () => import('./caja/caja.component').then(m => m.RetailCajaComponent)
+      },
+      {
+        path: 'productos',
+        loadComponent: () => import('./productos/productos.component').then(m => m.RetailProductsComponent)
+      },
+      {
+        path: 'venta',
+        loadComponent: () => import('./venta/venta.component').then(m => m.RetailVentaComponent)
+      },
+      {
+        path: 'proveedores',
+        loadComponent: () => import('./proveedores/proveedores.component').then(m => m.RetailProveedoresComponent)
+      },
+      {
+        path: 'compras',
+        loadComponent: () => import('./compras/compras.component').then(m => m.RetailComprasComponent)
+      },
+      {
+        path: 'gastos',
+        loadComponent: () => import('./gastos/gastos.component').then(m => m.RetailGastosComponent)
+      },
+      { path: '', redirectTo: 'venta', pathMatch: 'full' }
+    ]
+  }
+];

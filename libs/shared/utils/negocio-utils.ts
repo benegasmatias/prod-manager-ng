@@ -253,6 +253,48 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
         }
       };
 
+    case 'KIOSCO':
+      return {
+        sidebarItems: ['/kiosco/dashboard', '/kiosco/venta', '/kiosco/caja', '/kiosco/productos', '/kiosco/compras', '/kiosco/proveedores', '/reportes', '/ajustes'],
+        labels: {
+          produccion: 'Ventas de Hoy',
+          items: 'Ventas',
+          maquinas: 'Cajas Registradoras',
+          materiales: 'Proveedores',
+          unidadName: 'Nombre de la Caja',
+          unidadModel: 'Ubicación / Sector',
+          staffPlaceholder: 'Vendedor, Cajero, Repositor...',
+        },
+        icons: {
+          produccion: 'TrendingUp',
+          maquinas: 'Wallet',
+          materiales: 'Truck',
+        },
+        stats: [
+          ...commonStats,
+          { key: 'activeSales', label: 'Ventas de Hoy', icon: 'ShoppingCart', format: 'number' },
+          { key: 'lowStock', label: 'Alertas de Stock', icon: 'AlertTriangle', format: 'number' },
+        ],
+        productionStages: [], // Not used in retail
+        materialConfig: {
+          namePlaceholder: 'Ej: Coca Cola 500ml',
+          brandPlaceholder: 'Ej: Coca Cola Company',
+          defaultUnit: 'uds',
+          defaultType: 'PRODUCTO',
+          types: [{ key: 'PRODUCTO', label: 'Producto' }],
+          units: [{ key: 'uds', label: 'Unidad' }],
+        },
+        itemFields: [],
+        staffPlaceholder: 'Ej: Vendedor, Cajero...',
+        features: {
+          hasNozzle: false,
+          hasMaxFilaments: false,
+          hasVisits: false,
+          hasQuotes: false,
+          hasMaterials: false,
+        }
+      };
+
     case 'GENERICO':
     default:
       return {
@@ -388,6 +430,8 @@ export function mapCategoryToRubro(category: string): Rubro {
   const map: Record<string, Rubro> = {
     'METALURGICA': 'METALURGICA',
     'CARPINTERIA': 'CARPINTERIA',
+    'KIOSCO': 'KIOSCO',
+    'RETAIL': 'KIOSCO',
     'GENERICO': 'GENERICO'
   };
 

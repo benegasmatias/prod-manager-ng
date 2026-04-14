@@ -37,9 +37,45 @@ export class SessionService {
     this.activeNegocio()?.rubro || APP_CONFIG.DEFAULT_RUBRO
   );
 
+  activeCapabilities = computed<string[]>(() => 
+    this.activeNegocio()?.capabilities || []
+  );
+
+  hasCapability(capability: string): boolean {
+    return this.activeCapabilities().includes(capability);
+  }
+
   isInitialized = signal(false);
+  private initResolver: (() => void) | null = null;
+  private initPromise = new Promise<void>((resolve) => {
+    this.initResolver = resolve;
+  });
 
   private lastUserId: string | null = null;
+
+  /**
+   * Returns a promise that resolves when the session is fully initialized.
+   * Useful for guards that need to wait on refresh.
+   */
+  async waitUntilInitialized(): Promise<void> {
+    if (this.isInitialized()) return;
+    return this.initPromise;
+  }
+
+  private setInitialized(val: boolean) {
+    this.isInitialized.set(val);
+    if (val && this.initResolver) {
+      this.initResolver();
+    }
+  }
+
+  // Helper to reboot the promise (e.g. on logout/login of different user)
+  private resetInitState() {
+    this.isInitialized.set(false);
+    this.initPromise = new Promise<void>((resolve) => {
+      this.initResolver = resolve;
+    });
+  }
 
   constructor() {
     console.log('[SessionService] Constructor started');
@@ -53,7 +89,7 @@ export class SessionService {
         // Solo inicializar si el usuario cambió o si no está inicializado
         if (this.lastUserId !== session.user.id) {
           this.lastUserId = session.user.id;
-          this.isInitialized.set(false); // Reset initialization state for new user
+          this.resetInitState(); // Reset initialization state for new user
           this.initialize();
         }
       } else {
@@ -61,9 +97,19 @@ export class SessionService {
         this._negocios.set([]);
         this._activeId.set(null);
         this.context.setBusinessId(null);
-        this.isInitialized.set(true);
+        this.setInitialized(true);
       }
     });
+  }
+
+  private resolveDefaultCapabilities(rubro: Rubro, existing: string[]): string[] {
+    const caps = new Set(existing);
+    if (rubro === 'KIOSCO') {
+      caps.add('RETAIL');
+    } else if (['IMPRESION_3D', 'METALURGICA', 'CARPINTERIA'].includes(rubro)) {
+      caps.add('PRODUCTION');
+    }
+    return Array.from(caps);
   }
 
   public async initialize() {
@@ -79,7 +125,8 @@ export class SessionService {
           status: b.status,
           subscriptionExpiresAt: b.subscriptionExpiresAt,
           createdAt: b.createdAt,
-          userRole: b.userRole
+          userRole: b.userRole,
+          capabilities: this.resolveDefaultCapabilities(mapCategoryToRubro(b.category), b.capabilities || [])
       }));
 
       this._negocios.set(mapped);
@@ -99,10 +146,10 @@ export class SessionService {
       }
 
       console.log('[SessionService] Initialized successful');
-      this.isInitialized.set(true);
+      this.setInitialized(true);
     } catch (error) {
       console.error('[SessionService] Initialization error:', error);
-      this.isInitialized.set(true);
+      this.setInitialized(true);
     }
   }
 
@@ -129,6 +176,7 @@ export class SessionService {
         userRole: 'OWNER'
       };
       this._negocios.update(list => [...list, newNegocio]);
+      this.setActiveId(newNegocio.id);
       return newNegocio;
     } catch (error) {
       console.error('[SessionService] Error adding business:', error);

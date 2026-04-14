@@ -1,4 +1,4 @@
-export type Rubro = 'IMPRESION_3D' | 'METALURGICA' | 'CARPINTERIA' | 'GENERICO';
+export type Rubro = 'IMPRESION_3D' | 'METALURGICA' | 'CARPINTERIA' | 'KIOSCO' | 'GENERICO';
 
 export interface BusinessTemplate {
   key: Rubro;
@@ -19,6 +19,7 @@ export interface Negocio {
   subscriptionExpiresAt?: string;
   createdAt: string;
   userRole?: 'OWNER' | 'ADMIN' | 'OPERATOR' | 'VIEWER';
+  capabilities?: string[];
 }
 
 export interface CampoItem {

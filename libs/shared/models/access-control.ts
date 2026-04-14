@@ -64,6 +64,7 @@ export interface MenuItemMetadata {
   icon: any; // Type depends on the icon library (e.g., Lucide)
   requiredFeature?: FeatureCode;
   requiredPermission?: PermissionAction;
+  requiredCapability?: string; // Modular SaaS capability gating
   shortcut?: string;
   configKey?: string; // Links to business-specific label overrides
 }

@@ -6,12 +6,13 @@ import { Pedido, Employee } from '@shared/models';
 import { 
   LucideAngularModule, ArrowLeft, Package, User, Calendar, Clock, 
   DollarSign, CheckCircle, Info, Tag, History, MessageSquare, 
-  ChevronRight, Edit3, AlertCircle, TrendingUp, Mail, Phone, Zap
+  ChevronRight, Edit3, AlertCircle, TrendingUp, Mail, Phone, Zap, Trash2
 } from 'lucide-angular';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
 import { ClientDetailComponent } from './components/client-detail.component';
 import { StockDetailComponent } from '../../stock/components/stock-detail/stock-detail.component';
 import { SessionService } from '@core/session/session.service';
+import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-pedido-detalle',
@@ -23,12 +24,12 @@ import { SessionService } from '@core/session/session.service';
   template: `
     <div class="min-h-screen bg-[#fafbfc] dark:bg-zinc-950 p-6 md:p-10 animate-in fade-in duration-500">
       
-      @if (loading()) {
+      @if (loading() || isDeleting()) {
         <div class="flex flex-col items-center justify-center py-40 space-y-6">
           <div class="h-16 w-16 rounded-[2rem] border-4 border-primary/20 border-t-primary animate-spin shadow-xl"></div>
           <div class="text-center">
-            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Levantando Expediente</p>
-            <p class="text-xs font-bold text-zinc-300 mt-2 italic">Procesando metadatos y activos...</p>
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">{{ isDeleting() ? 'Eliminando Pedido' : 'Levantando Expediente' }}</p>
+            <p class="text-xs font-bold text-zinc-300 mt-2 italic">{{ isDeleting() ? 'Borrando registros permanentemente...' : 'Procesando metadatos y activos...' }}</p>
           </div>
         </div>
       } @else if (pedido()) {
@@ -37,7 +38,8 @@ import { SessionService } from '@core/session/session.service';
         @if (pedido()?.type === 'STOCK') {
           <app-stock-detail 
             [pedido]="pedido()" 
-            (onSaved)="loadData()">
+            (onSaved)="loadData()"
+            (onDelete)="handleDelete()">
           </app-stock-detail>
         } @else {
           <app-client-detail 
@@ -48,7 +50,8 @@ import { SessionService } from '@core/session/session.service';
             [hasPendingPayment]="hasPendingPayment()"
             [employees]="employees()"
             (onSaved)="loadData()"
-            (onEdit)="handleEdit()">
+            (onEdit)="handleEdit()"
+            (onDelete)="handleDelete()">
           </app-client-detail>
         }
 
@@ -76,9 +79,11 @@ export class PedidoDetalleComponent implements OnInit {
   private router = inject(Router);
   private api = inject(PedidosApiService);
   private session = inject(SessionService);
+  private confirm = inject(ConfirmService);
   
   pedido = signal<Pedido | null>(null);
   loading = signal(true);
+  isDeleting = signal(false);
   isManageModalOpen = signal(false);
   employees = signal<Employee[]>([]);
 
@@ -86,7 +91,7 @@ export class PedidoDetalleComponent implements OnInit {
   icons = {
     ArrowLeft, Package, User, Calendar, Clock, DollarSign, 
     CheckCircle, Info, Tag, History, MessageSquare, ChevronRight, 
-    Edit3, AlertCircle, TrendingUp, Mail, Phone, Zap
+    Edit3, AlertCircle, TrendingUp, Mail, Phone, Zap, Trash2
   };
 
   // Computeds for Operative Intelligence
@@ -203,6 +208,31 @@ export class PedidoDetalleComponent implements OnInit {
     const p = this.pedido();
     if (!p) return;
     this.router.navigate(['/pedidos/editar', p.id]);
+  }
+
+  async handleDelete() {
+    const p = this.pedido();
+    if (!p) return;
+
+    const ok = await this.confirm.confirm({
+      title: 'Eliminar Pedido',
+      message: `¿Estás seguro de que deseas eliminar permanentemente el pedido #${p.code}? Esta acción no se puede deshacer.`,
+      confirmLabel: 'Eliminar Ahora',
+      cancelLabel: 'Cancelar',
+      type: 'danger'
+    });
+
+    if (ok) {
+      try {
+        this.isDeleting.set(true);
+        await this.api.delete(p.id, p.businessId);
+        this.router.navigate(['/pedidos']);
+      } catch (error) {
+        this.isDeleting.set(false);
+        console.error('Error deleting order:', error);
+        alert('No se pudo eliminar el pedido. Verifique su conexión o permisos.');
+      }
+    }
   }
 
   downloadFile(url?: string) {

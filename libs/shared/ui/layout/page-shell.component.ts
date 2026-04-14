@@ -6,26 +6,26 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="space-y-8 animate-in fade-in duration-700">
+    <div class="space-y-[var(--section-gap)] animate-in fade-in duration-700">
       <!-- HEADER LAYER -->
-      <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4 sm:px-0">
-        <div class="space-y-1">
-          <div class="flex items-center gap-2 mb-1">
-            <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+      <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 px-0">
+        <div class="space-y-0.5 md:space-y-1">
+          <div class="flex items-center gap-2 mb-0.5 md:mb-1">
+            <div class="h-1.2 w-1.2 md:h-1.5 md:w-1.5 rounded-full bg-primary animate-pulse"></div>
+            <span class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-primary">
               {{ category() }}
             </span>
           </div>
-          <h1 class="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 uppercase">
+          <h1 class="text-lg md:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 uppercase leading-tight">
             {{ title() }} <span class="italic text-primary">{{ titleAccent() }}</span>
           </h1>
-          <p class="text-[11px] font-bold text-zinc-400 leading-relaxed uppercase tracking-widest max-w-2xl">
+          <p class="hidden md:block text-[11px] font-bold text-zinc-400 leading-relaxed uppercase tracking-widest max-w-2xl">
             {{ description() }}
           </p>
         </div>
 
         <!-- ACTIONS SLOT -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 md:gap-3 w-full md:w-auto">
           <ng-content select="[actions]"></ng-content>
         </div>
       </header>

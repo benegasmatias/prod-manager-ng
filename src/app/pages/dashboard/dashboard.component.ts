@@ -55,11 +55,11 @@ import { cn } from '@shared/utils/cn';
       </div>
 
       <!-- DASHBOARD CONTENT LAYER -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-16 pb-20">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 md:gap-y-16 pb-20">
         
         <!-- DYNAMIC SECTIONS ENGINE -->
         @for (section of activeConfig().sections; track section.widgetId) {
-          <section [class]="cn('space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000', section.fullWidth ? 'lg:col-span-2' : '')">
+          <section [class]="cn('space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000', section.fullWidth ? 'lg:col-span-2' : '')">
             
             @if (section.title && section.widgetId !== 'hero-summary' && section.widgetId !== 'primary-metrics') {
               <div class="flex items-center justify-between px-2">
@@ -86,24 +86,24 @@ import { cn } from '@shared/utils/cn';
                 ></app-kpi-grid>
               }
               @case ('secondary-metrics') {
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  <div class="p-10 rounded-[2.5rem] border border-zinc-100/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-xl hover:border-zinc-200">
-                    <div class="space-y-2 z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                  <div class="p-5 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-zinc-100/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-xl hover:border-zinc-200">
+                    <div class="space-y-1 md:space-y-2 z-10">
                       <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 opacity-80">Máquinas Produciendo</span>
-                      <p class="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">{{ summary()?.activeMachines || 0 }} UNIDADES</p>
+                      <p class="text-xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">{{ summary()?.activeMachines || 0 }} UNIDADES</p>
                     </div>
-                    <div class="h-14 w-14 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-primary/30 group-hover:text-primary group-hover:bg-primary/5 transition-all duration-500">
-                      <lucide-angular [img]="icons.Printer" class="h-6 w-6"></lucide-angular>
+                    <div class="h-10 w-10 md:h-14 md:w-14 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-primary/30 group-hover:text-primary group-hover:bg-primary/5 transition-all duration-500">
+                      <lucide-angular [img]="icons.Printer" class="h-5 w-5 md:h-6 md:w-6"></lucide-angular>
                     </div>
                   </div>
                   
-                  <div class="p-10 rounded-[2.5rem] border border-zinc-100/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-xl hover:border-zinc-200">
-                    <div class="space-y-2 z-10">
+                  <div class="p-5 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-zinc-100/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-xl hover:border-zinc-200">
+                    <div class="space-y-1 md:space-y-2 z-10">
                       <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 opacity-80">Captación Mensual</span>
-                      <p class="text-3xl font-black text-emerald-500 tracking-tighter">+{{ summary()?.newCustomers || 0 }} CLIENTES</p>
+                      <p class="text-xl md:text-3xl font-black text-emerald-500 tracking-tighter">+{{ summary()?.newCustomers || 0 }} CLIENTES</p>
                     </div>
-                    <div class="h-14 w-14 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 group-hover:text-zinc-400 group-hover:bg-zinc-100 transition-all duration-500">
-                      <lucide-angular [img]="icons.Users" class="h-6 w-6"></lucide-angular>
+                    <div class="h-10 w-10 md:h-14 md:w-14 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 group-hover:text-zinc-400 group-hover:bg-zinc-100 transition-all duration-500">
+                      <lucide-angular [img]="icons.Users" class="h-5 w-5 md:h-6 md:w-6"></lucide-angular>
                     </div>
                   </div>
                 </div>
@@ -112,9 +112,9 @@ import { cn } from '@shared/utils/cn';
                 <app-recent-orders-widget [orders]="summary()?.recentOrders || []"></app-recent-orders-widget>
               }
               @default {
-                <div class="p-12 rounded-[2.5rem] border border-dashed border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center space-y-4 opacity-50 grayscale transition-all hover:grayscale-0">
-                   <lucide-angular [img]="icons.Clock" class="h-8 w-8 text-zinc-400"></lucide-angular>
-                   <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Extensión Industrial en Fase de Implementación</p>
+                <div class="p-8 md:p-12 rounded-2xl md:rounded-[2.5rem] border border-dashed border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center space-y-4 opacity-50 grayscale transition-all hover:grayscale-0">
+                   <lucide-angular [img]="icons.Clock" class="h-6 w-6 md:h-8 md:w-8 text-zinc-400"></lucide-angular>
+                   <p class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-zinc-400">Extensión Industrial en Fase de Implementación</p>
                 </div>
               }
             }
@@ -146,7 +146,15 @@ export class DashboardComponent {
 
   activeConfig = computed(() => {
     const rubro = this.session.rubro();
-    return DASHBOARD_CONFIG[rubro] || DEFAULT_DASHBOARD;
+    const caps = this.session.activeCapabilities();
+    const baseConfig = DASHBOARD_CONFIG[rubro] || DEFAULT_DASHBOARD;
+    
+    return {
+      ...baseConfig,
+      metrics: baseConfig.metrics.filter(m => !m.requiredCapability || caps.includes(m.requiredCapability)),
+      sections: baseConfig.sections.filter(s => !s.requiredCapability || caps.includes(s.requiredCapability)),
+      quickActions: baseConfig.quickActions.filter(a => !a.requiredCapability || caps.includes(a.requiredCapability))
+    };
   });
 
   readonly icons = {

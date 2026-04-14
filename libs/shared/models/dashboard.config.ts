@@ -7,6 +7,7 @@ export interface DashboardMetric {
   color?: string;
   dataKey: string; // The property name in the summary DTO (e.g. 'totalSales', 'activePrinters')
   unit?: string;
+  requiredCapability?: string;
 }
 
 export interface DashboardQuickAction {
@@ -15,6 +16,7 @@ export interface DashboardQuickAction {
   url?: string;
   action?: string;
   color?: string;
+  requiredCapability?: string;
 }
 
 export interface DashboardSection {
@@ -22,6 +24,7 @@ export interface DashboardSection {
   type: 'grid' | 'list' | 'chart' | 'custom';
   widgetId?: string; // For specialized components
   fullWidth?: boolean;
+  requiredCapability?: string;
 }
 
 export interface DashboardSectionTitles {

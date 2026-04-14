@@ -46,7 +46,7 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
             <h3 class="text-sm font-black uppercase tracking-widest text-zinc-400">Parámetros del Ítem</h3>
           </div>
           @if (canRemove()) {
-            <button type="button" (click)="onRemove.emit()" class="h-10 w-10 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center justify-center">
+            <button type="button" [disabled]="isSaving()" (click)="onRemove.emit()" class="h-10 w-10 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center justify-center disabled:opacity-30 disabled:grayscale">
               <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
             </button>
           }
@@ -111,6 +111,7 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
                           [(value)]="item[f.key]"
                           (valueChange)="onUpdate.emit()"
                           [placeholder]="f.placeholder || '0,00'"
+                          [disabled]="isSaving()"
                         ></app-money-input>
                       } @else if (f.tipo === 'number') {
                          <div class="relative group">
@@ -182,7 +183,7 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
               <button 
                 type="button" 
                 (click)="applySuggestedPrice()"
-                [disabled]="getSuggestedPrice() <= 0"
+                [disabled]="getSuggestedPrice() <= 0 || isSaving()"
                 class="h-12 px-6 w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base tabular-nums tracking-tight shadow-xl shadow-indigo-600/20 transition-all disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none flex items-center justify-center gap-2 group/btn relative overflow-hidden"
               >
                 <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
@@ -204,6 +205,7 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
                 [(value)]="item.precioUnitario"
                 (valueChange)="onUpdate.emit()"
                 inputClassName="h-12 text-sm shadow-sm"
+                [disabled]="isSaving()"
               ></app-money-input>
             </div>
 
@@ -215,6 +217,7 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
                 [color]="rubro() === 'METALURGICA' ? 'indigo' : 'primary'"
                 placeholder="0,00"
                 inputClassName="h-12 text-sm shadow-sm"
+                [disabled]="isSaving()"
               ></app-money-input>
             }
           </div>
@@ -239,6 +242,7 @@ export class ItemDetailsFormComponent {
   canRemove = input(false);
   rubro = input.required<Rubro>();
   orderType = input<'CLIENT' | 'STOCK'>('CLIENT');
+  isSaving = input(false);
 
   private calculator = inject(OrderCalculatorService);
 

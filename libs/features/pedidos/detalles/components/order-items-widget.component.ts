@@ -25,11 +25,11 @@ import { StatusBadgeComponent } from '@shared/ui/badges/status-badge.component';
                   <lucide-angular [img]="icons.Package" class="h-6 w-6 text-zinc-300 group-hover:text-primary transition-colors"></lucide-angular>
                 </div>
                 <div class="space-y-1">
-                  <p class="text-lg font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">{{ item.nombreProducto }}</p>
+                  <p class="text-lg font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">{{ item.name || item.nombreProducto }}</p>
                   <div class="flex flex-wrap gap-2 pt-1 items-center">
                     <app-status-badge [status]="item.status"></app-status-badge>
                     <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-100 dark:border-zinc-700 text-zinc-400">
-                      Cantidad: {{ item.cantidad }} u.
+                      Cantidad: {{ item.qty || item.cantidad }} u.
                     </span>
                     @if (item.metadata?.['material']) {
                       <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 bg-primary/5 text-primary rounded-lg border border-primary/10">
@@ -42,7 +42,7 @@ import { StatusBadgeComponent } from '@shared/ui/badges/status-badge.component';
               
               <div class="text-right flex flex-col justify-center">
                 <p class="text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">
-                  {{ (item.precioUnitario * item.cantidad) | currency:'ARS' }}
+                  {{ ((item.price || item.unitPrice || item.precioUnitario || 0) * (item.qty || item.cantidad || 1)) | currency:'ARS' }}
                 </p>
                 <p class="text-[8px] font-black text-zinc-400 uppercase tracking-widest leading-none mt-1">Subtotal Item</p>
               </div>
@@ -58,7 +58,7 @@ import { StatusBadgeComponent } from '@shared/ui/badges/status-badge.component';
                     </div>
                     <div class="space-y-0.5">
                       <p class="text-[10px] font-black uppercase tracking-widest text-primary/60 leading-none">Etapa Actual</p>
-                      <p class="text-xs font-black text-primary uppercase">{{ item.job.currentStage }}</p>
+                      <p class="text-xs font-black text-primary uppercase">{{ item.job.currentStage || 'PENDIENTE' }}</p>
                     </div>
                   </div>
 
@@ -97,7 +97,7 @@ import { StatusBadgeComponent } from '@shared/ui/badges/status-badge.component';
                   <lucide-angular [img]="icons.Info" class="h-3 w-3 text-zinc-400"></lucide-angular>
                   <p class="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Requerimientos Técnicos</p>
                 </div>
-                <p class="text-xs text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{{ item.descripcion }}</p>
+                <p class="text-xs text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{{ item.description || item.descripcion }}</p>
               </div>
             }
           </div>
