@@ -2,7 +2,7 @@ import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { ApiService } from '../api/api.service';
 import { AuthService } from '../auth/auth.service';
 import { CacheService } from '../cache/cache.service';
-import { Negocio, Rubro, NegocioConfig } from '../../shared/models';
+import { Negocio, Rubro, NegocioConfig, UserProfile } from '../../shared/models';
 import { BusinessContextService } from './business-context.service';
 import { getNegocioConfig, mapCategoryToRubro } from '../../shared/utils';
 import { STORAGE_KEYS, APP_CONFIG } from '../../shared/constants';
@@ -15,6 +15,9 @@ export class SessionService {
   private auth = inject(AuthService);
   private cache = inject(CacheService);
   private context = inject(BusinessContextService);
+
+  private _user = signal<UserProfile | null>(null);
+  user = computed(() => this._user());
 
   private _negocios = signal<Negocio[]>([]);
   negocios = computed(() => this._negocios());
@@ -96,6 +99,7 @@ export class SessionService {
         this.lastUserId = null;
         this._negocios.set([]);
         this._activeId.set(null);
+        this._user.set(null); // Clear user profile
         this.context.setBusinessId(null);
         this.setInitialized(true);
       }
@@ -115,6 +119,11 @@ export class SessionService {
   public async initialize() {
     console.log('[SessionService] Initializing...');
     try {
+      // Fetch user profile first to check status
+      const profile = await this.api.users.getMe();
+      this._user.set(profile);
+      console.log('[SessionService] User profile fetched:', profile.id, profile.status);
+
       const data = await this.api.businesses.getAll();
       console.log('[SessionService] Fetched businesses:', data?.length);
       const mapped: Negocio[] = (data || []).map((b: any) => ({
@@ -133,7 +142,6 @@ export class SessionService {
 
       // Si no tenemos ID activo, intentamos obtener el perfil del usuario
       if (!this._activeId()) {
-        const profile = await this.api.users.getMe();
         const defaultId = profile?.defaultBusinessId;
         
         if (defaultId && mapped.find(n => n.id === defaultId)) {

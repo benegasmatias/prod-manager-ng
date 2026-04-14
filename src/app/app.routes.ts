@@ -2,10 +2,15 @@ import { Routes } from '@angular/router';
 import { MainLayoutComponent } from '@core/layout';
 import { authGuard, publicGuard } from '../../libs/core/auth/auth.guard';
 import { businessGuard } from '../../libs/core/auth/business.guard';
-import { capabilityGuard } from '../../libs/core';
+import { capabilityGuard, userStatusGuard, superAdminGuard } from '../../libs/core';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  {
+    path: 'admin',
+    canMatch: [superAdminGuard],
+    loadChildren: () => import('../../libs/features/platform-admin/platform-admin.routes').then(m => m.PLATFORM_ADMIN_ROUTES)
+  },
   {
     path: 'login',
     canActivate: [publicGuard],
@@ -23,7 +28,7 @@ export const routes: Routes = [
   },
   {
     path: 'onboarding',
-    canActivate: [authGuard],
+    canActivate: [authGuard, userStatusGuard],
     loadComponent: () => import('../../libs/features/auth/pages/onboarding/onboarding.component').then(m => m.OnboardingComponent)
   },
   {
@@ -37,9 +42,13 @@ export const routes: Routes = [
     loadComponent: () => import('../../libs/features/auth/pages/select-business/select-business.component').then(m => m.SelectBusinessComponent)
   },
   {
+    path: 'waiting-room',
+    loadComponent: () => import('../../libs/features/auth/pages/waiting-room/waiting-room.component').then(m => m.WaitingRoomComponent)
+  },
+  {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [authGuard, businessGuard],
+    canActivate: [authGuard, userStatusGuard, businessGuard],
     children: [
       {
         path: 'dashboard',
