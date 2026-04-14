@@ -62,6 +62,10 @@ export const routes: Routes = [
         loadComponent: () => import('../../libs/features/pedidos/detalles/pedido-detalle.component').then(m => m.PedidoDetalleComponent)
       },
       {
+        path: 'pedidos/editar/:id',
+        loadComponent: () => import('../../libs/features/pedidos/editar/editar-pedido.component').then(m => m.EditarPedidoPageComponent)
+      },
+      {
         path: 'clientes',
         loadChildren: () => import('../../libs/features/clientes/clientes.routes').then(m => m.CLIENTES_ROUTES)
       },

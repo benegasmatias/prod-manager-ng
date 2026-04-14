@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, inject, signal, computed, input
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Pedido, Employee } from '@shared/models';
-import { LucideAngularModule, ArrowLeft, User, Calendar, DollarSign, Edit3, Zap, Phone, Mail, Info } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, User, Calendar, DollarSign, Edit3, Zap, Phone, Mail, Info, Trash2 } from 'lucide-angular';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
 import { OrderStatusModalComponent } from '../../status-modal/status-modal.component';
 import { OrderTimelineComponent } from './order-timeline.component';
@@ -42,6 +42,10 @@ import { SessionService } from '@core/session/session.service';
         </div>
 
         <div class="flex items-center gap-3">
+          <button (click)="onDelete.emit()" class="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center group" title="Eliminar Pedido">
+            <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+          </button>
+
           <button (click)="onEdit.emit()" class="h-12 px-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-[10px] font-black uppercase tracking-widest hover:border-primary/20 transition-all flex items-center gap-3">
             <lucide-angular [img]="icons.Edit3" class="h-4 w-4"></lucide-angular>
             <span>Editar</span>
@@ -139,11 +143,12 @@ export class ClientDetailComponent {
   @Output() onSaved = new EventEmitter<void>();
   @Output() onDownload = new EventEmitter<string>();
   @Output() onEdit = new EventEmitter<void>();
+  @Output() onDelete = new EventEmitter<void>();
 
   isManageModalOpen = signal(false);
 
   icons = {
-    ArrowLeft, User, Calendar, DollarSign, Edit3, Zap, Phone, Mail, Info
+    ArrowLeft, User, Calendar, DollarSign, Edit3, Zap, Phone, Mail, Info, Trash2
   };
 
   openManage(mode: 'STATUS' | 'PAYMENT' = 'STATUS') {

@@ -192,7 +192,7 @@ export class EmployeeSelectorComponent implements OnInit {
     if (!this.businessId()) return;
     this.loading.set(true);
     try {
-      this.employees.set(await this.api.getAll(this.businessId(), true));
+      this.employees.set(await this.api.getAll(this.businessId(), false));
     } finally {
       this.loading.set(false);
     }

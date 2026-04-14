@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection, importProvidersFrom, LOCALE_ID } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection, importProvidersFrom, LOCALE_ID, DEFAULT_CURRENCY_CODE } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../libs/core/auth/auth.interceptor';
@@ -8,6 +8,9 @@ import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 
 registerLocaleData(localeEs);
+
+import localeEsAr from '@angular/common/locales/es-AR';
+registerLocaleData(localeEsAr);
 
 import { 
   LucideAngularModule, 
@@ -78,7 +81,8 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([cacheInterceptor, apiInterceptor, authInterceptor])),
-    { provide: LOCALE_ID, useValue: 'es' },
+    { provide: LOCALE_ID, useValue: 'es-AR' },
+    { provide: DEFAULT_CURRENCY_CODE, useValue: 'ARS' },
     importProvidersFrom(
       LucideAngularModule.pick({
         LayoutDashboard,

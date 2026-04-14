@@ -6,9 +6,10 @@ import { Router, RouterModule } from '@angular/router';
 import { SessionService } from '@core/session/session.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { ClientesApiService } from '@core/api/clientes.api.service';
-import { Employee, Client, Rubro } from '@shared/models';
+import { Employee, Client, Rubro, ItemPedido } from '@shared/models';
 import { ClientSelectorComponent } from '@shared/ui/clientes/client-selector.component';
 import { EmployeeSelectorComponent } from '@shared/ui/employees/employee-selector.component';
+import { IntelligentDatePickerComponent } from '@shared/ui/calendar/intelligent-date-picker.component';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 import { ItemDetailsFormComponent } from './items-section/item-details-form.component';
 import { FloatingCalculatorComponent } from './floating-calculator.component';
@@ -26,7 +27,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
     RouterModule,
     ClientSelectorComponent,
     EmployeeSelectorComponent,
-    AppDatePickerComponent,
+    IntelligentDatePickerComponent,
     ItemDetailsFormComponent,
     FloatingCalculatorComponent
   ],
@@ -61,7 +62,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
       </div>
 
       <!-- LAYOUT PRINCIPAL -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-3 gap-8 contents">
         
         <!-- COLUMNA IZQUIERDA: FORMULARIO (Se extiende hacia abajo) -->
         <div class="lg:col-span-2 space-y-10">
@@ -90,20 +91,23 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                     (valueChange)="clienteId = $event"
                     (clientSelected)="selectedClientName = $event.name"
                     [error]="vErrors['clienteId']"
+                    [disabled]="isSaving()"
                     class="sm:col-span-2"
                   ></app-client-selector>
                   
-                  <app-date-picker
+                  <app-intelligent-date-picker
                     label="Promesa de Entrega"
                     [(value)]="fechaEntrega"
-                    name="fechaEntrega"
-                  ></app-date-picker>
+                    [disabled]="isSaving()"
+                    placeholder="dd/mm/aaaa"
+                  ></app-intelligent-date-picker>
                 }
 
                 <app-employee-selector
                   label="Responsable Operativo"
                   [value]="responsableId"
                   (valueChange)="responsableId = $event"
+                  [disabled]="isSaving()"
                 ></app-employee-selector>
 
                 <div class="sm:col-span-2 space-y-3">
@@ -117,7 +121,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
           <div class="space-y-6">
             <div class="flex items-center justify-between px-6">
                 <h2 class="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400">Canal de Configuración ({{ items().length }} ítems)</h2>
-                <button type="button" (click)="addItem()" class="h-10 px-6 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-2 hover:scale-105 transition-all active:scale-95">
+                <button type="button" [disabled]="isSaving()" (click)="addItem()" class="h-10 px-6 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-2 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                   <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nuevo Ítem
                 </button>
             </div>
@@ -130,6 +134,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                   [config]="config()"
                   [rubro]="rubro()"
                   [orderType]="orderType()"
+                  [isSaving]="isSaving()"
                   [canRemove]="items().length > 1"
                   (onRemove)="removeItem($index)"
                   (onUpdate)="recalcTotales()"
@@ -234,7 +239,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
 
            </div>
         </div>
-      </div>
+      </fieldset>
     </form>
     
     <app-floating-calculator></app-floating-calculator>
@@ -256,6 +261,7 @@ export class OrderFormComponent implements OnDestroy {
 
   @Input() forcedStatus?: string;
   @Input() cloneId?: string;
+  @Input() id?: string; // Edit Mode
   @Input() returnUrl: string = '/pedidos';
 
   // State
@@ -270,6 +276,8 @@ export class OrderFormComponent implements OnDestroy {
   isSaved = false;
   pendingFiles: string[] = [];
   vErrors: Record<string, string> = {};
+  private lastNegocioLoaded = '';
+  private orderLoadedId = '';
 
   // Context
   config = computed(() => this.session.config());
@@ -290,9 +298,58 @@ export class OrderFormComponent implements OnDestroy {
 
   constructor() {
     effect(() => {
-      if (this.negocioId()) this.loadEmployees();
+      const bid = this.negocioId();
+      if (bid && bid !== this.lastNegocioLoaded) {
+        this.lastNegocioLoaded = bid;
+        this.loadEmployees();
+      }
+      
+      if (this.id && this.id !== this.orderLoadedId) {
+        this.orderLoadedId = this.id;
+        this.loadOrderForEditing();
+      }
     });
-    this.addItem();
+    // Si no es edición, añadir un item inicial
+    if (!this.id) this.addItem();
+  }
+
+  async loadOrderForEditing() {
+    if (!this.id) return;
+    try {
+      this.isSaving.set(true);
+      const order = await this.api.findOne(this.id);
+      
+      this.orderType.set(order.type);
+      this.clienteId = order.customerId || (order as any).clienteId;
+      this.selectedClientName = order.clientName;
+      this.fechaEntrega = order.dueDate ? new Date(order.dueDate).toISOString().split('T')[0] : '';
+      this.responsableId = order.responsableGeneralId || (order as any).responsableId || (order as any).operatorId || order.responsableGeneral?.id || '';
+      this.observaciones = order.notes || '';
+      
+      // Map Items back to form names
+      const mappedItems = order.items.map(it => ({
+        id: it.id,
+        nombreProducto: it.name || it.nombreProducto,
+        cantidad: it.qty || it.cantidad,
+        precioUnitario: it.price || it.unitPrice || it.precioUnitario,
+        senia: it.deposit || it.senia || 0,
+        descripcion: it.description || it.descripcion,
+        url_stl: it.stlUrl,
+        peso_gramos: it.weightGrams,
+        duracion_estimada_minutos: it.estimatedMinutes,
+        referenceImages: it.referenceImages,
+        metadata: it.metadata,
+        // Spread print3d metadata if exists
+        ...(it.metadata?.['print3d'] || {})
+      } as any));
+      
+      this.items.set(mappedItems);
+      this.recalcTotales();
+    } catch (e) {
+      console.error('Error loading order for editing', e);
+    } finally {
+      this.isSaving.set(false);
+    }
   }
 
   ngOnDestroy() {
@@ -417,7 +474,15 @@ export class OrderFormComponent implements OnDestroy {
         totalPrice: this.totales().total,
         totalSenias: this.totales().totalSenias
       };
-      await this.api.create(payload);
+      
+      if (this.id) {
+        delete payload.businessId;
+        delete payload.customerId;
+        delete payload.priority;
+        await this.api.update(this.id, payload);
+      } else {
+        await this.api.create(payload);
+      }
       this.isSaved = true;
       this.router.navigate([this.returnUrl]);
     } catch (err) {

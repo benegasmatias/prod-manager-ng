@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Upload, Loader2, FileCheck, X, Image, FileSearch } from 'lucide-angular';
+import { LucideAngularModule, Upload, Loader2, FileCheck, X, Image, FileSearch, ExternalLink } from 'lucide-angular';
 import { FilesApiService } from '@core/api/files.api.service';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
@@ -12,25 +12,36 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
   template: `
     <div class="flex flex-col gap-3">
       <!-- Manual URL Input (Always available as fallback) -->
-      <div class="relative group">
-        @if (isImage()) {
-          <input 
-            type="text" 
-            [(ngModel)]="item.reference_image" 
-            (ngModelChange)="onUpdate.emit()"
-            placeholder="URL de imagen (Pinterest, etc)..."
-            class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-950/20 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 transition-all"
-          >
-        } @else {
-          <input 
-            type="text" 
-            [(ngModel)]="item.url_stl" 
-            (ngModelChange)="onUpdate.emit()"
-            placeholder="URL del modelo (Thingiverse, Printables)..."
-            class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-950/20 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 transition-all"
-          >
-        }
-      </div>
+        <div class="flex items-center gap-2">
+          @if (isImage()) {
+            <input 
+              type="text" 
+              [(ngModel)]="item.reference_image" 
+              (ngModelChange)="onUpdate.emit()"
+              placeholder="URL de imagen (Pinterest, etc)..."
+              class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-950/20 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 transition-all"
+            >
+          } @else {
+            <input 
+              type="text" 
+              [(ngModel)]="item.url_stl" 
+              (ngModelChange)="onUpdate.emit()"
+              placeholder="URL del modelo (Thingiverse, Printables)..."
+              class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-950/20 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 transition-all"
+            >
+          }
+
+          @if (isValidUrl(isImage() ? item.reference_image : item.url_stl)) {
+            <a 
+              [href]="isImage() ? item.reference_image : item.url_stl" 
+              target="_blank"
+              class="h-12 w-12 flex-shrink-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-primary hover:bg-primary/10 transition-all border border-zinc-200 dark:border-zinc-800"
+              title="Abrir enlace"
+            >
+              <lucide-angular [img]="icons.ExternalLink" class="h-4 w-4"></lucide-angular>
+            </a>
+          }
+        </div>
 
       <input type="file" #fileInput class="hidden" [accept]="isImage() ? 'image/*' : '.stl'" (change)="onFileSelected($event)">
       
@@ -92,7 +103,7 @@ export class Print3dItemEnhancementComponent {
   private filesApi = inject(FilesApiService);
   private confirm = inject(ConfirmService);
   isUploading = signal(false);
-  readonly icons = { Upload, Loader2, FileCheck, X, Image, FileSearch };
+  readonly icons = { Upload, Loader2, FileCheck, X, Image, FileSearch, ExternalLink };
 
   isImage() {
     return this.fieldKey === 'reference_image';
@@ -158,6 +169,15 @@ export class Print3dItemEnhancementComponent {
       } finally {
         this.isUploading.set(false);
       }
+    }
+  }
+  isValidUrl(url: string | undefined): boolean {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return url.startsWith('http');
+    } catch {
+      return false;
     }
   }
 }

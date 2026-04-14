@@ -31,7 +31,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
                   {{ getStatusLabel(entry.toStatus) }}
                 </span>
                 <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                  {{ entry.createdAt | date:'dd MMM, HH:mm' }}
+                  {{ (entry.changedAt || entry.createdAt) | date:'dd MMM, HH:mm' }}
                 </span>
               </div>
               
@@ -42,15 +42,15 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
                   </div>
                   <div>
                     <p class="text-[8px] font-black uppercase text-zinc-400 tracking-widest leading-none">Operador</p>
-                    <p class="text-xs font-black text-zinc-700 dark:text-white">{{ entry.employee?.firstName || 'Sistema' }}</p>
+                    <p class="text-xs font-black text-zinc-700 dark:text-white">{{ entry.performedBy?.fullName || entry.employee?.firstName || 'Sistema' }}</p>
                   </div>
                 </div>
                 
-                @if (entry.notes) {
+                @if (entry.note || entry.notes) {
                   <div class="relative group/note">
                     <lucide-angular [img]="icons.MessageSquare" class="h-4 w-4 text-zinc-300 hover:text-primary cursor-help"></lucide-angular>
                     <div class="absolute bottom-full right-0 mb-2 w-48 p-3 bg-zinc-900 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover/note:opacity-100 transition-opacity pointer-events-none shadow-2xl z-50">
-                       {{ entry.notes }}
+                       {{ entry.note || entry.notes }}
                     </div>
                   </div>
                 }
