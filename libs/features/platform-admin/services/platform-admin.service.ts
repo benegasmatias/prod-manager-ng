@@ -33,4 +33,8 @@ export class PlatformAdminService {
   async getPlans(): Promise<any[]> {
     return firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/plans`));
   }
+
+  async getStats(): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${this.apiUrl}/stats`));
+  }
 }

@@ -65,6 +65,7 @@ export interface MenuItemMetadata {
   requiredFeature?: FeatureCode;
   requiredPermission?: PermissionAction;
   requiredCapability?: string; // Modular SaaS capability gating
+  requiredGlobalRole?: 'SUPER_ADMIN' | 'USER'; // Platform-level role requirement
   shortcut?: string;
   configKey?: string; // Links to business-specific label overrides
 }

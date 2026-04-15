@@ -16,7 +16,8 @@ import {
   Store,
   ShoppingBag,
   Truck,
-  Receipt
+  Receipt,
+  ShieldCheck
 } from 'lucide-angular';
 import { MenuGroupMetadata } from '../models/access-control';
 
@@ -120,6 +121,12 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
     items: [
       { label: 'Reportes Industriales', href: '/reportes', icon: BarChart3, requiredFeature: 'REPORTS', requiredCapability: 'PRODUCTION' },
       { label: 'Configuración', href: '/ajustes', icon: Settings, requiredFeature: 'SETTINGS' },
+    ]
+  },
+  {
+    title: 'Administración',
+    items: [
+      { label: 'Panel de Plataforma', href: '/admin', icon: ShieldCheck, requiredGlobalRole: 'SUPER_ADMIN' },
     ]
   }
 ];

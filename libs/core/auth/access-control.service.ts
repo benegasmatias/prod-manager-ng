@@ -75,6 +75,11 @@ export class AccessControlService {
       return false;
     }
 
+    // New Global Role-Based Gating (Platform Level)
+    if (item.requiredGlobalRole && this.sessionService.user()?.globalRole !== item.requiredGlobalRole) {
+      return false;
+    }
+
     if (item.requiredPermission && item.requiredFeature) {
       return this.hasPermission(item.requiredFeature, item.requiredPermission);
     }

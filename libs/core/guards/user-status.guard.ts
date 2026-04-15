@@ -22,7 +22,7 @@ export const userStatusGuard: CanActivateFn = async (route, state) => {
     return router.createUrlTree(['/login'], { queryParams: { error: 'ACCOUNT_BLOCKED' } });
   }
 
-  if (user.status === 'PENDING') {
+  if (user.status === 'PENDING' && user.globalRole !== 'SUPER_ADMIN') {
     // If user is pending, they can only access the waiting-room
     if (state.url === '/waiting-room') {
       return true;

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@core/auth';
+import { SessionService } from '@core/index';
+
 
 @Component({
   selector: 'app-login',
@@ -13,6 +15,7 @@ import { AuthService } from '@core/auth';
 })
 export class LoginComponent {
   authService = inject(AuthService);
+  sessionService = inject(SessionService);
   router = inject(Router);
   route = inject(ActivatedRoute);
 
@@ -29,25 +32,49 @@ export class LoginComponent {
   }
 
   async handleSubmit() {
-    console.log('Login attempt started:', this.email());
+    console.log('[Login] Attempt started:', this.email());
     this.loading.set(true);
     this.error.set(null);
 
+    // Phase 1: Authentication
+    let authData;
     try {
       const { data, error } = await this.authService.login(this.email(), this.password());
-      console.log('Auth response received:', { data, error });
-
       if (error) {
+        console.warn('[Login] Authentication failed:', error.message);
         this.error.set(error.message);
         this.loading.set(false);
-      } else {
-        console.log('Login successful, navigating to:', this.returnUrl);
-        this.router.navigateByUrl(this.returnUrl);
+        return;
       }
+      authData = data;
+      console.log('[Login] Authentication successful:', authData.user?.email);
     } catch (err: any) {
-      console.error('Unexpected error during login:', err);
-      this.error.set('Error inesperado al intentar iniciar sesión.');
+      console.error('[Login] Critical Auth error:', err);
+      this.error.set('Error de conexión con el servidor de autenticación.');
       this.loading.set(false);
+      return;
+    }
+
+    // Phase 2: Session Initialization
+    try {
+      console.log('[Login] Waiting for session service initialization...');
+      // Note: SessionService effect will react to the new session and start initialize()
+      await this.sessionService.waitUntilInitialized();
+      
+      const target = this.sessionService.getPostLoginRedirect(this.returnUrl);
+      console.log('[Login] Initialization complete, redirecting to:', target);
+      
+      this.loading.set(false);
+      await this.router.navigateByUrl(target);
+    } catch (err: any) {
+      console.error('[Login] Session initialization failed:', err);
+      // We don't necessarily want to block the user if auth succeeded but init had a glitch
+      // Often, a simple navigation to dashboard will trigger a retry
+      this.loading.set(false);
+      this.error.set('Sesión iniciada, pero hubo un problema al cargar tus datos. Intentando entrar...');
+      
+      // Attempt bypass navigation after a short delay
+      setTimeout(() => this.router.navigateByUrl('/dashboard'), 2000);
     }
   }
 
