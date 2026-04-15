@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlatformAdminService } from '../../services/platform-admin.service';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, RefreshCw, Play, Pause } from 'lucide-angular';
 
 @Component({
   selector: 'app-businesses-admin',
@@ -97,6 +97,7 @@ import { LucideAngularModule } from 'lucide-angular';
   `
 })
 export class BusinessesAdminComponent implements OnInit {
+  readonly icons = { RefreshCw, Play, Pause };
   private adminService = inject(PlatformAdminService);
   businesses = signal<any[]>([]);
 

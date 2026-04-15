@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, Terminal, Users, LayoutGrid, CreditCard, ArrowLeft } from 'lucide-angular';
 import { AuthService } from '@core/auth';
 
 @Component({
@@ -55,5 +55,8 @@ import { AuthService } from '@core/auth';
   `
 })
 export class PlatformAdminLayoutComponent {
+  readonly icons = {
+    Terminal, Users, LayoutGrid, CreditCard, ArrowLeft
+  };
   private auth = inject(AuthService);
 }

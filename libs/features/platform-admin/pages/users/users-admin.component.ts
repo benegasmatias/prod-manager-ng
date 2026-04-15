@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlatformAdminService } from '../../services/platform-admin.service';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, RefreshCw, Check, Slash } from 'lucide-angular';
 import { UserProfile } from '@shared/models';
 
 @Component({
@@ -97,6 +97,7 @@ import { UserProfile } from '@shared/models';
   `
 })
 export class UsersAdminComponent implements OnInit {
+  readonly icons = { RefreshCw, Check, Slash };
   private adminService = inject(PlatformAdminService);
   users = signal<any[]>([]);
 
