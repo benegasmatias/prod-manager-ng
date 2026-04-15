@@ -6,7 +6,11 @@ export const PLATFORM_ADMIN_ROUTES: Routes = [
     path: '',
     component: PlatformAdminLayoutComponent,
     children: [
-      { path: '', redirectTo: 'users', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/dashboard/dashboard-admin.component').then(m => m.DashboardAdminComponent)
+      },
       {
         path: 'users',
         loadComponent: () => import('./pages/users/users-admin.component').then(m => m.UsersAdminComponent)
@@ -17,7 +21,7 @@ export const PLATFORM_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'plans',
-        loadComponent: () => import('./pages/users/users-admin.component').then(m => m.UsersAdminComponent) // Reusing Users as placeholder for now
+        loadComponent: () => import('./pages/dashboard/dashboard-admin.component').then(m => m.DashboardAdminComponent) // Placeholder dashboard for now
       }
     ]
   }

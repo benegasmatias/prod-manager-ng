@@ -64,8 +64,9 @@ export class SessionService {
       const session = this.auth.session();
       if (session) {
         if (this.lastUserId !== session.user.id) {
+          console.log('[SessionService] Session changed from', this.lastUserId, 'to', session.user.id);
+          this.clearSession(); // Wipe before re-init
           this.lastUserId = session.user.id;
-          console.log('[SessionService] Session detected for:', session.user.id);
           this.initialize();
         }
       } else {
@@ -81,7 +82,15 @@ export class SessionService {
   async waitUntilInitialized(): Promise<void> {
     if (this.isInitialized()) return;
     
-    // We wait for the signal to become true
+    // If not initialized but we have a session, call initialize() which handles deduplication
+    const session = this.auth.session();
+    if (session) {
+      await this.initialize();
+      return;
+    }
+    
+    // If no session, wait a bit for signals to resolve or just return if we are sure
+    // We already have a computed/signal system, so firstValueFrom on isInitialized is a good fallback
     await firstValueFrom(
       toObservable(this.isInitialized).pipe(
         filter(init => init === true),
@@ -107,6 +116,14 @@ export class SessionService {
    * Fetches user profile, businesses, and selects the active business.
    */
   public async initialize(): Promise<void> {
+    const session = this.auth.session();
+    
+    // Safety: if no session, we can't initialize
+    if (!session) {
+       this.clearSession();
+       return;
+    }
+
     if (this.initPromise) {
       return this.initPromise;
     }
@@ -191,7 +208,11 @@ export class SessionService {
       return '/admin';
     }
 
-    // 2. Unapproved Users Room
+    // 2. Restricted Users
+    if (user.status === 'BLOCKED') {
+      return '/login?error=ACCOUNT_BLOCKED';
+    }
+
     if (user.status === 'PENDING') {
       return '/waiting-room';
     }

@@ -58,8 +58,8 @@ export class LoginComponent {
     // Phase 2: Session Initialization
     try {
       console.log('[Login] Waiting for session service initialization...');
-      // Note: SessionService effect will react to the new session and start initialize()
-      await this.sessionService.waitUntilInitialized();
+      // Explicitly trigger and await initialization to avoid race conditions with effects
+      await this.sessionService.initialize();
       
       const target = this.sessionService.getPostLoginRedirect(this.returnUrl);
       console.log('[Login] Initialization complete, redirecting to:', target);
