@@ -21,7 +21,7 @@ export const PLATFORM_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'plans',
-        loadComponent: () => import('./pages/dashboard/dashboard-admin.component').then(m => m.DashboardAdminComponent) // Placeholder dashboard for now
+        loadComponent: () => import('./pages/plans/plans-admin.component').then(m => m.PlansAdminComponent)
       }
     ]
   }

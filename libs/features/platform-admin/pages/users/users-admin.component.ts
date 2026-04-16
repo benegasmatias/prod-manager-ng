@@ -1,188 +1,289 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
+import { UserProfile } from '@shared/models';
 import { PlatformAdminService } from '../../services/platform-admin.service';
-import { LucideAngularModule, RefreshCw, Check, Slash, UserX, UserCheck, ShieldAlert, Loader2 } from 'lucide-angular';
-import { UserProfile, UserStatus } from '@shared/models';
-
 import { ToastService } from '../../../../shared/services/toast.service';
+import { ConfirmService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
+import { UserDetailComponent } from './components/user-detail/user-detail.component';
+import { UserEditModalComponent } from './components/user-edit-modal/user-edit-modal.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-users-admin',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
-  template: `
-    <div class="animate-in fade-in duration-700">
-      <div class="flex items-center justify-between mb-10">
-        <div>
-          <h2 class="text-3xl font-black text-white tracking-tight uppercase">Gestión de Usuarios</h2>
-          <p class="text-zinc-500 font-bold italic">Administra el acceso global de los usuarios al ecosistema.</p>
-        </div>
-        <button 
-          (click)="loadUsers()" 
-          [disabled]="loading()"
-          class="p-3 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition-all text-zinc-300 disabled:opacity-50"
-        >
-           <i-lucide [name]="loading() ? 'loader-2' : 'refresh-cw'" [class.animate-spin]="loading()" class="h-5 w-5"></i-lucide>
-        </button>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="error()" class="p-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl mb-8 flex items-center gap-4">
-        <i-lucide name="shield-alert" class="h-6 w-6 text-rose-500"></i-lucide>
-        <div>
-            <p class="text-rose-500 font-black uppercase text-xs">Error de Conexión</p>
-            <p class="text-rose-400/80 text-xs font-bold">{{ error() }}</p>
-        </div>
-      </div>
-
-      <div class="bg-zinc-900/50 backdrop-blur rounded-[2rem] border border-zinc-800 p-2 overflow-hidden shadow-2xl">
-        <table class="w-full text-left">
-          <thead>
-            <tr class="text-[10px] uppercase font-black text-zinc-600 tracking-widest border-b border-zinc-800">
-              <th class="px-8 py-6">Identidad</th>
-              <th class="px-8 py-6">Estatus Global</th>
-              <th class="px-8 py-6 text-right">Membresía</th>
-              <th class="px-8 py-6 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-800/50">
-            <!-- Loading Skeletons -->
-            <ng-container *ngIf="loading()">
-              <tr *ngFor="let i of [1,2,3,4,5]" class="animate-pulse">
-                <td colspan="4" class="px-8 py-8">
-                  <div class="h-8 bg-zinc-800/50 rounded-xl w-full"></div>
-                </td>
-              </tr>
-            </ng-container>
-
-            <!-- Real Data -->
-            <tr *ngIf="!loading() && users().length === 0">
-               <td colspan="4" class="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest text-xs">
-                  No se encontraron usuarios registrados
-               </td>
-            </tr>
-
-            <tr *ngFor="let user of users()" class="hover:bg-zinc-800/30 transition-all group">
-              <td class="px-8 py-6">
-                <div class="flex flex-col">
-                  <span class="text-[13px] font-black text-zinc-100">{{ user.fullName || 'Sin Nombre' }}</span>
-                  <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tight">{{ user.email }}</span>
-                </div>
-              </td>
-              <td class="px-8 py-6">
-                <div 
-                  [ngClass]="{
-                    'bg-amber-500/10 text-amber-500 border-amber-500/20': user.status === 'PENDING',
-                    'bg-emerald-500/10 text-emerald-500 border-emerald-500/20': user.status === 'ACTIVE',
-                    'bg-rose-500/10 text-rose-500 border-rose-500/20': user.status === 'BLOCKED'
-                  }"
-                  class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black tracking-widest border flex-shrink-0"
-                >
-                  <div class="h-1 w-1 rounded-full" [ngClass]="{
-                    'bg-amber-500': user.status === 'PENDING',
-                    'bg-emerald-500': user.status === 'ACTIVE',
-                    'bg-rose-500': user.status === 'BLOCKED'
-                  }"></div>
-                  {{ user.status }}
-                </div>
-              </td>
-               <td class="px-8 py-6 text-right">
-                  <span class="text-[10px] font-black text-violet-400/60 uppercase tracking-widest">
-                    {{ user.globalRole }}
-                  </span>
-              </td>
-              <td class="px-8 py-6 text-right">
-                <div class="flex items-center justify-end gap-2">
-                   <button 
-                    *ngIf="user.status === 'PENDING'"
-                    (click)="approve(user)"
-                    class="h-10 px-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20"
-                  >
-                    Aprobar
-                  </button>
-
-                   <button 
-                    *ngIf="user.status !== 'BLOCKED'"
-                    (click)="block(user)"
-                    class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all border border-zinc-700"
-                    title="Bloquear"
-                  >
-                    <i-lucide name="slash" class="h-4 w-4"></i-lucide>
-                  </button>
-
-                  <button 
-                    *ngIf="user.status === 'BLOCKED'"
-                    (click)="approve(user)"
-                    class="h-10 px-4 bg-emerald-600/10 text-emerald-500 border border-emerald-500/20 rounded-xl hover:bg-emerald-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all"
-                  >
-                    Habilitar
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `
+  imports: [CommonModule, LucideAngularModule, UserDetailComponent, UserEditModalComponent, FormsModule],
+  templateUrl: './users-admin.component.html',
+  styleUrl: './users-admin.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UsersAdminComponent implements OnInit {
   private adminService = inject(PlatformAdminService);
   private toast = inject(ToastService);
+  private confirmService = inject(ConfirmService);
   
+  // Data Signals
   users = signal<UserProfile[]>([]);
+  meta = signal<any>(null);
+  stats = signal<any>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+  
+  // UI State Signals
+  activeTab = signal<'users' | 'invitations' | 'audit'>('users');
+  selectedUserForDetail = signal<string | null>(null);
+  selectedUserForEdit = signal<UserProfile | null>(null);
+  
+  // Data Signals (Invitations)
+  invitations = signal<any[]>([]);
+  invitationsMeta = signal<any>(null);
+  invitationsLoading = signal<boolean>(false);
 
-  ngOnInit() {
-    this.loadUsers();
+  // Expose service metadata to template (Signals chain)
+  metadata = this.adminService.metadata;
+
+  // Filter Signals
+  search = signal<string>('');
+  statusFilter = signal<string>('');
+  planFilter = signal<string>('');
+  currentPage = signal<number>(1);
+  pageSize = 10;
+  
+  constructor() {
+    // Reload when filters or tab change
+    effect(() => {
+      const tab = this.activeTab();
+      // Access filters to trigger effect
+      this.search();
+      this.statusFilter();
+      this.planFilter();
+
+      untracked(() => {
+        if (tab === 'users') {
+          this.loadUsers(1); 
+        } else if (tab === 'invitations') {
+          this.loadInvitations(1);
+        }
+      });
+    }, { allowSignalWrites: true });
   }
 
-  async loadUsers() {
+  ngOnInit() {
+    this.loadStats();
+    this.ensureMetadata();
+  }
+
+  async ensureMetadata() {
+    try {
+      await this.adminService.ensureMetadataLoaded();
+    } catch (e) {
+      this.toast.error('Error al cargar configuración global');
+    }
+  }
+
+  async loadInvitations(page: number = 1) {
+    try {
+      this.invitationsLoading.set(true);
+      const response = await this.adminService.getInvitations(page, this.pageSize, {
+        search: this.search(),
+        status: this.statusFilter()
+      });
+      this.invitations.set(response.items);
+      this.invitationsMeta.set(response.meta);
+    } catch (e) {
+      this.toast.error('Error al cargar invitaciones');
+    } finally {
+      this.invitationsLoading.set(false);
+    }
+  }
+
+  async resendInvitation(inv: any) {
+    const confirmed = await this.confirmService.confirm({
+      title: 'RE-ENVIAR INVITACIÓN',
+      message: `¿Deseas enviar nuevamente la invitación a ${inv.email}?`,
+      type: 'info',
+      confirmLabel: 'ENVIAR',
+      cancelLabel: 'Cancelar'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await this.adminService.resendInvitation(inv.id);
+      this.toast.success('Invitación re-enviada correctamente');
+      this.loadInvitations();
+    } catch (e) {
+      this.toast.error('Error al re-enviar invitación');
+    }
+  }
+
+  async cancelInvitation(inv: any) {
+    const confirmed = await this.confirmService.confirm({
+      title: 'CANCELAR INVITACIÓN',
+      message: `¿Estás seguro de cancelar la invitación para ${inv.email}? El enlace dejará de ser válido.`,
+      type: 'danger',
+      confirmLabel: 'CANCELAR',
+      cancelLabel: 'Volver'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await this.adminService.cancelInvitation(inv.id);
+      this.toast.warning('Invitación cancelada');
+      this.loadInvitations();
+    } catch (e) {
+      this.toast.error('Error al cancelar invitación');
+    }
+  }
+
+  async loadStats() {
+    try {
+      const data = await this.adminService.getStats();
+      this.stats.set(data.users);
+    } catch (e) {
+      console.error('Error loading user stats');
+    }
+  }
+
+  async loadUsers(page: number = this.currentPage()) {
     try {
       this.loading.set(true);
       this.error.set(null);
-      const data = await this.adminService.getUsers();
-      this.users.set(data);
+      this.currentPage.set(page);
+      
+      const response = await this.adminService.getUsers(page, this.pageSize, {
+        search: this.search(),
+        status: this.statusFilter(),
+        plan: this.planFilter()
+      });
+      
+      if (Array.isArray(response)) {
+        this.users.set(response);
+        this.meta.set({ totalItems: response.length, totalPages: 1, currentPage: 1 });
+      } else {
+        this.users.set(response.items || []);
+        this.meta.set(response.meta);
+      }
     } catch (e: any) {
       this.error.set(e.message || 'No se pudieron cargar los usuarios');
+      this.toast.error('Error al cargar usuarios');
     } finally {
       this.loading.set(false);
     }
   }
 
+  getStatCount(status: string): number {
+    if (!this.stats()?.breakdown) return 0;
+    return this.stats().breakdown.find((s: any) => s.status === status)?.count || 0;
+  }
+
+  async goToPage(page: number) {
+    if (page < 1 || (this.meta() && page > this.meta().totalPages)) return;
+    await this.loadUsers(page);
+  }
+
+  // --- ACTIONS ---
+
+  async toggleUserBlock(user: UserProfile) {
+    const isBlocked = user.status === 'BLOCKED';
+    const action = isBlocked ? 'DESBLOQUEAR' : 'BLOQUEAR';
+    
+    const confirmed = await this.confirmService.confirm({
+      title: `${action} ACCESO`,
+      message: `¿Estás seguro de que quieres ${action.toLowerCase()} el acceso a ${user.fullName || user.email}?`,
+      type: isBlocked ? 'warning' : 'danger',
+      confirmLabel: action,
+      cancelLabel: 'Volver'
+    });
+
+    if (!confirmed) return;
+    
+    try {
+        if (isBlocked) {
+            await this.adminService.unblockUser(user.id);
+            this.toast.success(`Usuario ${user.email} desbloqueado`);
+        } else {
+            await this.adminService.blockUser(user.id);
+            this.toast.warning(`Usuario ${user.email} bloqueado`);
+        }
+        this.loadUsers();
+        this.loadStats();
+    } catch (e: any) {
+        this.toast.error(`Error al ${action.toLowerCase()} usuario`);
+    }
+  }
+
+  async toggleUserSuspension(user: UserProfile) {
+    const isSuspended = user.status === 'SUSPENDED';
+    const action = isSuspended ? 'REACTIVAR' : 'SUSPENDER';
+    
+    const confirmed = await this.confirmService.confirm({
+      title: `${action} CUENTA`,
+      message: `¿Estás seguro de que quieres ${action.toLowerCase()} la cuenta de ${user.fullName || user.email}?`,
+      type: 'info',
+      confirmLabel: action,
+      cancelLabel: 'Volver'
+    });
+
+    if (!confirmed) return;
+    
+    try {
+        if (isSuspended) {
+            await this.adminService.reactivateUser(user.id);
+        } else {
+            await this.adminService.suspendUser(user.id);
+        }
+        this.toast.success(`Usuario ${user.email} ${isSuspended ? 'reactivado' : 'suspendido'}`);
+        this.loadUsers();
+        this.loadStats();
+    } catch (e: any) {
+        this.toast.error(`Error al ${action.toLowerCase()} usuario`);
+    }
+  }
+
   async approve(user: UserProfile) {
-    if (!confirm(`¿Confirmas la activación de ${user.email}?`)) return;
+    const isNew = user.status === 'PENDING';
+    const action = isNew ? 'APROBAR' : 'ACTIVAR';
+    
+    const confirmed = await this.confirmService.confirm({
+      title: `${action} USUARIO`,
+      message: `¿Deseas habilitar permanentemente el acceso a ${user.fullName || user.email}?`,
+      type: 'info',
+      confirmLabel: action,
+      cancelLabel: 'Cancelar'
+    });
+
+    if (!confirmed) return;
     
     try {
         await this.adminService.approveUser(user.id);
-        this.toast.success(`Usuario ${user.email} aprobado con éxito`);
+        this.toast.success(`Usuario ${user.email} habilitado`);
         this.loadUsers();
+        this.loadStats();
     } catch (e: any) {
-        this.toast.error('Error al aprobar usuario');
+        this.toast.error('Error al activar usuario');
     }
   }
 
-  async block(user: UserProfile) {
-    if (!confirm(`¿Estás seguro de que quieres BLOQUEAR el acceso a ${user.email}?`)) return;
+  async delete(user: UserProfile) {
+    const confirmed = await this.confirmService.confirm({
+      title: 'ELIMINAR USUARIO',
+      message: `¿Estás seguro de eliminar a ${user.email}? Esta acción es un borrado lógico y el usuario no podrá volver a loguearse.`,
+      type: 'danger',
+      confirmLabel: 'ELIMINAR',
+      cancelLabel: 'Cancelar'
+    });
+
+    if (!confirmed) return;
     
     try {
-      await this.adminService.blockUser(user.id);
-      this.toast.warning(`Usuario ${user.email} bloqueado correctamente`);
+      await this.adminService.deleteUser(user.id);
+      this.toast.success(`Usuario ${user.email} eliminado lógicamente`);
       this.loadUsers();
+      this.loadStats();
     } catch (e: any) {
-      this.toast.error('Error al bloquear usuario');
+      this.toast.error('Error al eliminar usuario');
     }
   }
 }
-
-// Icon registration
-LucideAngularModule.pick({ 
-    RefreshCw, 
-    Check, 
-    Slash, 
-    UserX, 
-    UserCheck, 
-    ShieldAlert, 
-    Loader2 
-});

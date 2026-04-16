@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService, ToastType } from '../../services/toast.service';
-import { LucideAngularModule, CheckCircle2, AlertCircle, X, Info } from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-toast-container',
@@ -67,11 +67,3 @@ export class ToastComponent {
     }
   }
 }
-
-// Icon registration
-LucideAngularModule.pick({
-    CheckCircle2, 
-    AlertCircle, 
-    X, 
-    Info
-});

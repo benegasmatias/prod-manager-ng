@@ -1,0 +1,187 @@
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md animate-in fade-in duration-300">
+  <div class="w-full max-w-4xl bg-zinc-900 border border-zinc-800 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+    
+    <!-- Modal Header -->
+    <div class="px-10 py-8 border-b border-zinc-800 flex items-center justify-between bg-zinc-800/20">
+      <div class="flex items-center gap-6">
+        <div class="h-16 w-16 bg-zinc-800 rounded-3xl flex items-center justify-center text-2xl font-black text-zinc-300 shadow-inner group-hover:bg-violet-600 transition-all uppercase">
+          {{ user()?.fullName?.substring(0, 1) || user()?.email?.substring(0, 1) }}
+        </div>
+        <div>
+          <h3 class="text-2xl font-black text-white uppercase tracking-tight">{{ user()?.fullName || 'Usuario sin nombre' }}</h3>
+          <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest italic">{{ user()?.email }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+          <div 
+            [ngClass]="getStatusStyles(user()?.status)"
+            class="px-4 py-2 rounded-full text-[10px] font-black tracking-widest border uppercase"
+          >
+            {{ user()?.status }}
+          </div>
+          <button (click)="close.emit()" class="h-12 w-12 flex items-center justify-center rounded-2xl bg-zinc-800 text-zinc-400 hover:text-white transition-all">
+            <i-lucide name="x" class="h-6 w-6"></i-lucide>
+          </button>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="px-10 flex border-b border-zinc-800 bg-zinc-900/50">
+      <button 
+        (click)="activeTab.set('info')"
+        [class.border-violet-500]="activeTab() === 'info'"
+        [class.text-white]="activeTab() === 'info'"
+        class="px-8 py-4 border-b-2 border-transparent text-[11px] font-black uppercase tracking-widest transition-all text-zinc-500 hover:text-zinc-300"
+      >
+        Información y Roles
+      </button>
+      <button 
+        (click)="activeTab.set('activity')"
+        [class.border-violet-500]="activeTab() === 'activity'"
+        [class.text-white]="activeTab() === 'activity'"
+        class="px-8 py-4 border-b-2 border-transparent text-[11px] font-black uppercase tracking-widest transition-all text-zinc-500 hover:text-zinc-300"
+      >
+        Registro de Auditoría
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="flex-1 overflow-y-auto p-10 custom-scrollbar">
+      
+      <div *ngIf="loading()" class="h-64 flex flex-col items-center justify-center gap-4">
+         <i-lucide name="loader-2" class="h-10 w-10 text-violet-500 animate-spin"></i-lucide>
+         <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Cargando datos maestros...</p>
+      </div>
+
+      <div *ngIf="!loading() && activeTab() === 'info'" class="animate-in slide-in-from-bottom-4 duration-500">
+        <div class="grid grid-cols-2 gap-10">
+          
+          <!-- General Info -->
+          <div class="space-y-8">
+             <section>
+                <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-4 block">Detalles de Sistema</label>
+                <div class="bg-zinc-800/20 rounded-3xl border border-zinc-800 p-6 space-y-4">
+                   <div class="flex justify-between items-center">
+                      <span class="text-[11px] text-zinc-500 font-bold uppercase">ID Global</span>
+                      <span class="text-[11px] text-zinc-300 font-mono">{{ user()?.id }}</span>
+                   </div>
+                   <div class="flex justify-between items-center">
+                      <span class="text-[11px] text-zinc-500 font-bold uppercase">Rol Global</span>
+                      <span class="px-2 py-0.5 bg-zinc-700 rounded text-[9px] font-black text-zinc-300">{{ user()?.globalRole }}</span>
+                   </div>
+                   <div class="flex justify-between items-center">
+                      <span class="text-[11px] text-zinc-500 font-bold uppercase">Fecha Registro</span>
+                      <span class="text-[11px] text-zinc-300 font-bold">{{ user()?.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                   </div>
+                   <div class="flex justify-between items-center">
+                      <span class="text-[11px] text-zinc-500 font-bold uppercase">Plan Actual</span>
+                      <span class="text-[11px] text-violet-400 font-black">{{ user()?.plan }}</span>
+                   </div>
+                </div>
+             </section>
+
+             <section>
+                <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-4 block">Seguridad</label>
+                <div class="bg-zinc-800/20 rounded-3xl border border-zinc-800 p-6 space-y-4">
+                   <div class="flex items-center gap-3">
+                      <div class="h-2 w-2 rounded-full" [class.bg-emerald-500]="user()?.active" [class.bg-rose-500]="!user()?.active"></div>
+                      <span class="text-[11px] font-bold text-zinc-300">{{ user()?.active ? 'Sesión Habilitada' : 'Sesión Deshabilitada' }}</span>
+                   </div>
+                   <div class="flex items-center gap-3">
+                      <i-lucide [name]="user()?.mustChangePassword ? 'clock' : 'check-circle-2'" class="h-4 w-4" [class.text-amber-500]="user()?.mustChangePassword" [class.text-emerald-500]="!user()?.mustChangePassword"></i-lucide>
+                      <span class="text-[11px] font-bold text-zinc-300">Password: {{ user()?.mustChangePassword ? 'Cambio Pendiente' : 'Al día' }}</span>
+                   </div>
+                </div>
+             </section>
+
+             <section *ngIf="user()?.invitations?.length > 0">
+                <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-4 block">Invitaciones Asociadas</label>
+                <div class="space-y-3">
+                   <div *ngFor="let inv of user()?.invitations" class="p-4 bg-zinc-800/10 rounded-2xl border border-zinc-800 flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                         <i-lucide name="mail" class="h-4 w-4 text-zinc-500"></i-lucide>
+                         <div>
+                            <p class="text-[11px] font-black text-zinc-100 uppercase tracking-tight">{{ inv.business?.name }}</p>
+                            <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">Rol: {{ inv.role }}</p>
+                         </div>
+                      </div>
+                      <div 
+                        [ngClass]="{
+                          'bg-amber-500/10 text-amber-500 border-amber-500/20': inv.status === 'PENDING',
+                          'bg-emerald-500/10 text-emerald-500 border-emerald-500/20': inv.status === 'ACCEPTED',
+                          'bg-rose-500/10 text-rose-500 border-rose-500/20': inv.status === 'EXPIRED',
+                          'bg-zinc-500/10 text-zinc-400 border-zinc-700': inv.status === 'CANCELLED'
+                        }"
+                        class="px-2 py-0.5 rounded-full text-[8px] font-black tracking-widest border uppercase"
+                      >
+                        {{ inv.status }}
+                      </div>
+                   </div>
+                </div>
+             </section>
+          </div>
+
+          <!-- Memberships -->
+          <div class="space-y-8">
+             <section>
+                <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-4 block">Negocios Asociados</label>
+                <div *ngIf="user()?.memberships?.length === 0" class="p-10 text-center border-2 border-dashed border-zinc-800 rounded-3xl">
+                   <i-lucide name="building-2" class="h-8 w-8 text-zinc-700 mx-auto mb-3"></i-lucide>
+                   <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Sin membresías activas</p>
+                </div>
+
+                <div class="space-y-3">
+                   <div *ngFor="let m of user()?.memberships" class="p-4 bg-zinc-800/30 rounded-2xl border border-zinc-800 hover:border-violet-500/50 transition-all flex items-center justify-between group">
+                      <div class="flex items-center gap-4">
+                         <div class="h-10 w-10 bg-zinc-800 rounded-xl flex items-center justify-center font-black text-xs text-zinc-400 group-hover:bg-violet-600 group-hover:text-white transition-all">
+                            {{ m.business?.name.substring(0, 1) }}
+                         </div>
+                         <div>
+                            <p class="text-[12px] font-black text-zinc-100 uppercase tracking-tight">{{ m.business?.name }}</p>
+                            <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest italic">{{ m.role }} • {{ m.business?.category }}</p>
+                         </div>
+                      </div>
+                      <i-lucide name="arrow-up-right" class="h-4 w-4 text-zinc-600 group-hover:text-violet-400 transition-all"></i-lucide>
+                   </div>
+                </div>
+             </section>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Audit Logs Tab -->
+      <div *ngIf="!loading() && activeTab() === 'activity'" class="animate-in slide-in-from-right-4 duration-500">
+         <div *ngIf="logs().length === 0" class="p-20 text-center flex flex-col items-center">
+            <i-lucide name="history" class="h-12 w-12 text-zinc-800 mb-4"></i-lucide>
+            <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">No hay registros de auditoría para este usuario</p>
+         </div>
+
+         <div class="space-y-4">
+            <div *ngFor="let log of logs()" class="p-6 bg-zinc-800/10 rounded-[1.5rem] border border-zinc-800/50 flex items-start gap-5">
+               <div class="h-12 w-12 bg-zinc-800 rounded-2xl flex items-center justify-center text-zinc-500">
+                  <i-lucide name="activity" class="h-5 w-5"></i-lucide>
+               </div>
+               <div class="flex-1">
+                  <div class="flex justify-between items-start mb-1">
+                     <p class="text-[13px] font-black text-zinc-100 uppercase tracking-tight">{{ log.action }}</p>
+                     <span class="text-[10px] font-bold text-zinc-500 uppercase">{{ log.createdAt | date:'short' }}</span>
+                  </div>
+                  <p class="text-[11px] font-bold text-zinc-500 leading-relaxed max-w-lg italic">
+                     Operador: {{ log.operatorId.substring(0, 8) }} • {{ log.details ? (log.details | json) : 'Sin detalles adicionales' }}
+                  </p>
+               </div>
+            </div>
+         </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-10 py-8 bg-zinc-800/20 border-t border-zinc-800 flex justify-end">
+       <button (click)="close.emit()" class="px-10 py-4 bg-zinc-800 text-zinc-300 rounded-2xl hover:bg-zinc-700 font-black text-[11px] uppercase tracking-widest transition-all">
+          Cerrar Vista
+       </button>
+    </div>
+
+  </div>
+</div>

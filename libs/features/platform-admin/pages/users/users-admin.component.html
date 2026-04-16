@@ -1,0 +1,393 @@
+<div class="animate-in fade-in duration-700">
+  
+  <!-- Header & Title -->
+  <div class="flex items-center justify-between mb-10">
+    <div>
+      <h2 class="text-4xl font-black text-white tracking-tight uppercase">Control de Usuarios</h2>
+      <p class="text-zinc-500 font-bold italic">Gestiona el acceso global, aprueba nuevos registros y audita la actividad del ecosistema.</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <button 
+          (click)="loadUsers()" 
+          [disabled]="loading()"
+          class="p-4 bg-zinc-800 rounded-2xl hover:bg-zinc-700 transition-all text-zinc-300 disabled:opacity-50"
+        >
+          <i-lucide [name]="loading() ? 'loader-2' : 'refresh-cw'" [class.animate-spin]="loading()" class="h-5 w-5"></i-lucide>
+        </button>
+    </div>
+  </div>
+
+  <!-- Quick Stats Metrics -->
+  <div class="grid grid-cols-4 gap-6 mb-10">
+     <div class="p-6 bg-zinc-900/50 border border-zinc-800 rounded-3xl flex items-center justify-between">
+        <div>
+           <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Total Registrados</p>
+           <p class="text-2xl font-black text-white">{{ stats()?.total || 0 }}</p>
+        </div>
+        <div class="h-12 w-12 bg-zinc-800 rounded-2xl flex items-center justify-center text-zinc-500"><i-lucide name="users" class="h-6 w-6"></i-lucide></div>
+     </div>
+     <div class="p-6 bg-zinc-900/50 border border-zinc-800 rounded-3xl flex items-center justify-between group hover:border-emerald-500/50 transition-all cursor-pointer" (click)="statusFilter.set('ACTIVE')">
+        <div>
+           <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Activos / Habilitados</p>
+           <p class="text-2xl font-black text-emerald-500">{{ getStatCount('ACTIVE') }}</p>
+        </div>
+        <div class="h-12 w-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500"><i-lucide name="user-check" class="h-6 w-6"></i-lucide></div>
+     </div>
+     <div class="p-6 bg-zinc-900/50 border border-zinc-800 rounded-3xl flex items-center justify-between group hover:border-amber-500/50 transition-all cursor-pointer" (click)="statusFilter.set('PENDING')">
+        <div>
+           <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Pendientes Aprobación</p>
+           <p class="text-2xl font-black text-amber-500">{{ getStatCount('PENDING') }}</p>
+        </div>
+        <div class="h-12 w-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500"><i-lucide name="shield-alert" class="h-6 w-6"></i-lucide></div>
+     </div>
+     <div class="p-6 bg-zinc-900/50 border border-zinc-800 rounded-3xl flex items-center justify-between group hover:border-rose-500/50 transition-all cursor-pointer" (click)="statusFilter.set('BLOCKED')">
+        <div>
+           <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Bloqueados</p>
+           <p class="text-2xl font-black text-rose-500">{{ getStatCount('BLOCKED') }}</p>
+        </div>
+        <div class="h-12 w-12 bg-rose-500/10 rounded-2xl flex items-center justify-center text-rose-500"><i-lucide name="user-x" class="h-6 w-6"></i-lucide></div>
+     </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="flex items-center gap-2 mb-8 bg-zinc-900/30 p-1.5 rounded-[1.8rem] border border-zinc-800/50 w-fit">
+    <button 
+      (click)="activeTab.set('users')"
+      [class.bg-zinc-800]="activeTab() === 'users'"
+      [class.text-white]="activeTab() === 'users'"
+      class="px-8 py-3 rounded-[1.4rem] text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-all"
+    >
+      Usuarios Reales
+    </button>
+    <button 
+      (click)="activeTab.set('invitations')"
+      [class.bg-zinc-800]="activeTab() === 'invitations'"
+      [class.text-white]="activeTab() === 'invitations'"
+      class="px-8 py-3 rounded-[1.4rem] text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-all border border-transparent"
+      [class.border-amber-500/20]="activeTab() === 'invitations'"
+    >
+      Invitaciones Pendientes
+    </button>
+    <button 
+      (click)="activeTab.set('audit')"
+      [class.bg-zinc-800]="activeTab() === 'audit'"
+      [class.text-white]="activeTab() === 'audit'"
+      class="px-8 py-3 rounded-[1.4rem] text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-all"
+    >
+      Registro Global
+    </button>
+  </div>
+
+  <!-- Advanced Filters Bar (Shared) -->
+  <div class="bg-zinc-900/40 p-3 rounded-[2rem] border border-zinc-800 mb-8 flex items-center gap-4">
+     <div class="relative flex-1">
+        <i-lucide name="search" class="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600"></i-lucide>
+        <input 
+          type="text" 
+          [ngModel]="search()" 
+          (ngModelChange)="search.set($event)"
+          placeholder="Buscar por email..." 
+          class="w-full bg-zinc-800/50 border-none rounded-2xl py-4 pl-14 pr-6 text-xs font-bold text-white placeholder:text-zinc-600 focus:ring-2 focus:ring-violet-500/50 transition-all uppercase tracking-tight"
+        >
+     </div>
+     
+     <select 
+       [ngModel]="statusFilter()" 
+       (ngModelChange)="statusFilter.set($event)"
+       class="bg-zinc-800/50 border-none rounded-2xl py-4 px-6 text-[10px] font-black uppercase text-zinc-400 focus:ring-2 focus:ring-violet-500/50 cursor-pointer"
+     >
+        <option value="">Cualquier Estatus</option>
+        <ng-container *ngIf="activeTab() === 'users'">
+          <option *ngFor="let s of metadata()?.userStatuses" [value]="s">{{ s }}</option>
+        </ng-container>
+        <ng-container *ngIf="activeTab() === 'invitations'">
+            <option *ngFor="let s of metadata()?.invitationStatuses" [value]="s">{{ s }}</option>
+        </ng-container>
+     </select>
+
+     <select 
+       *ngIf="activeTab() === 'users'"
+       [ngModel]="planFilter()" 
+       (ngModelChange)="planFilter.set($event)"
+       class="bg-zinc-800/50 border-none rounded-2xl py-4 px-6 text-[10px] font-black uppercase text-zinc-400 focus:ring-2 focus:ring-violet-500/50 cursor-pointer"
+     >
+        <option value="">Todos los Planes</option>
+        <option *ngFor="let p of metadata()?.plans" [value]="p.id">{{ p.name }}</option>
+     </select>
+
+     <button 
+       *ngIf="search() || statusFilter() || planFilter()"
+       (click)="search.set(''); statusFilter.set(''); planFilter.set('')"
+       class="p-4 text-[10px] font-black text-rose-500 uppercase hover:bg-rose-500/10 rounded-2xl transition-all"
+     >
+        Limpiar Filtros
+     </button>
+  </div>
+
+  <!-- Users Table (Tab: users) -->
+  <div *ngIf="activeTab() === 'users'" class="bg-zinc-900/50 backdrop-blur-xl rounded-[2.5rem] border border-zinc-800 p-2 overflow-hidden shadow-2xl relative">
+    
+    <div *ngIf="loading()" class="absolute inset-0 z-50 bg-zinc-950/20 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300">
+        <i-lucide name="loader-2" class="h-10 w-10 text-violet-500 animate-spin"></i-lucide>
+    </div>
+
+    <table class="w-full text-left">
+      <thead>
+        <tr class="text-[10px] uppercase font-black text-zinc-600 tracking-widest border-b border-zinc-800/50">
+          <th class="px-10 py-8">Perfil de Usuario</th>
+          <th class="px-10 py-8">Estatus / Rol</th>
+          <th class="px-10 py-8 text-right">Membresía</th>
+          <th class="px-10 py-8 text-right">Acciones de Control</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-800/30">
+        
+        <!-- Empty State -->
+        <tr *ngIf="!loading() && users().length === 0">
+           <td colspan="4" class="px-10 py-32 text-center flex-col items-center">
+              <i-lucide name="package-search" class="h-12 w-12 text-zinc-800 mx-auto mb-4"></i-lucide>
+              <p class="text-xs font-black text-zinc-600 uppercase tracking-widest">No se encontraron usuarios con los criterios actuales</p>
+           </td>
+        </tr>
+
+        <tr *ngFor="let u of users()" class="hover:bg-zinc-800/30 transition-all group">
+          
+          <td class="px-10 py-6">
+            <div class="flex items-center gap-5 cursor-pointer" (click)="selectedUserForDetail.set(u.id)">
+              <div class="h-12 w-12 bg-zinc-800 rounded-2xl flex items-center justify-center text-sm font-black text-zinc-400 shadow-inner group-hover:bg-violet-600 group-hover:text-white transition-all">
+                {{ u.fullName?.substring(0, 1) || u.email.substring(0, 1) }}
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[14px] font-black text-zinc-100 uppercase tracking-tight group-hover:text-violet-400 transition-all">{{ u.fullName || 'Sin Nombre' }}</span>
+                <span class="text-[10px] font-bold text-zinc-500 tracking-tighter italic">{{ u.email }}</span>
+              </div>
+            </div>
+          </td>
+
+          <td class="px-10 py-6">
+            <div class="flex flex-col gap-2">
+                <div 
+                  [ngClass]="{
+                    'bg-emerald-500/10 text-emerald-500 border-emerald-500/20': u.status === 'ACTIVE',
+                    'bg-rose-500/10 text-rose-500 border-rose-500/20': u.status === 'BLOCKED',
+                    'bg-amber-500/10 text-amber-500 border-amber-500/20': u.status === 'PENDING',
+                    'bg-zinc-500/10 text-zinc-400 border-zinc-700': u.status === 'SUSPENDED' || u.status === 'DELETED'
+                  }"
+                  class="self-start px-3 py-1 rounded-full text-[9px] font-black tracking-widest border uppercase"
+                >
+                  {{ u.status }}
+                </div>
+                <span class="text-[9px] font-black text-zinc-600 uppercase tracking-widest pl-1">{{ u.globalRole }}</span>
+            </div>
+          </td>
+
+          <td class="px-10 py-6 text-right">
+             <div class="flex flex-col items-end">
+                <span class="text-[12px] font-black text-zinc-100 italic">{{ u.plan || 'FREE' }}</span>
+                <span class="text-[9px] font-bold text-zinc-600 uppercase tracking-tighter">DESDE {{ u.createdAt | date:'MM/yy' }}</span>
+             </div>
+          </td>
+
+          <td class="px-10 py-6 text-right">
+            <div class="flex items-center justify-end gap-3 translate-x-4 opacity-40 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              
+              <button 
+                (click)="selectedUserForEdit.set(u)"
+                class="h-12 w-12 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-2xl hover:text-violet-400 transition-all"
+                title="Editar Perfil"
+              >
+                <i-lucide name="edit-2" class="h-5 w-5"></i-lucide>
+              </button>
+
+              <button 
+                *ngIf="u.status === 'PENDING'"
+                (click)="approve(u)"
+                class="h-12 px-6 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-500 text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20"
+              >
+                Aprobar
+              </button>
+
+              <button 
+                *ngIf="u.status === 'ACTIVE'"
+                (click)="toggleUserBlock(u)"
+                class="h-12 w-12 flex items-center justify-center bg-zinc-800 text-rose-500 border border-zinc-700 rounded-2xl hover:bg-rose-500 hover:text-white transition-all"
+                title="Bloquear Acceso"
+              >
+                <i-lucide name="user-x" class="h-5 w-5"></i-lucide>
+              </button>
+
+              <button 
+                *ngIf="u.status === 'BLOCKED'"
+                (click)="toggleUserBlock(u)"
+                class="h-12 w-12 flex items-center justify-center bg-emerald-950/30 text-emerald-400 border border-emerald-500/20 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all"
+                title="Quitar Bloqueo"
+              >
+                <i-lucide name="user-check" class="h-5 w-5"></i-lucide>
+              </button>
+
+              <button 
+                (click)="toggleUserSuspension(u)"
+                *ngIf="u.status === 'ACTIVE' || u.status === 'SUSPENDED'"
+                class="h-12 w-12 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-2xl hover:text-white transition-all"
+                [title]="u.status === 'SUSPENDED' ? 'Reactivar' : 'Suspender Temporalmente'"
+              >
+                <i-lucide [name]="u.status === 'SUSPENDED' ? 'play' : 'pause'" class="h-5 w-5"></i-lucide>
+              </button>
+
+              <button 
+                (click)="delete(u)"
+                *ngIf="u.status !== 'DELETED'"
+                class="h-12 w-12 flex items-center justify-center bg-zinc-800 text-zinc-600 border border-zinc-800 rounded-2xl hover:bg-rose-950/30 hover:text-rose-500 transition-all"
+                title="Eliminar lógicamente"
+              >
+                <i-lucide name="trash-2" class="h-5 w-5"></i-lucide>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination Footer -->
+    <div *ngIf="meta()" class="px-10 py-8 bg-zinc-800/10 border-t border-zinc-800/50 flex items-center justify-between">
+       <div class="text-[11px] font-bold text-zinc-500">
+          Mostrando {{ users().length }} de <span class="text-zinc-100">{{ meta().totalItems }}</span> usuarios registrados
+       </div>
+       <div class="flex items-center gap-2">
+         <button 
+           (click)="goToPage(currentPage() - 1)" 
+           [disabled]="currentPage() === 1"
+           class="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+         >
+           <i-lucide name="chevron-left" class="h-5 w-5"></i-lucide>
+         </button>
+         
+         <div class="flex items-center gap-1">
+            <span class="text-xs font-black text-white px-3">{{ currentPage() }}</span>
+            <span class="text-[10px] font-bold text-zinc-600 uppercase">de</span>
+            <span class="text-xs font-black text-zinc-400 px-3">{{ meta().totalPages }}</span>
+         </div>
+
+         <button 
+           (click)="goToPage(currentPage() + 1)" 
+           [disabled]="currentPage() === meta().totalPages"
+           class="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+         >
+           <i-lucide name="chevron-right" class="h-5 w-5"></i-lucide>
+         </button>
+       </div>
+    </div>
+  </div>
+
+  <!-- Invitations Table (Tab: invitations) -->
+  <div *ngIf="activeTab() === 'invitations'" class="bg-zinc-900/50 backdrop-blur-xl rounded-[2.5rem] border border-zinc-800 p-2 overflow-hidden shadow-2xl relative animate-in slide-in-from-right-4 duration-500">
+    <div *ngIf="invitationsLoading()" class="absolute inset-0 z-50 bg-zinc-950/20 backdrop-blur-sm flex items-center justify-center">
+        <i-lucide name="loader-2" class="h-10 w-10 text-violet-500 animate-spin"></i-lucide>
+    </div>
+
+    <table class="w-full text-left">
+      <thead>
+        <tr class="text-[10px] uppercase font-black text-zinc-600 tracking-widest border-b border-zinc-800/50">
+          <th class="px-10 py-8">Invitación</th>
+          <th class="px-10 py-8">Destino / Negocio</th>
+          <th class="px-10 py-8">Estatus</th>
+          <th class="px-10 py-8">Vencimiento</th>
+          <th class="px-10 py-8 text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-800/30">
+        <tr *ngIf="!invitationsLoading() && invitations().length === 0">
+           <td colspan="5" class="px-10 py-32 text-center">
+              <i-lucide name="mail-question" class="h-12 w-12 text-zinc-800 mx-auto mb-4"></i-lucide>
+              <p class="text-xs font-black text-zinc-600 uppercase tracking-widest">No hay invitaciones registradas</p>
+           </td>
+        </tr>
+
+        <tr *ngFor="let inv of invitations()" class="hover:bg-zinc-800/30 transition-all group">
+          <td class="px-10 py-6">
+            <div class="flex flex-col">
+              <span class="text-[13px] font-black text-zinc-100 uppercase tracking-tight">{{ inv.email }}</span>
+              <span class="text-[9px] font-bold text-zinc-500 tracking-tighter italic">INVITADO POR {{ inv.invitedByUser?.email || 'SYSTEM' }}</span>
+            </div>
+          </td>
+          <td class="px-10 py-6">
+            <div class="flex items-center gap-2">
+               <i-lucide name="building" class="h-3 w-3 text-zinc-600"></i-lucide>
+               <span class="text-[11px] font-black text-zinc-400 uppercase">{{ inv.business?.name || '---' }}</span>
+            </div>
+          </td>
+          <td class="px-10 py-6">
+             <div 
+              [ngClass]="{
+                'bg-amber-500/10 text-amber-500 border-amber-500/20': inv.status === 'PENDING',
+                'bg-emerald-500/10 text-emerald-500 border-emerald-500/20': inv.status === 'ACCEPTED',
+                'bg-rose-500/10 text-rose-500 border-rose-500/20': inv.status === 'EXPIRED',
+                'bg-zinc-500/10 text-zinc-400 border-zinc-700': inv.status === 'CANCELLED'
+              }"
+              class="px-3 py-1 rounded-full text-[9px] font-black tracking-widest border uppercase inline-block"
+            >
+              {{ inv.status }}
+            </div>
+          </td>
+          <td class="px-10 py-6">
+             <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-tighter">{{ inv.expiresAt | date:'dd/MM/yy' }}</span>
+                <span class="text-[8px] font-black text-zinc-600">{{ inv.resendCount }} RE-ENVÍOS</span>
+             </div>
+          </td>
+          <td class="px-10 py-6 text-right">
+             <div class="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-all">
+                <button 
+                  *ngIf="inv.status === 'PENDING' || inv.status === 'EXPIRED'"
+                  (click)="resendInvitation(inv)"
+                  class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-zinc-400 rounded-xl hover:text-white transition-all"
+                  title="Re-enviar"
+                >
+                  <i-lucide name="refresh-cw" class="h-4 w-4"></i-lucide>
+                </button>
+                <button 
+                  *ngIf="inv.status === 'PENDING'"
+                  (click)="cancelInvitation(inv)"
+                  class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-rose-500/50 rounded-xl hover:bg-rose-500 hover:text-white transition-all"
+                  title="Cancelar"
+                >
+                  <i-lucide name="x" class="h-4 w-4"></i-lucide>
+                </button>
+             </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Invitations Pagination -->
+    <div *ngIf="invitationsMeta()" class="px-10 py-6 bg-zinc-800/10 border-t border-zinc-800/50 flex items-center justify-between">
+        <div class="text-[10px] font-bold text-zinc-600 uppercase">PÁGINA {{ invitationsMeta().currentPage }} de {{ invitationsMeta().totalPages }}</div>
+        <div class="flex gap-2">
+            <button (click)="loadInvitations(invitationsMeta().currentPage - 1)" [disabled]="invitationsMeta().currentPage === 1" class="p-2 bg-zinc-800 rounded-lg disabled:opacity-30"><i-lucide name="chevron-left" class="h-4 w-4"></i-lucide></button>
+            <button (click)="loadInvitations(invitationsMeta().currentPage + 1)" [disabled]="invitationsMeta().currentPage === invitationsMeta().totalPages" class="p-2 bg-zinc-800 rounded-lg disabled:opacity-30"><i-lucide name="chevron-right" class="h-4 w-4"></i-lucide></button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Audit Logs (Placeholder/Simple List) -->
+  <div *ngIf="activeTab() === 'audit'" class="p-20 text-center bg-zinc-900/50 rounded-[2.5rem] border border-zinc-800 animate-in zoom-in-95 duration-500">
+     <i-lucide name="shield" class="h-16 w-16 text-zinc-800 mx-auto mb-6"></i-lucide>
+     <h3 class="text-xl font-black text-zinc-500 uppercase mb-2">Monitor Global de Auditoría</h3>
+     <p class="text-xs font-bold text-zinc-600 max-w-md mx-auto italic uppercase tracking-widest">Próximamente: Historial completo de todas las acciones administrativas de la plataforma.</p>
+  </div>
+
+  <!-- User Detail Modal Wrapper -->
+  <app-user-detail
+    *ngIf="selectedUserForDetail()"
+    [userId]="selectedUserForDetail()!"
+    (close)="selectedUserForDetail.set(null)"
+  ></app-user-detail>
+
+  <app-user-edit-modal
+    *ngIf="selectedUserForEdit()"
+    [user]="selectedUserForEdit()"
+    (close)="selectedUserForEdit.set(null)"
+    (updated)="loadUsers(); loadStats()"
+  ></app-user-edit-modal>
+
+</div>
