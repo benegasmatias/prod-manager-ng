@@ -4,18 +4,28 @@
       <h2 class="text-3xl font-black text-white tracking-tight uppercase">Ecosistema de Negocios</h2>
       <p class="text-zinc-500 font-bold italic">Controla los tenants activos, suspendidos y su facturación.</p>
     </div>
-    <button 
-      (click)="loadBusinesses()" 
-      [disabled]="loading()"
-      class="p-3 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition-all text-zinc-300 disabled:opacity-50"
-    >
-       <i-lucide [name]="loading() ? 'loader-2' : 'refresh-cw'" [class.animate-spin]="loading()" class="h-5 w-5"></i-lucide>
-    </button>
+    <div class="flex items-center gap-4">
+      <button 
+        (click)="fixAllCapabilities()"
+        class="flex items-center gap-2 px-5 py-3 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-xl hover:bg-amber-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+      >
+        <lucide-angular [img]="icons.ShieldAlert" class="h-4 w-4"></lucide-angular>
+        Reparar Capacidades
+      </button>
+
+      <button 
+        (click)="loadBusinesses()" 
+        [disabled]="loading()"
+        class="p-3 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition-all text-zinc-300 disabled:opacity-50"
+      >
+         <lucide-angular [img]="loading() ? icons.Loader2 : icons.RefreshCw" [class.animate-spin]="loading()" class="h-5 w-5"></lucide-angular>
+      </button>
+    </div>
   </div>
 
   <!-- Error State -->
   <div *ngIf="error()" class="p-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl mb-8 flex items-center gap-4">
-    <i-lucide name="shield-alert" class="h-6 w-6 text-rose-500"></i-lucide>
+    <lucide-angular [img]="icons.ShieldAlert" class="h-6 w-6 text-rose-500"></lucide-angular>
     <div>
         <p class="text-rose-500 font-black uppercase text-xs">Error de Servidor</p>
         <p class="text-rose-400/80 text-xs font-bold">{{ error() }}</p>
@@ -26,23 +36,24 @@
     <table class="w-full text-left">
       <thead>
         <tr class="text-[10px] uppercase font-black text-zinc-600 tracking-widest border-b border-zinc-800">
-          <th class="px-8 py-6">Organización / ID</th>
-          <th class="px-8 py-6">Estatus</th>
-          <th class="px-8 py-6 text-right">Plan Actual</th>
-          <th class="px-8 py-6 text-right">Acciones</th>
+           <th class="px-8 py-6">Organización / ID</th>
+           <th class="px-8 py-6">Estatus</th>
+           <th class="px-8 py-6 text-center">Equipo</th>
+           <th class="px-8 py-6 text-right">Plan Actual</th>
+           <th class="px-8 py-6 text-right">Acciones</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-zinc-800/50">
         <!-- Loading Skeletons -->
         <ng-container *ngIf="loading()">
           <tr *ngFor="let i of [1,2,3,4]" class="animate-pulse">
-            <td colspan="4" class="px-8 py-8 h-24 bg-zinc-800/20"></td>
+            <td colspan="5" class="px-8 py-8 h-24 bg-zinc-800/20"></td>
           </tr>
         </ng-container>
 
         <!-- Empty State -->
         <tr *ngIf="!loading() && businesses().length === 0">
-           <td colspan="4" class="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest text-xs">
+           <td colspan="5" class="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest text-xs">
               No se encontraron organizaciones registradas
            </td>
         </tr>
@@ -50,12 +61,24 @@
         <tr *ngFor="let b of businesses()" class="hover:bg-zinc-800/30 transition-all group">
            <td class="px-8 py-6">
             <div class="flex items-center gap-4">
-              <div class="h-10 w-10 bg-zinc-800 rounded-xl flex items-center justify-center font-black text-zinc-300 shadow-inner group-hover:bg-violet-600 group-hover:text-white transition-all">
+              <div class="h-10 w-10 bg-zinc-800 rounded-xl flex items-center justify-center font-black text-zinc-400 shadow-inner group-hover:bg-violet-600 group-hover:text-white transition-all">
                 {{ b.name.substring(0, 1) }}
               </div>
               <div class="flex flex-col">
                 <span class="text-[13px] font-black text-zinc-100">{{ b.name }}</span>
                 <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter italic">{{ b.category }} • {{ b.id.substring(0, 8) }}</span>
+                
+                <!-- Capabilities Chips -->
+                <div class="flex flex-wrap gap-1 mt-2">
+                   @for (cap of b.capabilities?.slice(0, 3); track cap) {
+                     <span class="text-[8px] px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-400 border border-zinc-700 font-bold tracking-tight">
+                       {{ cap.replace('_', ' ') }}
+                     </span>
+                   }
+                   @if (b.capabilities?.length > 3) {
+                     <span class="text-[8px] px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-500 font-bold">+{{ b.capabilities.length - 3 }}</span>
+                   }
+                </div>
               </div>
             </div>
           </td>
@@ -76,6 +99,12 @@
               {{ b.status }}
             </div>
           </td>
+          <td class="px-8 py-6 text-center">
+             <div class="flex flex-col items-center">
+                <span class="text-[11px] font-black text-zinc-100">{{ b.memberships?.length || 0 }}</span>
+                <span class="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Miembros</span>
+             </div>
+          </td>
            <td class="px-8 py-6 text-right">
              <div class="flex flex-col items-end">
                 <span class="text-[11px] font-black text-zinc-100 uppercase">{{ b.planId || 'GRATIS' }}</span>
@@ -85,7 +114,16 @@
               </div>
           </td>
            <td class="px-8 py-6 text-right">
-            <div class="flex items-center justify-end gap-2">
+            <div class="flex items-center justify-end gap-2 translate-x-4 opacity-40 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+               
+               <button 
+                (click)="contactBusiness(b)"
+                class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-xl hover:text-white transition-all"
+                title="Contactar Dueño"
+              >
+                <lucide-angular [img]="icons.Mail" class="h-4 w-4"></lucide-angular>
+              </button>
+
                <button 
                 *ngIf="b.status !== 'ACTIVE'"
                 (click)="updateStatus(b, 'ACTIVE')"
@@ -100,7 +138,7 @@
                 class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-rose-500 border border-zinc-700 rounded-xl hover:bg-rose-500 hover:text-white transition-all"
                 title="Suspender Acceso"
               >
-                <i-lucide name="pause" class="h-4 w-4"></i-lucide>
+                <lucide-angular [img]="icons.Pause" class="h-4 w-4"></lucide-angular>
               </button>
 
               <button 
@@ -108,7 +146,7 @@
                 class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-xl hover:text-white transition-all"
                 title="Configurar Plan"
               >
-                <i-lucide name="dollar-sign" class="h-4 w-4"></i-lucide>
+                <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
               </button>
             </div>
           </td>
@@ -116,6 +154,82 @@
       </tbody>
     </table>
    </div>
+
+   <!-- Templates Management -->
+   <div class="mt-20">
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <h2 class="text-2xl font-black text-white tracking-tight uppercase">Templates de Negocio</h2>
+        <p class="text-zinc-500 font-bold italic text-sm">Configuración de rubros y capacidades por defecto.</p>
+      </div>
+      <button 
+        (click)="syncTemplates()"
+        class="flex items-center gap-2 px-5 py-3 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-xl hover:bg-indigo-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+      >
+        <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4"></lucide-angular>
+        Sincronizar Plantillas Base
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (template of templates(); track template.key) {
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 hover:border-primary/50 transition-all group">
+          <div class="flex items-center justify-between mb-6">
+            <div class="p-3 rounded-2xl bg-zinc-800 group-hover:bg-primary/20 group-hover:text-primary transition-all">
+               <lucide-angular [img]="icons.Building" class="h-6 w-6"></lucide-angular>
+            </div>
+            <div 
+              [ngClass]="template.isEnabled ? 'text-emerald-500 bg-emerald-500/10' : 'text-zinc-500 bg-zinc-500/10'"
+              class="px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-current opacity-70"
+            >
+              {{ template.isEnabled ? 'Habilitado' : 'Desactivado' }}
+            </div>
+          </div>
+
+          <h3 class="text-lg font-black text-zinc-100 uppercase tracking-tight mb-2">{{ template.name }}</h3>
+          <p class="text-xs text-zinc-500 font-medium mb-8 leading-relaxed">{{ template.description }}</p>
+
+          <div class="space-y-4">
+             <div class="flex flex-col gap-2">
+                <span class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">Capacidades Base</span>
+                <div class="flex flex-wrap gap-2">
+                  @for (cap of template.defaultCapabilities; track cap) {
+                    <span class="text-[9px] px-2 py-1 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold">
+                      {{ cap }}
+                    </span>
+                  }
+                </div>
+             </div>
+             
+             <div class="flex items-center justify-between pt-4 border-t border-zinc-800">
+                <span class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">Prioridad</span>
+                <button 
+                  (click)="selectedTemplate.set(template)"
+                  class="text-[10px] font-black text-primary uppercase hover:underline"
+                >
+                  Editar
+                </button>
+             </div>
+          </div>
+        </div>
+      }
+    </div>
+   </div>
+
+   <!-- Template Editor Modal -->
+   <app-template-editor-modal
+     *ngIf="selectedTemplate()"
+     [template]="selectedTemplate()"
+     (close)="selectedTemplate.set(null)"
+     (updated)="loadTemplates()"
+   ></app-template-editor-modal>
+
+   <!-- Audit Modal -->
+   <app-audit-capabilities-modal
+     *ngIf="showAuditModal()"
+     (close)="showAuditModal.set(false)"
+     (updated)="loadBusinesses()"
+   ></app-audit-capabilities-modal>
 
    <!-- Plan Selection Modal -->
    <app-business-plan-modal

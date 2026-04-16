@@ -42,7 +42,15 @@ export class LoginComponent {
       const { data, error } = await this.authService.login(this.email(), this.password());
       if (error) {
         console.warn('[Login] Authentication failed:', error.message);
-        this.error.set(error.message);
+        
+        let msg = error.message;
+        if (msg.includes('Email not confirmed')) {
+          msg = 'Debes validar tu email antes de ingresar. Revisa tu casilla de correo.';
+        } else if (msg.includes('Invalid login credentials')) {
+          msg = 'Credenciales inválidas. Verifica tu email y contraseña.';
+        }
+        
+        this.error.set(msg);
         this.loading.set(false);
         return;
       }

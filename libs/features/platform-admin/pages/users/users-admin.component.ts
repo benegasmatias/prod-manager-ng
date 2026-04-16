@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, Users, UserCheck, ShieldAlert, UserX, RefreshCw, Loader2, Search, Edit2, Play, Pause, Trash2, ChevronLeft, ChevronRight, PackageSearch, MailQuestion, Mail, Building, X, Phone, ShieldCheck, History, Activity, Shield } from 'lucide-angular';
 import { UserProfile } from '@shared/models';
 import { PlatformAdminService } from '../../services/platform-admin.service';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -42,14 +42,22 @@ export class UsersAdminComponent implements OnInit {
   // Expose service metadata to template (Signals chain)
   metadata = this.adminService.metadata;
 
+  readonly icons = {
+    Users, UserCheck, ShieldAlert, UserX, RefreshCw, Loader2, Search, Edit2, Play, Pause, Trash2, 
+    ChevronLeft, ChevronRight, PackageSearch, MailQuestion, Mail, Building, X, Phone, 
+    ShieldCheck, History, Activity, Shield
+  };
+
   // Filter Signals
   search = signal<string>('');
   statusFilter = signal<string>('');
   planFilter = signal<string>('');
   currentPage = signal<number>(1);
   pageSize = 10;
-  
+
   constructor() {
+    LucideAngularModule.pick(this.icons);
+    
     // Reload when filters or tab change
     effect(() => {
       const tab = this.activeTab();

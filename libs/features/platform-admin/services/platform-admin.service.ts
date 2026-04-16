@@ -70,6 +70,11 @@ export class PlatformAdminService {
     return firstValueFrom(this.http.delete(`${this.apiUrl}/users/${id}`));
   }
 
+  async seedTemplates(): Promise<any> {
+    const data = await firstValueFrom(this.http.post(`${this.apiUrl}/templates/seed`, {}));
+    return data;
+  }
+
   async updateUser(id: string, data: any): Promise<any> {
     return firstValueFrom(this.http.patch(`${this.apiUrl}/users/${id}`, data));
   }
@@ -120,5 +125,22 @@ export class PlatformAdminService {
   
   async updateBusinessSubscription(id: string, planId: string, expiresAt: Date): Promise<any> {
     return firstValueFrom(this.http.patch(`${this.apiUrl}/businesses/${id}/subscription`, { planId, expiresAt }));
+  }
+
+  // --- Templates & Capabilities ---
+  async getTemplates(): Promise<any[]> {
+    return firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/templates`));
+  }
+
+  async updateTemplate(key: string, data: any): Promise<any> {
+    return firstValueFrom(this.http.patch(`${this.apiUrl}/templates/${key}`, data));
+  }
+
+  async auditCapabilities(): Promise<any[]> {
+    return firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/capabilities/audit`));
+  }
+
+  async repairCapabilities(businessIds?: string[], dryRun: boolean = true): Promise<any> {
+    return firstValueFrom(this.http.post(`${this.apiUrl}/capabilities/repair`, { businessIds, dryRun }));
   }
 }

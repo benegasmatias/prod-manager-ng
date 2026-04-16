@@ -21,13 +21,13 @@ import { cn } from '@shared/utils/cn';
           </div>
           <div class="flex gap-2">
             <button
-              (click)="onEdit.emit(machine!)"
+              (click)="machine && onEdit.emit(machine)"
               class="h-10 w-10 rounded-xl border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-500 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all"
             >
               <lucide-angular [img]="icons.Edit2" class="h-4 w-4"></lucide-angular>
             </button>
             <button
-              (click)="onDelete.emit(machine!.id)"
+              (click)="machine && onDelete.emit(machine.id)"
               class="h-10 w-10 rounded-xl bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 hover:bg-orange-500 hover:text-white transition-all shadow-sm flex items-center justify-center border border-orange-100 dark:border-orange-900/30"
             >
               <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>

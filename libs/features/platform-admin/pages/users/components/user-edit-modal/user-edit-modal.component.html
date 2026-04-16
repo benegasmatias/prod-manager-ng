@@ -20,11 +20,25 @@
         <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Nombre Completo</label>
         <div class="relative">
            <i-lucide name="user" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600"></i-lucide>
+            <input 
+              type="text" 
+              formControlName="fullName"
+              class="w-full bg-zinc-800/50 border border-zinc-800 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white focus:ring-2 focus:ring-violet-500/50 transition-all outline-none uppercase tracking-tight"
+              placeholder="Nombre Completo"
+            >
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="space-y-2">
+        <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Teléfono de contacto</label>
+        <div class="relative">
+           <i-lucide name="phone" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600"></i-lucide>
            <input 
              type="text" 
-             formControlName="fullName"
+             formControlName="phone"
              class="w-full bg-zinc-800/50 border border-zinc-800 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white focus:ring-2 focus:ring-violet-500/50 transition-all outline-none"
-             placeholder="Ej: Juan Pérez"
+             placeholder="+54 9 ..."
            >
         </div>
       </div>

@@ -8,23 +8,13 @@ import { firstValueFrom } from 'rxjs';
 export class MaquinasApiService {
   private http = inject(HttpClient);
 
-  private cache = new Map<string, { data: Machine[], total: number }>();
-
   async getAll(businessId: string, context?: any): Promise<{ data: Machine[], total: number }> {
-    if (this.cache.has(businessId)) {
-      return this.cache.get(businessId)!;
-    }
-
-    const res = await firstValueFrom(
+    return firstValueFrom(
       this.http.get<{ data: Machine[], total: number }>(API_ENDPOINTS.MACHINES.LIST, { 
         params: { businessId, page: '1', pageSize: '50' },
         context
       })
     );
-    
-    this.cache.set(businessId, res);
-    setTimeout(() => this.cache.delete(businessId), 5 * 60 * 1000);
-    return res;
   }
 
   async getOne(id: string, businessId: string): Promise<Machine> {
@@ -34,21 +24,18 @@ export class MaquinasApiService {
   }
 
   async create(data: Partial<Machine>): Promise<Machine> {
-    this.cache.clear();
     return firstValueFrom(
       this.http.post<Machine>(API_ENDPOINTS.MACHINES.CREATE, data)
     );
   }
 
   async update(id: string, data: Partial<Machine>, businessId: string): Promise<Machine> {
-    this.cache.clear();
     return firstValueFrom(
       this.http.patch<Machine>(API_ENDPOINTS.MACHINES.UPDATE(id), data, { params: { businessId } })
     );
   }
 
   async remove(id: string, businessId: string): Promise<void> {
-    this.cache.clear();
     await firstValueFrom(
       this.http.delete<void>(API_ENDPOINTS.MACHINES.REMOVE(id), { params: { businessId } })
     );

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, User, Phone, X, Save, Loader2, UserCheck, UserX } from 'lucide-angular';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlatformAdminService } from '../../../../services/platform-admin.service';
 import { ToastService } from '../../../../../../shared/services/toast.service';
@@ -19,6 +19,12 @@ export class UserEditModalComponent implements OnInit {
   private adminService = inject(PlatformAdminService);
   private toast = inject(ToastService);
 
+  constructor() {
+    LucideAngularModule.pick({
+      User, Phone, X, Save, Loader2, UserCheck, UserX
+    });
+  }
+
   @Input() user: any;
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
@@ -33,6 +39,7 @@ export class UserEditModalComponent implements OnInit {
     this.ensureMetadata();
     this.editForm = this.fb.group({
       fullName: [this.user.fullName || '', [Validators.required]],
+      phone: [this.user.phone || ''],
       globalRole: [this.user.globalRole || 'USER', [Validators.required]],
       plan: [this.user.plan || 'free', [Validators.required]],
       active: [this.user.active ?? true]

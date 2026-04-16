@@ -135,6 +135,7 @@
       <thead>
         <tr class="text-[10px] uppercase font-black text-zinc-600 tracking-widest border-b border-zinc-800/50">
           <th class="px-10 py-8">Perfil de Usuario</th>
+          <th class="px-10 py-8">Teléfono</th>
           <th class="px-10 py-8">Estatus / Rol</th>
           <th class="px-10 py-8 text-right">Membresía</th>
           <th class="px-10 py-8 text-right">Acciones de Control</th>
@@ -144,7 +145,7 @@
         
         <!-- Empty State -->
         <tr *ngIf="!loading() && users().length === 0">
-           <td colspan="4" class="px-10 py-32 text-center flex-col items-center">
+           <td colspan="5" class="px-10 py-32 text-center flex-col items-center">
               <i-lucide name="package-search" class="h-12 w-12 text-zinc-800 mx-auto mb-4"></i-lucide>
               <p class="text-xs font-black text-zinc-600 uppercase tracking-widest">No se encontraron usuarios con los criterios actuales</p>
            </td>
@@ -155,13 +156,20 @@
           <td class="px-10 py-6">
             <div class="flex items-center gap-5 cursor-pointer" (click)="selectedUserForDetail.set(u.id)">
               <div class="h-12 w-12 bg-zinc-800 rounded-2xl flex items-center justify-center text-sm font-black text-zinc-400 shadow-inner group-hover:bg-violet-600 group-hover:text-white transition-all">
-                {{ u.fullName?.substring(0, 1) || u.email.substring(0, 1) }}
+                {{ u?.fullName?.substring(0, 1) || u?.email?.substring(0, 1) || '?' }}
               </div>
               <div class="flex flex-col">
-                <span class="text-[14px] font-black text-zinc-100 uppercase tracking-tight group-hover:text-violet-400 transition-all">{{ u.fullName || 'Sin Nombre' }}</span>
-                <span class="text-[10px] font-bold text-zinc-500 tracking-tighter italic">{{ u.email }}</span>
+                <span class="text-[14px] font-black text-zinc-100 uppercase tracking-tight group-hover:text-violet-400 transition-all">{{ u?.fullName || 'Sin Nombre' }}</span>
+                <span class="text-[10px] font-bold text-zinc-500 tracking-tighter italic">{{ u?.email || '---' }}</span>
               </div>
             </div>
+          </td>
+
+          <td class="px-10 py-6">
+             <div class="flex items-center gap-2">
+                <lucide-angular [img]="icons.Phone" class="h-3 w-3 text-zinc-600"></lucide-angular>
+                <span class="text-[11px] font-bold text-zinc-400">{{ u.phone || '---' }}</span>
+             </div>
           </td>
 
           <td class="px-10 py-6">
@@ -177,7 +185,10 @@
                 >
                   {{ u.status }}
                 </div>
-                <span class="text-[9px] font-black text-zinc-600 uppercase tracking-widest pl-1">{{ u.globalRole }}</span>
+                <div class="flex items-center gap-1 pl-1">
+                   <i-lucide *ngIf="u.globalRole === 'SUPER_ADMIN'" name="shield-check" class="h-3 w-3 text-violet-500"></i-lucide>
+                   <span class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">{{ u.globalRole }}</span>
+                </div>
             </div>
           </td>
 
@@ -298,7 +309,7 @@
       <tbody class="divide-y divide-zinc-800/30">
         <tr *ngIf="!invitationsLoading() && invitations().length === 0">
            <td colspan="5" class="px-10 py-32 text-center">
-              <i-lucide name="mail-question" class="h-12 w-12 text-zinc-800 mx-auto mb-4"></i-lucide>
+              <lucide-angular [img]="icons.MailQuestion" class="h-12 w-12 text-zinc-800 mx-auto mb-4"></lucide-angular>
               <p class="text-xs font-black text-zinc-600 uppercase tracking-widest">No hay invitaciones registradas</p>
            </td>
         </tr>
@@ -312,7 +323,7 @@
           </td>
           <td class="px-10 py-6">
             <div class="flex items-center gap-2">
-               <i-lucide name="building" class="h-3 w-3 text-zinc-600"></i-lucide>
+               <lucide-angular [img]="icons.Building" class="h-3 w-3 text-zinc-600"></lucide-angular>
                <span class="text-[11px] font-black text-zinc-400 uppercase">{{ inv.business?.name || '---' }}</span>
             </div>
           </td>
@@ -343,7 +354,7 @@
                   class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-zinc-400 rounded-xl hover:text-white transition-all"
                   title="Re-enviar"
                 >
-                  <i-lucide name="refresh-cw" class="h-4 w-4"></i-lucide>
+                  <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4"></lucide-angular>
                 </button>
                 <button 
                   *ngIf="inv.status === 'PENDING'"
@@ -351,7 +362,7 @@
                   class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-rose-500/50 rounded-xl hover:bg-rose-500 hover:text-white transition-all"
                   title="Cancelar"
                 >
-                  <i-lucide name="x" class="h-4 w-4"></i-lucide>
+                  <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
                 </button>
              </div>
           </td>
@@ -363,15 +374,15 @@
     <div *ngIf="invitationsMeta()" class="px-10 py-6 bg-zinc-800/10 border-t border-zinc-800/50 flex items-center justify-between">
         <div class="text-[10px] font-bold text-zinc-600 uppercase">PÁGINA {{ invitationsMeta().currentPage }} de {{ invitationsMeta().totalPages }}</div>
         <div class="flex gap-2">
-            <button (click)="loadInvitations(invitationsMeta().currentPage - 1)" [disabled]="invitationsMeta().currentPage === 1" class="p-2 bg-zinc-800 rounded-lg disabled:opacity-30"><i-lucide name="chevron-left" class="h-4 w-4"></i-lucide></button>
-            <button (click)="loadInvitations(invitationsMeta().currentPage + 1)" [disabled]="invitationsMeta().currentPage === invitationsMeta().totalPages" class="p-2 bg-zinc-800 rounded-lg disabled:opacity-30"><i-lucide name="chevron-right" class="h-4 w-4"></i-lucide></button>
+            <button (click)="loadInvitations(invitationsMeta().currentPage - 1)" [disabled]="invitationsMeta().currentPage === 1" class="p-2 bg-zinc-800 rounded-lg disabled:opacity-30"><lucide-angular [img]="icons.ChevronLeft" class="h-4 w-4"></lucide-angular></button>
+            <button (click)="loadInvitations(invitationsMeta().currentPage + 1)" [disabled]="invitationsMeta().currentPage === invitationsMeta().totalPages" class="p-2 bg-zinc-800 rounded-lg disabled:opacity-30"><lucide-angular [img]="icons.ChevronRight" class="h-4 w-4"></lucide-angular></button>
         </div>
     </div>
   </div>
 
   <!-- Audit Logs (Placeholder/Simple List) -->
   <div *ngIf="activeTab() === 'audit'" class="p-20 text-center bg-zinc-900/50 rounded-[2.5rem] border border-zinc-800 animate-in zoom-in-95 duration-500">
-     <i-lucide name="shield" class="h-16 w-16 text-zinc-800 mx-auto mb-6"></i-lucide>
+     <lucide-angular [img]="icons.Shield" class="h-16 w-16 text-zinc-800 mx-auto mb-6"></lucide-angular>
      <h3 class="text-xl font-black text-zinc-500 uppercase mb-2">Monitor Global de Auditoría</h3>
      <p class="text-xs font-bold text-zinc-600 max-w-md mx-auto italic uppercase tracking-widest">Próximamente: Historial completo de todas las acciones administrativas de la plataforma.</p>
   </div>

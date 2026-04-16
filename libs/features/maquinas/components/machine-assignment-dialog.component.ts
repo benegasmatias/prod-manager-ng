@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Pedido, Material } from '@shared/models';
 import { LucideAngularModule, X, ChevronDown, Package, Plus } from 'lucide-angular';
 import { SessionService } from '@core/session/session.service';
+import { cn } from '@shared/utils/cn';
 
 
 @Component({
@@ -58,17 +59,20 @@ import { SessionService } from '@core/session/session.service';
           <div class="space-y-4">
             <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left block">Seleccionar Pedido Pendiente</label>
             <div class="max-h-[280px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-              @if (loadingOrders) {
+              @if (loading || saving) {
                 <div class="py-12 flex flex-col items-center justify-center gap-2">
                   <div class="h-6 w-6 border-2 border-zinc-100 border-t-primary rounded-full animate-spin"></div>
                   <p class="text-[10px] font-bold text-zinc-400 uppercase">Consultando pedidos...</p>
                 </div>
               } @else if (pendingOrders.length > 0) {
                 @for (order of pendingOrders; track order.id) {
-                  <div
-                    (click)="onAssign.emit({ orderId: order.id, materialId: selectedMaterialId })"
-                    class="group relative flex items-center justify-between p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-200 dark:hover:border-zinc-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
-                  >
+                    <div
+                      (click)="!saving && onAssign.emit({ orderId: order.id, materialId: selectedMaterialId })"
+                      [class]="cn(
+                        'group relative flex items-center justify-between p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-200 dark:hover:border-zinc-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md',
+                        saving && 'opacity-50 cursor-not-allowed pointer-events-none'
+                      )"
+                    >
                     <div class="flex flex-col text-left">
                       <div class="flex items-center gap-2">
                         <p class="font-bold text-sm text-zinc-900 dark:text-zinc-100">{{ order.clientName }}</p>
@@ -97,7 +101,8 @@ import { SessionService } from '@core/session/session.service';
 export class MachineAssignmentDialogComponent {
   @Input() pendingOrders: Pedido[] = [];
   @Input() availableMaterials: Material[] = [];
-  @Input() loadingOrders = false;
+  @Input() saving = false;
+  @Input() loading = false;
 
   @Output() onAssign = new EventEmitter<{ orderId: string; materialId: string }>();
   @Output() onCancel = new EventEmitter<void>();
@@ -106,5 +111,6 @@ export class MachineAssignmentDialogComponent {
 
   private session = inject(SessionService);
   config = this.session.config;
+  cn = cn;
   readonly icons = { X, ChevronDown, Package, Plus };
 }

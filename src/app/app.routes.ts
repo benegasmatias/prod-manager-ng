@@ -84,17 +84,14 @@ export const routes: Routes = [
       },
       {
         path: 'materiales',
-        canMatch: [capabilityGuard('PRODUCTION')],
         loadChildren: () => import('@features/materiales/materiales.routes').then(m => m.MATERIALES_ROUTES)
       },
       {
         path: 'produccion',
-        canMatch: [capabilityGuard('PRODUCTION')],
         loadChildren: () => import('../../libs/features/produccion/produccion.routes').then(m => m.PRODUCCION_ROUTES)
       },
       {
         path: 'maquinas',
-        canMatch: [capabilityGuard('PRODUCTION')],
         loadChildren: () => import('@features/maquinas/maquinas.routes').then(m => m.MAQUINAS_ROUTES)
       },
       {

@@ -2,7 +2,7 @@ import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { ApiService } from '../api/api.service';
 import { AuthService } from '../auth/auth.service';
 import { CacheService } from '../cache/cache.service';
-import { Negocio, Rubro, NegocioConfig, UserProfile } from '../../shared/models';
+import { Negocio, Rubro, NegocioConfig, UserProfile, BusinessConfig } from '../../shared/models';
 import { BusinessContextService } from './business-context.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, take, firstValueFrom } from 'rxjs';
@@ -28,6 +28,9 @@ export class SessionService {
   private _activeId = signal<string | null>(null);
   activeId = computed(() => this._activeId());
 
+  // New Dynamic Module Config
+  businessConfig = signal<BusinessConfig | null>(null);
+
   activeNegocio = computed(() => {
     const id = this._activeId();
     if (!id) return null;
@@ -38,9 +41,9 @@ export class SessionService {
   private isInitializing = false;
   private initPromise: Promise<void> | null = null;
 
-  // La configuración se deriva dinámicamente del rubro del negocio activo
+  // La configuración se extrae del businessConfig dinámico si existe, sino cae al local
   config = computed<NegocioConfig>(() => 
-    getNegocioConfig(this.activeNegocio()?.rubro || APP_CONFIG.DEFAULT_RUBRO)
+    this.businessConfig()?.config || getNegocioConfig(this.activeNegocio()?.rubro || APP_CONFIG.DEFAULT_RUBRO)
   );
 
   // Rubro del negocio activo para fácil acceso
@@ -106,6 +109,7 @@ export class SessionService {
     this._negocios.set([]);
     this._activeId.set(null);
     this.isInitialized.set(false);
+    this.businessConfig.set(null);
     this.initPromise = null;
     this.isInitializing = false;
     this.cache.clearAll();
@@ -150,6 +154,8 @@ export class SessionService {
             rubro: rubro,
             moneda: b.currency || b.moneda || APP_CONFIG.DEFAULT_CURRENCY,
             status: b.status,
+            phone: b.phone,
+            email: b.email,
             subscriptionExpiresAt: b.subscriptionExpiresAt,
             createdAt: b.createdAt,
             userRole: b.userRole,
@@ -178,7 +184,7 @@ export class SessionService {
         }
 
         if (activeId) {
-          this.setActiveId(activeId);
+          await this.setActiveId(activeId);
         }
 
         this.isInitialized.set(true);
@@ -237,14 +243,17 @@ export class SessionService {
   }
 
   private resolveCapabilities(rubro: Rubro, existing: string[]): string[] {
-    const caps = new Set(existing);
-    if (rubro === 'KIOSCO') caps.add('RETAIL');
-    else caps.add('PRODUCTION');
-    return Array.from(caps);
+    // Return existing from DB as is, no hardcoded injections
+    return Array.from(new Set(existing || []));
   }
 
-  async addNegocio(name: string, templateKey: string) {
-    const newBusiness = await this.api.businesses.create({ name, templateKey });
+  async addNegocio(name: string, templateKey: string, phone?: string, email?: string) {
+    const newBusiness = await this.api.businesses.create({ 
+      name, 
+      templateKey,
+      ...(phone && { phone }),
+      ...(email && { email })
+    });
     await this.initialize();
     return newBusiness;
   }
@@ -264,11 +273,26 @@ export class SessionService {
     await this.initialize();
   }
 
-  setActiveId(id: string) {
+  async setActiveId(id: string) {
     this._activeId.set(id);
     localStorage.setItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID, id);
     this.context.setBusinessId(id);
     this.cache.clearAll();
+    
+    // Load dynamic config for the selected business
+    await this.loadBusinessConfig(id);
+    
     this.api.users.setDefaultBusiness(id).catch(() => {});
+  }
+
+  private async loadBusinessConfig(id: string) {
+    try {
+      const resp = await this.api.businesses.getConfig(id);
+      this.businessConfig.set(resp);
+      console.log('[SessionService] Business Config loaded. Sidebar items:', resp.config?.sidebarItems?.length);
+    } catch (error) {
+      console.error('[SessionService] Failed to load business config:', error);
+      this.businessConfig.set(null);
+    }
   }
 }

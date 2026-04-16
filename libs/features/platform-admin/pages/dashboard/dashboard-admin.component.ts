@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, Users, Building2, ShieldAlert, CheckCircle2, ArrowUpRight, Terminal } from 'lucide-angular';
 import { PlatformAdminService } from '../../services/platform-admin.service';
 
 @Component({
@@ -22,6 +22,18 @@ export class DashboardAdminComponent implements OnInit {
   stats = signal<any>(null);
   loading = signal<boolean>(true);
 
+  constructor() {
+    // Force icon registration
+    LucideAngularModule.pick({
+      Users,
+      Building2,
+      ShieldAlert,
+      CheckCircle2,
+      ArrowUpRight,
+      Terminal
+    });
+  }
+
   async ngOnInit() {
     try {
       this.loading.set(true);
@@ -32,5 +44,11 @@ export class DashboardAdminComponent implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  getPendingUsers(): number {
+    const breakdown = this.stats()?.users?.breakdown;
+    if (!breakdown) return 0;
+    return breakdown.find((s: any) => s.status === 'PENDING')?.count || 0;
   }
 }

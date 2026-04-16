@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, User, Mail, Phone, MapPin, Building, Calendar, Info, Activity, Shield, X, History, ExternalLink, ShieldCheck, CheckCircle2 } from 'lucide-angular';
 import { PlatformAdminService } from '../../../../services/platform-admin.service';
 import { ToastService } from '../../../../../../shared/services/toast.service';
 
@@ -16,6 +16,12 @@ import { ToastService } from '../../../../../../shared/services/toast.service';
 export class UserDetailComponent implements OnInit {
   private adminService = inject(PlatformAdminService);
   private toast = inject(ToastService);
+
+  constructor() {
+    LucideAngularModule.pick({
+      User, Mail, Phone, MapPin, Building, Calendar, Info, Activity, Shield, X, History, ExternalLink, ShieldCheck, CheckCircle2
+    });
+  }
 
   @Input() userId!: string;
   @Output() close = new EventEmitter<void>();

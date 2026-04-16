@@ -19,7 +19,8 @@ export type FeatureCode =
   | 'REPORTS'
   | 'SETTINGS'
   | 'CALENDAR'
-  | 'PAYMENTS';
+  | 'PAYMENTS'
+  | 'FINANCES';
 
 /**
  * Specific permissions for user authorization.
@@ -61,13 +62,10 @@ export type RolePermissionsConfig = Record<UserRole, Partial<Record<FeatureCode,
 export interface MenuItemMetadata {
   label: string;
   href: string;
-  icon: any; // Type depends on the icon library (e.g., Lucide)
-  requiredFeature?: FeatureCode;
-  requiredPermission?: PermissionAction;
-  requiredCapability?: string; // Modular SaaS capability gating
-  requiredGlobalRole?: 'SUPER_ADMIN' | 'USER'; // Platform-level role requirement
+  icon: any; 
+  requiredGlobalRole?: 'SUPER_ADMIN' | 'USER'; 
   shortcut?: string;
-  configKey?: string; // Links to business-specific label overrides
+  configKey?: string; 
 }
 
 export interface MenuGroupMetadata {

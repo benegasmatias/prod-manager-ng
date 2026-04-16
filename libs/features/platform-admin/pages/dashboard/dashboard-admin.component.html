@@ -21,11 +21,11 @@
             </div>
             <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Global</span>
         </div>
-        <span class="text-4xl font-black text-white tabular-nums">{{ stats()?.users || 0 }}</span>
+        <span class="text-4xl font-black text-white tabular-nums">{{ stats()?.users?.total || 0 }}</span>
         <div class="flex items-center justify-between mt-2">
             <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-tighter">Usuarios Totales</span>
             <!-- Fix: stats structure based on API response check -->
-            <span class="text-[10px] font-black text-emerald-500 tabular-nums">API v1.0</span>
+            <span class="text-[10px] font-black text-emerald-500 tabular-nums">API v1.1 Refined</span>
         </div>
       </div>
 
@@ -44,17 +44,17 @@
         </div>
       </div>
 
-      <!-- Pending Users / Placeholder for now -->
-      <div class="p-8 bg-zinc-900 border border-zinc-800 rounded-[2.5rem] shadow-xl group hover:border-amber-500/50 transition-all duration-500">
+      <!-- Pending Users / Dynamically linked -->
+      <div class="p-8 bg-zinc-900 border border-zinc-800 rounded-[2.5rem] shadow-xl group hover:border-amber-500/50 transition-all duration-500 cursor-pointer" routerLink="/admin/users">
         <div class="flex items-center justify-between mb-6">
             <div class="h-12 w-12 bg-amber-500/10 rounded-2xl flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white text-amber-500 transition-all">
-                <i-lucide name="alert-circle" class="h-6 w-6"></i-lucide>
+                <i-lucide name="shield-alert" class="h-6 w-6"></i-lucide>
             </div>
             <span class="text-[10px] font-black text-amber-500/50 uppercase tracking-widest">Alerta</span>
         </div>
-        <span class="text-4xl font-black text-white tabular-nums">0</span>
+        <span class="text-4xl font-black text-white tabular-nums">{{ getPendingUsers() }}</span>
         <div class="flex items-center justify-between mt-2">
-            <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-tighter">Acción Requerida</span>
+            <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-tighter">Usuarios Pendientes</span>
             <i-lucide name="arrow-up-right" class="h-3 w-3 text-amber-500"></i-lucide>
         </div>
       </div>

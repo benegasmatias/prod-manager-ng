@@ -66,7 +66,7 @@ export class RegisterComponent {
             this.router.navigate(['/login'], { queryParams: { returnUrl: this.returnUrl } });
           }, 2000);
         } else {
-          this.success.set('Cuenta creada. Revisa tu correo para confirmar (si está activado).');
+          this.success.set('¡Registro exitoso! Te enviamos un email de validación. Por favor, confirma tu cuenta para poder ingresar.');
           this.loading.set(false);
         }
       }

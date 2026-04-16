@@ -71,9 +71,10 @@ import { SessionService } from '@core/session/session.service';
           @if (machine.status === 'IDLE') {
             <button
               (click)="onAssign.emit(machine)"
+              [disabled]="saving"
               class="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-sm transition-all active:scale-[0.98] disabled:opacity-50"
             >
-              Asignar Trabajo
+              {{ saving ? '...' : 'Asignar Trabajo' }}
             </button>
           } @else {
             <button

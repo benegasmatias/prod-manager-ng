@@ -84,7 +84,8 @@
   <app-machine-assignment-dialog
     [pendingOrders]="pendingOrders()"
     [availableMaterials]="availableMaterials()"
-    [loadingOrders]="loadingOrders()"
+    [loading]="loadingOrders()"
+    [saving]="saving()"
     (onAssign)="handleAssign($event)"
     (onCancel)="isAssignDialogOpen.set(false)"
   ></app-machine-assignment-dialog>
@@ -93,7 +94,7 @@
 @if (isDetailSheetOpen()) {
   <app-machine-detail-sheet
     [machine]="selectedMachineDetail()"
-    [loading]="loadingDetail()"
+    [loading]="loadingDetail() || saving()"
     (onClose)="isDetailSheetOpen.set(false)"
     (onEdit)="editMachine($event)"
     (onDelete)="handleDelete($event)"
