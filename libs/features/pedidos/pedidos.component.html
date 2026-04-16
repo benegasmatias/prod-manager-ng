@@ -176,6 +176,7 @@
   </div>
   }
 
-  <app-order-status-modal [order]="selectedOrder()" [isOpen]="isModalOpen()" [employees]="employees()"
-    (onClose)="isModalOpen.set(false)" (onSave)="loadData()"></app-order-status-modal>
 </app-page-shell>
+
+<app-order-status-modal [order]="selectedOrder()" [isOpen]="isModalOpen()" [employees]="employees()"
+  (onClose)="isModalOpen.set(false)" (onSave)="loadData()"></app-order-status-modal>

@@ -1,0 +1,89 @@
+<div class="animate-in fade-in duration-700">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+    <div>
+      <h2 class="text-3xl font-black text-white tracking-tight uppercase">Templates de Negocio</h2>
+      <p class="text-zinc-500 font-bold italic">Configuración de rubros y capacidades por defecto del ecosistema.</p>
+    </div>
+    <app-button-spinner 
+      (onClick)="syncTemplates()"
+      [loading]="loadingTemplates()"
+      btnClass="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-xl hover:bg-indigo-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+    >
+      <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4"></lucide-angular>
+      <span class="ml-2">Sincronizar Plantillas Base</span>
+    </app-button-spinner>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @if (loadingTemplates()) {
+      <div *ngFor="let i of [1,2,3]" class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 animate-pulse h-64"></div>
+    } @else {
+      @for (template of templates(); track template.key) {
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-8 hover:border-primary/50 transition-all group relative overflow-hidden">
+          <!-- Background Decor -->
+          <div class="absolute -right-4 -top-4 text-zinc-800/20 group-hover:text-primary/10 transition-all">
+            <lucide-angular [img]="icons.Building" class="h-32 w-32"></lucide-angular>
+          </div>
+
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-6">
+              <div class="p-3 rounded-2xl bg-zinc-800 group-hover:bg-primary/20 group-hover:text-primary transition-all">
+                 <lucide-angular [img]="icons.Building" class="h-6 w-6"></lucide-angular>
+              </div>
+              <div 
+                [ngClass]="template.isEnabled ? 'text-emerald-500 bg-emerald-500/10' : 'text-zinc-500 bg-zinc-500/10'"
+                class="px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-current opacity-70"
+              >
+                {{ template.isEnabled ? 'Habilitado' : 'Desactivado' }}
+              </div>
+            </div>
+
+            <h3 class="text-xl font-black text-white uppercase tracking-tight mb-2">{{ template.name }}</h3>
+            <p class="text-xs text-zinc-500 font-medium mb-8 leading-relaxed h-10 line-clamp-2">{{ template.description }}</p>
+
+            <div class="space-y-4">
+               <div class="flex flex-col gap-2">
+                  <span class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">Capacidades Base</span>
+                  <div class="flex flex-wrap gap-2">
+                    @for (cap of template.defaultCapabilities; track cap) {
+                      <span class="text-[9px] px-2 py-1 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold">
+                        {{ cap }}
+                      </span>
+                    }
+                  </div>
+               </div>
+               
+               <div class="flex items-center justify-between pt-4 border-t border-zinc-800">
+                  <span class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">Prioridad Admin</span>
+                  <button 
+                    (click)="selectedTemplate.set(template)"
+                    class="text-[10px] font-black text-primary uppercase hover:underline"
+                  >
+                    Editar Configuración
+                  </button>
+               </div>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (!loadingTemplates() && templates().length === 0) {
+    <div class="flex flex-col items-center justify-center py-20 px-8 bg-zinc-900/50 border border-dashed border-zinc-800 rounded-[2.5rem]">
+      <div class="h-16 w-16 bg-zinc-800 rounded-2xl flex items-center justify-center mb-6 text-zinc-600">
+        <lucide-angular [img]="icons.Building" class="h-8 w-8"></lucide-angular>
+      </div>
+      <h3 class="text-lg font-black text-white uppercase tracking-tight">Sin Plantillas</h3>
+      <p class="text-zinc-500 font-bold italic text-sm mt-2 text-center">No se encontraron plantillas de negocio. Sincroniza para cargar las bases del sistema.</p>
+    </div>
+  }
+</div>
+
+<!-- Template Editor Modal -->
+<app-template-editor-modal
+  *ngIf="selectedTemplate()"
+  [template]="selectedTemplate()"
+  (close)="selectedTemplate.set(null)"
+  (updated)="loadTemplates()"
+></app-template-editor-modal>

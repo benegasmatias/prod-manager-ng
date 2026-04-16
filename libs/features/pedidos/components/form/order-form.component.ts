@@ -404,13 +404,13 @@ export class OrderFormComponent implements OnDestroy {
   }
 
   addItem() {
-    this.items.update(prev => [...prev, {
+    this.items.update(prev => [{
       cantidad: 1,
       precioUnitario: 0,
       senia: 0,
       nombreProducto: '',
       seDiseñaSTL: false,
-    }]);
+    }, ...prev]);
   }
 
   removeItem(index: number) {

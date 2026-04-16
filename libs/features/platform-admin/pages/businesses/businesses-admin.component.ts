@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlatformAdminService } from '../../services/platform-admin.service';
-import { LucideAngularModule, Building2, RefreshCw, ShieldAlert, Pause, DollarSign, Loader2, Mail, Building } from 'lucide-angular';
+import { LucideAngularModule, Building2, RefreshCw, ShieldAlert, Pause, DollarSign, Loader2, Mail } from 'lucide-angular';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfirmService } from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
+import { ButtonSpinnerComponent } from '../../../../shared/ui/button-spinner/button-spinner.component';
 
 import { BusinessPlanModalComponent } from './components/plan-modal/plan-modal.component';
 import { AuditCapabilitiesModalComponent } from './components/audit-modal/audit-modal.component';
-import { TemplateEditorModalComponent } from './components/template-editor/template-editor.component';
 
 @Component({
   selector: 'app-businesses-admin',
@@ -17,14 +17,10 @@ import { TemplateEditorModalComponent } from './components/template-editor/templ
     LucideAngularModule, 
     BusinessPlanModalComponent, 
     AuditCapabilitiesModalComponent,
-    TemplateEditorModalComponent
+    ButtonSpinnerComponent
   ],
   templateUrl: './businesses-admin.component.html',
-  styles: [`
-    :host {
-      display: block;
-    }
-  `],
+  styleUrls: ['./businesses-admin.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BusinessesAdminComponent implements OnInit {
@@ -33,7 +29,7 @@ export class BusinessesAdminComponent implements OnInit {
   private confirmService = inject(ConfirmService);
 
   readonly icons = {
-    Building2, RefreshCw, ShieldAlert, Pause, DollarSign, Loader2, Mail, Building
+    Building2, RefreshCw, ShieldAlert, Pause, DollarSign, Loader2, Mail
   };
 
   constructor() {
@@ -41,17 +37,13 @@ export class BusinessesAdminComponent implements OnInit {
   }
   
   businesses = signal<any[]>([]);
-  templates = signal<any[]>([]);
   loading = signal<boolean>(true);
-  loadingTemplates = signal<boolean>(false);
   error = signal<string | null>(null);
   selectedBusinessForPlan = signal<any | null>(null);
-  selectedTemplate = signal<any | null>(null);
   showAuditModal = signal<boolean>(false);
 
   ngOnInit() {
     this.loadBusinesses();
-    this.loadTemplates();
   }
 
   async loadBusinesses() {
@@ -64,18 +56,6 @@ export class BusinessesAdminComponent implements OnInit {
       this.error.set(e.message || 'Error al conectar con el servidor');
     } finally {
       this.loading.set(false);
-    }
-  }
-
-  async loadTemplates() {
-    try {
-      this.loadingTemplates.set(true);
-      const data = await this.adminService.getTemplates();
-      this.templates.set(data || []);
-    } catch (e: any) {
-      console.error('Error loading templates:', e);
-    } finally {
-      this.loadingTemplates.set(false);
     }
   }
 
@@ -115,17 +95,6 @@ export class BusinessesAdminComponent implements OnInit {
         window.open(`mailto:${email}?subject=ProdManager: Contacto Administrativo para ${business.name}`, '_blank');
     } else {
         this.toast.error('No se encontró un email de contacto para este negocio');
-    }
-  }
-
-  async syncTemplates() {
-    try {
-      this.toast.info('Sincronizando plantillas con el estándar del sistema...');
-      await this.adminService.seedTemplates();
-      this.toast.success('Plantillas sincronizadas correctamente');
-      this.loadTemplates();
-    } catch (e: any) {
-      this.toast.error('Error al sincronizar plantillas: ' + (e.message || 'Error desconocido'));
     }
   }
 }

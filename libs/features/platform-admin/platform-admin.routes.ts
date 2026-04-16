@@ -22,6 +22,10 @@ export const PLATFORM_ADMIN_ROUTES: Routes = [
       {
         path: 'plans',
         loadComponent: () => import('./pages/plans/plans-admin.component').then(m => m.PlansAdminComponent)
+      },
+      {
+        path: 'templates',
+        loadComponent: () => import('./pages/templates/templates-admin.component').then(m => m.TemplatesAdminComponent)
       }
     ]
   }
