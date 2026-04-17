@@ -7,10 +7,10 @@ import { FormsModule } from '@angular/forms';
 import {
   LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
   DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
-  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight
+  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight, Clock, Truck, XCircle
 } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui';
-import { Pedido, Employee, OrderStatus } from '@shared/models/pedido';
+import { Pedido, Employee, OrderStatus, OrderItemStatus } from '@shared/models/pedido';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { MaquinasApiService } from '@core/api/maquinas.api.service';
 import { MaterialesApiService } from '@core/api/materiales.api.service';
@@ -39,8 +39,6 @@ import { MultiMaterial } from '@shared/models/material-consumption';
     ButtonSpinnerComponent,
     PaymentModuleComponent,
     FailureModuleComponent,
-    MetalurgicaSectionComponent,
-    Impresion3dSectionComponent,
     AppDatePickerComponent
   ],
   templateUrl: './status-modal.component.html',
@@ -65,6 +63,34 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit {
   status = signal<string>('');
   responsableGeneralId = signal<string>('');
   notes = signal<string>('');
+  // Simplified Global Stages for UI Stepper
+  protected readonly GLOBAL_STAGES = [
+    { key: 'PENDING', label: 'Pendiente', icon: 'Clock' },
+    { key: 'IN_PROGRESS', label: 'En Proceso', icon: 'Cpu' },
+    { key: 'READY', label: 'Listo', icon: 'CheckCircle2' },
+    { key: 'DELIVERED', label: 'Entregado', icon: 'Truck' },
+    { key: 'CANCELLED', label: 'Cancelado', icon: 'XCircle' }
+  ];
+
+  // Helper to determine active step in the simplified view
+  currentGlobalStep = computed(() => {
+    const s = this.status();
+    if (!s) return -1;
+    
+    // Mapping Technical states to Global steps
+    if (s === 'PENDING') return 0;
+    
+    if (['DESIGN', 'IN_PRODUCTION', 'PRINTING', 'REPRINT_PENDING', 'RE_WORK', 'POST_PROCESS', 'CUTTING', 'WELDING', 'ASSEMBLY', 'PAINTING', 'INSTALACION_OBRA', 'IN_PROGRESS'].includes(s)) {
+      return 1;
+    }
+    
+    if (['READY', 'READY_FOR_DELIVERY', 'DONE'].includes(s)) return 2;
+    if (s === 'DELIVERED') return 3;
+    if (s === 'CANCELLED') return 4;
+    
+    return 1; // Default to Proceso if mixed
+  });
+
   isSaving = signal(false);
 
   // Scroller State
@@ -104,16 +130,29 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit {
   multiMaterials = signal<MultiMaterial[]>([]);
   machines = signal<Machine[]>([]);
   materials = signal<Material[]>([]);
+  updatingItemIds = signal<Set<string>>(new Set());
 
-  // Icons for Template (Senior standard: [img] syntax)
-  icons = {
+  icons: any = {
     Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2,
-    User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, ChevronRight
+    User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, ChevronRight,
+    Clock, Truck, XCircle
   };
+
+  getIcon(name: string): any {
+    return this.icons[name] || this.icons.Check;
+  }
 
   // Derived Values
   rubro = computed(() => this.session.activeNegocio()?.rubro || 'GENERICO');
   isMetalurgica = computed(() => this.rubro() === 'METALURGICA');
+
+  // Payment Status context (calculated for safety)
+  totalVal = computed(() => Number(this.order()?.totalPrice || 0));
+  paidVal = computed(() => Number(this.order()?.totalPayments || 0));
+  balanceVal = computed(() => Math.max(0, this.totalVal() - this.paidVal()));
+  isFullyPaid = computed(() => this.balanceVal() < 0.01); // Safe comparison for decimals
+  isReadyState = computed(() => ['READY', 'READY_FOR_DELIVERY', 'DONE'].includes(this.status()));
+  isDeliveredState = computed(() => this.status() === 'DELIVERED');
 
   config = computed(() => getNegocioConfig(this.rubro()));
   is3D = computed(() => this.rubro() === 'IMPRESION_3D');
@@ -167,6 +206,16 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.resetForm();
+    
+    // Auto-reset when order input changes (e.g. after item update)
+    effect(() => {
+      const o = this.order();
+      if (o) {
+        this.resetForm();
+        // Clear any pending loading states when new data arrives
+        this.updatingItemIds.set(new Set());
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -407,6 +456,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit {
           await this.maquinasApi.assignOrder(
             this.selectedMachineId(),
             order.id,
+            undefined, // orderItemId: auto-select on backend
             firstMaterialId,
             order.businessId,
             metadata
@@ -424,10 +474,73 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit {
 
       this.onSave.emit();
       this.onClose.emit();
-    } catch (e) {
-      console.error('Error saving order status:', e);
+    } catch (err) {
+      console.error('Error in handleSave:', err);
+      alert('Error al procesar la operación.');
     } finally {
       this.isSaving.set(false);
+    }
+  }
+
+  async deliverOrder() {
+    const order = this.order();
+    if (!order) return;
+
+    // Financial warning
+    if (!this.isFullyPaid()) {
+      const confirmDebt = confirm(`Atención: El pedido tiene un saldo pendiente de $${this.balanceVal()}. ¿Deseas entregarlo de todas formas?`);
+      if (!confirmDebt) return;
+    } else {
+      const confirmDelivery = confirm('¿Confirmar la entrega del pedido? Esta acción lo moverá al historial.');
+      if (!confirmDelivery) return;
+    }
+
+    this.isSaving.set(true);
+    try {
+      await this.api.update(order.id, { 
+        status: 'DELIVERED',
+        businessId: order.businessId 
+      });
+      this.onSave.emit();
+      this.onClose.emit();
+    } catch (err) {
+      console.error('Error delivering order:', err);
+      alert('No se pudo marcar el pedido como entregado.');
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+
+  async updateItemStatus(itemId: string, status: string, name: string) {
+    const order = this.order();
+    if (!order || this.updatingItemIds().has(itemId)) return;
+
+    if (status === 'CANCELLED') {
+      const confirmed = confirm(`¿Estás seguro de cancelar el ítem "${name}"?`);
+      if (!confirmed) return;
+    }
+
+    this.updatingItemIds.update(ids => {
+      const newIds = new Set(ids);
+      newIds.add(itemId);
+      return newIds;
+    });
+
+    try {
+      const updatedItem = await this.api.updateItemStatus(order.id, itemId, status, order.businessId);
+      
+      // Emitimo onSave para que el parent refresque la lista (y por ende el input 'order' de este modal)
+      // Lo marcamos en el parent, y cuando vuelva el nuevo input 'order' se reseteará el form y se limpiará el loading
+      this.onSave.emit();
+    } catch (e: any) {
+      console.error('Error updating item status:', e);
+      alert(e.error?.message || 'Error al actualizar el ítem. Verifica si tiene trabajos activos.');
+      // Si falla, sí limpiamos el loading de este ítem
+      this.updatingItemIds.update(ids => {
+        const newIds = new Set(ids);
+        newIds.delete(itemId);
+        return newIds;
+      });
     }
   }
 

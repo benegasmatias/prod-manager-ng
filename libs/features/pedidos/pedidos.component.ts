@@ -243,6 +243,7 @@ export class PedidosPageComponent implements OnInit {
       });
       this.productionOrdersData.set(res.data);
       this.productionTotal.set(res.total || 0);
+      this.syncSelectedOrder(res.data);
     } catch (err) { console.error('Error production:', err); }
     finally { this.loadingProduction.set(false); }
   }
@@ -261,6 +262,7 @@ export class PedidosPageComponent implements OnInit {
       });
       this.commercialOrdersData.set(res.data);
       this.commercialTotal.set(res.total || 0);
+      this.syncSelectedOrder(res.data);
     } catch (err) { console.error('Error commercial:', err); }
     finally { this.loadingCommercial.set(false); }
   }
@@ -279,6 +281,7 @@ export class PedidosPageComponent implements OnInit {
       });
       this.archivedOrdersData.set(res.data);
       this.archivedTotal.set(res.total || 0);
+      this.syncSelectedOrder(res.data);
     } catch (err) { console.error('Error archived:', err); }
     finally { this.loadingArchived.set(false); }
   }
@@ -304,6 +307,16 @@ export class PedidosPageComponent implements OnInit {
   onArchivedPageChange(page: number) {
     this.archivedPage.set(page);
     this.loadArchived();
+  }
+
+  private syncSelectedOrder(newData: Pedido[]) {
+    const current = this.selectedOrder();
+    if (!current) return;
+    
+    const updated = newData.find(o => o.id === current.id);
+    if (updated) {
+      this.selectedOrder.set(updated);
+    }
   }
 
   goToDetail(order: Pedido) {

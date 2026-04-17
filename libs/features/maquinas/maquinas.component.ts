@@ -151,13 +151,14 @@ export class MaquinasPageComponent {
     }
   }
 
-  async handleAssign(event: { orderId: string; materialId: string }) {
+  async handleAssign(event: { orderId: string; orderItemId?: string; materialId: string }) {
     const machineId = this.selectedMachineId();
     if (!machineId) return;
 
     await this.maquinasService.assignOrder(
       machineId,
       event.orderId,
+      event.orderItemId,
       event.materialId || undefined
     );
     this.isAssignDialogOpen.set(false);

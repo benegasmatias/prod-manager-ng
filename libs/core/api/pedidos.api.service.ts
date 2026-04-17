@@ -97,7 +97,10 @@ export class PedidosApiService {
    * Registra un pago para un pedido.
    */
   async addPayment(orderId: string, payment: { businessId?: string; amount: number; method: string; note?: string }): Promise<Pedido> {
-    return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.PAYMENTS(orderId), payment));
+    const { businessId, ...data } = payment;
+    let url = API_ENDPOINTS.ORDERS.PAYMENTS(orderId);
+    if (businessId) url += `?businessId=${businessId}`;
+    return firstValueFrom(this.http.post<Pedido>(url, data));
   }
 
   /**
@@ -111,12 +114,17 @@ export class PedidosApiService {
     wastedGrams?: number;
     moveToReprint?: boolean;
   }): Promise<Pedido> {
+    const { businessId, ...body } = data;
     const payload = {
-      ...data,
-      wastedGrams: data.wastedGrams || 0,
-      moveToReprint: data.moveToReprint || (data.action === 'REDO' && data.targetStatus === 'REPRINT_PENDING')
+      ...body,
+      wastedGrams: body.wastedGrams || 0,
+      moveToReprint: body.moveToReprint || (body.action === 'REDO' && body.targetStatus === 'REPRINT_PENDING')
     };
-    return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.REPORT_FAILURE(orderId), payload));
+    
+    let url = API_ENDPOINTS.ORDERS.REPORT_FAILURE(orderId);
+    if (businessId) url += `?businessId=${businessId}`;
+    
+    return firstValueFrom(this.http.post<Pedido>(url, payload));
   }
   private workloadCache = new Map<string, any[]>();
 
@@ -141,5 +149,9 @@ export class PedidosApiService {
     setTimeout(() => this.workloadCache.delete(cacheKey), 5 * 60 * 1000);
 
     return data;
+  }
+
+  async updateItemStatus(orderId: string, itemId: string, status: string, businessId: string): Promise<any> {
+    return firstValueFrom(this.http.patch(`${API_ENDPOINTS.ORDERS.ROOT}/${orderId}/items/${itemId}/status`, { status, businessId }));
   }
 }

@@ -41,9 +41,15 @@ export class MaquinasApiService {
     );
   }
 
-  async assignOrder(machineId: string, orderId: string, materialId?: string, businessId?: string, metadata?: any): Promise<void> {
+  async assignOrder(machineId: string, orderId: string, orderItemId?: string, materialId?: string, businessId?: string, metadata?: any): Promise<void> {
     await firstValueFrom(
-      this.http.post<void>(API_ENDPOINTS.MACHINES.ASSIGN(machineId), { orderId, materialId, businessId, metadata })
+      this.http.post<void>(API_ENDPOINTS.MACHINES.ASSIGN(machineId), { 
+        orderId, 
+        orderItemId,
+        materialId, 
+        businessId, 
+        metadata 
+      })
     );
   }
 
