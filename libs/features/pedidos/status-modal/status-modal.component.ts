@@ -39,7 +39,8 @@ import { MultiMaterial } from '@shared/models/material-consumption';
     ButtonSpinnerComponent,
     PaymentModuleComponent,
     FailureModuleComponent,
-    AppDatePickerComponent
+    AppDatePickerComponent,
+    MaterialSelectorComponent
   ],
   templateUrl: './status-modal.component.html',
   styleUrls: ['./status-modal.component.css']
@@ -101,6 +102,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   paymentAmount = signal<number>(0);
   paymentMethod = signal<string>('CASH');
   saving = computed(() => this.isSaving());
+  isProcessingGlobal = computed(() => this.updatingItemIds().size > 0);
   
   updatingItemIds = signal<Set<string>>(new Set());
   selectedMachineIdForItem = signal<string>('');
@@ -127,14 +129,25 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     this.wastedTime.set(0);
     
     // AUTO-DETECCIÓN DE FILAMENTOS:
-    // Si el ítem tiene un job y una máquina, precargamos los filamentos de esa máquina.
-    if (item.job?.machine?.metadata?.materials) {
-      const machineMaterials = item.job.machine.metadata.materials;
+    // Priorizamos los materiales que fueron asignados específicamente a este trabajo (Job)
+    const activeJob: any = item.job || (item as any).productionJob;
+    const jobMaterials = activeJob?.metadata?.materials;
+    const machineMaterials = activeJob?.machine?.metadata?.materials;
+
+    if (jobMaterials && Array.isArray(jobMaterials) && jobMaterials.length > 0) {
+      this.failureMaterialWastes.set(
+        jobMaterials.map((m: any) => ({ materialId: m.materialId, grams: 0 }))
+      );
+    } else if (activeJob?.materialId) {
+      // Fallback a materialId simple si no hay multi-material
+      this.failureMaterialWastes.set([{ materialId: activeJob.materialId, grams: 0 }]);
+    } else if (machineMaterials && Array.isArray(machineMaterials) && machineMaterials.length > 0) {
+      // Fallback final a lo que tenga cargado la máquina actualmente
       this.failureMaterialWastes.set(
         machineMaterials.map((m: any) => ({ materialId: m.materialId, grams: 0 }))
       );
     } else {
-      // Si no, empezamos con uno vacío para que el usuario elija
+      // Si no hay nada, ítem vacío para selección manual
       this.failureMaterialWastes.set([{ materialId: '', grams: 0 }]);
     }
 
@@ -344,9 +357,9 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     }
   });
 
-  async load3DData() {
-    const businessId = this.session.activeNegocio()?.id;
-    if (!businessId || this.machines().length > 0) return;
+  async load3DData(force = false) {
+    const businessId = this.session.activeId();
+    if (!businessId || (!force && this.machines().length > 0)) return;
     try {
       const resp = await this.maquinasApi.getAll(businessId);
       const mats = await this.materialesApi.getAll(businessId);
@@ -534,6 +547,13 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       this.onSave.emit();
     } catch (e: any) {
       console.error('Error updating item status:', e);
+      // Solo limpiamos si hay error, si es éxito esperamos al refresco del input order()
+      this.updatingItemIds.update((ids: Set<string>) => {
+        const newIds = new Set(ids);
+        newIds.delete(itemId);
+        return newIds;
+      });
+
       const isMachineError = e.error?.message?.includes('trabajo activo en máquina');
       
       if (isMachineError) {
@@ -556,11 +576,26 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
 
          if (confirmed) {
             if (machineId) {
+               // Re-activamos el estado de carga para el re-intento
+               this.updatingItemIds.update(ids => {
+                  const newIds = new Set(ids);
+                  newIds.add(itemId);
+                  return newIds;
+               });
+
                try {
                   await this.maquinasApi.release(machineId, order.businessId);
                   await this.api.updateItemStatus(order.id, itemId, status, order.businessId);
                   this.onSave.emit();
+                  // No limpiamos el ID aquí, esperamos al onOrderChange como en el flujo normal
                } catch (err2) {
+                  console.error('Error in release and retry:', err2);
+                  // Si falló el re-intento, tenemos que limpiar el estado de carga manualmente
+                  this.updatingItemIds.update(ids => {
+                    const newIds = new Set(ids);
+                    newIds.delete(itemId);
+                    return newIds;
+                  });
                   this.confirmService.confirm({
                       title: 'Error',
                       message: 'No se pudo liberar la máquina automáticamente.',
@@ -585,12 +620,6 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
             type: 'danger'
          });
       }
-    } finally {
-      this.updatingItemIds.update((ids: Set<string>) => {
-        const newIds = new Set(ids);
-        newIds.delete(itemId);
-        return newIds;
-      });
     }
   }
 
@@ -617,8 +646,9 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     });
   }
 
-  prepareAssign(itemId: string) {
+  async prepareAssign(itemId: string) {
     this.itemToAssignId.set(itemId);
+    await this.load3DData(true); // Force refresh machines before showing selector
     
     // Buscar los datos pre-guardados del item (peso)
     const item = this.order()?.items?.find((i: any) => i.id === itemId);
@@ -672,15 +702,10 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
         metadata
       );
 
+      await this.load3DData(true); // Refresh machine statuses after assign
       this.onSave.emit();
       this.itemToAssignId.set(null);
       this.filamentAssignments.set([{ materialId: '', grams: 0 }]);
-      
-      this.updatingItemIds.update((ids: Set<string>) => {
-        const newIds = new Set(ids);
-        newIds.delete(itemId);
-        return newIds;
-      });
     } catch (e: any) {
       console.error('Error starting item production:', e);
       this.confirmService.confirm({
@@ -701,3 +726,4 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   getStyles = getStatusStyles;
   cn = cn;
 }
+

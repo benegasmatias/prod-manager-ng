@@ -87,6 +87,7 @@ export interface ItemPedido {
   // Phase 6.1: Industrial Data
   status: OrderItemStatus;
   job?: ProductionJob;
+  productionJob?: ProductionJob;
 }
 
 export interface Pedido {

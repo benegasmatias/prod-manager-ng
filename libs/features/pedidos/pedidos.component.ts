@@ -145,11 +145,16 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private setupObserver() {
     this.observer = new IntersectionObserver(([entry]) => {
-      // Load history if it's not loaded yet and we haven't reached it
-      if (entry.isIntersecting && !this.loadingArchived() && !this.archivedLoaded()) {
+      // REGLA: No cargar historial si las tablas principales todavía están cargando (falsa intersección por skeletons)
+      const mainLoading = this.loadingProduction() || this.loadingCommercial();
+      
+      if (entry.isIntersecting && !mainLoading && !this.loadingArchived() && !this.archivedLoaded()) {
         this.loadArchived();
       }
-    }, { threshold: 0.1 });
+    }, { 
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px' // Forzar a que entre al menos 100px en pantalla
+    });
 
     if (this.historyTrigger) {
       this.observer.observe(this.historyTrigger.nativeElement);
@@ -215,10 +220,10 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'endDate': this.dateHasta.set(value); break;
     }
     
-    // When filters change, we reset pages and reload only the "active" or "previously visible" sections
     this.productionPage.set(1);
     this.commercialPage.set(1);
     this.archivedPage.set(1);
+    this.archivedLoaded.set(false); // REGLA: Resetear carga para forzar lazy loading en scroll
     
     this.loadData();
   }
@@ -243,11 +248,9 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // 3. History (Table 2) is lazy-loaded on scroll by the template
-    // but if we are re-filtering and it was already visible, we might want to refresh it
-    if (!options.initial && (this.archivedOrdersData().length > 0 || this.archivedLoaded())) {
-      this.loadArchived();
-    } else if (options.initial) {
-      // On initial load or business change, we reset history to allow lazy loading again
+    // REGLA OBLIGATORIA: El historial NUNCA se carga automáticamente en loadData principal
+    // Se resetea para que el IntersectionObserver lo dispare al scrollear
+    if (options.initial) {
       this.archivedOrdersData.set([]);
       this.archivedTotal.set(0); 
       this.archivedLoaded.set(false);
@@ -270,11 +273,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     const bId = this.businessId();
     if (!bId) return;
     try {
-      const [summaryRes, empsRes] = await Promise.all([
-        this.api.getSummary(bId),
-        this.api.getEmployees(bId)
-      ]);
-      this.summary.set(summaryRes);
+      const empsRes = await this.api.getEmployees(bId);
       this.employees.set(empsRes);
       this.lastLoadedBusinessId = bId;
     } catch (err) { console.error('Error global data:', err); }

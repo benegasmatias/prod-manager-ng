@@ -229,8 +229,8 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
       </fieldset>
     <!-- BARRA DE ACCIÓN FLOTANTE (UX) -->
      @if (showFloatingFooter()) {
-       <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[50] flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-700">
-          <div class="h-16 px-8 rounded-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border border-zinc-100 dark:border-zinc-800 shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex items-center gap-6">
+       <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-700">
+          <div class="h-16 px-8 rounded-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border border-zinc-100 dark:border-zinc-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex items-center gap-6">
              <div class="flex flex-col">
                 <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 leading-none mb-1">Total acumulado</span>
                 <span class="text-lg font-black text-zinc-900 dark:text-white leading-none tabular-nums">{{ totales().total | currency }}</span>

@@ -40,7 +40,7 @@ import { cn } from '@shared/utils/cn';
       <!-- Dropdown Panel (Overlay) -->
       @if (isOpen() && !readOnly()) {
         <div 
-          class="absolute z-[120] left-0 right-0 mt-2 p-2 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-2xl max-h-[240px] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 custom-scrollbar"
+          class="absolute z-[1000] left-0 right-0 mt-2 p-2 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-2xl max-h-[240px] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 custom-scrollbar"
         >
           <div class="grid grid-cols-1 gap-1">
             <!-- Option: None -->
@@ -86,7 +86,7 @@ import { cn } from '@shared/utils/cn';
         </div>
 
         <!-- Backdrop to close -->
-        <div class="fixed inset-0 z-[115]" (click)="isOpen.set(false)"></div>
+        <div class="fixed inset-0 z-[995]" (click)="isOpen.set(false)"></div>
       }
     </div>
   `,

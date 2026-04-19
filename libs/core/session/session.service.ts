@@ -282,7 +282,11 @@ export class SessionService {
     // Load dynamic config for the selected business
     await this.loadBusinessConfig(id);
     
-    this.api.users.setDefaultBusiness(id).catch(() => {});
+    // Only update default in server if it actually changed to save traffic
+    const userProfile = this._user();
+    if (userProfile && userProfile.defaultBusinessId !== id) {
+       this.api.users.setDefaultBusiness(id).catch(() => {});
+    }
   }
 
   private async loadBusinessConfig(id: string) {

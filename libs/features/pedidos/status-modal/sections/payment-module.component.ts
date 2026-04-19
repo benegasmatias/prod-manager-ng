@@ -97,7 +97,7 @@ export class PaymentModuleComponent {
   }
 
   onAmountChange(val: number) {
-    this.amount.set(val);
+    this.amount.set(Math.max(0, val || 0));
   }
 
   onMethodChange(method: string) {
