@@ -12,6 +12,7 @@ export enum OrderItemStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   READY = 'READY',
   DONE = 'DONE',
+  IN_STOCK = 'IN_STOCK',
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED'
 }
