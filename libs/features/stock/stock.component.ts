@@ -2,27 +2,32 @@ import { Component, inject, OnInit, computed, signal, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, Wallet } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers } from 'lucide-angular';
 import { StockService } from '../../core/api/stock.service';
 import { SessionService } from '../../core/session/session.service';
 import { Pedido } from '../../shared/models';
 import { OrdersTableComponent } from '../../shared/ui';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 import { StockSaleDialogComponent } from '../../shared/ui/stock/stock-sale-dialog/stock-sale-dialog.component';
 import { StockStatusModalComponent } from './components/stock-status-modal/stock-status-modal.component';
 
 @Component({
   selector: 'app-stock-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, OrdersTableComponent, StockSaleDialogComponent, StockStatusModalComponent],
+  imports: [
+    CommonModule, RouterModule, FormsModule, LucideAngularModule, 
+    OrdersTableComponent, StockSaleDialogComponent, StockStatusModalComponent,
+    PageShellComponent
+  ],
   templateUrl: './stock.component.html',
-  styles: [`:host { display: block; }`]
+  styleUrls: ['./stock.component.css']
 })
 export class StockPageComponent implements OnInit {
   public stockService = inject(StockService);
   public session = inject(SessionService);
   private router = inject(Router);
 
-  icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet };
+  icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers };
 
   // Expose signals from service
   loading = this.stockService.loading;
