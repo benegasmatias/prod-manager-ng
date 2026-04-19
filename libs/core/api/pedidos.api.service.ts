@@ -18,6 +18,18 @@ export interface ListingParams {
   responsableId?: string;
 }
 
+export interface ReportFailureData {
+  businessId?: string;
+  itemId?: string;
+  reason: string;
+  action?: 'REDO' | 'DISCARD' | 'KEEP';
+  targetStatus?: string;
+  wastedGrams?: number;
+  materialWastes?: { materialId: string, grams: number }[];
+  moveToReprint?: boolean;
+  metadata?: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -106,14 +118,7 @@ export class PedidosApiService {
   /**
    * Reporta un fallo en un pedido (específicamente Impresión 3D o general).
    */
-  async reportFailure(orderId: string, data: {
-    businessId?: string;
-    reason: string;
-    action?: 'REDO' | 'DISCARD' | 'KEEP';
-    targetStatus?: string;
-    wastedGrams?: number;
-    moveToReprint?: boolean;
-  }): Promise<Pedido> {
+  async reportFailure(orderId: string, data: ReportFailureData): Promise<Pedido> {
     const { businessId, ...body } = data;
     const payload = {
       ...body,
@@ -126,6 +131,7 @@ export class PedidosApiService {
     
     return firstValueFrom(this.http.post<Pedido>(url, payload));
   }
+
   private workloadCache = new Map<string, any[]>();
 
   /**

@@ -1,365 +1,551 @@
 @if (isOpen() && order()) {
-  <!-- Overlay Base -->
-  <div class="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-    <!-- Backdrop interactivo -->
-    <div class="fixed inset-0 bg-black/40 backdrop-blur-[12px]" (click)="onClose.emit()"></div>
-    
-    <!-- Contenedor Modal -->
-    <div class="relative w-full sm:max-w-[680px] max-h-[90vh] sm:max-h-[88vh] flex flex-col bg-white dark:bg-zinc-950 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-[0.98] duration-200">
-      
-      <!-- HEADER: Patrón Clientes (Compacto, borde inferior, flex-shrink-0) -->
-      <header class="px-6 py-5 sm:px-8 border-b border-zinc-100 dark:border-zinc-900 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-950">
-        <div class="flex items-center gap-3 sm:gap-4 min-w-0">
-          <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-            <lucide-angular [img]="icons.Gauge" class="h-6 w-6"></lucide-angular>
-          </div>
-          <div class="min-w-0">
-            <h2 class="text-base sm:text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight truncate">
-              Control de Pedido <span class="text-primary">#{{ order()?.code }}</span>
-            </h2>
-            <p class="text-[10px] sm:text-[11px] font-black text-zinc-400 uppercase tracking-widest truncate mt-0.5">
-              {{ getLabel(order()!.status, rubro()) }}
-            </p>
-          </div>
+<!-- Overlay Base -->
+<div class="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+  <!-- Backdrop interactivo -->
+  <div class="fixed inset-0 bg-black/40 backdrop-blur-[12px]" (click)="onClose.emit()"></div>
+
+  <!-- Contenedor Modal -->
+  <div
+    class="relative w-full sm:max-w-[680px] max-h-[90vh] sm:max-h-[88vh] flex flex-col bg-white dark:bg-zinc-950 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-[0.98] duration-200">
+
+    <!-- HEADER: Patrón Clientes (Compacto, borde inferior, flex-shrink-0) -->
+    <header
+      class="px-6 py-5 sm:px-8 border-b border-zinc-100 dark:border-zinc-900 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-950">
+      <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+        <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+          <lucide-angular [img]="icons.Gauge" class="h-6 w-6"></lucide-angular>
+        </div>
+        <div class="min-w-0">
+          <h2
+            class="text-base sm:text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight truncate">
+            Control de Pedido <span class="text-primary">#{{ order()?.code }}</span>
+          </h2>
+          <p class="text-[10px] sm:text-[11px] font-black text-zinc-400 uppercase tracking-widest truncate mt-0.5">
+            {{ getLabel(order()!.status, rubro()) }}
+          </p>
+        </div>
+      </div>
+
+      <button (click)="onClose.emit()"
+        class="p-2 sm:p-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shrink-0 ml-3">
+        <lucide-angular [img]="icons.X" class="h-5 w-5 text-zinc-500"></lucide-angular>
+      </button>
+    </header>
+
+    <!-- BODY: Internal Scrolling (min-h-0 es CRITICO para que el flexbox no desborde) -->
+    <main
+      class="flex-1 min-h-0 overflow-y-auto p-5 sm:p-8 space-y-5 sm:space-y-6 custom-scrollbar bg-zinc-50/30 dark:bg-zinc-950/50">
+
+      <!-- Stepper: Informational Only (Read-only) -->
+      <section
+        class="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <span class="text-[9px] font-black tracking-widest text-zinc-400 uppercase">Estado General (Automático)</span>
+          <span
+            class="text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-primary/5 border border-primary/10">Derivado
+            de ítems</span>
         </div>
 
-        <button (click)="onClose.emit()"
-          class="p-2 sm:p-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shrink-0 ml-3">
-          <lucide-angular [img]="icons.X" class="h-5 w-5 text-zinc-500"></lucide-angular>
-        </button>
-      </header>
-
-      <!-- BODY: Internal Scrolling (min-h-0 es CRITICO para que el flexbox no desborde) -->
-      <main class="flex-1 min-h-0 overflow-y-auto p-5 sm:p-8 space-y-5 sm:space-y-6 custom-scrollbar bg-zinc-50/30 dark:bg-zinc-950/50">
-        
-        <!-- Stepper: Informational Only (Read-only) -->
-        <section class="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col gap-4">
-          <div class="flex items-center justify-between">
-            <span class="text-[9px] font-black tracking-widest text-zinc-400 uppercase">Estado General (Automático)</span>
-            <span class="text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-primary/5 border border-primary/10">Derivado de ítems</span>
-          </div>
-
-          <div class="relative w-full group overflow-hidden">
-            <div class="flex flex-nowrap items-center justify-between gap-1 sm:gap-2 px-1 py-4 overflow-x-auto no-scrollbar">
-              @for (stage of GLOBAL_STAGES; track stage.key; let i = $index; let last = $last) {
-                <div class="flex flex-col items-center gap-2 shrink-0 min-w-[70px] sm:min-w-[100px] relative z-10">
-                  <div
-                    class="h-9 w-9 sm:h-11 sm:w-11 rounded-2xl flex items-center justify-center transition-all duration-700 shadow-sm border-2"
-                    [class]="i <= currentGlobalStep() 
+        <div class="relative w-full group overflow-hidden">
+          <div
+            class="flex flex-nowrap items-center justify-between gap-1 sm:gap-2 px-1 py-4 overflow-x-auto no-scrollbar">
+            @for (stage of GLOBAL_STAGES; track stage.key; let i = $index; let last = $last) {
+            <div class="flex flex-col items-center gap-2 shrink-0 min-w-[70px] sm:min-w-[100px] relative z-10">
+              <div
+                class="h-9 w-9 sm:h-11 sm:w-11 rounded-2xl flex items-center justify-center transition-all duration-700 shadow-sm border-2"
+                [class]="i <= currentGlobalStep() 
                       ? 'bg-primary border-primary text-white scale-110 shadow-lg shadow-primary/20' 
                       : 'bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 text-zinc-300 dark:text-zinc-600 shadow-zinc-200/5'">
-                    
-                    @if (i < currentGlobalStep()) {
-                      <lucide-angular [img]="icons.Check" class="h-4 w-4 sm:h-5 sm:w-5"></lucide-angular>
-                    } @else {
-                      <lucide-angular [img]="getIcon(stage.icon)" class="h-4 w-4 sm:h-5 sm:w-5" [class.animate-pulse]="i === currentGlobalStep()"></lucide-angular>
-                    }
-                  </div>
-                  <span [class]="cn('text-[8px] font-black uppercase tracking-widest transition-all', i === currentGlobalStep() ? 'text-zinc-900 dark:text-white' : 'text-zinc-400')">
-                    {{ stage.label }}
-                  </span>
-                </div>
-                @if (!last) { 
-                  <div class="flex-1 h-[2px] min-w-[20px] bg-zinc-100 dark:bg-zinc-800 relative -mt-4">
-                    <div [class]="cn('h-full bg-primary transition-all duration-1000', i < currentGlobalStep() ? 'w-full' : 'w-0')"></div>
-                  </div> 
-                }
-              }
+
+                @if (i < currentGlobalStep()) { <lucide-angular [img]="icons.Check" class="h-4 w-4 sm:h-5 sm:w-5">
+                  </lucide-angular>
+                  } @else {
+                  <lucide-angular [img]="getIcon(stage.icon)" class="h-4 w-4 sm:h-5 sm:w-5"
+                    [class.animate-pulse]="i === currentGlobalStep()"></lucide-angular>
+                  }
+              </div>
+              <span
+                [class]="cn('text-[8px] font-black uppercase tracking-widest transition-all', i === currentGlobalStep() ? 'text-zinc-900 dark:text-white' : 'text-zinc-400')">
+                {{ stage.label }}
+              </span>
             </div>
+            @if (!last) {
+            <div class="flex-1 h-[2px] min-w-[20px] bg-zinc-100 dark:bg-zinc-800 relative -mt-4">
+              <div
+                [class]="cn('h-full bg-primary transition-all duration-1000', i < currentGlobalStep() ? 'w-full' : 'w-0')">
+              </div>
+            </div>
+            }
+            }
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- Item Management (Refined Pill-style UI) -->
-        <section class="space-y-3">
-          <div class="flex items-center justify-between px-1">
-            <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase leading-none">Desglose de Ítems</span>
-            <span class="text-[10px] font-bold text-zinc-400 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800">{{ order()?.items?.length || 0 }} ítems</span>
-          </div>
+      <!-- Item Management (Refined Pill-style UI) -->
+      @if (!selectedItemForFailureId()) {
+      <section class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase leading-none">Desglose de
+            Ítems</span>
+          <span class="text-[10px] font-bold text-zinc-400 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800">{{
+            order()?.items?.length || 0 }} ítems</span>
+        </div>
 
-          <div class="space-y-2.5">
-            @for (item of order()?.items; track item.id) {
-              <div 
-                [class]="cn(
+        <div class="space-y-2.5">
+          @for (item of order()?.items; track item.id) {
+          <div [class]="cn(
                   'flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-[1.5rem] border transition-all duration-200 gap-4',
                   item.status === 'READY' || item.status === 'DONE' || item.status === 'CANCELLED' 
                     ? 'opacity-60 bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800' 
                     : 'bg-white dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 shadow-sm',
                   item.status === 'IN_PROGRESS' && 'border-primary/20 bg-primary/5 ring-1 ring-primary/10 shadow-md'
-                )"
-              >
-                <div class="flex items-center gap-4">
-                   <!-- Icono/Estado Visual -->
-                   <div [class]="cn('h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm',
+                )">
+            <div class="flex items-center gap-4">
+              <!-- Icono/Estado Visual -->
+              <div
+                [class]="cn('h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm',
                      item.status === 'IN_PROGRESS' ? 'bg-amber-500 text-white' : 
                      item.status === 'READY' || item.status === 'DONE' ? 'bg-emerald-500 text-white' :
                      item.status === 'CANCELLED' ? 'bg-red-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
-                     <lucide-angular [img]="
+                <lucide-angular [img]="
                        item.status === 'IN_PROGRESS' ? icons.Cpu : 
                        item.status === 'READY' || item.status === 'DONE' ? icons.Check :
                        item.status === 'CANCELLED' ? icons.X : icons.Layers
                      " class="h-5 w-5"></lucide-angular>
-                   </div>
+              </div>
 
-                   <div class="min-w-0">
-                     <div class="flex items-center gap-2 mb-1">
-                       <p class="text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">{{ item.name || 'Sin nombre' }}</p>
-                       
-                       <!-- STATUS PILL -->
-                       <span [class]="cn('text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border',
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">{{ item.name || 'Sin nombre' }}
+                  </p>
+
+                  <!-- STATUS PILL -->
+                  <span
+                    [title]="item.job?.machine?.name || ''"
+                    [class]="cn('text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border cursor-help',
                          item.status.toUpperCase() === 'IN_PROGRESS' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
                          (item.status.toUpperCase() === 'READY' || item.status.toUpperCase() === 'DONE') ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' :
                          item.status.toUpperCase() === 'CANCELLED' ? 'bg-red-500/10 text-red-600 border-red-500/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700')">
-                         {{ item.status.toUpperCase() === 'IN_PROGRESS' ? 'En Máquina' : 
-                            item.status.toUpperCase() === 'READY' ? 'Listo' : 
-                            item.status.toUpperCase() === 'DONE' ? 'Entregado' :
-                            item.status.toUpperCase() === 'CANCELLED' ? 'Cancelado' : 'Pendiente' }}
-                       </span>
-                     </div>
-
-                     <div class="flex items-center gap-3">
-                       <span class="text-[10px] font-bold text-zinc-400">Cantidad: {{ item.qty }}</span>
-                       @if (item.job) {
-                         <span class="text-[10px] font-black text-primary flex items-center gap-1 uppercase tracking-tighter">
-                           <div class="h-1 w-1 rounded-full bg-primary animate-ping"></div>
-                           {{ item.job.machine?.name || 'Impresora' }}
-                         </span>
-                       }
-                     </div>
-                   </div>
+                    {{ item.status.toUpperCase() === 'IN_PROGRESS' ? 'En Máquina' :
+                    item.status.toUpperCase() === 'READY' ? 'Listo' :
+                    item.status.toUpperCase() === 'DONE' ? 'Entregado' :
+                    item.status.toUpperCase() === 'CANCELLED' ? 'Cancelado' : 'Pendiente' }}
+                  </span>
                 </div>
 
                 <div class="flex items-center gap-2">
-                  @if (updatingItemIds().has(item.id)) {
-                    <div class="flex items-center gap-2 animate-pulse">
-                      <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4 text-zinc-400 animate-spin"></lucide-angular>
-                      <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Actualizando</span>
+                  <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Cant: {{ item.qty }}</span>
+                  
+                  @let weight = item.weightGrams || item.metadata?.['weightGrams'] || item.metadata?.['weight'];
+                  @let minutes = item.estimatedMinutes || item.metadata?.['estimatedMinutes'] || item.metadata?.['duration'];
+
+                  @if (weight || minutes) {
+                    <span class="text-zinc-200 dark:text-zinc-800 text-xs">•</span>
+                    <div class="flex items-center gap-2">
+                      @if (weight) {
+                        <span class="text-[10px] font-black text-zinc-500 uppercase tracking-tighter">{{ weight }}g</span>
+                      }
+                      @if (minutes) {
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">{{ minutes }}m</span>
+                      }
                     </div>
-                  } @else if (itemToAssignId() === item.id) {
-                    <!-- Inline Assignation View -->
-                    <div class="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-1.5 rounded-2xl shadow-inner">
+                  }
+                  
+                  @if (item.job) {
+                  <span class="text-zinc-200 dark:text-zinc-800 text-xs">•</span>
+                  <span class="text-[10px] font-black text-primary flex items-center gap-1 uppercase tracking-tighter">
+                    <div class="h-1 w-1 rounded-full bg-primary animate-ping"></div>
+                    {{ item.job.machine?.name || 'Impresora' }}
+                  </span>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              @if (updatingItemIds().has(item.id)) {
+              <div class="flex items-center gap-2 animate-pulse">
+                <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4 text-zinc-400 animate-spin"></lucide-angular>
+                <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Actualizando</span>
+              </div>
+              } @else if (itemToAssignId() === item.id) {
+              <!-- Inline Assignation View (Refined & Responsive) -->
+              <div class="flex flex-col items-stretch gap-2 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 p-3 rounded-[1.5rem] w-full max-w-[380px] ml-auto animate-in slide-in-from-right-2 duration-300">
+                  <div class="space-y-2">
+                    <!-- Machine Selector -->
+                    <div class="relative">
+                      @if (machines().length === 0) {
+                        <div class="h-10 w-full px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 flex items-center gap-3 animate-pulse">
+                          <div class="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                          <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Buscando unidades...</span>
+                        </div>
+                      } @else {
                         <select [ngModel]="selectedMachineIdForItem()" 
                                 (ngModelChange)="selectedMachineIdForItem.set($event)"
-                                class="h-10 pl-4 pr-10 rounded-xl bg-white dark:bg-zinc-950 border-none text-[10px] font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-300 focus:ring-1 focus:ring-primary shadow-sm min-w-[150px]">
-                            <option value="">Selecciona Impresora</option>
+                                class="h-10 w-full pl-4 pr-10 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-[10px] font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-300 focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all appearance-none cursor-pointer">
+                            <option value="">Selecciona Unidad</option>
                             @for (m of machines(); track m.id) {
                               <option [value]="m.id" [disabled]="m.status !== 'IDLE'">
-                                 {{m.name}} {{ m.status !== 'IDLE' ? '(OCUPADA)' : '' }}
+                                 {{m.name}} {{ m.status !== 'IDLE' ? '(CUPADA)' : '' }}
                               </option>
                             }
                         </select>
-                        <button (click)="startItemProduction(item.id)" 
-                                [disabled]="!selectedMachineIdForItem()"
-                                class="h-10 px-4 rounded-xl bg-primary text-white font-black text-[9px] uppercase tracking-widest hover:bg-primary/95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/10">
-                            Iniciar
-                        </button>
-                        <button (click)="cancelAssign()" class="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-rose-500 transition-colors">
-                            <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
-                        </button>
+                        <lucide-angular [img]="icons.ChevronDown" class="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none"></lucide-angular>
+                      }
                     </div>
-                  } @else {
-                    @if (item.status.toUpperCase() === 'PENDING' || !item.status) {
-                      <div class="flex items-center gap-2">
-                        <!-- 3D Fabricar Button -->
-                        @if (is3D()) {
-                          <button (click)="prepareAssign(item.id)"
-                            class="h-10 px-4 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center gap-2">
-                            <lucide-angular [img]="icons.Cpu" class="h-4 w-4"></lucide-angular>
-                            Fabricar
-                          </button>
+
+                    @if (is3D() && selectedMachineIdForItem()) {
+                      <div class="space-y-2 animate-in fade-in zoom-in-95 duration-300">
+                        @for (assignment of filamentAssignments(); track $index) {
+                          <div class="grid grid-cols-[1fr,90px,40px] gap-2 items-center">
+                            <!-- Filament Selector -->
+                            <div class="relative">
+                              <select [ngModel]="assignment.materialId" 
+                                      (ngModelChange)="updateFilamentAssignment($index, { materialId: $event })"
+                                      class="h-9 w-full pl-3 pr-8 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-[9px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+                                 <option value="">Filamento</option>
+                                 @for (mat of materials(); track mat.id) {
+                                   <option [value]="mat.id">{{mat.name}} ({{mat.remainingWeightGrams}}{{mat.unit}})</option>
+                                 }
+                              </select>
+                              <lucide-angular [img]="icons.ChevronDown" class="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-400 pointer-events-none"></lucide-angular>
+                            </div>
+                            
+                            <!-- Grams Input -->
+                            <div class="relative flex items-center">
+                              <input type="number" 
+                                     [ngModel]="assignment.grams" 
+                                     (ngModelChange)="updateFilamentAssignment($index, { grams: $event })"
+                                     placeholder="0"
+                                     min="0"
+                                     class="h-9 w-full px-2 pr-5 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-[9px] font-bold text-center text-zinc-700 dark:text-zinc-300 focus:ring-2 focus:ring-primary/20 transition-all" />
+                              <span class="absolute right-1.5 text-[7px] font-black text-zinc-400 uppercase">gr</span>
+                            </div>
+
+                            <!-- Remove Button -->
+                            <div class="flex justify-center">
+                              @if ($index > 0) {
+                                <button (click)="removeFilamentAssignment($index)" class="h-8 w-8 flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg transition-colors">
+                                  <lucide-angular [img]="icons.Minus" class="h-3.5 w-3.5"></lucide-angular>
+                                </button>
+                              }
+                            </div>
+                          </div>
                         }
 
-                        <button 
-                          (click)="updateItemStatus(item.id, 'READY', item.name)"
-                          [disabled]="isSaving()"
-                          class="h-10 px-4 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 hover:text-emerald-700 transition-all active:scale-95 flex items-center gap-2"
-                        >
-                          <lucide-angular [img]="icons.Check" class="h-3.5 w-3.5"></lucide-angular>
-                          Listo
-                        </button>
-
-                        <button 
-                          (click)="updateItemStatus(item.id, 'CANCELLED', item.name)"
-                          [disabled]="isSaving()"
-                          class="h-10 px-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-rose-500 hover:bg-rose-50 transition-all flex items-center gap-2"
-                        >
-                          <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
-                          <span class="text-[9px] font-black uppercase tracking-widest">Cancelar</span>
-                        </button>
-                      </div>
-                    } 
-                    @else if (['IN_PROGRESS', 'PRINTING', 'IN_PRODUCTION'].includes(item.status.toUpperCase())) {
-                       <div class="flex items-center gap-3">
-                          <div class="flex flex-col items-end gap-1 px-4 py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 shadow-sm min-w-[160px]">
-                              <div class="flex items-center gap-2 text-amber-600">
-                                 <lucide-angular [img]="icons.Cpu" class="h-4 w-4 animate-spin-slow"></lucide-angular>
-                                 <span class="text-[10px] font-black uppercase tracking-widest">
-                                    @if (item.job?.machine) { En {{ item.job?.machine?.name }} }
-                                    @else { Imprimiendo }
-                                 </span>
-                              </div>
-                              <span class="text-[8px] font-bold text-amber-600/50 uppercase tracking-widest">Produciendo</span>
-                          </div>
-                          
-                          <button (click)="updateItemStatus(item.id, 'READY', item.name)" 
-                                  class="h-10 px-4 rounded-xl bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all flex items-center gap-2">
-                             Terminar
+                        <!-- Add Filament Button -->
+                        @if (filamentAssignments().length < (machines().find(m => m.id === selectedMachineIdForItem())?.maxFilaments || 1)) {
+                          <button (click)="addFilamentAssignment()" class="w-full py-2 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-[8px] font-black text-zinc-400 uppercase tracking-widest hover:border-primary/30 hover:text-primary transition-all flex items-center justify-center gap-2">
+                            <lucide-angular [img]="icons.Plus" class="h-3 w-3"></lucide-angular>
+                            Agregar Filamento
                           </button>
-
-                          <button (click)="updateItemStatus(item.id, 'CANCELLED', item.name)" 
-                                  class="h-10 w-10 rounded-xl bg-white dark:bg-zinc-900 border border-rose-100 dark:border-rose-900/30 text-rose-500 hover:bg-rose-50 transition-all flex items-center justify-center">
-                             <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
-                          </button>
-                       </div>
-                    }
-                    @else if (item.status.toUpperCase() === 'CANCELLED') {
-                      <button (click)="updateItemStatus(item.id, 'PENDING', item.name)"
-                        class="h-10 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:bg-zinc-200 transition-all flex items-center gap-2">
-                        <lucide-angular [img]="icons.RefreshCw" class="h-3.5 w-3.5"></lucide-angular>
-                        Reactivar
-                      </button>
-                    }
-                    @else if (item.status.toUpperCase() === 'READY' || item.status.toUpperCase() === 'DONE') {
-                      <div class="h-10 px-4 rounded-xl bg-emerald-500/5 text-emerald-600 border border-emerald-500/10 flex items-center gap-2 shadow-sm">
-                        <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600/70">Completado</span>
+                        }
                       </div>
                     }
-                  }
+                  </div>
+
+                  <div class="flex items-center gap-2 pt-1">
+                    <button (click)="startItemProduction(item.id)" 
+                            [disabled]="!selectedMachineIdForItem() || (is3D() && !filamentAssignments()[0].materialId)"
+                            class="h-10 flex-1 rounded-xl bg-primary text-white font-black text-[9px] uppercase tracking-widest hover:bg-primary/95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/10 disabled:opacity-50">
+                        <lucide-angular [img]="icons.Cpu" class="h-4 w-4"></lucide-angular>
+                        Iniciar
+                    </button>
+                    <button (click)="cancelAssign()" class="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 hover:text-rose-500 transition-colors border border-transparent hover:border-rose-200">
+                        <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
+                    </button>
+                  </div>
+              </div>
+              } @else {
+              @if (item.status.toUpperCase() === 'PENDING' || !item.status) {
+              <div class="flex items-center gap-2 mt-2 sm:mt-0 ml-auto">
+                <!-- 3D Fabricar Button -->
+                @if (is3D()) {
+                <button (click)="prepareAssign(item.id)" title="Iniciar Producción"
+                  class="h-10 px-3 sm:px-5 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center gap-2">
+                  <lucide-angular [img]="icons.Cpu" class="h-4 w-4"></lucide-angular>
+                  <span class="hidden lg:inline text-[9px]">Fabricar</span>
+                </button>
+                } @else {
+                <button (click)="updateItemStatus(item.id, 'IN_PROGRESS', item.name)" title="Iniciar Producción"
+                  class="h-10 px-3 sm:px-5 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center gap-2">
+                  <lucide-angular [img]="icons.Cpu" class="h-4 w-4"></lucide-angular>
+                  <span class="hidden lg:inline text-[9px]">Iniciar</span>
+                </button>
+                }
+              </div>
+              }
+              @else if (['IN_PROGRESS', 'PRINTING', 'IN_PRODUCTION'].includes(item.status.toUpperCase())) {
+              <div class="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0 ml-auto">
+                <!-- Machine Info (Icon Only on small, text on large) -->
+                <div
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-500/5 border border-amber-500/10 text-amber-600"
+                  [title]="item.job?.machine?.name || 'En Producción'">
+                  <lucide-angular [img]="icons.Cpu" class="h-4 w-4 animate-spin-slow"></lucide-angular>
+                  <span class="hidden md:inline text-[9px] font-black uppercase tracking-widest truncate max-w-[100px]">
+                    {{ item.job?.machine?.name || '' }}
+                  </span>
                 </div>
-              </div>
-            }
-          </div>
-        </section>
 
-        <!-- Data Sections -->
-        <div class="space-y-4">
-          <div class="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div class="group/input space-y-1.5">
-                <label class="text-[11px] font-black text-zinc-400 uppercase tracking-widest ml-1">Responsable</label>
-                <select [ngModel]="responsableGeneralId()" (ngModelChange)="responsableGeneralId.set($event)"
-                  class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all">
-                  <option value="">Sin asignar</option>
-                  @for (emp of employees(); track emp.id) {
-                  <option [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }}</option>
-                  }
-                </select>
+                <button (click)="updateItemStatus(item.id, 'READY', item.name)" title="Marcar como Terminado"
+                  class="h-10 px-3 sm:px-4 rounded-xl bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 active:scale-95 transition-all flex items-center gap-2 justify-center">
+                  <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
+                  <span class=" sm:inline"></span>
+                </button>
+
+                <!-- Failure Button (Item Level) -->
+                <button (click)="openFailureReport(item)" 
+                        class="h-10 w-10 shrink-0 rounded-xl bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center shadow-sm border border-amber-100 dark:border-amber-900/30"
+                        [title]="'Reportar Falla'">
+                    <lucide-angular [img]="icons.AlertOctagon" class="h-4 w-4"></lucide-angular>
+                </button>
+
+                <button (click)="updateItemStatus(item.id, 'CANCELLED', item.name)" title="Cancelar"
+                  class="h-10 w-10 shrink-0 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-rose-500 hover:bg-rose-50 hover:border-rose-200 active:scale-95 transition-all flex items-center justify-center">
+                  <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
+                </button>
               </div>
-              <div class="group/input space-y-1.5">
-                <label class="text-[11px] font-black text-zinc-400 uppercase tracking-widest ml-1">Entrega</label>
-                <app-date-picker [value]="order()?.dueDate || ''" (valueChange)="visitDate.set($event)" className="h-12 relative flex w-full [&>button]:w-full [&>button]:h-12 [&>button]:rounded-2xl"></app-date-picker>
+              }
+              @else if (item.status.toUpperCase() === 'CANCELLED') {
+              <div class="flex items-center gap-2 mt-2 sm:mt-0 ml-auto">
+                <button (click)="updateItemStatus(item.id, 'PENDING', item.name)" title="Reactivar Ítem"
+                  class="h-10 px-3 sm:px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:bg-zinc-200 active:scale-95 transition-all flex items-center gap-2">
+                  <lucide-angular [img]="icons.RefreshCw" class="h-3.5 w-3.5"></lucide-angular>
+                  <span class="hidden lg:inline">Reactivar</span>
+                </button>
               </div>
+              }
+              @else if (item.status.toUpperCase() === 'READY' || item.status.toUpperCase() === 'DONE') {
+              <div
+                class="h-10 px-4 rounded-xl bg-emerald-500/5 text-emerald-600 border border-emerald-500/10 flex items-center gap-2 shadow-sm">
+                <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
+                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600/70">Completado</span>
+              </div>
+              }
+              }
             </div>
           </div>
+          }
+        </div>
+      </section>
+      }
 
-          <div class="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-            <label class="text-[11px] font-black text-zinc-400 uppercase tracking-widest ml-1 block mb-1.5">Observaciones</label>
-            <textarea [ngModel]="notes()" (ngModelChange)="notes.set($event)"
-              placeholder="Notas adicionales..."
-              class="min-h-[100px] w-full rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all resize-none"></textarea>
+      <!-- Data Sections -->
+      <div class="space-y-4">
+        <div
+          class="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div class="group/input space-y-1.5">
+              <label class="text-[11px] font-black text-zinc-400 uppercase tracking-widest ml-1">Responsable</label>
+              <select [ngModel]="responsableGeneralId()" (ngModelChange)="responsableGeneralId.set($event)"
+                class="h-12 w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all">
+                <option value="">Sin asignar</option>
+                @for (emp of employees(); track emp.id) {
+                <option [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }}</option>
+                }
+              </select>
+            </div>
+            <div class="group/input space-y-1.5">
+              <label class="text-[11px] font-black text-zinc-400 uppercase tracking-widest ml-1">Entrega</label>
+              <app-date-picker [value]="order()?.dueDate || ''" (valueChange)="visitDate.set($event)"
+                className="h-12 relative flex w-full [&>button]:w-full [&>button]:h-12 [&>button]:rounded-2xl"></app-date-picker>
+            </div>
           </div>
-
-        <!-- Condensed Actions Row -->
-        <div class="flex items-center gap-3">
-          <button (click)="isPaymentMode.set(!isPaymentMode())"
-               [class]="cn('flex-1 h-12 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm', 
-               isPaymentMode() ? 'bg-emerald-600 border-emerald-600 text-white active:scale-95' : 'bg-white dark:bg-zinc-900 border-border text-emerald-600')">
-              <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
-              <span class="text-[10px] font-black uppercase tracking-widest">Cobranza</span>
-          </button>
-          <button (click)="isFailureMode.set(!isFailureMode())"
-               [class]="cn('flex-1 h-12 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm', 
-               isFailureMode() ? 'bg-rose-600 border-rose-600 text-white active:scale-95' : 'bg-white dark:bg-zinc-900 border-border text-rose-600')">
-              <lucide-angular [img]="icons.AlertOctagon" class="h-4 w-4"></lucide-angular>
-              <span class="text-[10px] font-black uppercase tracking-widest">Falla</span>
-          </button>
         </div>
 
-        @if (isPaymentMode()) { <app-payment-module [order]="order()!" [amount]="paymentAmount" [selectedMethod]="paymentMethod"></app-payment-module> }
-        @if (isFailureMode()) { <app-failure-module [order]="order()!" [rubro]="rubro()" [reason]="failureReason" [action]="failureAction" [wastedTime]="wastedTime" [wastedMaterial]="wastedMaterial"></app-failure-module> }
-      </div>
-      </main>
-
-      <!-- FOOTER: Patrón Clientes (Border superior, fondo definido, flex-shrink-0) -->
-      <!-- FOOTER: Multi-action commercial system -->
-      <footer class="flex flex-col border-t border-zinc-100 dark:border-zinc-800 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] shrink-0">
-        
-        <!-- Payment Summary: Context for delivery -->
-        @if (!isPaymentMode() && !isFailureMode()) {
-          <div class="px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
-            <div class="flex items-center gap-6">
-              <div class="flex items-center gap-2.5">
-                <div class="h-8 w-8 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center text-zinc-400">
-                  <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
-                </div>
-                <div class="flex flex-col">
-                  <span class="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Importe Total</span>
-                  <span class="text-xs font-black text-zinc-900 dark:text-zinc-100">{{ totalVal() | currency }}</span>
-                </div>
-              </div>
-              
-              <div class="h-8 w-px bg-zinc-200/60 dark:bg-zinc-800/60"></div>
-
-              <div class="flex items-center gap-2.5">
-                <div class="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
-                  <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
-                </div>
-                <div class="flex flex-col">
-                  <span class="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Ya Cobrado</span>
-                  <span class="text-xs font-black text-emerald-600">{{ paidVal() | currency }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex flex-col items-end">
-              <div class="flex items-center gap-2 mb-0.5">
-                @if (!isFullyPaid()) {
-                  <lucide-angular [img]="icons.AlertOctagon" class="h-3 w-3 text-amber-500 animate-pulse"></lucide-angular>
-                }
-                <span class="text-[9px] font-black uppercase tracking-widest" [class]="isFullyPaid() ? 'text-emerald-500' : 'text-amber-500'">
-                  {{ isFullyPaid() ? 'Saldado' : 'Saldo Pendiente' }}
-                </span>
-              </div>
-              <span class="text-lg font-black tracking-tighter" [class]="isFullyPaid() ? 'text-emerald-600' : 'text-amber-600'">
-                {{ balanceVal() | currency }}
-              </span>
-            </div>
+        @if (!isPaymentMode() && !selectedItemForFailureId()) {
+          <div
+            class="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <label
+              class="text-[11px] font-black text-zinc-400 uppercase tracking-widest ml-1 block mb-1.5">Observaciones</label>
+            <textarea [ngModel]="notes()" (ngModelChange)="notes.set($event)" placeholder="Notas adicionales..."
+              class="min-h-[100px] w-full rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-4 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all resize-none"></textarea>
           </div>
         }
 
+        @if (isPaymentMode()) { 
+          <div class="animate-in slide-in-from-top-4 duration-300">
+            <app-payment-module [order]="order()!" [amount]="paymentAmount" [selectedMethod]="paymentMethod"></app-payment-module>
+          </div>
+        }
+        @if (selectedItemForFailureId()) {
+          <div class="animate-in slide-in-from-top-4 duration-300 p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-950/10">
+            <div id="failure-section" class="mb-4 flex items-center justify-between animate-in slide-in-from-top-4 duration-500">
+              <div class="flex items-center gap-2">
+                <div class="h-1 w-4 rounded-full bg-rose-500"></div>
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-rose-900 dark:text-rose-100">Reportando Falla en {{ selectedItemForFailure()?.name }}</h3>
+              </div>
+              <button (click)="selectedItemForFailureId.set(null)" class="text-[10px] font-bold text-rose-400 hover:text-rose-600 transition-colors uppercase tracking-widest">Cancelar</button>
+            </div>
+            <app-failure-module
+               [order]="order()!"
+               [rubro]="rubro()"
+               [reason]="failureReason"
+               [action]="failureAction"
+               [wastedTime]="wastedTime"
+               [materialWastes]="failureMaterialWastes"
+               [materials]="materials()"
+               (onAddRow)="addFailureMaterial()"
+               (onSelectMaterial)="openMaterialSelectorForRow($event)"
+               (onRemoveMaterial)="handleRemoveFailureMaterial($event)"
+               (onMaterialChange)="handleFailureMaterialChange($event.index, $event.materialId)"
+               (onGramsChange)="handleFailureGramsChange($event.index, $event.grams)"
+            ></app-failure-module>
+
+            <button (click)="saveFailure()" 
+                    [disabled]="!failureReason() || isSaving()"
+                    class="w-full h-12 mt-4 rounded-xl bg-rose-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-rose-600/20 hover:bg-rose-700 active:scale-[0.98] transition-all disabled:opacity-50">
+               Confirmar Reporte de Falla
+            </button>
+          </div>
+        }
+      </div>
+    </main>
+
+    <!-- FOOTER: Patrón Clientes (Border superior, fondo definido, flex-shrink-0) -->
+    <!-- FOOTER: Multi-action commercial system -->
+    <footer
+      class="flex flex-col border-t border-zinc-100 dark:border-zinc-800 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] shrink-0">
+
+      <!-- Payment Summary: Context for delivery -->
+      @if (!isPaymentMode() && !isFailureMode()) {
+      <div class="px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-2.5">
+            <div
+              class="h-8 w-8 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center text-zinc-400">
+              <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Importe Total</span>
+              <span class="text-xs font-black text-zinc-900 dark:text-zinc-100">{{ totalVal() | currency }}</span>
+            </div>
+          </div>
+
+          <div class="h-8 w-px bg-zinc-200/60 dark:bg-zinc-800/60"></div>
+
+          <div class="flex items-center gap-2.5">
+            <div
+              class="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
+              <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Ya Cobrado</span>
+              <span class="text-xs font-black text-emerald-600">{{ paidVal() | currency }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div (click)="!isPaymentMode() && !isFailureMode() && !isFullyPaid() && isPaymentMode.set(true)"
+             [class]="cn('flex flex-col items-end transition-all duration-200', !isFullyPaid() && !isPaymentMode() && 'cursor-pointer hover:scale-105 active:scale-95 group')">
+          <div class="flex items-center gap-2 mb-0.5">
+            @if (!isFullyPaid()) {
+            <lucide-angular [img]="icons.AlertOctagon" class="h-3 w-3 text-amber-500" [class.animate-pulse]="!isPaymentMode()"></lucide-angular>
+            }
+            <span class="text-[9px] font-black uppercase tracking-widest"
+              [class]="isFullyPaid() ? 'text-emerald-500' : 'text-amber-500'">
+              {{ isFullyPaid() ? 'Saldado' : (isPaymentMode() ? 'Cobrando' : 'Saldo Pendiente') }}
+            </span>
+          </div>
+          <div class="flex items-center gap-3">
+             @if (!isFullyPaid() && !isPaymentMode() && !isFailureMode()) {
+                <div class="h-7 px-3 rounded-lg bg-amber-500 text-white flex items-center gap-1.5 transition-all shadow-sm hover:bg-amber-600">
+                   <lucide-angular [img]="icons.Plus" class="h-3.5 w-3.5"></lucide-angular>
+                   <span class="text-[9px] font-black uppercase tracking-widest">Cobrar</span>
+                </div>
+             }
+             <span class="text-xl font-black tracking-tighter tabular-nums"
+               [class]="isFullyPaid() ? 'text-emerald-600' : 'text-amber-600'">
+               {{ balanceVal() | currency }}
+             </span>
+          </div>
+        </div>
+      </div>
+      }
+
         <!-- Action Buttons -->
         <div class="p-6 bg-white dark:bg-zinc-950 flex flex-col sm:flex-row items-center gap-3">
-          <button (click)="onClose.emit()" class="w-full sm:w-auto px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all">
+          <button (click)="onClose.emit()"
+            class="w-full sm:w-auto px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-all">
             Cerrar Ventana
           </button>
-
+  
           <div class="hidden sm:block flex-1"></div>
-
-          <!-- Administrative Save -->
-          <button (click)="handleSave()" 
-            [disabled]="isSaving()" 
-            class="w-full sm:w-auto px-8 py-3.5 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 font-extrabold text-[10px] uppercase tracking-[0.15em] transition-all flex items-center justify-center min-w-[180px]"
-            [class]="isPaymentMode() ? 'bg-emerald-600 text-white border-none' : isFailureMode() ? 'bg-rose-600 text-white border-none' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800'">
-            @if (isSaving()) { <app-button-spinner></app-button-spinner> }
-            @else { {{ isPaymentMode() ? 'Registrar Pago' : isFailureMode() ? 'Reportar Falla' : 'Guardar cambios' }} }
-          </button>
-
-          <!-- Commercial Deliver (Only in standard mode if READY) -->
-          @if (!isPaymentMode() && !isFailureMode() && isReadyState()) {
-            <button (click)="deliverOrder()" 
-              [disabled]="isSaving()" 
+  
+          @if (isPaymentMode()) {
+            <!-- Payment Specific Actions -->
+            <button (click)="isPaymentMode.set(false)"
+              class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-extrabold text-[10px] uppercase tracking-widest transition-all">
+              Cancelar Cobro
+            </button>
+            <button (click)="savePayment()" [disabled]="isSaving() || paymentAmount() <= 0"
+              class="w-full sm:w-auto px-10 py-3.5 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 active:scale-95 transition-all flex items-center justify-center min-w-[200px]">
+              @if (isSaving()) { <app-button-spinner></app-button-spinner> }
+              @else { Confirmar Cobro }
+            </button>
+          } @else if (!isFailureMode()) {
+            <!-- Administrative Save -->
+            <button (click)="handleSave()" [disabled]="isSaving()"
+              class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-800/80 font-extrabold text-[10px] uppercase tracking-[0.15em] transition-all flex items-center justify-center min-w-[180px]">
+              @if (isSaving()) { <app-button-spinner></app-button-spinner> }
+              @else { Guardar cambios }
+            </button>
+    
+            <!-- Commercial Deliver (Only in standard mode if READY) -->
+            @if (isReadyState()) {
+            <button (click)="deliverOrder()" [disabled]="isSaving()"
               class="w-full sm:w-auto px-10 py-3.5 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center justify-center min-w-[200px] border-b-4 border-emerald-800">
               @if (isSaving()) { <app-button-spinner></app-button-spinner> }
-              @else { 
+              @else {
                 <div class="flex items-center gap-2">
                   <lucide-angular [img]="icons.Truck" class="h-4 w-4"></lucide-angular>
-                  Entregar Pedido 
+                  Entregar Pedido
                 </div>
               }
             </button>
+            }
           }
         </div>
-      </footer>
+    </footer>
+  </div>
+</div>
+
+@if (isMaterialSelectorOpen()) {
+  <div class="fixed inset-0 z-[100001] flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md animate-in fade-in duration-300">
+    <div class="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 border border-zinc-200 dark:border-zinc-800">
+      <div class="text-center mb-8">
+        <h3 class="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 mb-2">Seleccionar Material</h3>
+        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Merma detectada de:</p>
+      </div>
+      
+      <div class="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+        <!-- Option: None -->
+        <button (click)="handleMaterialSelectedForFailure('')"
+          class="w-full group px-5 py-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 flex items-center gap-4 transition-all active:scale-95">
+          <div class="h-5 w-5 rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-700 group-hover:rotate-45 transition-transform"></div>
+          <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Ninguno / Genérico</span>
+        </button>
+
+        @for (m of materials(); track m.id) {
+          <button (click)="handleMaterialSelectedForFailure(m.id)"
+            class="w-full group px-5 py-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 hover:border-primary/30 bg-zinc-50 dark:bg-zinc-800/40 flex items-center gap-4 transition-all active:scale-95">
+            <div class="h-5 w-5 rounded-full border border-black/10 shadow-sm transition-transform group-hover:scale-110"
+                 [style.backgroundColor]="m.color || '#ccc'"></div>
+            <div class="flex flex-col text-left">
+              <span class="text-[11px] font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-200">{{ m.name }}</span>
+              <span class="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter">{{ m.brand || 'GST3D' }} — {{ m.type || 'PLA' }}</span>
+            </div>
+          </button>
+        }
+      </div>
+
+      <div class="mt-8">
+        <button (click)="isMaterialSelectorOpen.set(false)" 
+          class="w-full py-4 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-zinc-600 transition-colors">
+          Cancelar
+        </button>
+      </div>
     </div>
   </div>
+}
 }

@@ -7,8 +7,9 @@ import { FormsModule } from '@angular/forms';
 import {
   LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
   DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
-  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight, Clock, Truck, XCircle
+  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight, Clock, Truck, XCircle, Plus, Minus
 } from 'lucide-angular';
+import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { ButtonSpinnerComponent } from '@shared/ui';
 import { Pedido, Employee, OrderStatus, OrderItemStatus } from '@shared/models/pedido';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
@@ -21,6 +22,7 @@ import { getNegocioConfig, getStatusLabel, getStatusStyles } from '@shared/utils
 import { cn } from '@shared/utils/cn';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 import { Machine, Material } from '@shared/models';
+import { MaterialSelectorComponent } from '@shared/ui/material-selector/material-selector.component';
 
 // Sections
 import { PaymentModuleComponent } from './sections/payment-module.component';
@@ -50,6 +52,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   private maquinasService = inject(MaquinasService);
   private materialesService = inject(MaterialesService);
   private cdr = inject(ChangeDetectorRef);
+  private confirmService = inject(ConfirmService);
 
   order = input<Pedido | null>(null);
   isOpen = input<boolean>(false);
@@ -92,15 +95,86 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   private isJumping = signal(false);
 
   isPaymentMode = signal(false);
-  isFailureMode = signal(false);
-
+  
+  isFailureMode = computed(() => !!this.selectedItemForFailureId());
+  
   paymentAmount = signal<number>(0);
   paymentMethod = signal<string>('CASH');
+  saving = computed(() => this.isSaving());
+  
+  updatingItemIds = signal<Set<string>>(new Set());
+  selectedMachineIdForItem = signal<string>('');
+  filamentAssignments = signal<{ materialId: string; grams: number }[]>([{ materialId: '', grams: 0 }]);
+  selectedItemForFailureId = signal<string | null>(null);
+  selectedItemForFailure = computed(() => {
+    const id = this.selectedItemForFailureId();
+    return (this.order()?.items || []).find((i: any) => i.id === id);
+  });
+  isMaterialSelectorOpen = signal<boolean>(false);
 
-  failureReason = signal<string>('');
+  // Failure state
+  failureReason = signal('');
   failureAction = signal<'REDO' | 'DISCARD' | 'KEEP'>('REDO');
-  wastedTime = signal<number>(0);
-  wastedMaterial = signal<number>(0);
+  wastedTime = signal(0);
+  failureMaterialWastes = signal<{ materialId: string, grams: number }[]>([]);
+  selectedFailureMaterialId = signal<string | null>(null);
+  selectedFailureMaterial = computed(() => this.materials().find(m => m.id === this.selectedFailureMaterialId()));
+
+  openFailureReport(item: any) {
+    this.selectedItemForFailureId.set(item.id);
+    this.failureReason.set('');
+    this.failureAction.set('REDO');
+    this.wastedTime.set(0);
+    
+    // AUTO-DETECCIÓN DE FILAMENTOS:
+    // Si el ítem tiene un job y una máquina, precargamos los filamentos de esa máquina.
+    if (item.job?.machine?.metadata?.materials) {
+      const machineMaterials = item.job.machine.metadata.materials;
+      this.failureMaterialWastes.set(
+        machineMaterials.map((m: any) => ({ materialId: m.materialId, grams: 0 }))
+      );
+    } else {
+      // Si no, empezamos con uno vacío para que el usuario elija
+      this.failureMaterialWastes.set([{ materialId: '', grams: 0 }]);
+    }
+
+    // Scroll suave al área de falla
+    setTimeout(() => {
+      const element = document.getElementById('failure-section');
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }
+
+  failureMaterialPickingIndex = signal<number | null>(null);
+
+  openMaterialSelectorForRow(index: number) {
+    this.failureMaterialPickingIndex.set(index);
+    this.isMaterialSelectorOpen.set(true);
+  }
+
+  handleRemoveFailureMaterial(index: number) {
+    this.failureMaterialWastes.update(list => list.filter((_, i) => i !== index));
+  }
+
+  handleFailureMaterialChange(index: number, materialId: string) {
+    this.failureMaterialWastes.update(list => {
+      const newList = [...list];
+      newList[index] = { ...newList[index], materialId };
+      return newList;
+    });
+  }
+
+  handleFailureGramsChange(index: number, grams: number) {
+    this.failureMaterialWastes.update(list => {
+      const newList = [...list];
+      newList[index] = { ...newList[index], grams };
+      return newList;
+    });
+  }
+
+  addFailureMaterial() {
+    this.failureMaterialWastes.update(list => [...list, { materialId: '', grams: 0 }]);
+  }
 
   // Metalurgica Specific
   tipoTrabajo = signal<string>('');
@@ -118,14 +192,12 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   multiMaterials = signal<MultiMaterial[]>([]);
   machines = signal<Machine[]>([]);
   materials = signal<Material[]>([]);
-  updatingItemIds = signal<Set<string>>(new Set<string>());
   itemToAssignId = signal<string | null>(null);
-  selectedMachineIdForItem = signal<string>('');
 
   icons: any = {
     Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2,
     User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, ChevronRight,
-    Clock, Truck, XCircle
+    Clock, Truck, XCircle, Plus, Minus
   };
 
   getIcon(name: string): any {
@@ -179,13 +251,6 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnInit() {
     this.resetForm();
-    effect(() => {
-      const o = this.order();
-      if (o) {
-        this.resetForm();
-        this.updatingItemIds.set(new Set<string>());
-      }
-    });
   }
 
   ngAfterViewInit() {
@@ -250,7 +315,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       this.responsableGeneralId.set(order.responsableGeneral?.id || '');
       this.notes.set(order.notes || '');
       this.isPaymentMode.set(false);
-      this.isFailureMode.set(false);
+      this.selectedItemForFailureId.set(null);
       
       const total = Number(order.totalPrice || 0);
       const paid = order.payments?.reduce((s, p) => s + Number(p.amount), 0) || 0;
@@ -273,7 +338,8 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
 
   _onProductionPhase = effect(() => {
     const currentStatus = this.status();
-    if (this.is3D() && ['IN_PROGRESS', 'IN_PRODUCTION'].includes(currentStatus)) {
+    const isAssigning = !!this.itemToAssignId();
+    if (this.is3D() && (['IN_PROGRESS', 'IN_PRODUCTION'].includes(currentStatus) || isAssigning)) {
       this.load3DData();
     }
   });
@@ -295,6 +361,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     if (this.order() && this.isOpen()) {
       this.resetForm();
       this.autoCenterActiveStep();
+      this.updatingItemIds.set(new Set<string>());
     }
   }, { allowSignalWrites: true });
 
@@ -321,6 +388,29 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     document.documentElement.style.overflow = '';
   }
 
+  saveFailure() {
+    this.handleSave();
+  }
+
+  savePayment() {
+    this.handleSave();
+  }
+
+  showMaterialSelectorForFailure() {
+    this.isMaterialSelectorOpen.set(true);
+  }
+
+  handleMaterialSelectedForFailure(materialId: string) {
+    const index = this.failureMaterialPickingIndex();
+    if (index !== null) {
+      this.handleFailureMaterialChange(index, materialId);
+      this.failureMaterialPickingIndex.set(null);
+    } else {
+      this.selectedFailureMaterialId.set(materialId || null);
+    }
+    this.isMaterialSelectorOpen.set(false);
+  }
+
   async handleSave() {
     const order = this.order();
     if (!order) return;
@@ -334,11 +424,19 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
         });
       } else if (this.isFailureMode()) {
         const targetStatus = this.failureAction() === 'DISCARD' ? 'FAILED' : (this.rubro() === 'IMPRESION_3D' ? 'REPRINT_PENDING' : 'RE_WORK');
+        const wastes = this.failureMaterialWastes();
+        
         await this.api.reportFailure(order.id, {
           businessId: order.businessId,
+          itemId: this.selectedItemForFailureId() || undefined,
           reason: this.failureReason(),
           action: this.failureAction(),
-          targetStatus
+          wastedGrams: wastes.reduce((acc, curr) => acc + (curr.grams || 0), 0),
+          materialWastes: wastes,
+          targetStatus,
+          metadata: {
+            wastedTime: this.wastedTime()
+          }
         });
       } else {
         const updateData: any = {
@@ -359,7 +457,12 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       this.onClose.emit();
     } catch (err) {
       console.error('Error in handleSave:', err);
-      alert('Error al procesar la operación.');
+      this.confirmService.confirm({
+        title: 'Error',
+        message: 'Error al procesar la operación.',
+        hideCancel: true,
+        type: 'danger'
+      });
     } finally {
       this.isSaving.set(false);
     }
@@ -369,10 +472,20 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     const order = this.order();
     if (!order) return;
     if (!this.isFullyPaid()) {
-      const confirmDebt = confirm(`Atención: El pedido tiene un saldo pendiente de $${this.balanceVal()}. ¿Deseas entregarlo de todas formas?`);
+      const confirmDebt = await this.confirmService.confirm({
+        title: 'Saldo Pendiente',
+        message: `Atención: El pedido tiene un saldo pendiente de $${this.balanceVal()}. ¿Deseas entregarlo de todas formas?`,
+        confirmLabel: 'Entregar Igual',
+        type: 'warning'
+      });
       if (!confirmDebt) return;
     } else {
-      const confirmDelivery = confirm('¿Confirmar la entrega del pedido? Esta acción lo moverá al historial.');
+      const confirmDelivery = await this.confirmService.confirm({
+        title: 'Confirmar Entrega',
+        message: '¿Confirmar la entrega del pedido? Esta acción lo moverá al historial.',
+        confirmLabel: 'Entregar',
+        type: 'info'
+      });
       if (!confirmDelivery) return;
     }
     this.isSaving.set(true);
@@ -385,30 +498,94 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       this.onClose.emit();
     } catch (err) {
       console.error('Error delivering order:', err);
-      alert('No se pudo marcar el pedido como entregado.');
+      this.confirmService.confirm({
+        title: 'Error',
+        message: 'No se pudo marcar el pedido como entregado.',
+        hideCancel: true,
+        type: 'danger'
+      });
     } finally {
       this.isSaving.set(false);
     }
   }
 
-  async updateItemStatus(itemId: string, status: string, name: string) {
+  async updateItemStatus(itemId: string, status: string, name: string = '') {
     const order = this.order();
     if (!order || this.updatingItemIds().has(itemId)) return;
+
     if (status === 'CANCELLED') {
-      const confirmed = confirm(`¿Estás seguro de cancelar el ítem "${name}"?`);
+      const confirmed = await this.confirmService.confirm({
+        title: 'Cancelar Ítem',
+        message: `¿Estás seguro de cancelar el ítem "${name}"?`,
+        confirmLabel: 'Sí, cancelar',
+        type: 'warning'
+      });
       if (!confirmed) return;
     }
+
     this.updatingItemIds.update((ids: Set<string>) => {
       const newIds = new Set(ids);
       newIds.add(itemId);
       return newIds;
     });
+
     try {
       await this.api.updateItemStatus(order.id, itemId, status, order.businessId);
       this.onSave.emit();
     } catch (e: any) {
       console.error('Error updating item status:', e);
-      alert(e.error?.message || 'Error al actualizar el ítem.');
+      const isMachineError = e.error?.message?.includes('trabajo activo en máquina');
+      
+      if (isMachineError) {
+         const targetItem = order.items?.find((i: any) => i.id === itemId);
+         const itemJob = targetItem?.job || (targetItem as any)?.productionJob;
+         let machineId = itemJob?.machine?.id || itemJob?.machineId;
+         
+         if (!machineId && order.jobs) {
+           const job = (order.jobs as any[]).find(j => (j.orderItemId === itemId || j.itemId === itemId));
+           machineId = job?.machineId || job?.machine?.id;
+         }
+
+         const confirmed = await this.confirmService.confirm({
+            title: 'Ítem en Máquina',
+            message: e.error.message + '\n¿Deseas liberar la máquina y forzar el cambio de estado ahora?',
+            confirmLabel: 'Liberar y Cambiar',
+            cancelLabel: 'Cancelar',
+            type: 'warning'
+         });
+
+         if (confirmed) {
+            if (machineId) {
+               try {
+                  await this.maquinasApi.release(machineId, order.businessId);
+                  await this.api.updateItemStatus(order.id, itemId, status, order.businessId);
+                  this.onSave.emit();
+               } catch (err2) {
+                  this.confirmService.confirm({
+                      title: 'Error',
+                      message: 'No se pudo liberar la máquina automáticamente.',
+                      hideCancel: true,
+                      type: 'danger'
+                  });
+               }
+            } else {
+               this.confirmService.confirm({
+                  title: 'Información Faltante',
+                  message: 'No pudimos identificar la máquina vinculada a este ítem. Intente refrescar la página.',
+                  hideCancel: true,
+                  type: 'warning'
+               });
+            }
+         }
+      } else {
+         this.confirmService.confirm({
+            title: 'Error',
+            message: e.error?.message || 'Error al actualizar el ítem.',
+            hideCancel: true,
+            type: 'danger'
+         });
+      }
+    } finally {
       this.updatingItemIds.update((ids: Set<string>) => {
         const newIds = new Set(ids);
         newIds.delete(itemId);
@@ -417,35 +594,101 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  addFilamentAssignment() {
+    const machine = this.machines().find(m => m.id === this.selectedMachineIdForItem());
+    const max = machine?.maxFilaments || 1;
+    if (this.filamentAssignments().length < max) {
+      this.filamentAssignments.update(list => [...list, { materialId: '', grams: 0 }]);
+    }
+  }
+
+  removeFilamentAssignment(index: number) {
+    if (this.filamentAssignments().length > 1) {
+      this.filamentAssignments.update(list => list.filter((_, i) => i !== index));
+    }
+  }
+
+  updateFilamentAssignment(index: number, data: Partial<{ materialId: string; grams: number }>) {
+    this.filamentAssignments.update(list => {
+      const newList = [...list];
+      const finalGrams = data.grams !== undefined ? Math.max(0, data.grams) : newList[index].grams;
+      newList[index] = { ...newList[index], ...data, grams: finalGrams };
+      return newList;
+    });
+  }
+
   prepareAssign(itemId: string) {
     this.itemToAssignId.set(itemId);
+    
+    // Buscar los datos pre-guardados del item (peso)
+    const item = this.order()?.items?.find((i: any) => i.id === itemId);
+    const weight = (item as any)?.weightGrams || (item as any)?.weight || 0;
+    
+    this.filamentAssignments.set([{ materialId: '', grams: weight }]);
+    
     const available = this.machines().filter(m => m.status === 'IDLE');
     if (available.length > 0) {
       this.selectedMachineIdForItem.set(available[0].id);
+    }
+    if (this.is3D()) {
+      this.materialesService.loadMateriales(true);
     }
   }
 
   cancelAssign() {
     this.itemToAssignId.set(null);
     this.selectedMachineIdForItem.set('');
+    this.filamentAssignments.set([{ materialId: '', grams: 0 }]);
   }
 
   async startItemProduction(itemId: string) {
     const order = this.order();
     const machineId = this.selectedMachineIdForItem();
+    const assignments = this.filamentAssignments();
+    
     if (!order || !machineId || !itemId) return;
+
     this.updatingItemIds.update((ids: Set<string>) => {
       const newIds = new Set(ids);
       newIds.add(itemId);
       return newIds;
     });
+
     try {
-      await this.maquinasApi.assignOrder(machineId, order.id, itemId, undefined, order.businessId);
+      const metadata = this.is3D() ? { 
+        materials: assignments.map(a => ({
+          materialId: a.materialId,
+          gramsPerUnit: a.grams / (order?.items.find(i => i.id === itemId)?.qty || 1)
+        })),
+        estimatedGrams: assignments.reduce((acc, curr) => acc + curr.grams, 0)
+      } : undefined;
+
+      await this.maquinasApi.assignOrder(
+        machineId, 
+        order.id, 
+        itemId, 
+        assignments[0]?.materialId || undefined, 
+        order.businessId,
+        metadata
+      );
+
       this.onSave.emit();
       this.itemToAssignId.set(null);
+      this.filamentAssignments.set([{ materialId: '', grams: 0 }]);
+      
+      this.updatingItemIds.update((ids: Set<string>) => {
+        const newIds = new Set(ids);
+        newIds.delete(itemId);
+        return newIds;
+      });
     } catch (e: any) {
       console.error('Error starting item production:', e);
-      alert(e.error?.message || 'No se pudo iniciar la producción.');
+      this.confirmService.confirm({
+        title: 'Error',
+        message: e.error?.message || 'No se pudo iniciar la producción.',
+        hideCancel: true,
+        type: 'danger'
+      });
       this.updatingItemIds.update((ids: Set<string>) => {
         const newIds = new Set(ids);
         newIds.delete(itemId);
@@ -456,5 +699,5 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
 
   getLabel = getStatusLabel;
   getStyles = getStatusStyles;
-  protected readonly cnHelper = cn;
+  cn = cn;
 }

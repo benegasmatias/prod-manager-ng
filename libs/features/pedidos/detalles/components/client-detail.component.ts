@@ -8,7 +8,6 @@ import { OrderStatusModalComponent } from '../../status-modal/status-modal.compo
 import { OrderTimelineComponent } from './order-timeline.component';
 import { OrderFinancialWidgetComponent } from './order-financial-widget.component';
 import { OrderItemsWidgetComponent } from './order-items-widget.component';
-import { OrderFilesWidgetComponent } from './order-files-widget.component';
 import { OrderProgressStepperComponent } from './order-progress-stepper.component';
 import { SessionService } from '@core/session/session.service';
 
@@ -18,7 +17,7 @@ import { SessionService } from '@core/session/session.service';
   imports: [
     CommonModule, RouterLink, LucideAngularModule, 
     OrderStatusModalComponent, OrderTimelineComponent, OrderFinancialWidgetComponent,
-    OrderItemsWidgetComponent, OrderFilesWidgetComponent, OrderProgressStepperComponent
+    OrderItemsWidgetComponent, OrderProgressStepperComponent
   ],
   template: `
     <div class="space-y-8 animate-in fade-in duration-500">
@@ -91,7 +90,6 @@ import { SessionService } from '@core/session/session.service';
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2 space-y-8">
           <app-order-items-widget [items]="pedido()!.items || []"></app-order-items-widget>
-          <app-order-files-widget [items]="pedido()!.items || []" (downloadStatus)="onDownload.emit($event)"></app-order-files-widget>
           <app-order-timeline [history]="pedido()!.statusHistory || []"></app-order-timeline>
         </div>
 

@@ -7,6 +7,7 @@ export interface ConfirmData {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  hideCancel?: boolean;
   type?: 'danger' | 'warning' | 'info';
   resolve: (value: boolean) => void;
 }

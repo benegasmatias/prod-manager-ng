@@ -13,7 +13,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
   template: `
     <div class="space-y-4">
       <!-- TABLE VIEW (Desktop) -->
-      <div class="hidden md:block overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto pb-32">
         <table class="w-full border-separate border-spacing-y-2">
           <thead>
             <tr class="text-[10px] font-black uppercase tracking-widest text-zinc-400">
@@ -46,7 +46,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
           </thead>
           <tbody>
             @for (order of orders; track order.id) {
-              <tr class="group bg-white dark:bg-zinc-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all duration-300">
+              <tr class="group bg-white dark:bg-zinc-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all duration-300">
                 <td class="px-6 py-5 first:rounded-l-2xl border-y border-l border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700 transition-colors">
                   <span class="text-[10px] font-black tabular-nums text-zinc-400">#{{ order.code }}</span>
                 </td>
@@ -139,7 +139,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
                           </button>
                         </div>
                         <!-- Backdrop to close -->
-                        <div (click)="activeMenuOrderId.set(null)" class="fixed inset-0 z-[-1]"></div>
+                        <div (click)="activeMenuOrderId.set(null)" class="fixed inset-0 z-[40]"></div>
                       }
                     </div>
                   </div>

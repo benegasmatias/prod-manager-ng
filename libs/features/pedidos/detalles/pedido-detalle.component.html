@@ -95,8 +95,6 @@
       <!-- Items & Specifications Widget -->
       <app-order-items-widget [items]="p.items || []"></app-order-items-widget>
 
-      <!-- Files & Assets Widget -->
-      <app-order-files-widget [items]="p.items || []" (downloadStatus)="downloadFile($event)"></app-order-files-widget>
 
       <!-- History Timeline Widget -->
       <app-order-timeline [history]="p.statusHistory || []"></app-order-timeline>

@@ -41,13 +41,34 @@ import { SessionService } from '@core/session/session.service';
         </div>
 
         <div class="min-h-[50px] flex flex-col justify-center px-1 text-left">
-          @if (machine.status === 'WORKING') {
-            <div class="space-y-2">
-              <div class="flex items-center gap-2 text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                <lucide-angular [img]="icons.PlayCircle" class="h-4 w-4 text-emerald-500"></lucide-angular>
+          @if (machine.status === 'WORKING' || machine.currentJobId) {
+            <div class="space-y-2 animate-in fade-in slide-in-from-bottom-1 duration-500">
+              <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400/80">
+                <div class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </div>
                 <span>Trabajo en curso</span>
               </div>
-              <p class="text-[11px] text-zinc-500 font-medium ml-6 truncate">{{ machine.currentJobId || 'Monitorizando carga...' }}</p>
+              
+              <div class="ml-4 space-y-1 min-w-0">
+                @if (activeJob) {
+                   <div class="flex flex-col">
+                     <span class="text-[11px] font-black text-zinc-900 dark:text-zinc-100 truncate pr-2">
+                       #{{ activeJob.order?.code }} — {{ activeJob.order?.clientName || 'Cliente' }}
+                     </span>
+                     <span class="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold truncate">
+                       {{ activeJob.orderItem?.name || 'Ítem en producción' }}
+                     </span>
+                   </div>
+                } @else if (machine.currentJobId) {
+                   <p class="text-[11px] text-zinc-500 font-medium truncate italic opacity-70">
+                     ID: {{ machine.currentJobId.slice(0, 8) }}
+                   </p>
+                } @else {
+                   <p class="text-[11px] text-zinc-500 font-medium truncate italic opacity-50">Sincronizando...</p>
+                }
+              </div>
             </div>
           } @else if (machine.status === 'MAINTENANCE') {
             <div class="space-y-1.5 text-rose-600 dark:text-rose-400">
@@ -109,6 +130,10 @@ export class MachineCardComponent {
   cn = cn;
 
   readonly icons = { Cpu, Settings, Activity, PlayCircle, AlertTriangle, Check, MoreHorizontal };
+
+  get activeJob() {
+    return (this.machine.productionJobs || []).find(j => j.status !== 'COMPLETED' && j.status !== 'CANCELLED');
+  }
 
   getStatusColor(status: string) {
     switch (status) {

@@ -10,11 +10,11 @@ import { cn } from '@shared/utils/cn';
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+    <div class="fixed inset-0 z-[9999] flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       <div (click)="onClose.emit()" class="absolute inset-0"></div>
-      <div class="relative w-full max-w-lg h-full bg-white dark:bg-zinc-950 shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col border-l border-zinc-200 dark:border-zinc-800">
-        <!-- Sheet Header -->
-        <div class="p-8 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/30 dark:bg-zinc-900/10 flex items-center justify-between">
+      <div class="relative w-full max-w-lg h-screen bg-white dark:bg-zinc-950 shadow-[-20px_0_50px_-15px_rgba(0,0,0,0.5)] animate-in slide-in-from-right duration-500 flex flex-col border-l border-zinc-200 dark:border-zinc-800 overflow-hidden">
+        <!-- Sheet Header with safety padding -->
+        <div class="pt-10 pb-8 px-8 border-b border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/30 dark:bg-zinc-900/10 flex items-center justify-between">
           <div class="space-y-1.5 text-left">
             <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Gestión de {{ config().labels.maquinas.slice(0, -1) || 'Unidad' }}</h2>
             <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] opacity-80">{{ machine?.name || 'Cargando...' }}</p>

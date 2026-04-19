@@ -91,13 +91,35 @@ import { StatusBadgeComponent } from '@shared/ui/badges/status-badge.component';
               </div>
             }
 
-            @if (item.descripcion) {
-              <div class="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
-                <div class="flex items-center gap-2 mb-2">
-                  <lucide-angular [img]="icons.Info" class="h-3 w-3 text-zinc-400"></lucide-angular>
-                  <p class="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Requerimientos Técnicos</p>
+            @if (item.referenceImages && item.referenceImages.length > 0) {
+              <div class="mt-6 flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+                @for (img of item.referenceImages; track $index) {
+                   <div class="h-16 w-16 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden flex-shrink-0 group/img cursor-pointer relative bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                      <img [src]="img.path || img.url || img" 
+                           (error)="handleImageError($event)"
+                           class="h-full w-full object-cover transition-transform group-hover/img:scale-110" />
+                      <lucide-angular [img]="icons.Package" class="h-6 w-6 text-zinc-200 dark:text-zinc-700 absolute m-auto z-0"></lucide-angular>
+                      <div class="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity z-10"></div>
+                   </div>
+                }
+              </div>
+            }
+
+            @if (item.descripcion || item.stlUrl) {
+              <div class="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <lucide-angular [img]="icons.Info" class="h-3 w-3 text-zinc-400"></lucide-angular>
+                    <p class="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Requerimientos Técnicos</p>
+                  </div>
+                  <p class="text-xs text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{{ item.description || item.descripcion || 'Sin descripción técnica adicional.' }}</p>
                 </div>
-                <p class="text-xs text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{{ item.description || item.descripcion }}</p>
+
+                @if (item.stlUrl) {
+                  <a [href]="item.stlUrl" target="_blank" class="h-10 px-4 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all active:scale-95 no-underline">
+                     <lucide-angular [img]="icons.Monitor" class="h-3 w-3"></lucide-angular> Ver Archivo STL
+                  </a>
+                }
               </div>
             }
           </div>
@@ -122,4 +144,8 @@ export class OrderItemsWidgetComponent {
   icons = {
     Tag, Package, Info, AlertCircle, Cog, User, Monitor
   };
+
+  handleImageError(event: any) {
+    event.target.style.display = 'none';
+  }
 }

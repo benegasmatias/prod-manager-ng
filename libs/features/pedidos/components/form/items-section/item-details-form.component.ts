@@ -115,13 +115,42 @@ import { Print3dItemEnhancementComponent } from './enhancements/print3d-enhancem
                         ></app-money-input>
                       } @else if (f.tipo === 'number') {
                          <div class="relative group">
-                            <input 
-                              type="number"
-                              [(ngModel)]="item[f.key]"
-                              (ngModelChange)="onUpdate.emit()"
-                              class="flex h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all font-mono"
-                              [placeholder]="f.placeholder || '0'"
-                            >
+                            @if (f.key === 'duracion_estimada_minutos') {
+                               <div class="flex items-center gap-2">
+                                  <div class="relative flex-1">
+                                     <input 
+                                       type="number"
+                                       [ngModel]="getHoursValue($any(item[f.key]))"
+                                       (ngModelChange)="updateMinutesFromHs($event)"
+                                       min="0"
+                                       class="h-12 w-full pl-4 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/50 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all font-mono"
+                                       placeholder="Hs"
+                                     >
+                                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black text-zinc-400 uppercase">hs</span>
+                                  </div>
+                                  <div class="relative flex-1">
+                                     <input 
+                                       type="number"
+                                       [ngModel]="getMinutesRemainder($any(item[f.key]))"
+                                       (ngModelChange)="updateMinutesFromMin($event)"
+                                       min="0"
+                                       max="59"
+                                       class="h-12 w-full pl-4 pr-10 rounded-xl border border-zinc-200 bg-zinc-50/50 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all font-mono"
+                                       placeholder="Min"
+                                     >
+                                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black text-zinc-400 uppercase">min</span>
+                                  </div>
+                               </div>
+                            } @else {
+                              <input 
+                                type="number"
+                                [(ngModel)]="item[f.key]"
+                                (ngModelChange)="onUpdate.emit()"
+                                min="0"
+                                class="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-2 text-sm font-black focus:outline-none focus:ring-4 focus:ring-primary/5 dark:border-zinc-800 dark:bg-zinc-950/20 transition-all font-mono"
+                                [placeholder]="f.placeholder || '0'"
+                              >
+                            }
                          </div>
                       } @else {
                         <!-- ITEM SPECIFIC ENHANCEMENTS PLUGINS -->
@@ -269,6 +298,28 @@ export class ItemDetailsFormComponent {
       this.item.precioUnitario = Math.round(suggested);
       this.onUpdate.emit();
     }
+  }
+
+  getHoursValue(totalMin: number): number {
+    return Math.floor((Number(totalMin) || 0) / 60);
+  }
+
+  getMinutesRemainder(totalMin: number): number {
+    return (Number(totalMin) || 0) % 60;
+  }
+
+  updateMinutesFromHs(hs: number) {
+    const currentMin = this.getMinutesRemainder(this.item['duracion_estimada_minutos']);
+    const h = Math.max(0, Number(hs) || 0);
+    this.item['duracion_estimada_minutos'] = (h * 60) + currentMin;
+    this.onUpdate.emit();
+  }
+
+  updateMinutesFromMin(min: number) {
+    const currentHs = this.getHoursValue(this.item['duracion_estimada_minutos']);
+    const m = Math.max(0, Number(min) || 0);
+    this.item['duracion_estimada_minutos'] = (currentHs * 60) + (m % 60);
+    this.onUpdate.emit();
   }
 
   readonly icons = { Trash2, Zap, Check };

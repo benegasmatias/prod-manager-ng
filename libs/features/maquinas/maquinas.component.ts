@@ -100,15 +100,21 @@ export class MaquinasPageComponent {
   }
 
   async handleSave(data: Partial<Machine>) {
-    const payload: Partial<Machine> = {
-      ...data,
-      businessId: this.negocio()?.id,
-      active: true
-    };
-
     if (this.selectedMachineId()) {
-      await this.maquinasService.update(this.selectedMachineId()!, payload);
+      // Saneamiento de DTO para UPDATE (evitar id, createdAt, businessId, etc en el BODY)
+      const { 
+        id, createdAt, updatedAt, businessId, status, 
+        productionJobs, lastJob, isActive, active, 
+        ...cleanData 
+      } = data as any;
+
+      await this.maquinasService.update(this.selectedMachineId()!, cleanData);
     } else {
+      const payload: Partial<Machine> = {
+        ...data,
+        businessId: this.negocio()?.id,
+        active: true
+      };
       await this.maquinasService.create(payload);
     }
     this.isDialogOpen.set(false);

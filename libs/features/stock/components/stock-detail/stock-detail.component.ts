@@ -6,7 +6,6 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 import { SessionService } from '@core/session/session.service';
 import { OrderTimelineComponent } from '../../../pedidos/detalles/components/order-timeline.component';
 import { OrderItemsWidgetComponent } from '../../../pedidos/detalles/components/order-items-widget.component';
-import { OrderFilesWidgetComponent } from '../../../pedidos/detalles/components/order-files-widget.component';
 import { StockStatusModalComponent } from '../stock-status-modal/stock-status-modal.component';
 import { StockProgressFlowComponent } from './components/stock-progress-flow.component';
 
@@ -18,7 +17,6 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
     LucideAngularModule, 
     OrderTimelineComponent, 
     OrderItemsWidgetComponent, 
-    OrderFilesWidgetComponent, 
     StockProgressFlowComponent,
     StockStatusModalComponent
   ],
@@ -110,7 +108,6 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
           <app-order-items-widget [items]="pedido()!.items"></app-order-items-widget>
 
           <!-- Files Widget -->
-          <app-order-files-widget [items]="pedido()!.items || []" (downloadStatus)="downloadFile($event)"></app-order-files-widget>
 
         </div>
 

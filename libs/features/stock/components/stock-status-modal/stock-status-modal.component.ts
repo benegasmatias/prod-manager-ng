@@ -145,7 +145,12 @@ import { MaterialesApiService } from '../../../../core/api/materiales.api.servic
                   [reason]="failureReason"
                   [action]="failureAction"
                   [wastedTime]="wastedTime"
-                  [wastedMaterial]="wastedMaterial">
+                  [materialWastes]="failureMaterialWastes"
+                  [materials]="materials()"
+                  (onAddMaterial)="addFailureMaterial()"
+                  (onRemoveMaterial)="handleRemoveFailureMaterial($event)"
+                  (onMaterialChange)="handleFailureMaterialChange($event.index, $event.materialId)"
+                  (onGramsChange)="handleFailureGramsChange($event.index, $event.grams)">
                 </app-failure-module>
               }
             </div>
@@ -193,7 +198,31 @@ export class StockStatusModalComponent {
   failureReason = signal<string>('');
   failureAction = signal<'REDO' | 'DISCARD' | 'KEEP'>('REDO');
   wastedTime = signal<number>(0);
-  wastedMaterial = signal<number>(0);
+  failureMaterialWastes = signal<{ materialId: string, grams: number }[]>([]);
+
+  handleRemoveFailureMaterial(index: number) {
+    this.failureMaterialWastes.update(list => list.filter((_, i) => i !== index));
+  }
+
+  handleFailureMaterialChange(index: number, materialId: string) {
+    this.failureMaterialWastes.update(list => {
+      const newList = [...list];
+      newList[index] = { ...newList[index], materialId };
+      return newList;
+    });
+  }
+
+  handleFailureGramsChange(index: number, grams: number) {
+    this.failureMaterialWastes.update(list => {
+      const newList = [...list];
+      newList[index] = { ...newList[index], grams };
+      return newList;
+    });
+  }
+
+  addFailureMaterial() {
+    this.failureMaterialWastes.update(list => [...list, { materialId: '', grams: 0 }]);
+  }
 
   private api = inject(PedidosApiService);
   private maquinasApi = inject(MaquinasApiService);
@@ -294,19 +323,37 @@ export class StockStatusModalComponent {
     if (this.loading()) return;
     this.loading.set(true);
     try {
-      const payload: any = {
-        status: this.selectedStatus(),
-        responsableId: this.selectedOperatorId || null,
-        notes: this.notes,
-        businessId: this.session.activeNegocio()?.id
-      };
+      const bId = this.session.activeNegocio()?.id;
+      
+      if (this.selectedStatus() === 'FAILED') {
+        const wastes = this.failureMaterialWastes();
+        await this.api.reportFailure(this.order.id, {
+          businessId: bId,
+          reason: this.failureReason(),
+          action: this.failureAction(),
+          wastedGrams: wastes.reduce((acc, curr) => acc + (curr.grams || 0), 0),
+          materialWastes: wastes,
+          targetStatus: 'FAILED',
+          metadata: {
+            wastedTime: this.wastedTime()
+          }
+        });
+      } else {
+        const payload: any = {
+          status: this.selectedStatus(),
+          responsableId: this.selectedOperatorId || null,
+          notes: this.notes,
+          businessId: bId
+        };
 
-      if (this.is3D() && this.selectedMachineId()) {
-        payload.machineId = this.selectedMachineId();
-        payload.multiMaterials = this.multiMaterials();
+        if (this.is3D() && this.selectedMachineId()) {
+          payload.machineId = this.selectedMachineId();
+          payload.multiMaterials = this.multiMaterials();
+        }
+
+        await this.api.update(this.order.id, payload);
       }
 
-      const updated = await this.api.update(this.order.id, payload);
       this.onSaved.emit();
       this.close();
     } catch (error) {

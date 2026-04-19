@@ -32,7 +32,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
     FloatingCalculatorComponent
   ],
   template: `
-    <form (submit)="handleSave($event)" class="space-y-10 pb-20 relative max-w-6xl mx-auto animate-in fade-in duration-700 px-4 sm:px-6">
+    <form (submit)="handleSave($event)" class="space-y-10 pb-40 relative max-w-6xl mx-auto animate-in fade-in duration-700 px-4 sm:px-6">
       
       <!-- HEADER CONTEXTUAL -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-4">
@@ -62,7 +62,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
       </div>
 
       <!-- LAYOUT PRINCIPAL -->
-      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-3 gap-8 contents">
+      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         <!-- COLUMNA IZQUIERDA: FORMULARIO (Se extiende hacia abajo) -->
         <div class="lg:col-span-2 space-y-10">
@@ -119,11 +119,18 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
 
           <!-- SECCIÓN 2: ÍTEMS DE PRODUCCIÓN -->
           <div class="space-y-6">
-            <div class="flex items-center justify-between px-6">
-                <h2 class="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400">Canal de Configuración ({{ items().length }} ítems)</h2>
-                <button type="button" [disabled]="isSaving()" (click)="addItem()" class="h-10 px-6 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-2 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="flex items-center justify-between px-2">
+              <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Canal de Configuración ({{ items().length }} ítems)</h3>
+              <div class="flex gap-3">
+                @if (items().length > 5) {
+                  <button type="button" (click)="removeDuplicates()" class="text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg border border-rose-100 text-rose-500 hover:bg-rose-50 transition-colors">
+                    Limpiar Duplicados
+                  </button>
+                }
+                <button type="button" (click)="addItem()" class="h-10 px-6 rounded-2xl bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-lg">
                   <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nuevo Ítem
                 </button>
+              </div>
             </div>
 
             <div class="space-y-8">
@@ -144,37 +151,12 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
               }
             </div>
 
-            <!-- BOTÓN AÑADIDO ABAJO PARA FOMULARIOS LARGOS -->
-            <div class="pt-8 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 border-t border-zinc-100 dark:border-zinc-800/50">
-               <div class="flex items-center gap-2">
-                 <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Total a Cobrar</span>
-                 <span class="text-xl font-black text-zinc-900 dark:text-zinc-50">{{ totales().total | currency }}</span>
-               </div>
-               
-               <button
-                  type="submit"
-                  [disabled]="isSaving()"
-                  [class]="cn(
-                    'h-16 px-10 rounded-[2rem] text-white font-black uppercase tracking-wider text-[11px] shadow-2xl transition-all flex items-center justify-center gap-2 group relative overflow-hidden active:scale-95 whitespace-nowrap',
-                    forcedStatus === 'QUOTATION' ? 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700' : 'bg-zinc-950 shadow-zinc-950/20 hover:bg-black'
-                  )"
-                >
-                  @if (isSaving()) {
-                    <lucide-angular [img]="icons.RefreshCw" class="h-5 w-5 animate-spin"></lucide-angular>
-                  } @else {
-                    <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span class="relative z-10">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : 'Confirmar Orden' }}</span>
-                    <lucide-angular [img]="icons.CheckCircle2" class="h-4 w-4 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all relative z-10 shrink-0"></lucide-angular>
-                  }
-               </button>
-            </div>
-            
           </div>
         </div>
 
         <!-- COLUMNA DERECHA: RESUMEN (FLOTANTE STICKY) -->
-        <div class="h-full relative">
-           <div class="lg:sticky lg:top-10 space-y-8">
+        <div class="h-full relative overflow-visible">
+           <div class="sticky top-24 space-y-8">
               
               <!-- Card Resumen Premium -->
               <div class="p-10 rounded-[3rem] bg-white border border-zinc-100 shadow-2xl shadow-zinc-200/40 border-t-4 border-t-primary animate-in slide-in-from-right-10 duration-700">
@@ -184,10 +166,15 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                  </h3>
                  
                  <div class="space-y-8">
-                    <div class="flex justify-between items-center px-2">
-                       <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Items Cargados</span>
-                       <span class="text-xl font-black text-zinc-950 tabular-nums">{{ totales().unidades }}</span>
-                    </div>
+                     <div class="flex justify-between items-center px-2">
+                        <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Líneas de Pedido</span>
+                        <span class="text-xl font-black text-zinc-950 tabular-nums">{{ items().length }}</span>
+                     </div>
+
+                     <div class="flex justify-between items-center px-2">
+                        <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Unidades Totales</span>
+                        <span class="text-xl font-black text-zinc-950 tabular-nums">{{ totales().unidades }}</span>
+                     </div>
 
                     <div class="h-px bg-zinc-100 mx-2"></div>
 
@@ -225,7 +212,7 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                           <lucide-angular [img]="icons.RefreshCw" class="h-6 w-6 animate-spin"></lucide-angular>
                         } @else {
                           <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                          <span class="relative z-10 whitespace-nowrap">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : 'Confirmar Orden' }}</span>
+                          <span class="relative z-10 whitespace-nowrap">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : (id ? 'Guardar Cambios' : 'Confirmar Orden') }}</span>
                           <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all relative z-10 shrink-0"></lucide-angular>
                         }
                       </button>
@@ -240,9 +227,35 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
            </div>
         </div>
       </fieldset>
-    </form>
-    
-    <app-floating-calculator></app-floating-calculator>
+    <!-- BARRA DE ACCIÓN FLOTANTE (UX) -->
+     @if (showFloatingFooter()) {
+       <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[50] flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-700">
+          <div class="h-16 px-8 rounded-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border border-zinc-100 dark:border-zinc-800 shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex items-center gap-6">
+             <div class="flex flex-col">
+                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 leading-none mb-1">Total acumulado</span>
+                <span class="text-lg font-black text-zinc-900 dark:text-white leading-none tabular-nums">{{ totales().total | currency }}</span>
+             </div>
+             
+             <div class="w-px h-8 bg-zinc-100 dark:bg-zinc-800"></div>
+             
+             <button 
+                type="button" 
+                (click)="handleSave($event)" 
+                [disabled]="isSaving()"
+                class="h-10 px-6 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
+             >
+                @if (isSaving()) {
+                   <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4 animate-spin"></lucide-angular>
+                } @else {
+                   <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
+                   <span>{{ id ? 'Guardar' : 'Confirmar' }}</span>
+                }
+             </button>
+          </div>
+  
+          <app-floating-calculator></app-floating-calculator>
+       </div>
+     }
   `
 })
 export class OrderFormComponent implements OnDestroy {
@@ -273,6 +286,7 @@ export class OrderFormComponent implements OnDestroy {
   responsableId = '';
   observaciones = '';
   isSaving = signal(false);
+  showFloatingFooter = signal(false);
   isSaved = false;
   pendingFiles: string[] = [];
   vErrors: Record<string, string> = {};
@@ -326,7 +340,7 @@ export class OrderFormComponent implements OnDestroy {
       this.responsableId = order.responsableGeneralId || (order as any).responsableId || (order as any).operatorId || order.responsableGeneral?.id || '';
       this.observaciones = order.notes || '';
       
-      // Map Items back to form names
+      // Phase 7: Integrity Sanitization
       const mappedItems = order.items.map(it => ({
         id: it.id,
         nombreProducto: it.name || it.nombreProducto,
@@ -339,11 +353,21 @@ export class OrderFormComponent implements OnDestroy {
         duracion_estimada_minutos: it.estimatedMinutes,
         referenceImages: it.referenceImages,
         metadata: it.metadata,
-        // Spread print3d metadata if exists
         ...(it.metadata?.['print3d'] || {})
       } as any));
+
+      const sanitizedItems: any[] = [];
+      const seenItems = new Set<string>();
+
+      mappedItems.forEach(it => {
+        const fingerPrint = `${it.nombreProducto}|${it.precioUnitario}|${it.cantidad}|${it.descripcion || ''}`;
+        if (!seenItems.has(fingerPrint)) {
+          seenItems.add(fingerPrint);
+          sanitizedItems.push(it);
+        }
+      });
       
-      this.items.set(mappedItems);
+      this.items.set(sanitizedItems);
       this.recalcTotales();
     } catch (e) {
       console.error('Error loading order for editing', e);
@@ -354,6 +378,11 @@ export class OrderFormComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.cleanupFiles();
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    this.showFloatingFooter.set(window.scrollY > 400);
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -385,6 +414,19 @@ export class OrderFormComponent implements OnDestroy {
         await this.filesApi.deleteFile(path);
       } catch (e) { console.error('Cleanup error', path, e); }
     }
+  }
+
+  removeDuplicates() {
+    const prev = this.items();
+    const unique = new Map<string, any>();
+    prev.forEach(it => {
+      // Key based on content to identify duplicates
+      const key = `${it.nombreProducto}|${it.precioUnitario}|${it.cantidad}|${it.descripcion || ''}`;
+      if (!unique.has(key)) {
+        unique.set(key, it);
+      }
+    });
+    this.items.set(Array.from(unique.values()));
   }
 
   async loadEmployees() {
@@ -447,13 +489,15 @@ export class OrderFormComponent implements OnDestroy {
         priority: 4,
         responsableGeneralId: this.responsableId || undefined,
         items: this.items().map(it => ({
+          id: it.id,
           name: it.nombreProducto || 'ITEM',
           qty: Math.max(1, Math.floor(Number(it.cantidad) || 1)),
-          price: Number(it.precioUnitario) || 0,
-          deposit: Number(it.senia) || 0,
-          weightGrams: Number(it.peso_gramos) || 0,
-          estimatedMinutes: Math.floor(Number(it.duracion_estimada_minutos) || 0),
+          price: Math.max(0, Number(it.precioUnitario) || 0),
+          deposit: Math.max(0, Number(it.senia) || 0),
+          weightGrams: Math.max(0, Number(it.peso_gramos) || 0),
+          estimatedMinutes: Math.max(0, Math.floor(Number(it.duracion_estimada_minutos) || 0)),
           stlUrl: it.url_stl || '',
+          referenceImages: it.referenceImages || [],
           metadata: {
             ...it.metadata,
             ...(this.rubro() === 'IMPRESION_3D' ? {
@@ -470,13 +514,13 @@ export class OrderFormComponent implements OnDestroy {
             } : {})
           }
         })),
-        status: this.forcedStatus || (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING'),
+        status: this.forcedStatus || (this.id ? undefined : (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING')),
         totalPrice: this.totales().total,
         totalSenias: this.totales().totalSenias
       };
       
       if (this.id) {
-        delete payload.businessId;
+        // Keep businessId for role validation in guards
         delete payload.customerId;
         delete payload.priority;
         await this.api.update(this.id, payload);

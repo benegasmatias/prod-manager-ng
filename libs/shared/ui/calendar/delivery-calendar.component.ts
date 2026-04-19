@@ -38,7 +38,7 @@ interface DayWorkload {
       <div class="p-4">
         <div class="grid grid-cols-7 mb-2">
           @for (day of weekDays; track day) {
-            <span class="text-[9px] font-black uppercase text-zinc-400 text-center py-2">{{ day }}</span>
+            <span class="text-[9px] font-black uppercase text-zinc-500 dark:text-zinc-400 text-center py-2">{{ day }}</span>
           }
         </div>
 
@@ -50,19 +50,19 @@ interface DayWorkload {
               [disabled]="!day.isCurrentMonth"
               [class]="cn(
                 'relative h-10 w-full rounded-xl flex flex-col items-center justify-center transition-all group',
-                day.isCurrentMonth ? 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50' : 'opacity-20 cursor-default',
-                day.isSelected ? '!bg-primary text-white shadow-lg' : '',
-                day.isToday && !day.isSelected ? 'border border-primary/30 text-primary' : ''
+                day.isCurrentMonth ? 'hover:bg-zinc-100 dark:hover:bg-zinc-800/50' : 'opacity-10 cursor-default',
+                day.isSelected ? '!bg-primary text-white shadow-lg' : 'text-zinc-900 dark:text-zinc-100',
+                day.isToday && !day.isSelected ? 'ring-2 ring-primary/30 text-primary font-black' : ''
               )"
             >
-              <span class="text-[10px] font-bold">{{ day.date.getDate() }}</span>
+              <span class="text-[11px]">{{ day.date.getDate() }}</span>
               
               <!-- Workload Bubble -->
               @if (day.count > 0 && day.isCurrentMonth) {
                 <div 
                   [class]="cn(
-                    'absolute -top-1 -right-1 h-4 min-w-[1rem] px-1 rounded-full flex items-center justify-center text-[8px] font-black border-2 border-white dark:border-zinc-900 shadow-sm',
-                    day.isSelected ? 'bg-white text-primary' : 'bg-secondary text-white'
+                    'absolute -top-1 -right-1 h-[18px] min-w-[18px] px-1 rounded-full flex items-center justify-center text-[9px] font-black border-2 border-white dark:border-zinc-900 shadow-sm z-20',
+                    day.isSelected ? 'bg-white text-primary' : 'bg-primary text-white'
                   )"
                 >
                   {{ day.count }}

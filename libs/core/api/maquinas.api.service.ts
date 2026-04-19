@@ -55,7 +55,7 @@ export class MaquinasApiService {
 
   async release(machineId: string, businessId: string): Promise<void> {
     await firstValueFrom(
-      this.http.post<void>(API_ENDPOINTS.MACHINES.RELEASE(machineId), { businessId })
+      this.http.post<void>(API_ENDPOINTS.MACHINES.RELEASE(machineId), null, { params: { businessId } })
     );
   }
 }
