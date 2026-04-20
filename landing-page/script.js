@@ -49,9 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Pricing Logic
     const FALLBACK_PLANS = [
-        { name: 'Gratis', price: 0, desc: 'Para empezar', items: ['15 pedidos / mes', '1 negocio', '1 usuario'], recommended: false },
-        { name: 'Pro', price: 10990, desc: 'Para crecer', items: ['50 pedidos / mes', '1 negocio', '5 usuarios'], recommended: true },
-        { name: 'Business', price: 22900, desc: 'Para escalar', items: ['Ilimitado', '1 negocio', 'Ilimitado'], recommended: false }
+        { name: 'Prueba Gratis', price: 0, desc: '1 Mes de regalo', items: ['15 pedidos / mes', '1 negocio', '1 usuario'], recommended: false },
+        { name: 'Pro', price: 10990, desc: 'Para crecer', items: ['50 pedidos / mes', '1 negocio', '3 usuarios'], recommended: true },
+        { name: 'Business', price: 29900, desc: 'Para escalar', items: ['500 pedidos / mes', '1 negocio', '7 usuarios', 'Soporte prioritario'], recommended: false }
     ];
 
     function renderPlans(plans) {
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </li>
                     `).join('')}
                 </ul>
-                <a href="/register" class="block text-center py-3 rounded-xl ${plan.recommended ? 'bg-violet-600 text-white' : 'border border-zinc-700 text-white'} font-bold">
+                <a href="https://app.prodmanager.com.ar/register" class="block text-center py-3 rounded-xl ${plan.recommended ? 'bg-violet-600 text-white' : 'border border-zinc-700 text-white'} font-bold">
                     Comenzar
                 </a>
             </div>
@@ -81,8 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     }
 
-    // Fetch from API or use Fallback
-    // API configuration: use production domain or localhost fallback
+    // Forzado a usar planes locales para que coincidan con la Landing
+    renderPlans(FALLBACK_PLANS);
+
+    /* 
     const API_URL = window.location.hostname.includes('prodmanager.com.ar')
         ? 'https://api.prodmanager.com.ar'
         : 'http://localhost:3030';
@@ -102,4 +104,5 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(() => renderPlans(FALLBACK_PLANS));
+    */
 });
