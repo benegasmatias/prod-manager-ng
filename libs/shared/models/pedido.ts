@@ -12,6 +12,7 @@ export enum OrderItemStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   READY = 'READY',
   DONE = 'DONE',
+  IN_STOCK = 'IN_STOCK',
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED'
 }
@@ -73,6 +74,8 @@ export interface ItemPedido {
   precioUnitario?: number; // Legacy compatibility
   senia: number;
   stlUrl?: string;
+  link?: string; // External reference link
+  url_stl?: string; // 3D specific legacy
   weightGrams?: number;
   estimatedMinutes?: number;
   deposit?: number;
@@ -87,6 +90,7 @@ export interface ItemPedido {
   // Phase 6.1: Industrial Data
   status: OrderItemStatus;
   job?: ProductionJob;
+  productionJob?: ProductionJob;
 }
 
 export interface Pedido {

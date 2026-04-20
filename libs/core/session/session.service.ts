@@ -2,8 +2,10 @@ import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { ApiService } from '../api/api.service';
 import { AuthService } from '../auth/auth.service';
 import { CacheService } from '../cache/cache.service';
-import { Negocio, Rubro, NegocioConfig } from '../../shared/models';
+import { Negocio, Rubro, NegocioConfig, UserProfile, BusinessConfig } from '../../shared/models';
 import { BusinessContextService } from './business-context.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, take, firstValueFrom } from 'rxjs';
 import { getNegocioConfig, mapCategoryToRubro } from '../../shared/utils';
 import { STORAGE_KEYS, APP_CONFIG } from '../../shared/constants';
 
@@ -16,20 +18,32 @@ export class SessionService {
   private cache = inject(CacheService);
   private context = inject(BusinessContextService);
 
+  // Signals for holding state
+  private _user = signal<UserProfile | null>(null);
+  user = computed(() => this._user());
+
   private _negocios = signal<Negocio[]>([]);
   negocios = computed(() => this._negocios());
 
-  private _activeId = signal<string | null>(localStorage.getItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID));
+  private _activeId = signal<string | null>(null);
   activeId = computed(() => this._activeId());
 
-  // El negocio activo es computado basado en la lista y el ID actual
-  activeNegocio = computed<Negocio | null>(() => 
-    this._negocios().find(n => n.id === this._activeId()) || this._negocios()[0] || null
-  );
+  // New Dynamic Module Config
+  businessConfig = signal<BusinessConfig | null>(null);
 
-  // La configuración se deriva dinámicamente del rubro del negocio activo
+  activeNegocio = computed(() => {
+    const id = this._activeId();
+    if (!id) return null;
+    return this._negocios().find(n => n.id === id) || null;
+  });
+
+  isInitialized = signal(false);
+  private isInitializing = false;
+  private initPromise: Promise<void> | null = null;
+
+  // La configuración se extrae del businessConfig dinámico si existe, sino cae al local
   config = computed<NegocioConfig>(() => 
-    getNegocioConfig(this.activeNegocio()?.rubro || APP_CONFIG.DEFAULT_RUBRO)
+    this.businessConfig()?.config || getNegocioConfig(this.activeNegocio()?.rubro || APP_CONFIG.DEFAULT_RUBRO)
   );
 
   // Rubro del negocio activo para fácil acceso
@@ -45,182 +59,244 @@ export class SessionService {
     return this.activeCapabilities().includes(capability);
   }
 
-  isInitialized = signal(false);
-  private initResolver: (() => void) | null = null;
-  private initPromise = new Promise<void>((resolve) => {
-    this.initResolver = resolve;
-  });
-
   private lastUserId: string | null = null;
 
-  /**
-   * Returns a promise that resolves when the session is fully initialized.
-   * Useful for guards that need to wait on refresh.
-   */
-  async waitUntilInitialized(): Promise<void> {
-    if (this.isInitialized()) return;
-    return this.initPromise;
-  }
-
-  private setInitialized(val: boolean) {
-    this.isInitialized.set(val);
-    if (val && this.initResolver) {
-      this.initResolver();
-    }
-  }
-
-  // Helper to reboot the promise (e.g. on logout/login of different user)
-  private resetInitState() {
-    this.isInitialized.set(false);
-    this.initPromise = new Promise<void>((resolve) => {
-      this.initResolver = resolve;
-    });
-  }
-
   constructor() {
-    console.log('[SessionService] Constructor started');
-    // Sincronización inicial del contexto atómico para el caché
-    this.context.setBusinessId(this._activeId());
-    // Reaccionar al cambio de sesión
+    // Reaccionar al cambio de sesión de forma proactiva
     effect(() => {
       const session = this.auth.session();
-      console.log('[SessionService] Session changed:', !!session);
       if (session) {
-        // Solo inicializar si el usuario cambió o si no está inicializado
         if (this.lastUserId !== session.user.id) {
+          console.log('[SessionService] Session changed from', this.lastUserId, 'to', session.user.id);
+          this.clearSession(); // Wipe before re-init
           this.lastUserId = session.user.id;
-          this.resetInitState(); // Reset initialization state for new user
           this.initialize();
         }
       } else {
-        this.lastUserId = null;
-        this._negocios.set([]);
-        this._activeId.set(null);
-        this.context.setBusinessId(null);
-        this.setInitialized(true);
+        this.clearSession();
       }
     });
   }
 
-  private resolveDefaultCapabilities(rubro: Rubro, existing: string[]): string[] {
-    const caps = new Set(existing);
-    if (rubro === 'KIOSCO') {
-      caps.add('RETAIL');
-    } else if (['IMPRESION_3D', 'METALURGICA', 'CARPINTERIA'].includes(rubro)) {
-      caps.add('PRODUCTION');
+  /**
+   * Returns a promise that resolves when the session is fully initialized.
+   * Useful for guards. If already initialized, it returns immediately.
+   */
+  async waitUntilInitialized(): Promise<void> {
+    if (this.isInitialized()) return;
+    
+    // If not initialized but we have a session, call initialize() which handles deduplication
+    const session = this.auth.session();
+    if (session) {
+      await this.initialize();
+      return;
     }
-    return Array.from(caps);
+    
+    // If no session, wait a bit for signals to resolve or just return if we are sure
+    // We already have a computed/signal system, so firstValueFrom on isInitialized is a good fallback
+    await firstValueFrom(
+      toObservable(this.isInitialized).pipe(
+        filter(init => init === true),
+        take(1)
+      )
+    );
   }
 
-  public async initialize() {
-    console.log('[SessionService] Initializing...');
-    try {
-      const data = await this.api.businesses.getAll();
-      console.log('[SessionService] Fetched businesses:', data?.length);
-      const mapped: Negocio[] = (data || []).map((b: any) => ({
-          id: b.id,
-          nombre: b.name,
-          rubro: mapCategoryToRubro(b.category),
-          moneda: b.currency || APP_CONFIG.DEFAULT_CURRENCY,
-          status: b.status,
-          subscriptionExpiresAt: b.subscriptionExpiresAt,
-          createdAt: b.createdAt,
-          userRole: b.userRole,
-          capabilities: this.resolveDefaultCapabilities(mapCategoryToRubro(b.category), b.capabilities || [])
-      }));
+  private clearSession() {
+    console.log('[SessionService] Clearing session');
+    this.lastUserId = null;
+    this._user.set(null);
+    this._negocios.set([]);
+    this._activeId.set(null);
+    this.isInitialized.set(false);
+    this.businessConfig.set(null);
+    this.initPromise = null;
+    this.isInitializing = false;
+    this.cache.clearAll();
+  }
 
-      this._negocios.set(mapped);
+  /**
+   * Main initialization logic. 
+   * Fetches user profile, businesses, and selects the active business.
+   */
+  public async initialize(): Promise<void> {
+    const session = this.auth.session();
+    
+    // Safety: if no session, we can't initialize
+    if (!session) {
+       this.clearSession();
+       return;
+    }
 
-      // Si no tenemos ID activo, intentamos obtener el perfil del usuario
-      if (!this._activeId()) {
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+
+    this.initPromise = (async () => {
+      console.log('[SessionService] Starting initialization...');
+      this.isInitializing = true;
+      this.isInitialized.set(false);
+
+      try {
+        // 1. Fetch Profile
         const profile = await this.api.users.getMe();
-        const defaultId = profile?.defaultBusinessId;
-        
-        if (defaultId && mapped.find(n => n.id === defaultId)) {
-          this.setActiveId(defaultId);
-        } else if (mapped.length === 1) {
-          // Si solo hay uno, lo seteamos automáticamente
-          this.setActiveId(mapped[0].id);
+        console.log('[SessionService] Profile loaded:', profile.email);
+        this._user.set(profile);
+
+        // 2. Fetch Businesses
+        const businesses = await this.api.businesses.getAll();
+        console.log('[SessionService] Businesses loaded:', businesses.length);
+        const mapped: Negocio[] = businesses.map(b => {
+          const rubro = mapCategoryToRubro(b.category || b.rubro);
+          return {
+            id: b.id,
+            nombre: b.name || b.nombre,
+            rubro: rubro,
+            moneda: b.currency || b.moneda || APP_CONFIG.DEFAULT_CURRENCY,
+            status: b.status,
+            phone: b.phone,
+            email: b.email,
+            subscriptionExpiresAt: b.subscriptionExpiresAt,
+            createdAt: b.createdAt,
+            userRole: b.userRole,
+            capabilities: this.resolveCapabilities(rubro, b.capabilities || []),
+            config: getNegocioConfig(rubro)
+          };
+        });
+        this._negocios.set(mapped);
+
+        // 3. Selection Logic
+        let activeId = localStorage.getItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID);
+
+        // Validate stored ID exists in fetched list
+        if (activeId && !mapped.some(n => n.id === activeId)) {
+          activeId = null;
+          localStorage.removeItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID);
         }
-        // Si hay más de uno y no hay default, el BusinessGuard se encargará de redirigir
+
+        // Auto-select if none selected
+        if (!activeId) {
+          if (profile.defaultBusinessId && mapped.some(n => n.id === profile.defaultBusinessId)) {
+            activeId = profile.defaultBusinessId;
+          } else if (mapped.length === 1) {
+            activeId = mapped[0].id;
+          }
+        }
+
+        if (activeId) {
+          await this.setActiveId(activeId);
+        }
+
+        this.isInitialized.set(true);
+        console.log('[SessionService] Initialization complete');
+      } catch (error) {
+        console.error('[SessionService] Initialization failed:', error);
+        // We still set initialized to true to unblock guards, even if failed
+        // Routing logic will handle missing data (e.g. redirecting to login)
+        this.isInitialized.set(true);
+      } finally {
+        this.isInitializing = false;
       }
+    })();
 
-      console.log('[SessionService] Initialized successful');
-      this.setInitialized(true);
-    } catch (error) {
-      console.error('[SessionService] Initialization error:', error);
-      this.setInitialized(true);
-    }
+    return this.initPromise;
   }
 
-  setActiveId(id: string) {
-    this._activeId.set(id);
-    localStorage.setItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID, id);
-    this.context.setBusinessId(id);
-    this.cache.clearAll(); // Limpieza total al cambiar de contexto
-    // Intentar persistir en el servidor en background
-    this.api.users.setDefaultBusiness(id).catch(() => {});
+  /**
+   * Determines the best route after login based on current state.
+   */
+  public getPostLoginRedirect(returnUrl: string = '/dashboard'): string {
+    const user = this._user();
+    if (!user) return '/login';
+
+    // 1. Super Admin Priority
+    if (user.globalRole === 'SUPER_ADMIN') {
+      return '/admin';
+    }
+
+    // 2. Restricted Users
+    if (user.status === 'BLOCKED') {
+      return '/login?error=ACCOUNT_BLOCKED';
+    }
+
+    if (user.status === 'PENDING') {
+      return '/waiting-room';
+    }
+
+    // 3. Active User Logic
+    const businesses = this._negocios();
+    const active = this.activeNegocio();
+
+    if (businesses.length === 0) {
+      return '/onboarding';
+    }
+
+    if (active) {
+      // If we have a returnUrl that isn't login/onboarding, respect it
+      if (returnUrl && returnUrl !== '/' && returnUrl !== '/login' && returnUrl !== '/onboarding') {
+        return returnUrl;
+      }
+      return '/dashboard';
+    }
+
+    return '/select-business';
   }
 
-  async addNegocio(nombre: string, rubro: Rubro) {
-    try {
-      const b = await this.api.businesses.create({ name: nombre, templateKey: rubro });
-      const newNegocio: Negocio = {
-        id: b.businessId,
-        nombre: nombre,
-        rubro: rubro,
-        moneda: 'ARS',
-        status: b.status,
-        subscriptionExpiresAt: b.subscriptionExpiresAt,
-        createdAt: new Date().toISOString(),
-        userRole: 'OWNER'
-      };
-      this._negocios.update(list => [...list, newNegocio]);
-      this.setActiveId(newNegocio.id);
-      return newNegocio;
-    } catch (error) {
-      console.error('[SessionService] Error adding business:', error);
-      throw error;
-    }
+  private resolveCapabilities(rubro: Rubro, existing: string[]): string[] {
+    // Return existing from DB as is, no hardcoded injections
+    return Array.from(new Set(existing || []));
   }
 
-  async updateNegocio(id: string, updates: Partial<Negocio>) {
-    try {
-      const b = await this.api.businesses.update(id, {
-        name: updates.nombre,
-        category: updates.rubro,
-        currency: updates.moneda
-      });
-      this._negocios.update(list => list.map(n => n.id === id ? {
-        ...n,
-        nombre: b.name,
-        rubro: mapCategoryToRubro(b.category),
-        moneda: b.currency
-      } : n));
-    } catch (error) {
-      console.error('[SessionService] Error updating business:', error);
-      throw error;
-    }
+  async addNegocio(name: string, templateKey: string, phone?: string, email?: string) {
+    const newBusiness = await this.api.businesses.create({ 
+      name, 
+      templateKey,
+      ...(phone && { phone }),
+      ...(email && { email })
+    });
+    await this.initialize();
+    return newBusiness;
+  }
+
+  async updateNegocio(id: string, data: any) {
+    const updated = await this.api.businesses.update(id, data);
+    await this.initialize();
+    return updated;
   }
 
   async removeNegocio(id: string) {
+    await this.api.businesses.delete(id);
+    if (this._activeId() === id) {
+      this._activeId.set(null);
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID);
+    }
+    await this.initialize();
+  }
+
+  async setActiveId(id: string) {
+    this._activeId.set(id);
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID, id);
+    this.context.setBusinessId(id);
+    this.cache.clearAll();
+    
+    // Load dynamic config for the selected business
+    await this.loadBusinessConfig(id);
+    
+    // Only update default in server if it actually changed to save traffic
+    const userProfile = this._user();
+    if (userProfile && userProfile.defaultBusinessId !== id) {
+       this.api.users.setDefaultBusiness(id).catch(() => {});
+    }
+  }
+
+  private async loadBusinessConfig(id: string) {
     try {
-      await this.api.businesses.delete(id);
-      this._negocios.update(list => list.filter(n => n.id !== id));
-      
-      const currentList = this._negocios();
-      if (this.activeId() === id) {
-          if (currentList.length > 0) {
-            this.setActiveId(currentList[0].id);
-          } else {
-            this._activeId.set(null);
-            this.context.setBusinessId(null);
-            localStorage.removeItem(STORAGE_KEYS.ACTIVE_BUSINESS_ID);
-          }
-      }
+      const resp = await this.api.businesses.getConfig(id);
+      this.businessConfig.set(resp);
+      console.log('[SessionService] Business Config loaded. Sidebar items:', resp.config?.sidebarItems?.length);
     } catch (error) {
-      console.error('[SessionService] Error removing business:', error);
-      throw error;
+      console.error('[SessionService] Failed to load business config:', error);
+      this.businessConfig.set(null);
     }
   }
 }

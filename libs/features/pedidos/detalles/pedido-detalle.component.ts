@@ -39,6 +39,7 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
           <app-stock-detail 
             [pedido]="pedido()" 
             (onSaved)="loadData()"
+            (onEdit)="handleEdit()"
             (onDelete)="handleDelete()">
           </app-stock-detail>
         } @else {

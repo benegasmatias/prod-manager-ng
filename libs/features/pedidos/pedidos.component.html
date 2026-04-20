@@ -49,7 +49,7 @@
     </div>
 
     <div
-      class="bg-white/50 dark:bg-zinc-950/20 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-3 sm:p-6 backdrop-blur-sm relative min-h-[200px] overflow-hidden">
+      class="bg-white/50 dark:bg-zinc-950/20 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-3 sm:p-6 pb-24 sm:pb-32 backdrop-blur-sm relative min-h-[200px]">
       @if (loadingCommercial()) {
       <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
       }
@@ -103,7 +103,7 @@
     </div>
     } @else if (productionTotal() > 0) {
     <div
-      class="bg-white/50 dark:bg-zinc-950/20 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-3 sm:p-6 backdrop-blur-sm relative min-h-[200px] overflow-hidden">
+      class="bg-white/50 dark:bg-zinc-950/20 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-3 sm:p-6 pb-24 sm:pb-32 backdrop-blur-sm relative min-h-[200px]">
       @if (loadingProduction()) {
       <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
       }
@@ -134,10 +134,8 @@
     </div>
     }
   </div>
-
+  
   <!-- History Section -->
-  @if (archivedTotal() > 0 && (estadoFilter() === 'all' || estadoFilter() === 'DELIVERED' || estadoFilter() ===
-  'CANCELLED')) {
   <div class="pt-8 sm:pt-12 space-y-4 sm:space-y-6">
     <div class="flex items-center gap-4 px-2">
       <div class="flex items-center gap-3">
@@ -145,37 +143,60 @@
         <h2
           class="text-xs sm:text-sm font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-wide leading-none">
           {{ labels.HISTORY_SECTION }}
-          <span class="text-[9px] font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{
-            archivedTotal() }}</span>
+          @if (archivedTotal() > 0) {
+            <span class="text-[9px] font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">{{
+              archivedTotal() }}</span>
+          }
         </h2>
       </div>
       <div class="h-[1px] flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
       <p class="text-[9px] font-black text-zinc-400 uppercase tracking-widest hidden sm:block">{{
         labels.HISTORY_SUBTITLE }}</p>
     </div>
-    <div
-      class="bg-white/30 dark:bg-zinc-950/10 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-3 sm:p-6 backdrop-blur-[2px] relative min-h-[200px] overflow-hidden">
-      @if (loadingArchived()) {
-      <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
-      }
-      <app-orders-table [orders]="sortedArchived()" [sortKey]="sortKey()" [sortDir]="sortDir()" [hideTypeColumn]="true"
-        [hideUrgency]="true" [hideDelivery]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
-        (viewClick)="goToDetail($event)" (deleteClick)="handleDelete($event)"></app-orders-table>
 
+    <!-- Lazy Load Trigger & Loading Feedback -->
+    @if (!archivedLoaded() && !loadingArchived()) {
+       <div #historyTrigger class="h-24 w-full flex flex-col items-center justify-center gap-3 opacity-40 py-8">
+          <app-loading-spinner [overlay]="false" message=""></app-loading-spinner>
+          <span class="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400">Cargando Historial...</span>
+       </div>
+    }
+
+    @if (loadingArchived() || archivedTotal() > 0) {
       <div
-        class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
-        <app-page-size-selector [pageSize]="pageSize"
-          (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
-        <div class="flex-1 w-full">
-          <app-paginator [totalItems]="archivedTotal()" [pageSize]="pageSize" [currentPage]="archivedPage()"
-            (pageChange)="onArchivedPageChange($event)"></app-paginator>
-        </div>
-      </div>
-    </div>
-  </div>
-  }
+        class="bg-white/30 dark:bg-zinc-950/10 rounded-3xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 p-3 sm:p-6 pb-24 sm:pb-32 backdrop-blur-[2px] relative min-h-[200px]">
+        
+        @if (loadingArchived()) {
+          <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
+          
+          <!-- Skeleton Shimmer -->
+          <div class="space-y-4 animate-pulse">
+            <div class="h-20 bg-zinc-100/50 dark:bg-zinc-800/30 rounded-2xl"></div>
+            <div class="h-20 bg-zinc-100/50 dark:bg-zinc-800/30 rounded-2xl"></div>
+          </div>
+        }
 
-  <app-order-status-modal [order]="selectedOrder()" [isOpen]="isModalOpen()" [employees]="employees()"
-    (onClose)="isModalOpen.set(false)" (onSave)="loadData()"></app-order-status-modal>
+        @if (archivedOrdersData().length > 0) {
+          <app-orders-table [orders]="sortedArchived()" [sortKey]="sortKey()" [sortDir]="sortDir()" [hideTypeColumn]="true"
+            [hideUrgency]="true" [hideDelivery]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
+            (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
+            (viewClick)="goToDetail($event)" (deleteClick)="handleDelete($event)"></app-orders-table>
+    
+          <div
+            class="mt-4 border-t border-zinc-100 dark:border-zinc-800/50 pt-4 pb-2 px-2 flex flex-col sm:flex-row items-center gap-4">
+            <app-page-size-selector [pageSize]="pageSize"
+              (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
+            <div class="flex-1 w-full">
+              <app-paginator [totalItems]="archivedTotal()" [pageSize]="pageSize" [currentPage]="archivedPage()"
+                (pageChange)="onArchivedPageChange($event)"></app-paginator>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
 </app-page-shell>
+
+<app-order-status-modal [order]="selectedOrder()" [isOpen]="isModalOpen()" [employees]="employees()"
+  (onClose)="isModalOpen.set(false)" (onSave)="loadData()"></app-order-status-modal>

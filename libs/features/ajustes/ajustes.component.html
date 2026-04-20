@@ -29,14 +29,48 @@
       </div>
       
       <div class="p-8 space-y-8">
-        <div class="grid gap-3">
-          <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Nombre de Fantasía</label>
-          <input
-            [ngModel]="nombre()"
-            (ngModelChange)="nombre.set($event)"
-            class="w-full max-w-md h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 outline-hidden"
-            placeholder="Ej: Mi Taller 3D"
-          />
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="grid gap-3 md:col-span-2">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Nombre de Fantasía</label>
+            <input
+              [ngModel]="nombre()"
+              (ngModelChange)="nombre.set($event)"
+              class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 outline-hidden"
+              placeholder="Ej: Mi Taller 3D"
+            />
+          </div>
+
+          <div class="grid gap-3">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Email del Negocio</label>
+            <div class="relative group">
+               <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                  <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
+               </div>
+               <input
+                type="email"
+                [ngModel]="email()"
+                (ngModelChange)="email.set($event)"
+                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-12 pr-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 outline-hidden"
+                placeholder="contacto@empresa.com"
+              />
+            </div>
+          </div>
+
+          <div class="grid gap-3">
+            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Teléfono del Negocio</label>
+            <div class="relative group">
+               <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                  <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
+               </div>
+               <input
+                type="text"
+                [ngModel]="phone()"
+                (ngModelChange)="phone.set($event)"
+                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-12 pr-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 outline-hidden"
+                placeholder="+54 264 ..."
+              />
+            </div>
+          </div>
         </div>
 
         @if (negocioActivo(); as negocio) {

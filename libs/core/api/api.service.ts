@@ -45,6 +45,7 @@ export class ApiService {
     getAll: () => this.request<any[]>('GET', API_ENDPOINTS.BUSINESSES.LIST),
     getTemplates: () => this.request<any[]>('GET', API_ENDPOINTS.BUSINESSES.TEMPLATES),
     getOne: (id: string) => this.request<any>('GET', API_ENDPOINTS.BUSINESSES.ONE(id)),
+    getConfig: (id: string) => this.request<any>('GET', API_ENDPOINTS.BUSINESSES.CONFIG(id)),
     getDashboardSummary: (id: string, context?: any) => this.request<DashboardSummary>('GET', API_ENDPOINTS.BUSINESSES.DASHBOARD(id), null, context),
     create: (data: any) => this.request<any>('POST', API_ENDPOINTS.BUSINESSES.LIST, data),
     activate: (id: string) => this.request<any>('POST', `${API_ENDPOINTS.BUSINESSES.LIST}/${id}/activate`),

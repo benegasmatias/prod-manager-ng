@@ -1,0 +1,348 @@
+<div *ngIf="isOpen()" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-300">
+  
+  <!-- Backdrop con efecto Blur profundo -->
+  <div 
+    class="absolute inset-0 bg-black/40 backdrop-blur-md cursor-pointer"
+    (click)="onClose.emit()">
+  </div>
+
+  <!-- Contenedor del Modal: Match Pedidos UI (max-w-[680px]) -->
+  <div class="relative w-full max-w-[680px] max-h-[90vh] sm:max-h-[88vh] bg-white dark:bg-zinc-950 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+    
+    <!-- Bloqueo Global de Operaciones -->
+    @if (loading()) {
+      <div class="absolute inset-0 z-[110] bg-white/40 dark:bg-black/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
+        <div class="flex flex-col items-center gap-4">
+          <div class="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-lg shadow-primary/20"></div>
+          <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Sincronizando...</span>
+        </div>
+      </div>
+    }
+
+    <!-- HEADER: Match Pedidos UI -->
+    <header class="px-6 py-5 sm:px-8 border-b border-zinc-100 dark:border-zinc-900 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-950">
+      <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+        <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+          <lucide-angular [img]="icons.Gauge" class="h-6 w-6"></lucide-angular>
+        </div>
+        <div class="min-w-0">
+          <h2 class="text-base sm:text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight truncate uppercase">
+            Control de Lote <span class="text-primary">#{{ order().code }}</span>
+          </h2>
+          <p class="text-[10px] sm:text-[11px] font-black text-zinc-400 uppercase tracking-widest truncate mt-0.5">
+            {{ statusLabelHelper(order().status, rubro(), 'STOCK') }}
+          </p>
+        </div>
+      </div>
+
+      <button (click)="close()" 
+        class="p-2 sm:p-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shrink-0 ml-3">
+        <lucide-angular [img]="icons.X" class="h-5 w-5 text-zinc-500"></lucide-angular>
+      </button>
+    </header>
+
+    <!-- BODY: Match Pedidos UI (Internal Scrolling) -->
+    <main class="flex-1 min-h-0 overflow-y-auto p-5 sm:p-8 space-y-6 custom-scrollbar bg-zinc-50/30 dark:bg-zinc-950/50">
+
+      <!-- 1. Stepper Circular (Match Pedidos UI) -->
+      <section class="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col gap-4">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-[9px] font-black tracking-widest text-zinc-400 uppercase">Estado General del Lote</span>
+          <span class="text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-primary/5 border border-primary/10">Manufactura Activa</span>
+        </div>
+
+        <div class="relative flex items-center justify-between px-4 sm:px-10 mb-2 overflow-x-auto sm:overflow-x-visible hide-scrollbar py-4">
+          @for (stage of GLOBAL_STAGES; track stage.key; let i = $index) {
+            <!-- Connection Line -->
+            @if (i > 0) {
+              <div class="absolute h-[2px] transition-all duration-500 ease-in-out"
+                [style.left.%]="((100 / GLOBAL_STAGES.length) * (i - 1)) + (100 / (GLOBAL_STAGES.length * 2))"
+                [style.width.%]="100 / GLOBAL_STAGES.length"
+                [class]="i <= currentGlobalStep() ? 'bg-primary' : 'bg-zinc-100 dark:bg-zinc-800'"
+                style="top: 36px; z-index: 0;">
+              </div>
+            }
+
+            <!-- Step Node -->
+            <div class="relative z-10 flex flex-col items-center gap-3 transition-all duration-300"
+              [style.flex-basis.%]="100 / GLOBAL_STAGES.length">
+              
+              <div [class]="cn(
+                'h-11 w-11 rounded-full flex items-center justify-center transition-all duration-500 border-2',
+                i < currentGlobalStep() ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-90' :
+                i === currentGlobalStep() ? 'bg-white dark:bg-zinc-950 border-primary text-primary shadow-xl shadow-primary/10 scale-110' :
+                'bg-white dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 text-zinc-300'
+              )">
+                @if (i < currentGlobalStep()) {
+                  <lucide-angular [img]="icons.Check" class="h-5 w-5"></lucide-angular>
+                } @else {
+                  <lucide-angular [img]="getIcon(stage.icon)" class="h-5 w-5"></lucide-angular>
+                }
+              </div>
+
+              <div class="flex flex-col items-center">
+                <span [class]="cn(
+                  'text-[9px] font-black uppercase tracking-widest transition-colors duration-300',
+                  i <= currentGlobalStep() ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400'
+                )">{{ stage.label }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- 2. Manifiesto Táctico (Exact Match con Desglose de Ítems) -->
+      @if (order().items && order().items.length > 0) {
+        <section class="space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase leading-none italic">Gestión de Manufactura</span>
+            <span class="text-[10px] font-bold text-zinc-400 px-2 py-0.5 rounded-md bg-zinc-100/50 dark:bg-zinc-800/50">{{ order().items.length }} ítems</span>
+          </div>
+
+          <div class="space-y-2.5">
+            @for (item of order().items; track item.id) {
+              <div [class]="cn(
+                'flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] border transition-all duration-300 gap-4',
+                item.status === 'DONE' || item.status === 'IN_STOCK' ? 'bg-zinc-50/50 dark:bg-zinc-900/30 opacity-70 border-zinc-100 dark:border-zinc-800' : 'bg-white dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 shadow-sm',
+                ['IN_PROGRESS', 'PRINTING'].includes(item.status || '') && 'border-primary/20 bg-primary/5 ring-1 ring-primary/10 shadow-md'
+              )">
+                <div class="flex items-center gap-4 min-w-0">
+                  <!-- Icono de Ítem -->
+                  <div [class]="cn(
+                    'h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-zinc-100 dark:border-zinc-800 transition-all',
+                    ['IN_PROGRESS', 'PRINTING'].includes(item.status || '') ? 'bg-amber-500 text-white' : 
+                    (item.status === 'DONE' || item.status === 'IN_STOCK') ? 'bg-emerald-500 text-white' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300'
+                  )">
+                    <lucide-angular [img]="
+                      ['IN_PROGRESS', 'PRINTING'].includes(item.status || '') ? icons.Cpu : 
+                      (item.status === 'DONE' || item.status === 'IN_STOCK') ? icons.Check : icons.Layers
+                    " class="h-5 w-5 sm:h-6 sm:w-6"></lucide-angular>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <p class="text-sm font-black text-zinc-900 dark:text-zinc-50 truncate hover:text-primary transition-colors cursor-default uppercase tracking-tight">
+                        {{ item.name || item.nombreProducto }}
+                      </p>
+                      @if (item.link || item.url_stl || item.stlUrl) {
+                        <a [href]="item.link || item.url_stl || item.stlUrl" target="_blank" class="p-1.5 rounded-lg text-zinc-400 hover:text-primary hover:bg-primary/10 transition-all active:scale-95 flex items-center justify-center translate-y-[-1px]" title="Ver referencia externa">
+                          <lucide-angular [img]="icons.ExternalLink" class="h-3.5 w-3.5"></lucide-angular>
+                        </a>
+                      }
+                      <!-- STATUS PILL (Match Pedidos) -->
+                      <span [class]="cn(
+                        'text-[8px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border',
+                        item.status === 'IN_PROGRESS' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 
+                        (item.status === 'DONE' || item.status === 'IN_STOCK') ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' :
+                        'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                      )">
+                        {{ statusLabelHelper(item.status || 'PENDING', rubro(), 'STOCK') }}
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                       <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Cant: {{ item.qty || item.cantidad }}</span>
+                       <span class="text-zinc-200 dark:text-zinc-800 text-xs">•</span>
+                       <div class="flex items-center gap-2">
+                          <span class="text-[10px] font-black text-zinc-500 uppercase tracking-tighter">{{ item.weightGrams || 0 }}g</span>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  @if (updatingItemIds().has(item.id)) {
+                    <div class="flex items-center gap-2 text-zinc-400 px-4">
+                      <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4 animate-spin"></lucide-angular>
+                    </div>
+                  } @else if (itemToAssignId() === item.id) {
+                    <!-- Inline Assignation View (Refined & Responsive) - Match Pedidos UI -->
+                    <div class="flex flex-col items-stretch gap-2 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 p-3 rounded-[1.5rem] w-full max-w-[320px] ml-auto animate-in slide-in-from-right-2 duration-300">
+                        <div class="space-y-2">
+                          <!-- Machine Selector -->
+                          <div class="relative">
+                            @if (machines().length === 0) {
+                              <div class="h-10 w-full px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 flex items-center gap-3 animate-pulse">
+                                <div class="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Buscando...</span>
+                              </div>
+                            } @else {
+                              <select [ngModel]="selectedMachineIdForItem()" 
+                                      (ngModelChange)="selectedMachineIdForItem.set($event)"
+                                      class="h-10 w-full pl-4 pr-10 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-[10px] font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-300 focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all appearance-none cursor-pointer">
+                                  <option value="">Selecciona Unidad</option>
+                                  @for (m of machines(); track m.id) {
+                                    <option [value]="m.id" [disabled]="m.status !== 'IDLE'">
+                                       {{m.name}} {{ m.status !== 'IDLE' ? '(OCUPADA)' : '' }}
+                                    </option>
+                                  }
+                              </select>
+                              <lucide-angular [img]="icons.ChevronDown" class="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none"></lucide-angular>
+                            }
+                          </div>
+
+                          @if (is3D() && selectedMachineIdForItem()) {
+                            <div class="space-y-2 animate-in fade-in zoom-in-95 duration-300 relative z-20">
+                              @for (assignment of filamentAssignments(); track $index) {
+                                <div class="grid grid-cols-[1fr,80px,36px] gap-1.5 items-center">
+                                  <!-- Filament Selector -->
+                                  <div class="relative">
+                                     <app-material-selector
+                                       [materials]="materials()"
+                                       [selectedId]="assignment.materialId"
+                                       (selectChange)="updateFilamentAssignment($index, { materialId: $event })"
+                                     ></app-material-selector>
+                                  </div>
+                                  
+                                  <!-- Grams Input -->
+                                  <div class="relative flex items-center">
+                                    <input type="number" 
+                                           [ngModel]="assignment.grams" 
+                                           (ngModelChange)="updateFilamentAssignment($index, { grams: $event })"
+                                           placeholder="0"
+                                           class="h-8 w-full px-1.5 pr-4 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-[8px] font-bold text-center focus:ring-2 focus:ring-primary/20 transition-all" />
+                                    <span class="absolute right-1 text-[6px] font-black text-zinc-400 uppercase">gr</span>
+                                  </div>
+
+                                  <!-- Remove Button -->
+                                  @if ($index > 0) {
+                                    <button (click)="removeFilamentAssignment($index)" class="h-7 w-7 flex items-center justify-center text-rose-500 hover:bg-rose-50 rounded-lg transition-colors">
+                                      <lucide-angular [img]="icons.Minus" class="h-3 w-3"></lucide-angular>
+                                    </button>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-1">
+                          <button (click)="startItemProduction(item.id, selectedMachineIdForItem())" 
+                                  [disabled]="isProcessingGlobal() || !selectedMachineIdForItem() || (is3D() && !filamentAssignments()[0].materialId)"
+                                  class="h-10 flex-1 rounded-xl bg-primary text-white font-black text-[9px] uppercase tracking-widest hover:bg-primary/95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/10 disabled:opacity-50 disabled:grayscale disabled:pointer-events-none">
+                              <lucide-angular [img]="icons.Cpu" class="h-4 w-4"></lucide-angular>
+                              Iniciar
+                          </button>
+                          <button (click)="cancelAssign()" class="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 hover:text-rose-500 transition-colors">
+                              <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
+                          </button>
+                        </div>
+                    </div>
+                  } @else {
+                    @if (!item.status || item.status === 'PENDING') {
+                      <button (click)="is3D() ? prepareAssign(item.id) : updateItemStatus(item.id, 'IN_PROGRESS')" 
+                              class="h-10 px-6 rounded-xl bg-primary text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center gap-2">
+                        <lucide-angular [img]="icons.Cpu" class="h-4 w-4"></lucide-angular>
+                        {{ is3D() ? 'Fabricar' : 'Iniciar' }}
+                      </button>
+                    } @else if (item.status === 'DONE') {
+                      <button (click)="updateItemStatus(item.id, 'IN_STOCK')" 
+                              class="h-10 px-4 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border border-zinc-900 dark:border-white text-[9px] font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-sm">
+                        <lucide-angular [img]="icons.Package" class="h-4 w-4"></lucide-angular>
+                        Ingresar Stock
+                      </button>
+                    } @else if (item.status === 'IN_PROGRESS') {
+                      <div class="flex items-center gap-1.5">
+                        <button (click)="updateItemStatus(item.id, 'DONE')" 
+                                class="h-10 w-10 rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all flex items-center justify-center">
+                          <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
+                        </button>
+                        <button (click)="selectedItemForFailureId.set(item.id)" 
+                                class="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-950/20 text-amber-600 border border-amber-100 dark:border-amber-900/30 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center">
+                          <lucide-angular [img]="icons.AlertOctagon" class="h-4 w-4"></lucide-angular>
+                        </button>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- Módulo de Fallas (Match Pedidos) -->
+      @if (selectedItemForFailureId()) {
+         <div class="animate-in slide-in-from-right duration-500">
+           <app-failure-module 
+              [order]="order()"
+              [rubro]="rubro()"
+              [reason]="failureReason"
+              [action]="failureAction"
+              [wastedTime]="wastedTime"
+              [materialWastes]="failureMaterialWastes"
+              [materials]="materials()"
+              (onAddMaterial)="addFailureMaterial()"
+              (onRemoveMaterial)="handleRemoveFailureMaterial($event)"
+              (onMaterialChange)="handleFailureMaterialChange($event.index, $event.materialId)"
+              (onGramsChange)="handleFailureGramsChange($event.index, $event.grams)"
+              (onCancel)="selectedItemForFailureId.set(null)"
+              (onSave)="saveFailure()">
+           </app-failure-module>
+         </div>
+      }
+
+      <!-- 3. Configuración & Notas (Match Pedidos UI) -->
+      <div class="space-y-4">
+        <div class="p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+            <div class="grid grid-cols-1 gap-8">
+               <!-- Responsable -->
+               <div class="space-y-2">
+                 <label class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                   <lucide-angular [img]="icons.User" class="h-3.5 w-3.5"></lucide-angular>
+                   Responsable del Lote
+                 </label>
+                 <div class="relative group">
+                   <select 
+                     [(ngModel)]="selectedOperatorId"
+                     class="h-14 w-full rounded-2xl border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-5 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all appearance-none text-zinc-900 dark:text-zinc-50 cursor-pointer">
+                     <option value="">Sin asignar...</option>
+                     @for (emp of employees(); track emp.id) {
+                       <option [value]="emp.id">{{ emp.firstName | uppercase }} {{ emp.lastName | uppercase }}</option>
+                     }
+                   </select>
+                   <lucide-angular [img]="icons.ChevronDown" class="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none transition-transform group-focus-within:rotate-180"></lucide-angular>
+                 </div>
+               </div>
+            </div>
+
+           <!-- Notas / Bitácora -->
+           <div class="mt-8 space-y-2">
+              <label class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <lucide-angular [img]="icons.MessageSquare" class="h-3.5 w-3.5"></lucide-angular>
+                Bitácora Técnica & Observaciones
+              </label>
+              <textarea 
+                [(ngModel)]="notes"
+                placeholder="Escribe observaciones del proceso de manufactura aquí..."
+                class="min-h-[100px] w-full rounded-2xl border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-6 py-5 text-xs font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all resize-none text-zinc-600 dark:text-zinc-400 font-mono tracking-tight"></textarea>
+           </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- FOOTER: Multi-Action Commercial System Pattern -->
+    <footer class="flex flex-col border-t border-zinc-100 dark:border-zinc-900 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] shrink-0 bg-white dark:bg-zinc-950">
+      <div class="px-8 py-6 flex items-center justify-between gap-6">
+        <button (click)="onClose.emit()"
+          class="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all">
+          Cerrar Ventana
+        </button>
+
+        <div class="flex items-center gap-3">
+          <button (click)="save()" [disabled]="loading()"
+            class="h-14 px-12 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-black uppercase tracking-[0.25em] shadow-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 min-w-[240px] flex items-center justify-center gap-3">
+            @if (loading()) { 
+              <app-button-spinner></app-button-spinner> 
+              Sincronizando...
+            } @else { 
+              <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
+              {{ primaryActionLabel() }}
+            }
+          </button>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</div>
+

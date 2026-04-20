@@ -1,6 +1,6 @@
 @if (service.data(); as data) {
 <div
-  class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+  class="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-200"
   (click)="service.close(false)"
 >
   <div
@@ -40,12 +40,14 @@
 
     <!-- Actions -->
     <div class="px-6 sm:px-8 pb-6 sm:pb-8 flex flex-col-reverse sm:flex-row gap-3">
-      <button
-        (click)="service.close(false)"
-        class="flex-1 h-12 px-4 text-sm font-bold text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl transition-all active:scale-[0.97]"
-      >
-        {{ data.cancelLabel || 'Cancelar' }}
-      </button>
+      @if (!data.hideCancel) {
+        <button
+          (click)="service.close(false)"
+          class="flex-1 h-12 px-4 text-sm font-bold text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl transition-all active:scale-[0.97]"
+        >
+          {{ data.cancelLabel || 'Cancelar' }}
+        </button>
+      }
       <button
         (click)="service.close(true)"
         class="flex-1 h-12 px-4 text-sm font-bold text-white rounded-xl shadow-lg transition-all active:scale-[0.97]"

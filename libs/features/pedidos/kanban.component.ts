@@ -158,6 +158,7 @@ export class PedidosKanbanComponent implements OnDestroy {
 
       this.allPedidos.set(filtered);
       this.employees.set(emps || []);
+      this.syncSelectedOrder(filtered);
     } catch (e) {
       console.error('Error loading Kanban data:', e);
     } finally {
@@ -269,6 +270,16 @@ export class PedidosKanbanComponent implements OnDestroy {
       if (order && order.status !== newStatus) {
         this.openManageModal(order, newStatus);
       }
+    }
+  }
+
+  private syncSelectedOrder(newData: Pedido[]) {
+    const current = this.selectedOrder();
+    if (!current) return;
+    
+    const updated = newData.find(o => o.id === current.id);
+    if (updated) {
+      this.selectedOrder.set(updated);
     }
   }
 

@@ -21,10 +21,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        // Token expiado o inválido
-        authService.logout().then(() => {
-          router.navigate(['/login']);
-        });
+        // Token expiado o inválido. 
+        // Importante: No forzar logout si ya estamos en la página de login para evitar bucles.
+        if (!router.url.includes('/login')) {
+          authService.logout().then(() => {
+            router.navigate(['/login']);
+          });
+        }
       }
       return throwError(() => error);
     })

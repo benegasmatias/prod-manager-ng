@@ -30,6 +30,8 @@ export class OnboardingComponent implements OnInit {
   
   // Creation state
   businessName = signal('');
+  businessPhone = signal('');
+  businessEmail = signal('');
   isCreating = signal(false);
 
   userEmail = computed(() => this.auth.session()?.user.email || 'Usuario');
@@ -72,7 +74,12 @@ export class OnboardingComponent implements OnInit {
     
     this.isCreating.set(true);
     try {
-      await this.session.addNegocio(this.businessName(), this.selectedTemplate().key);
+      await this.session.addNegocio(
+        this.businessName(), 
+        this.selectedTemplate().key,
+        this.businessPhone(),
+        this.businessEmail()
+      );
       this.step.set('CREATING');
       
       // Short delay for the "Success" animation before redirecting

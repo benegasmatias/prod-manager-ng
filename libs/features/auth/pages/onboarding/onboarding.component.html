@@ -5,6 +5,17 @@
 
   <div class="w-full max-w-2xl relative z-10 animate-in fade-in zoom-in-95 duration-700">
     
+    <!-- Brand Identity -->
+    <div class="mb-10 flex flex-col items-center gap-4">
+      <div class="h-16 w-16 bg-white dark:bg-zinc-900 rounded-2xl flex items-center justify-center shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-100 dark:border-zinc-800 overflow-hidden">
+        <img src="assets/logo.png" alt="ProdManager" class="h-10 w-10 object-contain" />
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-black uppercase tracking-[0.4em] text-primary">ProdManager</span>
+        <div class="h-1 w-1 rounded-full bg-primary animate-pulse"></div>
+      </div>
+    </div>
+    
     <!-- STEP 1: WELCOME / SIN ACCESO -->
     @if (step() === 'WELCOME') {
       <div class="bg-white dark:bg-zinc-900 border border-border rounded-[3rem] shadow-2xl p-10 text-center space-y-8 backdrop-blur-xl">
@@ -110,24 +121,51 @@
         </div>
 
         @if (selectedTemplate()) {
-          <div class="bg-zinc-900 dark:bg-zinc-100 rounded-[2.5rem] p-8 text-white dark:text-zinc-900 flex flex-col md:flex-row items-center gap-6 animate-in slide-in-from-bottom-8 duration-500">
-            <div class="flex-1 space-y-1">
-              <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Nombre del Espacio</span>
-              <input 
-                type="text" 
-                [value]="businessName()" 
-                (input)="businessName.set($any($event.target).value)"
-                class="bg-transparent border-none text-xl font-black uppercase tracking-tight focus:ring-0 w-full p-0"
-              >
+          <div class="bg-zinc-900 dark:bg-zinc-100 rounded-[2.5rem] p-8 text-white dark:text-zinc-900 space-y-8 animate-in slide-in-from-bottom-8 duration-500 shadow-2xl shadow-primary/20">
+            <div class="grid md:grid-cols-2 gap-8">
+              <div class="space-y-1 md:col-span-2">
+                <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Nombre del Espacio</span>
+                <input 
+                  type="text" 
+                  [value]="businessName()" 
+                  (input)="businessName.set($any($event.target).value)"
+                  placeholder="Ej: Mi Taller de Impresión"
+                  class="bg-transparent border-none text-2xl font-black uppercase tracking-tight focus:ring-0 w-full p-0 placeholder:text-zinc-800/20 dark:placeholder:text-zinc-200/20"
+                >
+              </div>
+
+              <div class="space-y-1">
+                <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Email del Negocio (Opcional)</span>
+                <input 
+                  type="email" 
+                  [value]="businessEmail()" 
+                  (input)="businessEmail.set($any($event.target).value)"
+                  placeholder="contacto@mi-negocio.com"
+                  class="bg-transparent border-none text-sm font-bold tracking-tight focus:ring-0 w-full p-0 placeholder:text-zinc-800/20 dark:placeholder:text-zinc-200/20"
+                >
+              </div>
+
+              <div class="space-y-1">
+                <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Teléfono del Negocio (Opcional)</span>
+                <input 
+                  type="text" 
+                  [value]="businessPhone()" 
+                  (input)="businessPhone.set($any($event.target).value)"
+                  placeholder="+54 9 264 ..."
+                  class="bg-transparent border-none text-sm font-bold tracking-tight focus:ring-0 w-full p-0 placeholder:text-zinc-800/20 dark:placeholder:text-zinc-200/20"
+                >
+              </div>
             </div>
             
-            <app-button-spinner 
-              [loading]="isCreating()"
-              (click)="createBusiness()"
-              class="w-full md:w-auto h-14 px-8 bg-primary hover:bg-primary-dark text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 transition-all"
-            >
-              Crear Sistema
-            </app-button-spinner>
+            <div class="pt-4 border-t border-zinc-800/10 dark:border-zinc-200/10 flex justify-end">
+              <app-button-spinner 
+                [loading]="isCreating()"
+                (click)="createBusiness()"
+                class="w-full md:w-auto h-14 px-10 bg-primary hover:bg-primary-dark text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 transition-all"
+              >
+                Crear Sistema Industrial
+              </app-button-spinner>
+            </div>
           </div>
         }
       </div>

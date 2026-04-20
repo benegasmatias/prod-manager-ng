@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -34,7 +34,7 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
   templateUrl: './pedidos.component.html',
   styleUrls: ['./pedidos.component.css']
 })
-export class PedidosPageComponent implements OnInit {
+export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private api = inject(PedidosApiService);
   public session = inject(SessionService);
   private auth = inject(AuthService);
@@ -83,6 +83,7 @@ export class PedidosPageComponent implements OnInit {
   archivedOrdersData = signal<Pedido[]>([]);
   archivedPage = signal(1);
   archivedTotal = signal(0);
+  archivedLoaded = signal(false);
 
   // Sort State
   sortKey = signal<PedidoSortKey>('fechaActualizacion');
@@ -121,14 +122,43 @@ export class PedidosPageComponent implements OnInit {
 
   private lastLoadedBusinessId: string | null = null;
 
+  @ViewChild('historyTrigger') historyTrigger?: ElementRef;
+  private observer?: IntersectionObserver;
+
   constructor() {
     // Refresh when businessId changes
     effect(() => {
       const bid = this.businessId();
       if (bid && bid !== this.lastLoadedBusinessId) {
-        this.loadData();
+        this.loadData({ initial: true });
       }
     });
+  }
+
+  ngAfterViewInit() {
+    this.setupObserver();
+  }
+
+  ngOnDestroy() {
+    if (this.observer) this.observer.disconnect();
+  }
+
+  private setupObserver() {
+    this.observer = new IntersectionObserver(([entry]) => {
+      // REGLA: No cargar historial si las tablas principales todavía están cargando (falsa intersección por skeletons)
+      const mainLoading = this.loadingProduction() || this.loadingCommercial();
+      
+      if (entry.isIntersecting && !mainLoading && !this.loadingArchived() && !this.archivedLoaded()) {
+        this.loadArchived();
+      }
+    }, { 
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px' // Forzar a que entre al menos 100px en pantalla
+    });
+
+    if (this.historyTrigger) {
+      this.observer.observe(this.historyTrigger.nativeElement);
+    }
   }
 
   ngOnInit() { 
@@ -136,7 +166,7 @@ export class PedidosPageComponent implements OnInit {
     const initialSearch = this.route.snapshot.queryParamMap.get('search');
     if (initialSearch) {
       this.searchTerm.set(initialSearch);
-      this.loadData();
+      this.loadData({ initial: true });
     }
   }
 
@@ -189,19 +219,43 @@ export class PedidosPageComponent implements OnInit {
       case 'startDate': this.dateDesde.set(value); break;
       case 'endDate': this.dateHasta.set(value); break;
     }
-    // Optimization: avoid reloading everything if only some local filters changed?
-    // For now, reload all to ensure consistency
+    
+    this.productionPage.set(1);
+    this.commercialPage.set(1);
+    this.archivedPage.set(1);
+    this.archivedLoaded.set(false); // REGLA: Resetear carga para forzar lazy loading en scroll
+    
     this.loadData();
   }
 
-  async loadData() {
-    this.loadingProduction.set(true);
-    this.loadingCommercial.set(true);
-    this.loadingArchived.set(true);
+  async loadData(options: { initial?: boolean } = {}) {
+    // Global data is always needed
     this.loadGlobalData();
+
+    // 1. Always load production (Table 1)
     this.loadProduction();
-    this.loadCommercial();
-    this.loadArchived();
+
+    // 2. Only load commercial if it's the right rubro 
+    // or if we are filtering and want to see if there's anything there
+    const isMetalurgica = this.session.activeNegocio()?.rubro === 'METALURGICA';
+    if (isMetalurgica) {
+      this.loadCommercial();
+    } else {
+      // Clear it for other rubros to avoid the "ghost" section
+      this.commercialOrdersData.set([]);
+      this.commercialTotal.set(0);
+      this.loadingCommercial.set(false);
+    }
+
+    // 3. History (Table 2) is lazy-loaded on scroll by the template
+    // REGLA OBLIGATORIA: El historial NUNCA se carga automáticamente en loadData principal
+    // Se resetea para que el IntersectionObserver lo dispare al scrollear
+    if (options.initial) {
+      this.archivedOrdersData.set([]);
+      this.archivedTotal.set(0); 
+      this.archivedLoaded.set(false);
+      this.loadingArchived.set(false);
+    }
   }
 
   private getCommonParams() {
@@ -219,11 +273,7 @@ export class PedidosPageComponent implements OnInit {
     const bId = this.businessId();
     if (!bId) return;
     try {
-      const [summaryRes, empsRes] = await Promise.all([
-        this.api.getSummary(bId),
-        this.api.getEmployees(bId)
-      ]);
-      this.summary.set(summaryRes);
+      const empsRes = await this.api.getEmployees(bId);
       this.employees.set(empsRes);
       this.lastLoadedBusinessId = bId;
     } catch (err) { console.error('Error global data:', err); }
@@ -243,6 +293,7 @@ export class PedidosPageComponent implements OnInit {
       });
       this.productionOrdersData.set(res.data);
       this.productionTotal.set(res.total || 0);
+      this.syncSelectedOrder(res.data);
     } catch (err) { console.error('Error production:', err); }
     finally { this.loadingProduction.set(false); }
   }
@@ -261,6 +312,7 @@ export class PedidosPageComponent implements OnInit {
       });
       this.commercialOrdersData.set(res.data);
       this.commercialTotal.set(res.total || 0);
+      this.syncSelectedOrder(res.data);
     } catch (err) { console.error('Error commercial:', err); }
     finally { this.loadingCommercial.set(false); }
   }
@@ -279,6 +331,8 @@ export class PedidosPageComponent implements OnInit {
       });
       this.archivedOrdersData.set(res.data);
       this.archivedTotal.set(res.total || 0);
+      this.archivedLoaded.set(true);
+      this.syncSelectedOrder(res.data);
     } catch (err) { console.error('Error archived:', err); }
     finally { this.loadingArchived.set(false); }
   }
@@ -304,6 +358,16 @@ export class PedidosPageComponent implements OnInit {
   onArchivedPageChange(page: number) {
     this.archivedPage.set(page);
     this.loadArchived();
+  }
+
+  private syncSelectedOrder(newData: Pedido[]) {
+    const current = this.selectedOrder();
+    if (!current) return;
+    
+    const updated = newData.find(o => o.id === current.id);
+    if (updated) {
+      this.selectedOrder.set(updated);
+    }
   }
 
   goToDetail(order: Pedido) {

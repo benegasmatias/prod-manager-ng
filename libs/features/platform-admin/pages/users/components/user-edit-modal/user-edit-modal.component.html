@@ -1,0 +1,111 @@
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md animate-in fade-in duration-300">
+  <div class="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+    
+    <!-- Modal Header -->
+    <div class="px-8 py-6 border-b border-zinc-800 flex items-center justify-between bg-zinc-800/20">
+      <div>
+        <h3 class="text-xl font-black text-white uppercase tracking-tight">Editar Usuario</h3>
+        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest italic">{{ user.email }}</p>
+      </div>
+      <button (click)="close.emit()" class="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-800 text-zinc-400 hover:text-white transition-all">
+        <i-lucide name="x" class="h-5 w-5"></i-lucide>
+      </button>
+    </div>
+
+    <!-- Modal Form -->
+    <form [formGroup]="editForm" (ngSubmit)="save()" class="p-8 space-y-6">
+      
+      <!-- Full Name -->
+      <div class="space-y-2">
+        <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Nombre Completo</label>
+        <div class="relative">
+           <i-lucide name="user" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600"></i-lucide>
+            <input 
+              type="text" 
+              formControlName="fullName"
+              class="w-full bg-zinc-800/50 border border-zinc-800 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white focus:ring-2 focus:ring-violet-500/50 transition-all outline-none uppercase tracking-tight"
+              placeholder="Nombre Completo"
+            >
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="space-y-2">
+        <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Teléfono de contacto</label>
+        <div class="relative">
+           <i-lucide name="phone" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600"></i-lucide>
+           <input 
+             type="text" 
+             formControlName="phone"
+             class="w-full bg-zinc-800/50 border border-zinc-800 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white focus:ring-2 focus:ring-violet-500/50 transition-all outline-none"
+             placeholder="+54 9 ..."
+           >
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+          <!-- Role -->
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Rol Global</label>
+            <select 
+              formControlName="globalRole"
+              class="w-full bg-zinc-800/50 border border-zinc-800 rounded-2xl p-4 text-xs font-black text-white uppercase outline-none focus:ring-2 focus:ring-violet-500/50"
+            >
+               <option *ngFor="let r of metadata()?.globalRoles" [value]="r.id">{{ r.label }}</option>
+            </select>
+          </div>
+
+          <!-- Plan -->
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Plan</label>
+            <select 
+              formControlName="plan"
+              class="w-full bg-zinc-800/50 border border-zinc-800 rounded-2xl p-4 text-xs font-black text-white uppercase outline-none focus:ring-2 focus:ring-violet-500/50"
+            >
+               <option *ngFor="let p of metadata()?.plans" [value]="p.id">{{ p.name }}</option>
+            </select>
+          </div>
+      </div>
+
+      <!-- Active Toggle -->
+      <div class="p-4 bg-zinc-800/30 rounded-2xl border border-zinc-800 flex items-center justify-between">
+         <div class="flex items-center gap-3">
+            <div 
+              class="h-10 w-10 rounded-xl flex items-center justify-center transition-all"
+              [ngClass]="editForm.get('active')?.value ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'"
+            >
+              <i-lucide [name]="editForm.get('active')?.value ? 'user-check' : 'user-x'" class="h-5 w-5"></i-lucide>
+            </div>
+            <div>
+               <p class="text-[11px] font-black text-zinc-200 uppercase tracking-tight">Estado de la cuenta</p>
+               <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{{ editForm.get('active')?.value ? 'Acceso Habilitado' : 'Acceso Revocado' }}</p>
+            </div>
+         </div>
+         <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" formControlName="active" class="sr-only peer">
+            <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+         </label>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="flex gap-3 pt-4">
+          <button 
+            type="button" 
+            (click)="close.emit()" 
+            class="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl hover:bg-zinc-700 font-black text-[11px] uppercase tracking-widest transition-all"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit"
+            [disabled]="editForm.invalid || saving()"
+            class="flex-[2] py-4 bg-violet-600 text-white rounded-2xl hover:bg-violet-500 font-black text-[11px] uppercase tracking-widest transition-all shadow-xl shadow-violet-600/20 flex items-center justify-center gap-2 group disabled:opacity-50"
+          >
+            <i-lucide *ngIf="saving()" name="loader-2" class="h-4 w-4 animate-spin"></i-lucide>
+            <span>{{ saving() ? 'Guardando...' : 'Guardar Cambios' }}</span>
+            <i-lucide *ngIf="!saving()" name="save" class="h-4 w-4 group-hover:scale-110 transition-transform"></i-lucide>
+          </button>
+      </div>
+    </form>
+  </div>
+</div>

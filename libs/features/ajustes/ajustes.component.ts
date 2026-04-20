@@ -2,9 +2,10 @@ import { Component, inject, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LucideAngularModule, Landmark, Globe, Save, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Landmark, Globe, Save, Trash2, Mail, Phone } from 'lucide-angular';
 import { SessionService } from '../../core/session/session.service';
 import { ConfirmService } from '../../shared/ui/confirm-dialog/confirm-dialog.component';
+import { ToastService } from '../../shared/services/toast.service';
 import { Negocio } from '../../shared/models';
 
 @Component({
@@ -16,6 +17,7 @@ import { Negocio } from '../../shared/models';
 export class AjustesComponent {
   public sessionService = inject(SessionService);
   private confirmService = inject(ConfirmService);
+  private toast = inject(ToastService);
   private router = inject(Router);
   
   // Use a computed signal for the active business to ensure reactivity
@@ -24,10 +26,12 @@ export class AjustesComponent {
   // Local state for editing
   nombre = signal('');
   moneda = signal('ARS');
+  phone = signal('');
+  email = signal('');
   saving = signal(false);
 
   readonly icons = {
-    Landmark, Globe, Save, Trash2
+    Landmark, Globe, Save, Trash2, Mail, Phone
   };
 
   readonly currencies = [
@@ -45,6 +49,8 @@ export class AjustesComponent {
       if (active) {
         this.nombre.set(active.nombre);
         this.moneda.set(active.moneda || 'ARS');
+        this.phone.set(active.phone || '');
+        this.email.set(active.email || '');
       }
     });
   }
@@ -56,12 +62,15 @@ export class AjustesComponent {
     this.saving.set(true);
     try {
       await this.sessionService.updateNegocio(active.id, {
-        nombre: this.nombre(),
-        moneda: this.moneda()
+        name: this.nombre(),
+        currency: this.moneda(),
+        phone: this.phone(),
+        email: this.email()
       });
-      // Optionally show a success toast here if toast service is available
+      this.toast.success('Configuración guardada correctamente');
     } catch (error) {
       console.error('Error saving settings:', error);
+      this.toast.error('Error al guardar la configuración');
     } finally {
       this.saving.set(false);
     }

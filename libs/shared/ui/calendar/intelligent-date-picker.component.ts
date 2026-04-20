@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, inject, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Calendar as CalendarIcon, X } from 'lucide-angular';
 import { DeliveryCalendarComponent } from './delivery-calendar.component';
@@ -46,14 +46,10 @@ import { DeliveryCalendarComponent } from './delivery-calendar.component';
       <!-- Floating Calendar -->
       @if (showCalendar()) {
         <div class="absolute top-full left-0 mt-2 z-[100] animate-in fade-in slide-in-from-top-2 duration-300">
-          <div (click)="stop($event)">
-             <app-delivery-calendar 
-               [selectedDate]="value" 
-               (dateChange)="onDateSelect($event)"
-             ></app-delivery-calendar>
-          </div>
-          <!-- Backdrop to close -->
-          <div (click)="toggleCalendar()" class="fixed inset-0 z-[-1]"></div>
+           <app-delivery-calendar 
+             [selectedDate]="value" 
+             (dateChange)="onDateSelect($event)"
+           ></app-delivery-calendar>
         </div>
       }
     </div>
@@ -71,6 +67,14 @@ export class IntelligentDatePickerComponent {
 
   showCalendar = signal(false);
   icons = { CalendarIcon, X };
+  private elementRef = inject(ElementRef);
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.showCalendar.set(false);
+    }
+  }
 
   toggleCalendar() {
     if (this.disabled) return;

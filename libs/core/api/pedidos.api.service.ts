@@ -18,6 +18,18 @@ export interface ListingParams {
   responsableId?: string;
 }
 
+export interface ReportFailureData {
+  businessId?: string;
+  itemId?: string;
+  reason: string;
+  action?: 'REDO' | 'DISCARD' | 'KEEP';
+  targetStatus?: string;
+  wastedGrams?: number;
+  materialWastes?: { materialId: string, grams: number }[];
+  moveToReprint?: boolean;
+  metadata?: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -97,27 +109,29 @@ export class PedidosApiService {
    * Registra un pago para un pedido.
    */
   async addPayment(orderId: string, payment: { businessId?: string; amount: number; method: string; note?: string }): Promise<Pedido> {
-    return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.PAYMENTS(orderId), payment));
+    const { businessId, ...data } = payment;
+    let url = API_ENDPOINTS.ORDERS.PAYMENTS(orderId);
+    if (businessId) url += `?businessId=${businessId}`;
+    return firstValueFrom(this.http.post<Pedido>(url, data));
   }
 
   /**
    * Reporta un fallo en un pedido (específicamente Impresión 3D o general).
    */
-  async reportFailure(orderId: string, data: {
-    businessId?: string;
-    reason: string;
-    action?: 'REDO' | 'DISCARD' | 'KEEP';
-    targetStatus?: string;
-    wastedGrams?: number;
-    moveToReprint?: boolean;
-  }): Promise<Pedido> {
+  async reportFailure(orderId: string, data: ReportFailureData): Promise<Pedido> {
+    const { businessId, ...body } = data;
     const payload = {
-      ...data,
-      wastedGrams: data.wastedGrams || 0,
-      moveToReprint: data.moveToReprint || (data.action === 'REDO' && data.targetStatus === 'REPRINT_PENDING')
+      ...body,
+      wastedGrams: body.wastedGrams || 0,
+      moveToReprint: body.moveToReprint || (body.action === 'REDO' && body.targetStatus === 'REPRINT_PENDING')
     };
-    return firstValueFrom(this.http.post<Pedido>(API_ENDPOINTS.ORDERS.REPORT_FAILURE(orderId), payload));
+    
+    let url = API_ENDPOINTS.ORDERS.REPORT_FAILURE(orderId);
+    if (businessId) url += `?businessId=${businessId}`;
+    
+    return firstValueFrom(this.http.post<Pedido>(url, payload));
   }
+
   private workloadCache = new Map<string, any[]>();
 
   /**
@@ -141,5 +155,9 @@ export class PedidosApiService {
     setTimeout(() => this.workloadCache.delete(cacheKey), 5 * 60 * 1000);
 
     return data;
+  }
+
+  async updateItemStatus(orderId: string, itemId: string, status: string, businessId: string, force: boolean = false): Promise<any> {
+    return firstValueFrom(this.http.patch(`${API_ENDPOINTS.ORDERS.ROOT}/${orderId}/items/${itemId}/status`, { status, businessId, force }));
   }
 }

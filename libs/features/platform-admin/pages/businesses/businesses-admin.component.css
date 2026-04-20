@@ -1,0 +1,28 @@
+@reference "../../../../../src/styles.css";
+
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  :host {
+    padding: 0;
+  }
+}
+
+.businesses-table-container {
+  @apply bg-zinc-900/50 backdrop-blur rounded-[2rem] border border-zinc-800 overflow-hidden shadow-2xl;
+}
+
+.businesses-table-container .overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.businesses-table-container .overflow-x-auto::-webkit-scrollbar-track {
+  @apply bg-zinc-900;
+}
+
+.businesses-table-container .overflow-x-auto::-webkit-scrollbar-thumb {
+  @apply bg-zinc-800 rounded-full hover:bg-zinc-700 transition-all;
+}

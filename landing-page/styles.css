@@ -1,0 +1,42 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* Custom Animations & Utilities */
+[data-visible="false"] {
+    opacity: 0;
+    transform: translateY(2rem);
+    transition: none;
+}
+
+[data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.7s ease-out;
+}
+
+.no-scrollbar::-webkit-scrollbar { 
+    display: none; 
+}
+.no-scrollbar { 
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+@keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up { 
+    animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; 
+}
+
+/* Base Theme Variables (if not using Tailwind v4 browser script for theme) */
+:root {
+    --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    --color-primary: #8b5cf6;
+}
+
+body {
+    font-family: var(--font-sans);
+}

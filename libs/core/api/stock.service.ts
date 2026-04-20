@@ -48,7 +48,7 @@ export class StockService {
     try {
       const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
         enabled: true,
-        ttl: 120000, 
+        ttl: 5000, // Reducido a 5 segundos para mayor reactividad en manufactura
         forceRefresh: force
       });
 

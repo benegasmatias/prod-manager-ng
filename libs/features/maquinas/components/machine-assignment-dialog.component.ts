@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Pedido, Material } from '@shared/models';
 import { LucideAngularModule, X, ChevronDown, Package, Plus } from 'lucide-angular';
 import { SessionService } from '@core/session/session.service';
+import { cn } from '@shared/utils/cn';
 
 
 @Component({
@@ -13,19 +14,25 @@ import { SessionService } from '@core/session/session.service';
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-4 slide-in-from-bottom-4 animate-in duration-300">
+        <!-- Header -->
         <div class="p-8 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
           <div class="flex items-baseline justify-between mb-1">
-            <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Asignar Producción</h2>
+            <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              {{ selectedOrder ? 'Seleccionar Item' : 'Asignar Producción' }}
+            </h2>
             <button (click)="onCancel.emit()" class="text-zinc-400 hover:text-zinc-600 transition-colors">
               <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
             </button>
           </div>
-          <p class="text-xs text-zinc-500 font-medium">Selecciona el material y el pedido para iniciar el proceso.</p>
+          <p class="text-xs text-zinc-500 font-medium">
+            {{ selectedOrder ? 'Este pedido tiene varios items. Elige uno para asignar.' : 'Selecciona el material y el pedido para iniciar el proceso.' }}
+          </p>
         </div>
 
-        <div class="p-8 space-y-8">
-          @if (config().features.hasMaterials) {
-            <div class="space-y-3">
+        <div class="p-8 space-y-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
+          <!-- Material Selection (Always visible) -->
+          @if (!selectedOrder && config().features.hasMaterials) {
+            <div class="space-y-3 animate-in fade-in duration-300">
               <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left block">Seleccionar Material / Insumo</label>
               @if (availableMaterials.length > 0) {
                 <div class="relative group">
@@ -55,37 +62,80 @@ import { SessionService } from '@core/session/session.service';
             </div>
           }
 
+          <!-- Selection List -->
           <div class="space-y-4">
-            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left block">Seleccionar Pedido Pendiente</label>
-            <div class="max-h-[280px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-              @if (loadingOrders) {
+            <div class="flex items-center justify-between">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pl-1 text-left block">
+                {{ selectedOrder ? 'Items de ' + selectedOrder.clientName : 'Seleccionar Pedido Pendiente' }}
+              </label>
+              @if (selectedOrder) {
+                <button (click)="selectedOrder = null" class="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline">
+                   Volver a Pedidos
+                </button>
+              }
+            </div>
+
+            <div class="space-y-2 pr-2">
+              @if (loading || saving) {
                 <div class="py-12 flex flex-col items-center justify-center gap-2">
                   <div class="h-6 w-6 border-2 border-zinc-100 border-t-primary rounded-full animate-spin"></div>
-                  <p class="text-[10px] font-bold text-zinc-400 uppercase">Consultando pedidos...</p>
+                  <p class="text-[10px] font-bold text-zinc-400 uppercase">Procesando...</p>
                 </div>
-              } @else if (pendingOrders.length > 0) {
-                @for (order of pendingOrders; track order.id) {
-                  <div
-                    (click)="onAssign.emit({ orderId: order.id, materialId: selectedMaterialId })"
-                    class="group relative flex items-center justify-between p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-200 dark:hover:border-zinc-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
-                  >
-                    <div class="flex flex-col text-left">
-                      <div class="flex items-center gap-2">
-                        <p class="font-bold text-sm text-zinc-900 dark:text-zinc-100">{{ order.clientName }}</p>
-                        <span class="text-[10px] font-bold text-primary group-hover:translate-x-1 transition-transform">#{{ order.code || order.id.slice(0, 8) }}</span>
+              } @else if (!selectedOrder) {
+                <!-- Order List -->
+                @if (pendingOrders.length > 0) {
+                  @for (order of pendingOrders; track order.id) {
+                    <div
+                      (click)="handleOrderClick(order)"
+                      [class]="cn(
+                        'group relative flex items-center justify-between p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-200 dark:hover:border-zinc-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md animate-in slide-in-from-right-4',
+                        saving && 'opacity-50 cursor-not-allowed pointer-events-none'
+                      )"
+                    >
+                      <div class="flex flex-col text-left">
+                        <div class="flex items-center gap-2">
+                          <p class="font-bold text-sm text-zinc-900 dark:text-zinc-100">{{ order.clientName }}</p>
+                          <span class="text-[10px] font-bold text-primary group-hover:translate-x-1 transition-transform">#{{ order.code || order.id.slice(0, 8) }}</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 font-medium">Items: {{ order.items.length || 0 }}</p>
                       </div>
-                      <p class="text-[11px] text-zinc-500 font-medium">Items: {{ order.items.length || 0 }}</p>
+                      <div class="h-8 w-8 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                        <lucide-angular [img]="order.items.length > 1 ? icons.ChevronDown : icons.Plus" class="h-4 w-4"></lucide-angular>
+                      </div>
                     </div>
-                    <div class="h-8 w-8 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                      <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular>
-                    </div>
+                  }
+                } @else {
+                  <div class="py-12 text-center space-y-2">
+                    <p class="text-sm font-semibold text-zinc-400">Todo al día</p>
+                    <p class="text-xs text-zinc-500 italic">No hay pedidos pendientes para asignar.</p>
                   </div>
                 }
               } @else {
-                <div class="py-12 text-center space-y-2">
-                  <p class="text-sm font-semibold text-zinc-400">Todo al día</p>
-                  <p class="text-xs text-zinc-500 italic">No hay pedidos pendientes para asignar.</p>
-                </div>
+                <!-- Item Selection View -->
+                @for (item of selectedOrder.items; track item.id) {
+                  @if (item.status !== 'DONE') {
+                    <div
+                      (click)="assign(item.id)"
+                      [class]="cn(
+                        'group relative flex items-center justify-between p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-200 dark:hover:border-zinc-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md animate-in slide-in-from-left-4',
+                        saving && 'opacity-50 cursor-not-allowed pointer-events-none'
+                      )"
+                    >
+                      <div class="flex flex-col text-left">
+                        <p class="font-bold text-sm text-zinc-900 dark:text-zinc-100">{{ item.name || 'Item sin nombre' }}</p>
+                        <div class="flex items-center gap-3 mt-1">
+                           <p class="text-[11px] text-zinc-500 font-medium">Cant: {{ item.qty }}</p>
+                           @if (item.estimatedMinutes) {
+                             <p class="text-[11px] text-zinc-400 font-medium">Tiempo: {{ item.estimatedMinutes }}m</p>
+                           }
+                        </div>
+                      </div>
+                      <div class="h-8 w-8 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                        <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular>
+                      </div>
+                    </div>
+                  }
+                }
               }
             </div>
           </div>
@@ -97,14 +147,49 @@ import { SessionService } from '@core/session/session.service';
 export class MachineAssignmentDialogComponent {
   @Input() pendingOrders: Pedido[] = [];
   @Input() availableMaterials: Material[] = [];
-  @Input() loadingOrders = false;
+  @Input() saving = false;
+  @Input() loading = false;
 
-  @Output() onAssign = new EventEmitter<{ orderId: string; materialId: string }>();
+  @Output() onAssign = new EventEmitter<{ orderId: string; orderItemId?: string; materialId: string }>();
   @Output() onCancel = new EventEmitter<void>();
 
   selectedMaterialId = '';
+  selectedOrder: Pedido | null = null;
 
   private session = inject(SessionService);
   config = this.session.config;
+  cn = cn;
   readonly icons = { X, ChevronDown, Package, Plus };
+
+  handleOrderClick(order: Pedido) {
+    if (this.saving) return;
+
+    const items = order.items || [];
+    // Si tiene un solo item elegible, lo mandamos directo (comportamiento legacy/simple)
+    const eligibleItems = items.filter(i => i.status !== 'DONE');
+    
+    if (eligibleItems.length === 1) {
+      this.onAssign.emit({ 
+        orderId: order.id, 
+        orderItemId: eligibleItems[0].id,
+        materialId: this.selectedMaterialId 
+      });
+    } else if (eligibleItems.length > 1) {
+      // Si tiene varios, mostramos el selector
+      this.selectedOrder = order;
+    } else {
+      // Caso fallback: si no hay items cargados o todos están DONE pero el pedido sigue PENDING
+      this.onAssign.emit({ orderId: order.id, materialId: this.selectedMaterialId });
+    }
+  }
+
+  assign(orderItemId: string) {
+    if (!this.selectedOrder || this.saving) return;
+    
+    this.onAssign.emit({ 
+      orderId: this.selectedOrder.id, 
+      orderItemId,
+      materialId: this.selectedMaterialId 
+    });
+  }
 }

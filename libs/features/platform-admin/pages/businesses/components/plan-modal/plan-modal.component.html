@@ -1,0 +1,99 @@
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md animate-in fade-in duration-300">
+  <div class="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+    
+    <!-- Modal Header -->
+    <div class="px-8 py-6 border-b border-zinc-800 flex items-center justify-between bg-zinc-800/20">
+      <div>
+        <h3 class="text-xl font-black text-white uppercase tracking-tight">Suscripción: {{ business?.name }}</h3>
+        <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Ajusta el plan y período del tenant</p>
+      </div>
+      <button (click)="close.emit()" class="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-800 text-zinc-400 hover:text-white transition-all">
+        <i-lucide name="x" class="h-5 w-5"></i-lucide>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-8">
+      
+      <!-- Plans Grid -->
+      <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-4 block">1. Selecciona el Plan</label>
+      <div class="grid grid-cols-3 gap-4 mb-10">
+        <div 
+          *ngFor="let plan of plans()" 
+          (click)="selectedPlanId.set(plan.id)"
+          class="relative p-5 rounded-3xl border-2 transition-all cursor-pointer overflow-hidden group"
+          [ngClass]="{
+            'border-violet-500 bg-violet-500/5': selectedPlanId() === plan.id,
+            'border-zinc-800 bg-zinc-900 hover:border-zinc-700': selectedPlanId() !== plan.id
+          }"
+        >
+          <div *ngIf="selectedPlanId() === plan.id" class="absolute top-0 right-0 p-2 text-violet-500 animate-in fade-in zoom-in">
+             <i-lucide name="check-circle-2" class="h-5 w-5"></i-lucide>
+          </div>
+          
+          <div class="flex flex-col h-full">
+            <span class="text-xs font-black text-zinc-100 uppercase mb-1">{{ plan.name }}</span>
+            <span class="text-xl font-black text-white mb-3">{{ plan.price | currency:'ARS':'symbol':'1.0-0' }}</span>
+            <p class="text-[10px] font-bold text-zinc-500 leading-tight">{{ plan.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Duration Selection -->
+      <label class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-4 block">2. Duración de la Suscripción</label>
+      <div class="flex gap-2">
+        <button 
+          *ngFor="let m of [1, 3, 6, 12]" 
+          (click)="selectedMonths.set(m)"
+          [ngClass]="{
+            'bg-zinc-100 text-black border-zinc-100': selectedMonths() === m,
+            'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700': selectedMonths() !== m
+          }"
+          class="flex-1 py-4 px-6 rounded-2xl border text-xs font-black transition-all"
+        >
+          {{ m }} {{ m === 1 ? 'MES' : 'MESES' }}
+          <span *ngIf="m > 1" class="block text-[8px] opacity-60">AHORRO DISPONIBLE</span>
+        </button>
+      </div>
+
+      <!-- Summary -->
+      <div class="mt-10 p-6 bg-zinc-800/30 rounded-[1.5rem] border border-zinc-800/50 flex items-center justify-between">
+         <div class="flex items-center gap-4">
+            <div class="h-12 w-12 bg-zinc-800 rounded-2xl flex items-center justify-center text-zinc-400">
+               <i-lucide name="calendar" class="h-6 w-6"></i-lucide>
+            </div>
+            <div>
+               <p class="text-[10px] font-black text-zinc-500 uppercase">Nueva fecha de vencimiento</p>
+               <p class="text-sm font-black text-zinc-100">
+                  Calculando para: {{ selectedMonths() }} {{ selectedMonths() === 1 ? 'Mes' : 'Meses' }}
+               </p>
+            </div>
+         </div>
+         <div class="text-right">
+            <p class="text-[10px] font-black text-zinc-500 uppercase">Estado Total</p>
+            <p class="text-xl font-black text-violet-400">ACTIVO</p>
+         </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-8 py-6 bg-zinc-800/20 border-t border-zinc-800 flex justify-end gap-3">
+       <button 
+        (click)="close.emit()" 
+        class="px-6 py-3 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white font-black text-[11px] uppercase tracking-widest transition-all"
+      >
+        Cancelar
+      </button>
+      <button 
+        (click)="save()" 
+        [disabled]="saving() || loading()"
+        class="px-8 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-black text-[11px] uppercase tracking-widest transition-all shadow-xl shadow-violet-600/20 flex items-center gap-2 group disabled:opacity-50"
+      >
+        <i-lucide *ngIf="saving()" name="loader-2" class="h-4 w-4 animate-spin"></i-lucide>
+        <span>{{ saving() ? 'Guardando...' : 'Actualizar Suscripción' }}</span>
+        <i-lucide *ngIf="!saving()" name="arrow-right" class="h-4 w-4 group-hover:translate-x-1 transition-transform"></i-lucide>
+      </button>
+    </div>
+
+  </div>
+</div>

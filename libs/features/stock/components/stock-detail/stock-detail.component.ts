@@ -6,8 +6,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 import { SessionService } from '@core/session/session.service';
 import { OrderTimelineComponent } from '../../../pedidos/detalles/components/order-timeline.component';
 import { OrderItemsWidgetComponent } from '../../../pedidos/detalles/components/order-items-widget.component';
-import { OrderFilesWidgetComponent } from '../../../pedidos/detalles/components/order-files-widget.component';
-import { StockStatusModalComponent } from '../stock-status-modal/stock-status-modal.component';
+import { StockProductionModalComponent } from '../stock-status-modal/stock-production-modal.component';
 import { StockProgressFlowComponent } from './components/stock-progress-flow.component';
 
 @Component({
@@ -18,9 +17,8 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
     LucideAngularModule, 
     OrderTimelineComponent, 
     OrderItemsWidgetComponent, 
-    OrderFilesWidgetComponent, 
     StockProgressFlowComponent,
-    StockStatusModalComponent
+    StockProductionModalComponent
   ],
   template: `
     <div class="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -39,11 +37,10 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
               {{ pedido()?.items?.[0]?.nombreProducto || 'Referencia de Producción' }}
               <span class="text-primary italic opacity-50 underline decoration-indigo-500/30">.stock</span>
             </h1>
-
-            <div class="flex flex-wrap items-center gap-6 text-zinc-400">
+            <div class="flex flex-wrap items-center gap-6 text-zinc-400">
               <div class="flex items-center gap-2">
                 <lucide-angular [img]="icons.Layers" class="h-4 w-4 text-primary"></lucide-angular>
-                <span class="text-sm font-bold">Cantidad: {{ pedido()?.totalUnits || pedido()?.items?.[0]?.cantidad || 0 }} u.</span>
+                <span class="text-sm font-bold">Cantidad: {{ totalUnits() }} u.</span>
               </div>
               <div class="flex items-center gap-2">
                 <lucide-angular [img]="icons.Calendar" class="h-4 w-4"></lucide-angular>
@@ -56,18 +53,31 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
             </div>
           </div>
 
-          <div class="flex flex-col items-start lg:items-end gap-4" *ngIf="pedido()">
-            <div [class]="'flex items-center gap-2 px-5 py-2.5 rounded-2xl border backdrop-blur-md shadow-lg ' + getStatusStyles(pedido()!.status)">
-              <div class="h-2 w-2 rounded-full bg-current animate-pulse"></div>
-              <span class="text-xs font-black uppercase tracking-widest">{{ getStatusLabel(pedido()!.status, session.activeNegocio()?.rubro, 'STOCK') }}</span>
+          <div class="flex flex-col items-start lg:items-end gap-3" *ngIf="pedido()">
+            <div class="flex items-center gap-2">
+              <button (click)="handleEdit()" class="p-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-all shadow-xl backdrop-blur-md border border-white/10" title="Editar Lote">
+                <lucide-angular [img]="icons.Edit3" class="h-5 w-5"></lucide-angular>
+              </button>
+              <div [class]="'flex items-center gap-2 px-5 py-2.5 rounded-2xl border backdrop-blur-md shadow-lg ' + getStatusStyles(pedido()!.status)">
+                <div class="h-2 w-2 rounded-full bg-current animate-pulse"></div>
+                <span class="text-xs font-black uppercase tracking-widest">{{ getStatusLabel(pedido()!.status, session.activeNegocio()?.rubro, 'STOCK') }}</span>
+              </div>
             </div>
-            <button (click)="isStatusModalOpen.set(true)" class="flex items-center gap-2 px-6 py-3 bg-white text-zinc-900 rounded-2xl font-black text-xs hover:scale-105 transition-all active:scale-95 shadow-xl border-2 border-primary/5 hover:border-primary/20">
-              <lucide-angular [img]="icons.Zap" class="h-4 w-4 text-primary"></lucide-angular>
-              CONTROL DE FABRICACIÓN
-            </button>
+            
+            <div class="flex items-center gap-2">
+              <button *ngIf="canSell()" (click)="handleSell()" class="flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-xs hover:scale-105 transition-all active:scale-95 shadow-xl shadow-emerald-500/20">
+                <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
+                VENDER STOCK
+              </button>
+              <button (click)="isStatusModalOpen.set(true)" class="flex items-center gap-2 px-6 py-3 bg-white text-zinc-900 rounded-2xl font-black text-xs hover:scale-105 transition-all active:scale-95 shadow-xl border-2 border-primary/5 hover:border-primary/20">
+                <lucide-angular [img]="icons.Zap" class="h-4 w-4 text-primary"></lucide-angular>
+                CONTROL DE FABRICACIÓN
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
 
       <!-- Main Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" *ngIf="pedido()">
@@ -110,7 +120,6 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
           <app-order-items-widget [items]="pedido()!.items"></app-order-items-widget>
 
           <!-- Files Widget -->
-          <app-order-files-widget [items]="pedido()!.items || []" (downloadStatus)="downloadFile($event)"></app-order-files-widget>
 
         </div>
 
@@ -164,13 +173,13 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
     </div>
 
     <!-- Stock Specific Control Modal -->
-    <app-stock-status-modal 
+    <app-stock-production-modal 
       *ngIf="pedido()"
       [isOpen]="isStatusModalOpen()" 
       [order]="pedido()!"
       (onClose)="isStatusModalOpen.set(false)"
       (onSaved)="onSaved.emit()">
-    </app-stock-status-modal>
+    </app-stock-production-modal>
   `,
   styles: [`
     :host { display: block; }
@@ -179,6 +188,8 @@ import { StockProgressFlowComponent } from './components/stock-progress-flow.com
 export class StockDetailComponent {
   pedido = input.required<Pedido | null>();
   @Output() onSaved = new EventEmitter<void>();
+  @Output() onEdit = new EventEmitter<void>();
+  @Output() onDelete = new EventEmitter<void>();
   
   public session = inject(SessionService);
   
@@ -189,6 +200,18 @@ export class StockDetailComponent {
     CheckCircle, Info, Tag, MessageSquare, ChevronRight, 
     Edit3, AlertCircle, TrendingUp, Zap, Layers, Box, BarChart3, ChevronLeft
   };
+
+  totalUnits = computed(() => {
+    const p = this.pedido();
+    if (!p) return 0;
+    if (p.totalUnits) return p.totalUnits;
+    return p.items?.reduce((acc, item) => acc + (item.qty || 0), 0) || 0;
+  });
+
+  canSell = computed(() => {
+    const s = this.pedido()?.status;
+    return s === 'DONE' || s === 'IN_STOCK' || s === 'READY';
+  });
 
   tiempoTranscurrido = computed(() => {
     const p = this.pedido();
@@ -202,6 +225,17 @@ export class StockDetailComponent {
 
   getStatusLabel = getStatusLabel;
   getStatusStyles = getStatusStyles;
+
+  handleEdit() {
+    this.onEdit.emit();
+  }
+
+  handleSell() {
+    // Por ahora, si se marca como vendido, el flujo ideal es moverlo a DELIVERED
+    // o abrir un modal de venta. Para cumplir con el requerimiento inmediato,
+    // permitiremos al usuario saber que esta es la puerta de entrada a la venta.
+    this.onSaved.emit();
+  }
 
   downloadFile(url?: string) {
     if (url) window.open(url, '_blank');

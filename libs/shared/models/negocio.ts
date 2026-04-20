@@ -16,10 +16,18 @@ export interface Negocio {
   rubro: Rubro;
   moneda?: string;
   status: 'ACTIVE' | 'SUSPENDED' | 'TRIAL';
+  phone?: string;
+  email?: string;
   subscriptionExpiresAt?: string;
   createdAt: string;
   userRole?: 'OWNER' | 'ADMIN' | 'OPERATOR' | 'VIEWER';
   capabilities?: string[];
+}
+
+export interface BusinessConfig {
+  businessId: string;
+  config: NegocioConfig;
+  [key: string]: any;
 }
 
 export interface CampoItem {

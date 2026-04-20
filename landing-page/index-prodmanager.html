@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProdManager | Gestión para Impresión 3D, Almacenes y Talleres</title>
+    <link rel="canonical" href="https://www.prodmanager.com.ar">
+    <meta name="description" content="Gestioná tu producción e inventario con ProdManager. Especializado en Impresión 3D y Almacenes.">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Tailwind CSS 4.0 CDN -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-white text-zinc-900 font-sans overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+            <a href="/" class="flex items-center gap-3">
+                <img src="logo.png" alt="Logo" class="h-9 w-9 object-contain rounded-xl">
+                <span class="text-xl font-black tracking-tight uppercase">ProdManager</span>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-500">
+                <a href="#problema" class="hover:text-zinc-900 transition-colors">Problema</a>
+                <a href="#industrias" class="hover:text-zinc-900 transition-colors">Industrias</a>
+                <a href="#funcionalidades" class="hover:text-zinc-900 transition-colors">Funcionalidades</a>
+                <a href="#precios" class="hover:text-zinc-900 transition-colors">Precios</a>
+                <a href="#beneficios" class="hover:text-zinc-900 transition-colors">Beneficios</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://app.prodmanager.com.ar/login" class="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-4 py-2">Iniciar sesión</a>
+                <a href="https://app.prodmanager.com.ar/register" class="inline-flex h-10 items-center gap-2 rounded-xl bg-violet-600 px-5 text-sm font-bold text-white shadow-lg shadow-violet-600/25 hover:shadow-xl hover:shadow-violet-600/30 transition-all active:scale-95">
+                    Probar gratis
+                    <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                </a>
+            </div>
+
+            <!-- Mobile menu button -->
+            <button id="menu-toggle" class="md:hidden p-2 rounded-xl hover:bg-zinc-100 transition-colors">
+                <i data-lucide="menu" id="menu-icon" class="h-5 w-5"></i>
+            </button>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-zinc-100 p-6 space-y-4 animate-slide-up">
+            <a href="#problema" class="mobile-link block text-sm font-semibold text-zinc-600 py-2">Problema</a>
+            <a href="#industrias" class="mobile-link block text-sm font-semibold text-zinc-600 py-2">Industrias</a>
+            <a href="#funcionalidades" class="mobile-link block text-sm font-semibold text-zinc-600 py-2">Funcionalidades</a>
+            <a href="#precios" class="mobile-link block text-sm font-semibold text-zinc-600 py-2">Precios</a>
+            <a href="#beneficios" class="mobile-link block text-sm font-semibold text-zinc-600 py-2">Beneficios</a>
+            <div class="pt-4 border-t border-zinc-100 space-y-3">
+                <a href="https://app.prodmanager.com.ar/login" class="block text-center text-sm font-bold text-zinc-600 py-2">Iniciar sesión</a>
+                <a href="https://app.prodmanager.com.ar/register" class="block text-center h-12 leading-[3rem] rounded-xl bg-violet-600 text-sm font-bold text-white shadow-lg shadow-violet-600/25">
+                    Probar gratis
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="relative pt-32 pb-20 md:pt-44 md:pb-32 overflow-hidden">
+        <div class="pointer-events-none absolute inset-0">
+            <div class="absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-violet-600/5 blur-3xl"></div>
+            <div class="absolute top-20 -left-40 h-[400px] w-[400px] rounded-full bg-violet-200/20 blur-3xl"></div>
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 h-px w-full max-w-5xl bg-gradient-to-r from-transparent via-zinc-200 to-transparent"></div>
+        </div>
+
+        <div class="relative mx-auto max-w-5xl px-6 text-center">
+            <div class="fade-in inline-flex items-center gap-2 rounded-full border border-violet-600/20 bg-violet-600/5 px-4 py-1.5 text-xs font-bold text-violet-600 uppercase tracking-widest mb-8" data-visible="false">
+                <i data-lucide="zap" class="h-3.5 w-3.5"></i>
+                Plataforma multi-industria
+            </div>
+
+            <h1 class="fade-in text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl" data-visible="false" style="transition-delay: 100ms">
+                Gestioná tu
+                <br>
+                <span class="bg-gradient-to-r from-violet-600 via-violet-500 to-purple-600 bg-clip-text text-transparent">
+                    negocio
+                </span>
+                como
+                <br>
+                un profesional
+            </h1>
+
+            <p class="fade-in mx-auto mt-8 max-w-2xl text-lg text-zinc-500 font-medium leading-relaxed md:text-xl" data-visible="false" style="transition-delay: 200ms">
+                Software especializado en <span class="text-zinc-900 font-black italic">Impresión 3D</span> que organiza tus pedidos, controla tu stock de materiales y gestiona tus máquinas en tiempo real.
+            </p>
+
+            <div class="fade-in mt-10 flex flex-col sm:flex-row items-center justify-center gap-4" data-visible="false" style="transition-delay: 300ms">
+                <a href="https://app.prodmanager.com.ar/register" class="group inline-flex h-14 items-center gap-3 rounded-2xl bg-violet-600 px-8 text-base font-black text-white shadow-xl shadow-violet-600/25 hover:shadow-2xl hover:shadow-violet-600/30 transition-all active:scale-95">
+                    Comenzar gratis
+                    <i data-lucide="arrow-right" class="h-5 w-5 transition-transform group-hover:translate-x-1"></i>
+                </a>
+                <a href="https://app.prodmanager.com.ar/login" class="inline-flex h-14 items-center gap-2 rounded-2xl border-2 border-zinc-200 px-8 text-base font-bold text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 transition-all">
+                    Entrar al sistema
+                </a>
+            </div>
+
+            <div class="fade-in mt-16 grid grid-cols-3 gap-8 mx-auto max-w-lg" data-visible="false" style="transition-delay: 400ms">
+                <div class="text-center">
+                    <p class="text-2xl font-black text-zinc-900 md:text-3xl">30</p>
+                    <p class="mt-1 text-xs font-bold text-zinc-400 uppercase tracking-widest">Días gratis</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-black text-zinc-900 md:text-3xl">100%</p>
+                    <p class="mt-1 text-xs font-bold text-zinc-400 uppercase tracking-widest">Digital</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-black text-zinc-900 md:text-3xl">∞</p>
+                    <p class="mt-1 text-xs font-bold text-zinc-400 uppercase tracking-widest">Modelos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problema -->
+    <section id="problema" class="py-24 md:py-32 bg-zinc-950 text-white">
+        <div class="mx-auto max-w-6xl px-6">
+            <div class="fade-in text-center max-w-3xl mx-auto mb-16" data-visible="false">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-violet-600 mb-4">El problema</p>
+                <h2 class="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">Tu taller pierde dinero sin saberlo</h2>
+                <p class="mt-6 text-lg text-zinc-400 font-medium">
+                    La mayoría de los talleres usan WhatsApp, planillas o papel para gestionar su producción, y eso les cuesta caro.
+                </p>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <div class="fade-in group rounded-3xl border border-zinc-800 bg-zinc-900/60 p-8 hover:border-violet-600/40 hover:bg-zinc-900 transition-all duration-300" data-visible="false">
+                    <div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-400 group-hover:bg-violet-600/10 group-hover:text-violet-600">
+                        <i data-lucide="package" class="h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-lg font-black tracking-tight mb-3">Pedidos perdidos</h3>
+                    <p class="text-sm text-zinc-400 leading-relaxed font-medium">Sin un sistema centralizado, los pedidos se pierden entre mensajes y anotaciones.</p>
+                </div>
+                <!-- Other problem items follow same pattern -->
+                <div class="fade-in group rounded-3xl border border-zinc-800 bg-zinc-900/60 p-8 hover:border-violet-600/40 hover:bg-zinc-900 transition-all duration-300" data-visible="false" style="transition-delay: 100ms">
+                    <div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-400 group-hover:bg-violet-600/10 group-hover:text-violet-600">
+                        <i data-lucide="clock" class="h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-lg font-black tracking-tight mb-3">Procesos manuales</h3>
+                    <p class="text-sm text-zinc-400 leading-relaxed font-medium">Horas invertidas en tareas repetitivas que podrían estar automatizadas.</p>
+                </div>
+                <div class="fade-in group rounded-3xl border border-zinc-800 bg-zinc-900/60 p-8 hover:border-violet-600/40 hover:bg-zinc-900 transition-all duration-300" data-visible="false" style="transition-delay: 200ms">
+                    <div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-400 group-hover:bg-violet-600/10 group-hover:text-violet-600">
+                        <i data-lucide="layers" class="h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-lg font-black tracking-tight mb-3">Sin seguimiento</h3>
+                    <p class="text-sm text-zinc-400 leading-relaxed font-medium">No sabés en qué etapa está cada pedido ni quién lo tiene.</p>
+                </div>
+                <div class="fade-in group rounded-3xl border border-zinc-800 bg-zinc-900/60 p-8 hover:border-violet-600/40 hover:bg-zinc-900 transition-all duration-300" data-visible="false" style="transition-delay: 300ms">
+                    <div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-400 group-hover:bg-violet-600/10 group-hover:text-violet-600">
+                        <i data-lucide="bar-chart-3" class="h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-lg font-black tracking-tight mb-3">Desorganización</h3>
+                    <p class="text-sm text-zinc-400 leading-relaxed font-medium">Materiales sin control, máquinas mal utilizadas, tiempos impredecibles.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Industrias -->
+    <section id="industrias" class="py-24 md:py-32 bg-zinc-50">
+        <div class="mx-auto max-w-6xl px-6">
+            <div class="fade-in text-center max-w-3xl mx-auto mb-16" data-visible="false">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-violet-600 mb-4">Multi-industria</p>
+                <h2 class="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl text-zinc-900">Un sistema, múltiples industrias</h2>
+                <p class="mt-6 text-lg text-zinc-500 font-medium">ProdManager se adapta a tu tipo de taller.</p>
+            </div>
+
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="fade-in group relative overflow-hidden rounded-3xl bg-white border-2 border-primary/20 p-8 shadow-xl shadow-primary/5 hover:border-primary/40 hover:shadow-2xl transition-all duration-300 transform md:-translate-y-4" data-visible="false">
+                    <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-white shadow-lg">
+                        <i data-lucide="printer" class="h-7 w-7"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-black tracking-tight">Impresión 3D</h3>
+                        <span class="px-2 py-0.5 rounded-full bg-primary/10 text-[10px] font-bold text-primary uppercase tracking-wider animate-pulse">Productivo</span>
+                    </div>
+                    <p class="text-xs font-bold text-zinc-400 mb-4 uppercase tracking-widest">Módulo estrella</p>
+                    <ul class="space-y-2.5 text-sm font-medium text-zinc-500">
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Granjas de impresión</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Control de filamentos</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Gestión de modelos STL</li>
+                    </ul>
+                </div>
+                <div class="fade-in group relative overflow-hidden rounded-3xl bg-white border border-zinc-200 p-8 hover:border-zinc-300 hover:shadow-xl transition-all duration-300 opacity-75 sm:opacity-60 grayscale-[0.5]" data-visible="false" style="transition-delay: 100ms">
+                    <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-lg opacity-80">
+                        <i data-lucide="wrench" class="h-7 w-7"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-black tracking-tight">Metalúrgica</h3>
+                        <span class="px-2 py-0.5 rounded-full bg-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-wider italic">Próximamente</span>
+                    </div>
+                    <ul class="space-y-2.5 text-sm font-medium text-zinc-500">
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Diseño y Corte</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Soldadura</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Pintura</li>
+                    </ul>
+                </div>
+                <div class="fade-in group relative overflow-hidden rounded-3xl bg-white border border-zinc-200 p-8 hover:border-zinc-300 hover:shadow-xl transition-all duration-300 opacity-75 sm:opacity-60 grayscale-[0.5]" data-visible="false" style="transition-delay: 200ms">
+                    <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-lg opacity-80">
+                        <i data-lucide="hammer" class="h-7 w-7"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-black tracking-tight">Carpintería</h3>
+                        <span class="px-2 py-0.5 rounded-full bg-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-wider italic">Próximamente</span>
+                    </div>
+                    <ul class="space-y-2.5 text-sm font-medium text-zinc-500">
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Diseño y Corte</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Armado</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Barnizado</li>
+                    </ul>
+                </div>
+                <div class="fade-in group relative overflow-hidden rounded-3xl bg-white border border-zinc-200 p-8 hover:border-zinc-300 hover:shadow-xl transition-all duration-300 opacity-75 sm:opacity-60 grayscale-[0.5]" data-visible="false" style="transition-delay: 300ms">
+                    <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg opacity-80">
+                        <i data-lucide="package" class="h-7 w-7"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-black tracking-tight">Almacenes</h3>
+                        <span class="px-2 py-0.5 rounded-full bg-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-wider italic">Próximamente</span>
+                    </div>
+                    <ul class="space-y-2.5 text-sm font-medium text-zinc-500">
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Control de Stock</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Gestión de Ventas</li>
+                        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="h-4 w-4 text-violet-600"></i> Movimiento de Caja</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="fade-in mt-16 text-center" data-visible="false">
+                <p class="text-sm font-bold text-zinc-400">
+                    <i data-lucide="info" class="h-4 w-4 inline mr-1 mb-1"></i>
+                    Sistema 100% funcional para <span class="text-violet-600">Impresión 3D</span>. Los demás módulos están actualmente en fase de desarrollo.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Funcionalidades -->
+    <section id="funcionalidades" class="py-24 md:py-32 bg-white">
+        <div class="mx-auto max-w-6xl px-6">
+            <div class="fade-in text-center max-w-3xl mx-auto mb-16" data-visible="false">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-violet-600 mb-4">Funcionalidades</p>
+                <h2 class="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl text-zinc-900">Todo lo que necesitás en un solo lugar</h2>
+            </div>
+
+            <div class="grid gap-12 lg:grid-cols-2 items-center">
+                <div class="space-y-8">
+                    <div class="fade-in flex gap-6" data-visible="false">
+                        <div class="flex-shrink-0 h-12 w-12 rounded-2xl bg-violet-600/10 flex items-center justify-center text-violet-600">
+                            <i data-lucide="layout-dashboard" class="h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black mb-2">Smart Dashboard</h3>
+                            <p class="text-zinc-500 font-medium">Alertas automáticas de pedidos próximos a vencer y métricas de producción diaria para que nunca se te pase una entrega.</p>
+                        </div>
+                    </div>
+                    <div class="fade-in flex gap-6" data-visible="false" style="transition-delay: 100ms">
+                        <div class="flex-shrink-0 h-12 w-12 rounded-2xl bg-violet-600/10 flex items-center justify-center text-violet-600">
+                            <i data-lucide="cpu" class="h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black mb-2">Control de Granja 3D</h3>
+                            <p class="text-zinc-500 font-medium">Monitorea el estado de tus impresoras (Imprimiendo, Lista, Mantenimiento) y asigna trabajos con un solo clic.</p>
+                        </div>
+                    </div>
+                    <div class="fade-in flex gap-6" data-visible="false" style="transition-delay: 200ms">
+                        <div class="flex-shrink-0 h-12 w-12 rounded-2xl bg-violet-600/10 flex items-center justify-center text-violet-600">
+                            <i data-lucide="layers" class="h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black mb-2">Pedidos & Kanban</h3>
+                            <p class="text-zinc-500 font-medium">Organiza tus trabajos en un tablero visual. Pasa los pedidos de "Diseño" a "Impresión" y finalmente a "Listo" de forma fluida.</p>
+                        </div>
+                    </div>
+                    <div class="fade-in flex gap-6" data-visible="false" style="transition-delay: 300ms">
+                        <div class="flex-shrink-0 h-12 w-12 rounded-2xl bg-violet-600/10 flex items-center justify-center text-violet-600">
+                            <i data-lucide="box" class="h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black mb-2">Inventario de Materiales</h3>
+                            <p class="text-zinc-500 font-medium">Controla tus suministros (Filamentos, Resinas) y productos en stock. Descontá materiales automáticamente al producir.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="fade-in bg-zinc-100 rounded-3xl p-4 lg:p-8" data-visible="false">
+                    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-zinc-200">
+                        <div class="h-10 bg-zinc-50 border-b border-zinc-200 flex items-center px-4 gap-2">
+                            <div class="w-24 h-2 bg-zinc-200 rounded-full"></div>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div class="h-4 w-20 bg-violet-100 rounded-lg"></div>
+                                <div class="h-4 w-4 bg-zinc-100 rounded-full"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="h-20 bg-violet-600/5 rounded-2xl border border-violet-600/10 p-4">
+                                    <div class="h-2 w-8 bg-violet-200 rounded mb-2"></div>
+                                    <div class="h-4 w-12 bg-violet-600 rounded"></div>
+                                </div>
+                                <div class="h-20 bg-zinc-50 rounded-2xl border border-zinc-100 p-4">
+                                    <div class="h-2 w-8 bg-zinc-200 rounded mb-2"></div>
+                                    <div class="h-4 w-12 bg-zinc-900 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="h-24 bg-zinc-50 rounded-2xl border border-zinc-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beneficios -->
+    <section id="beneficios" class="py-24 md:py-32 bg-violet-600 text-white overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-1/2 h-full opacity-10">
+            <i data-lucide="check-circle" class="absolute -right-20 -top-20 h-96 w-96 rotate-12"></i>
+        </div>
+        
+        <div class="mx-auto max-w-6xl px-6 relative z-10">
+            <div class="fade-in text-center max-w-3xl mx-auto mb-16" data-visible="false">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-violet-200 mb-4">¿Por qué elegirnos?</p>
+                <h2 class="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">La ventaja competitiva que tu taller necesita</h2>
+            </div>
+
+            <div class="grid gap-8 md:grid-cols-3">
+                <div class="fade-in p-8 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20" data-visible="false">
+                    <h3 class="text-xl font-black mb-4">Ahorro de Tiempo</h3>
+                    <p class="text-violet-100 font-medium leading-relaxed">Automatizá la generación de reportes y el seguimiento de pedidos, liberando horas de tu día.</p>
+                </div>
+                <div class="fade-in p-8 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20" data-visible="false" style="transition-delay: 100ms">
+                    <h3 class="text-xl font-black mb-4">Cero Errores</h3>
+                    <p class="text-violet-100 font-medium leading-relaxed">Eliminá los malentendidos de WhatsApp y las planillas borrosas. Información clara para todos.</p>
+                </div>
+                <div class="fade-in p-8 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20" data-visible="false" style="transition-delay: 200ms">
+                    <h3 class="text-xl font-black mb-4">Escalabilidad</h3>
+                    <p class="text-violet-100 font-medium leading-relaxed">Desde una sola máquina hasta una fábrica completa. El sistema crece con tu negocio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Precios -->
+    <section id="precios" class="py-24 md:py-32 bg-zinc-950 text-white relative">
+        <div class="mx-auto max-w-6xl px-6">
+            <div class="fade-in text-center max-w-3xl mx-auto mb-16" data-visible="false">
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-violet-600 mb-4">Precios</p>
+                <h2 class="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">Planes para cada etapa</h2>
+                <p class="mt-6 text-lg text-zinc-400 font-medium">Todos los planes incluyen 30 días de prueba <span class="text-violet-500 font-bold">GRATIS</span>.</p>
+            </div>
+            <div id="pricing-grid" class="grid gap-6 lg:grid-cols-3">
+                <!-- Data will be rendered by script.js -->
+            </div>
+            
+            <div class="fade-in mt-16 text-center" data-visible="false">
+                <p class="text-sm font-bold text-zinc-500">
+                    ¿Necesitás límites superiores o un plan a medida? 
+                    <a href="https://wa.me/5492645890813" class="text-violet-600 hover:underline ml-1">Contactá a soporte</a>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-100 bg-white py-12">
+        <div class="mx-auto max-w-6xl px-6 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="Logo" class="h-7 w-7 object-contain rounded-lg">
+                <span class="text-lg font-black tracking-tight uppercase">ProdManager</span>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-8 text-xs font-bold text-zinc-400 uppercase tracking-widest">
+                <a href="https://app.prodmanager.com.ar/login" class="hover:text-violet-600 transition-colors">Iniciar sesión</a>
+                <p>© 2026 ProdManager</p>
+                <div class="h-1 w-1 rounded-full bg-zinc-200 hidden md:block"></div>
+                <div class="flex items-center gap-4">
+                    <a href="mailto:shelter.solutionsdigital@gmail.com" class="hover:text-violet-600 transition-colors lowercase font-medium">shelter.solutionsdigital@gmail.com</a>
+                    <div class="h-1 w-1 rounded-full bg-zinc-200 hidden md:block"></div>
+                    <p class="flex items-center gap-1.5 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all cursor-default">
+                        Desarrollado por <span class="text-zinc-900">Shelter Solutions Digital</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/5492645890813" target="_blank" class="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 hover:scale-110 transition-all active:scale-95 group">
+        <i data-lucide="message-circle" class="h-7 w-7"></i>
+        <span class="absolute right-full mr-3 whitespace-nowrap rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-all translate-x-1 group-hover:translate-x-0">
+            ¿Tenés dudas? ¡Escribinos!
+        </span>
+    </a>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -28,11 +28,35 @@ export class AccessControlService {
 
   /**
    * Check if a feature is enabled for the current business type.
+   * Prioritizes granular capabilities stored in the DB over static rubric mappings.
    */
   isFeatureEnabled(feature: FeatureCode): boolean {
     // Universal features that are always enabled for everyone
-    if (feature === 'DASHBOARD') return true;
+    if (feature === 'DASHBOARD' || feature === 'SETTINGS') return true;
 
+    // Capability Mapping (Internal fallback if not explicitly defined in MenuItem)
+    const FEATURE_CAPS: Record<string, string[]> = {
+      CLIENTS: ['SALES_MANAGEMENT', 'SALES_BASIC'],
+      ORDERS: ['SALES_MANAGEMENT', 'SALES_BASIC', 'INVENTORY_RETAIL'],
+      ORDERS_PRODUCTION: ['PRODUCTION_MANAGEMENT'],
+      VISITS: ['VISITS_MANAGEMENT'],
+      QUOTES: ['SALES_QUOTES', 'SALES_MANAGEMENT'],
+      PRINT_QUEUE: ['PRODUCTION_MACHINES'],
+      MATERIALS: ['INVENTORY_RAW'],
+      STOCK: ['INVENTORY_RAW', 'INVENTORY_RETAIL'],
+      MACHINERY: ['PRODUCTION_MACHINES'],
+      TEAM: ['SALES_BASIC'], 
+      REPORTS: ['SALES_MANAGEMENT', 'PRODUCTION_MANAGEMENT', 'FINANCIAL_BASIC'],
+      CALENDAR: ['PRODUCTION_MANAGEMENT'],
+      PAYMENTS: ['SALES_BASIC', 'FINANCIAL_BASIC']
+    };
+
+    const requiredCaps = FEATURE_CAPS[feature] || [];
+    if (requiredCaps.some(cap => this.sessionService.hasCapability(cap))) {
+      return true;
+    }
+
+    // Fallback to legacy rubric-based mapping if no capabilities are found (for safety during migration)
     const rubro = this.currentRubro();
     if (!rubro) return false;
     
@@ -63,25 +87,23 @@ export class AccessControlService {
 
   /**
    * Rule engine for menu item visibility.
+   * Uses the dynamic config from the backend to determine visibility via href matching.
    */
   canViewMenuItem(item: MenuItemMetadata): boolean {
-    // If no specific requirement, let it be visible (unless it requires a feature that is disabled)
-    if (item.requiredFeature && !this.isFeatureEnabled(item.requiredFeature)) {
-      return false;
+    const config = this.sessionService.businessConfig();
+    
+    // 1. Dynamic Path Gating (Root-level filter)
+    if (config?.config?.sidebarItems) {
+      if (!config.config.sidebarItems.includes(item.href)) {
+        return false;
+      }
     }
 
-    // New Capability-Based Modular Gating
-    if (item.requiredCapability && !this.sessionService.hasCapability(item.requiredCapability)) {
-      return false;
-    }
-
-    if (item.requiredPermission && item.requiredFeature) {
-      return this.hasPermission(item.requiredFeature, item.requiredPermission);
-    }
-
-    // Default to VIEW permission if only feature is required
-    if (item.requiredFeature) {
-      return this.hasPermission(item.requiredFeature, 'VIEW');
+    // 2. Global Role-Based Gating (Platform Level)
+    if (item.requiredGlobalRole) {
+      if (this.sessionService.user()?.globalRole !== item.requiredGlobalRole) {
+        return false;
+      }
     }
 
     return true;

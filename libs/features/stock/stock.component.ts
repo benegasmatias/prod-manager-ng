@@ -2,27 +2,32 @@ import { Component, inject, OnInit, computed, signal, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, Wallet } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers } from 'lucide-angular';
 import { StockService } from '../../core/api/stock.service';
 import { SessionService } from '../../core/session/session.service';
 import { Pedido } from '../../shared/models';
 import { OrdersTableComponent } from '../../shared/ui';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 import { StockSaleDialogComponent } from '../../shared/ui/stock/stock-sale-dialog/stock-sale-dialog.component';
-import { StockStatusModalComponent } from './components/stock-status-modal/stock-status-modal.component';
+import { StockProductionModalComponent } from './components/stock-status-modal/stock-production-modal.component';
 
 @Component({
   selector: 'app-stock-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, OrdersTableComponent, StockSaleDialogComponent, StockStatusModalComponent],
+  imports: [
+    CommonModule, RouterModule, FormsModule, LucideAngularModule, 
+    OrdersTableComponent, StockSaleDialogComponent, StockProductionModalComponent,
+    PageShellComponent
+  ],
   templateUrl: './stock.component.html',
-  styles: [`:host { display: block; }`]
+  styleUrls: ['./stock.component.css']
 })
 export class StockPageComponent implements OnInit {
   public stockService = inject(StockService);
   public session = inject(SessionService);
   private router = inject(Router);
 
-  icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet };
+  icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers };
 
   // Expose signals from service
   loading = this.stockService.loading;
@@ -100,7 +105,9 @@ export class StockPageComponent implements OnInit {
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    // Eliminado: La carga ya se realiza en el effect() cuando cambie el businessId
+  }
 
   handleSort(key: string) {
     if (this.sortKey() === key) {
@@ -123,6 +130,18 @@ export class StockPageComponent implements OnInit {
 
   goToDetail(order: Pedido) {
     this.router.navigate(['/pedidos', order.id]);
+  }
+
+  async handleStatusSaved() {
+    await this.stockService.loadStock(true);
+    const currentId = this.selectedOrderForStatus()?.id;
+    if (currentId) {
+      // Intentamos encontrar la versión actualizada de la orden abierta en el modal
+      const updated = [...this.activeOrders(), ...this.inStockOrders()].find(o => o.id === currentId);
+      if (updated) {
+        this.selectedOrderForStatus.set(updated);
+      }
+    }
   }
 
   async handleSellConfirm(data: { price: number; clientName: string; date: string; notes: string }) {

@@ -85,11 +85,11 @@ export class MaquinasService {
     }
   }
 
-  async assignOrder(machineId: string, orderId: string, materialId?: string) {
+  async assignOrder(machineId: string, orderId: string, orderItemId?: string, materialId?: string) {
     const businessId = this.session.activeNegocio()?.id;
     this.saving.set(true);
     try {
-      await this.api.assignOrder(machineId, orderId, materialId, businessId);
+      await this.api.assignOrder(machineId, orderId, orderItemId, materialId, businessId);
       await this.loadMaquinas(true);
     } finally {
       this.saving.set(false);
