@@ -88,7 +88,15 @@ export class LoginComponent {
 
   async handleGoogleSignIn() {
     this.googleLoading.set(true);
-    // Not implemented yet in AuthService, but follows same pattern
-    // await this.authService.signInWithGoogle();
+    this.error.set(null);
+    try {
+      const { error } = await this.authService.signInWithGoogle();
+      if (error) throw error;
+      // Note: Redirect is handled by Supabase OAuth
+    } catch (err: any) {
+      console.error('[Login] Google Auth error:', err);
+      this.error.set(err.message || 'Error al conectar con Google');
+      this.googleLoading.set(false);
+    }
   }
 }

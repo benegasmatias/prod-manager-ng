@@ -13,4 +13,5 @@ export * from './button-spinner/button-spinner.component';
 export * from './loading-spinner/loading-spinner.component';
 export * from './card/base-card.component';
 export * from './layout/page-shell.component';
+export * from './material-selector/material-selector.component';
 // export * from './confirm-dialog'; // If needed later

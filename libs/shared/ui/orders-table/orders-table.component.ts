@@ -24,7 +24,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
                 </div>
               </th>
               <th *ngIf="!hideTypeColumn" class="px-6 py-4 text-left">{{ labels.TABLE.TYPE }}</th>
-              <th class="px-6 py-4 text-left">{{ clientLabel || labels.TABLE.CLIENT }}</th>
+              <th *ngIf="!hideClientColumn" class="px-6 py-4 text-left">{{ clientLabel || labels.TABLE.CLIENT }}</th>
               <th class="px-6 py-4 text-left">{{ labels.TABLE.STATUS }}</th>
               <th class="px-6 py-4 text-left">{{ labels.TABLE.RESPONSIBLE }}</th>
               
@@ -48,7 +48,14 @@ import { UI_LABELS } from '../../config/ui-labels.config';
             @for (order of orders; track order.id) {
               <tr class="group bg-white dark:bg-zinc-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all duration-300">
                 <td class="px-6 py-5 first:rounded-l-2xl border-y border-l border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700 transition-colors">
-                  <span class="text-[10px] font-black tabular-nums text-zinc-400">#{{ order.code }}</span>
+                  <div class="flex flex-col">
+                    <span class="text-[10px] font-black tabular-nums text-zinc-400">#{{ order.code }}</span>
+                    @if (hideClientColumn) {
+                      <span class="text-xs font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[180px] mt-0.5">
+                        {{ order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
+                      </span>
+                    }
+                  </div>
                 </td>
                 
                 <td *ngIf="!hideTypeColumn" class="px-6 py-5 border-y border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
@@ -56,18 +63,18 @@ import { UI_LABELS } from '../../config/ui-labels.config';
                       {{ order.type === 'STOCK' ? labels.ORDER_TYPES.STOCK : labels.ORDER_TYPES.CLIENT }}
                    </div>
                 </td>
-
-                <td class="px-6 py-5 border-y border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
-                  <div class="flex flex-col">
-                    <span class="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px]">
-                      {{ order.clientName || fallbackClientName || 'S/N' }}
-                    </span>
-                    <span class="text-[10px] text-zinc-400 line-clamp-1">
-                      {{ order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
-                      {{ order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
-                    </span>
-                  </div>
-                </td>
+ 
+                 <td *ngIf="!hideClientColumn" class="px-6 py-5 border-y border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
+                   <div class="flex flex-col">
+                     <span class="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px]">
+                       {{ order.clientName || order.items[0]?.name || order.items[0]?.nombreProducto || fallbackClientName || 'S/N' }}
+                     </span>
+                     <span class="text-[10px] text-zinc-400 line-clamp-1">
+                       {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' productos adicionales)' : 'Referencia de Stock') }}
+                       {{ order.clientName && order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
+                     </span>
+                   </div>
+                 </td>
 
                 <td class="px-6 py-5 border-y border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
                   <button 
@@ -163,11 +170,11 @@ import { UI_LABELS } from '../../config/ui-labels.config';
                   }
                 </div>
                 <h3 class="text-xs md:text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">
-                  {{ order.clientName || fallbackClientName || 'S/N' }}
+                  {{ order.clientName || order.items[0]?.name || order.items[0]?.nombreProducto || fallbackClientName || 'S/N' }}
                 </h3>
                 <p class="text-[9px] font-bold text-zinc-400 line-clamp-1 italic">
-                  {{ order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
-                  {{ order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
+                  {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' productos adicionales)' : 'Referencia de Stock') }}
+                  {{ order.clientName && order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
                 </p>
               </div>
 
@@ -246,6 +253,7 @@ export class OrdersTableComponent {
   @Input() hideUrgency = false;
   @Input() hideDelivery = false;
   @Input() hideFinancials = false;
+  @Input() hideClientColumn = false;
   @Input() clientLabel = 'Cliente / Referencia';
   @Input() fallbackClientName?: string;
   @Input() rubro?: Rubro;

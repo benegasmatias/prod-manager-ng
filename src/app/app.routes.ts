@@ -27,6 +27,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
   },
   {
+    path: 'auth/callback',
+    loadComponent: () => import('./pages/auth/callback.component').then(m => m.AuthCallbackComponent)
+  },
+  {
     path: 'onboarding',
     canActivate: [authGuard, userStatusGuard],
     loadComponent: () => import('../../libs/features/auth/pages/onboarding/onboarding.component').then(m => m.OnboardingComponent)

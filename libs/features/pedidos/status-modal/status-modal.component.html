@@ -116,8 +116,12 @@
 
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2 mb-1">
-                  <p class="text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">{{ item.name || 'Sin nombre' }}
-                  </p>
+                  <p class="text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">{{ item.name || 'Sin nombre' }}</p>
+                  @if (item.link || item.url_stl || item.stlUrl) {
+                    <a [href]="item.link || item.url_stl || item.stlUrl" target="_blank" class="p-1 rounded-lg text-zinc-400 hover:text-primary hover:bg-primary/10 transition-all active:scale-95 flex items-center justify-center translate-y-[-1px]" title="Ver referencia externa">
+                      <lucide-angular [img]="icons.ExternalLink" class="h-3.5 w-3.5"></lucide-angular>
+                    </a>
+                  }
 
                   <!-- STATUS PILL -->
                   @let activeJob = item.job || item.productionJob;
@@ -188,7 +192,7 @@
                     </div>
 
                     @if (is3D() && selectedMachineIdForItem()) {
-                      <div class="space-y-2 animate-in fade-in zoom-in-95 duration-300">
+                      <div class="space-y-2 animate-in fade-in zoom-in-95 duration-300 relative z-20">
                         @for (assignment of filamentAssignments(); track $index) {
                           <div class="grid grid-cols-[1fr,80px,36px] gap-1.5 items-center">
                             <!-- Filament Selector -->

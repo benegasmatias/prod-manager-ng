@@ -74,6 +74,8 @@ export interface ItemPedido {
   precioUnitario?: number; // Legacy compatibility
   senia: number;
   stlUrl?: string;
+  link?: string; // External reference link
+  url_stl?: string; // 3D specific legacy
   weightGrams?: number;
   estimatedMinutes?: number;
   deposit?: number;

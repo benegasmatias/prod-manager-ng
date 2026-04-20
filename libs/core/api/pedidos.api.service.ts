@@ -157,7 +157,7 @@ export class PedidosApiService {
     return data;
   }
 
-  async updateItemStatus(orderId: string, itemId: string, status: string, businessId: string): Promise<any> {
-    return firstValueFrom(this.http.patch(`${API_ENDPOINTS.ORDERS.ROOT}/${orderId}/items/${itemId}/status`, { status, businessId }));
+  async updateItemStatus(orderId: string, itemId: string, status: string, businessId: string, force: boolean = false): Promise<any> {
+    return firstValueFrom(this.http.patch(`${API_ENDPOINTS.ORDERS.ROOT}/${orderId}/items/${itemId}/status`, { status, businessId, force }));
   }
 }

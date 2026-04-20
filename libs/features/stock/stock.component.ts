@@ -9,14 +9,14 @@ import { Pedido } from '../../shared/models';
 import { OrdersTableComponent } from '../../shared/ui';
 import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 import { StockSaleDialogComponent } from '../../shared/ui/stock/stock-sale-dialog/stock-sale-dialog.component';
-import { StockStatusModalComponent } from './components/stock-status-modal/stock-status-modal.component';
+import { StockProductionModalComponent } from './components/stock-status-modal/stock-production-modal.component';
 
 @Component({
   selector: 'app-stock-page',
   standalone: true,
   imports: [
     CommonModule, RouterModule, FormsModule, LucideAngularModule, 
-    OrdersTableComponent, StockSaleDialogComponent, StockStatusModalComponent,
+    OrdersTableComponent, StockSaleDialogComponent, StockProductionModalComponent,
     PageShellComponent
   ],
   templateUrl: './stock.component.html',
@@ -105,7 +105,9 @@ export class StockPageComponent implements OnInit {
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    // Eliminado: La carga ya se realiza en el effect() cuando cambie el businessId
+  }
 
   handleSort(key: string) {
     if (this.sortKey() === key) {
@@ -131,7 +133,7 @@ export class StockPageComponent implements OnInit {
   }
 
   async handleStatusSaved() {
-    await this.stockService.loadStock();
+    await this.stockService.loadStock(true);
     const currentId = this.selectedOrderForStatus()?.id;
     if (currentId) {
       // Intentamos encontrar la versión actualizada de la orden abierta en el modal

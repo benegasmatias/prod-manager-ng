@@ -71,8 +71,7 @@
             [hideUrgency]="true"
             [hideDelivery]="true"
             [hideFinancials]="true"
-            clientLabel="Referencia"
-            fallbackClientName="STOCK"
+            [hideClientColumn]="true"
             [rubro]="session.rubro()"
             (statusClick)="openStatusModal($event)"
             (manageClick)="openStatusModal($event)"
@@ -117,8 +116,7 @@
             [hideUrgency]="true"
             [hideDelivery]="true"
             [hideFinancials]="true"
-            clientLabel="Referencia"
-            fallbackClientName="STOCK"
+            [hideClientColumn]="true"
             [rubro]="session.rubro()"
             (statusClick)="openSellModal($event)"
             (manageClick)="openSellModal($event)"
@@ -139,10 +137,9 @@
   (onConfirm)="handleSellConfirm($event)">
 </app-stock-sale-dialog>
 
-<app-stock-status-modal 
-  *ngIf="selectedOrderForStatus()"
-  [order]="selectedOrderForStatus()!" 
+<app-stock-production-modal 
   [isOpen]="isStatusModalOpen()" 
+  [order]="selectedOrderForStatus()!"
   (onClose)="isStatusModalOpen.set(false)"
   (onSaved)="handleStatusSaved()">
-</app-stock-status-modal>
+</app-stock-production-modal>

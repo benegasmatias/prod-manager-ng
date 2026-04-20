@@ -78,6 +78,14 @@ export class RegisterComponent {
 
   async handleGoogleSignIn() {
     this.googleLoading.set(true);
-    await this.authService.signInWithGoogle();
+    this.error.set(null);
+    try {
+      const { error } = await this.authService.signInWithGoogle();
+      if (error) throw error;
+    } catch (err: any) {
+      console.error('[Register] Google Auth error:', err);
+      this.error.set(err.message || 'Error al conectar con Google');
+      this.googleLoading.set(false);
+    }
   }
 }

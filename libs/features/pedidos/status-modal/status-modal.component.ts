@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import {
   LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
   DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
-  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight, Clock, Truck, XCircle, Plus, Minus
+  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight, Clock, Truck, XCircle, Plus, Minus, ExternalLink
 } from 'lucide-angular';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { ButtonSpinnerComponent } from '@shared/ui';
@@ -210,7 +210,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   icons: any = {
     Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2,
     User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, ChevronRight,
-    Clock, Truck, XCircle, Plus, Minus
+    Clock, Truck, XCircle, Plus, Minus, ExternalLink
   };
 
   getIcon(name: string): any {
