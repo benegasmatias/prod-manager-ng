@@ -1,4 +1,4 @@
-<div *ngIf="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-300">
+<div *ngIf="isOpen()" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-300">
   
   <!-- Backdrop con efecto Blur profundo -->
   <div 
@@ -27,10 +27,10 @@
         </div>
         <div class="min-w-0">
           <h2 class="text-base sm:text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight truncate uppercase">
-            Control de Lote <span class="text-primary">#{{ order.code }}</span>
+            Control de Lote <span class="text-primary">#{{ order().code }}</span>
           </h2>
           <p class="text-[10px] sm:text-[11px] font-black text-zinc-400 uppercase tracking-widest truncate mt-0.5">
-            {{ getStatusLabel(order.status, rubro(), 'STOCK') }}
+            {{ getStatusLabel(order().status, rubro(), 'STOCK') }}
           </p>
         </div>
       </div>
@@ -69,15 +69,15 @@
       </section>
 
       <!-- 2. Manifiesto Táctico (Exact Match con Desglose de Ítems) -->
-      @if (order.items && order.items.length > 0) {
+      @if (order().items && order().items.length > 0) {
         <section class="space-y-3">
           <div class="flex items-center justify-between px-1">
             <span class="text-[10px] font-black tracking-widest text-zinc-400 uppercase leading-none italic">Gestión de Manufactura</span>
-            <span class="text-[10px] font-bold text-zinc-400 px-2 py-0.5 rounded-md bg-zinc-100/50 dark:bg-zinc-800/50">{{ order.items.length }} ítems</span>
+            <span class="text-[10px] font-bold text-zinc-400 px-2 py-0.5 rounded-md bg-zinc-100/50 dark:bg-zinc-800/50">{{ order().items.length }} ítems</span>
           </div>
 
           <div class="space-y-2.5">
-            @for (item of order.items; track item.id) {
+            @for (item of order().items; track item.id) {
               <div [class]="cn(
                 'flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] border transition-all duration-300 gap-4',
                 item.status === 'DONE' || item.status === 'IN_STOCK' ? 'bg-zinc-50/50 dark:bg-zinc-900/30 opacity-70 border-zinc-100 dark:border-zinc-800' : 'bg-white dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 shadow-sm',
@@ -181,7 +181,7 @@
       @if (selectedItemForFailureId()) {
          <div class="animate-in slide-in-from-right duration-500">
            <app-failure-module 
-              [order]="order"
+              [order]="order()"
               [rubro]="rubro()"
               [reason]="failureReason"
               [action]="failureAction"
@@ -201,37 +201,26 @@
       <!-- 3. Configuración & Notas (Match Pedidos UI) -->
       <div class="space-y-4">
         <div class="p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
-           <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              <!-- Responsable -->
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-                  <lucide-angular [img]="icons.User" class="h-3.5 w-3.5"></lucide-angular>
-                  Responsable del Lote
-                </label>
-                <div class="relative group">
-                  <select 
-                    [(ngModel)]="selectedOperatorId"
-                    class="h-14 w-full rounded-2xl border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-5 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all appearance-none text-zinc-900 dark:text-zinc-50 cursor-pointer">
-                    <option value="">Sin asignar...</option>
-                    @for (emp of employees(); track emp.id) {
-                      <option [value]="emp.id">{{ emp.firstName | uppercase }} {{ emp.lastName | uppercase }}</option>
-                    }
-                  </select>
-                  <lucide-angular [img]="icons.ChevronDown" class="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none transition-transform group-focus-within:rotate-180"></lucide-angular>
-                </div>
-              </div>
-
-              <!-- Fecha de Entrega (DatePicker) -->
-              <div class="space-y-2">
-                <app-date-picker
-                  label="Fecha de Entrega / Stock"
-                  name="stock-delivery"
-                  [value]="visitDate()"
-                  (valueChange)="visitDate.set($event)"
-                  placeholder="Sin fecha definida">
-                </app-date-picker>
-              </div>
-           </div>
+            <div class="grid grid-cols-1 gap-8">
+               <!-- Responsable -->
+               <div class="space-y-2">
+                 <label class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                   <lucide-angular [img]="icons.User" class="h-3.5 w-3.5"></lucide-angular>
+                   Responsable del Lote
+                 </label>
+                 <div class="relative group">
+                   <select 
+                     [(ngModel)]="selectedOperatorId"
+                     class="h-14 w-full rounded-2xl border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-5 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all appearance-none text-zinc-900 dark:text-zinc-50 cursor-pointer">
+                     <option value="">Sin asignar...</option>
+                     @for (emp of employees(); track emp.id) {
+                       <option [value]="emp.id">{{ emp.firstName | uppercase }} {{ emp.lastName | uppercase }}</option>
+                     }
+                   </select>
+                   <lucide-angular [img]="icons.ChevronDown" class="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none transition-transform group-focus-within:rotate-180"></lucide-angular>
+                 </div>
+               </div>
+            </div>
 
            <!-- Notas / Bitácora -->
            <div class="mt-8 space-y-2">

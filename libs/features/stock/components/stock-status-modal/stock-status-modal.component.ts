@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal, computed, effect } from '@angular/core';
+import { Component, Output, EventEmitter, inject, signal, computed, effect, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Pedido, Employee, Machine, Material, OrderItemStatus } from '@shared/models';
@@ -7,37 +7,32 @@ import { getNegocioConfig, getStatusLabel, getStatusStyles } from '@shared/utils
 import { cn } from '@shared/utils/cn';
 import { SessionService } from '@core/session/session.service';
 import { PedidosApiService } from '../../../../core/api/pedidos.api.service';
-import { MaquinasService } from '../../../../core/api/maquinas.service';
-import { MaterialesService } from '../../../../core/api/materiales.service';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
-import { Impresion3dSectionComponent } from '../../../pedidos/status-modal/sections/impresion-3d-section.component';
-import { MetalurgicaSectionComponent } from '../../../pedidos/status-modal/sections/metalurgica-section.component';
 import { FailureModuleComponent } from '../../../pedidos/status-modal/sections/failure-module.component';
 import { MaquinasApiService } from '../../../../core/api/maquinas.api.service';
 import { MaterialesApiService } from '../../../../core/api/materiales.api.service';
-import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
+
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
-import { 
-  LucideAngularModule, Gauge, AlertOctagon, X, Layers, User, Calendar, 
-  MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, 
-  ChevronRight, Zap, Target, Package, Clock, Monitor, XCircle, Cog 
+import {
+  LucideAngularModule, Gauge, AlertOctagon, X, Layers, User, Calendar,
+  MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check,
+  ChevronRight, Zap, Target, Package, Clock, Monitor, XCircle, Cog
 } from 'lucide-angular';
 
 @Component({
   selector: 'app-stock-status-modal',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, LucideAngularModule, 
-    Impresion3dSectionComponent, MetalurgicaSectionComponent, 
-    FailureModuleComponent, AppDatePickerComponent, ButtonSpinnerComponent
+    CommonModule, FormsModule, LucideAngularModule,
+    FailureModuleComponent, ButtonSpinnerComponent
   ],
   templateUrl: './stock-status-modal.component.html',
   styleUrls: ['./stock-status-modal.component.css']
 })
 export class StockStatusModalComponent {
   cn = cn;
-  @Input() isOpen = false;
-  @Input({ required: true }) order!: Pedido;
+  isOpen = input(false);
+  order = input.required<Pedido>();
   @Output() onClose = new EventEmitter<void>();
   @Output() onSaved = new EventEmitter<void>();
 
@@ -53,7 +48,7 @@ export class StockStatusModalComponent {
   selectedOperatorId = '';
   notes = '';
   loading = signal(false);
-  visitDate = signal<string>('');
+
 
   // Granular Management
   selectedItemId = signal<string | null>(null);
@@ -63,7 +58,7 @@ export class StockStatusModalComponent {
 
   selectedItemForFailure = computed(() => {
     const id = this.selectedItemForFailureId();
-    return this.order?.items?.find(i => i.id === id) || null;
+    return this.order().items?.find(i => i.id === id) || null;
   });
 
   // Domains
@@ -72,7 +67,7 @@ export class StockStatusModalComponent {
   employees = signal<Employee[]>([]);
   selectedMachineId = signal<string>('');
   multiMaterials = signal<MultiMaterial[]>([]);
-  
+
   // Assignment State
   itemToAssignId = signal<string | null>(null);
   filamentAssignments = signal<{ materialId: string; grams: number }[]>([{ materialId: '', grams: 0 }]);
@@ -85,7 +80,7 @@ export class StockStatusModalComponent {
   isSaving = signal(false);
 
   icons = {
-    Gauge, AlertOctagon, X, Layers, User, Calendar, MessageSquare, 
+    Gauge, AlertOctagon, X, Layers, User, Calendar, MessageSquare,
     RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, ChevronRight, Zap, Target, Package,
     Clock, Monitor, XCircle, Cog
   };
@@ -96,11 +91,14 @@ export class StockStatusModalComponent {
 
   constructor() {
     effect(() => {
-      if (this.isOpen && this.order) {
-        this.selectedStatus.set(this.order.status);
-        this.selectedOperatorId = this.order.responsableGeneralId || this.order.operatorId || '';
-        this.notes = this.order.notes || '';
-        this.visitDate.set(this.order.dueDate || '');
+      const order = this.order();
+      const open = this.isOpen();
+      
+      if (open && order) {
+        this.selectedStatus.set(order.status);
+        this.selectedOperatorId = order.responsableGeneralId || order.operatorId || '';
+        this.notes = order.notes || '';
+
         this.loadContext();
       }
     });
@@ -112,7 +110,7 @@ export class StockStatusModalComponent {
     try {
       const emps = await this.api.getEmployees(bId);
       this.employees.set(emps);
-      
+
       if (this.is3D()) {
         const [macsRes, mats] = await Promise.all([
           this.maquinasApi.getAll(bId),
@@ -126,12 +124,12 @@ export class StockStatusModalComponent {
 
   // Item Management Methods
   async updateItemStatus(itemId: string, status: string) {
-    if (!this.order || this.updatingItemIds().has(itemId)) return;
+    if (!this.order() || this.updatingItemIds().has(itemId)) return;
 
     this.updatingItemIds.update(ids => new Set(ids).add(itemId));
 
     try {
-      await this.api.updateItemStatus(this.order.id, itemId, status, this.order.businessId);
+      await this.api.updateItemStatus(this.order().id, itemId, status, this.order().businessId);
       this.onSaved.emit();
     } catch (e: any) {
       this.updatingItemIds.update(ids => {
@@ -148,8 +146,8 @@ export class StockStatusModalComponent {
           type: 'warning'
         });
         if (confirmed) {
-           // Logic to release machine omitted for brevity but standard
-           this.onSaved.emit();
+          // Logic to release machine omitted for brevity but standard
+          this.onSaved.emit();
         }
       }
     } finally {
@@ -165,13 +163,13 @@ export class StockStatusModalComponent {
 
   async prepareAssign(itemId: string) {
     this.itemToAssignId.set(itemId);
-    const item = this.order.items?.find(i => i.id === itemId);
+    const item = this.order().items?.find(i => i.id === itemId);
     const weight = (item as any)?.weightGrams || (item as any)?.weight || 0;
     this.filamentAssignments.set([{ materialId: '', grams: weight }]);
   }
 
   async startItemProduction(itemId: string) {
-    const order = this.order;
+    const order = this.order();
     const machineId = this.selectedMachineId();
     if (!order || !machineId || !itemId) return;
 
@@ -212,12 +210,13 @@ export class StockStatusModalComponent {
 
   async saveFailure() {
     const item = this.selectedItemForFailure();
-    if (!item || !this.order || this.isSaving()) return;
+    const order = this.order();
+    if (!item || !order || this.isSaving()) return;
     this.isSaving.set(true);
     try {
       const wastes = this.failureMaterialWastes();
-      await this.api.reportFailure(this.order.id, {
-        businessId: this.order.businessId,
+      await this.api.reportFailure(order.id, {
+        businessId: order.businessId,
         itemId: item.id,
         reason: this.failureReason(),
         action: this.failureAction(),
@@ -264,10 +263,10 @@ export class StockStatusModalComponent {
         status: this.selectedStatus(),
         responsableId: this.selectedOperatorId || null,
         notes: this.notes,
-        dueDate: this.visitDate(),
-        businessId: this.order.businessId
+
+        businessId: this.order().businessId
       };
-      await this.api.update(this.order.id, payload);
+      await this.api.update(this.order().id, payload);
       this.onSaved.emit();
       this.close();
     } finally { this.loading.set(false); }

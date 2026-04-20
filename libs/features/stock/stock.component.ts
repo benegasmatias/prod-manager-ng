@@ -130,6 +130,18 @@ export class StockPageComponent implements OnInit {
     this.router.navigate(['/pedidos', order.id]);
   }
 
+  async handleStatusSaved() {
+    await this.stockService.loadStock();
+    const currentId = this.selectedOrderForStatus()?.id;
+    if (currentId) {
+      // Intentamos encontrar la versión actualizada de la orden abierta en el modal
+      const updated = [...this.activeOrders(), ...this.inStockOrders()].find(o => o.id === currentId);
+      if (updated) {
+        this.selectedOrderForStatus.set(updated);
+      }
+    }
+  }
+
   async handleSellConfirm(data: { price: number; clientName: string; date: string; notes: string }) {
     const order = this.selectedOrder();
     if (!order) return;
