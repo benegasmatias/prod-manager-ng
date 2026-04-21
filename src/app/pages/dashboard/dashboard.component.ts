@@ -55,7 +55,7 @@ import { cn } from '@shared/utils/cn';
       </div>
 
       <!-- DASHBOARD CONTENT LAYER -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 md:gap-y-16 pb-20">
+      <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-x-12 gap-y-8 md:gap-y-16 pb-20">
         
         <!-- DYNAMIC SECTIONS ENGINE -->
         @for (section of activeConfig().sections; track section.widgetId) {
@@ -86,7 +86,7 @@ import { cn } from '@shared/utils/cn';
                 ></app-kpi-grid>
               }
               @case ('secondary-metrics') {
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
                   <div class="p-5 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-zinc-100/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-950 flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-xl hover:border-zinc-200">
                     <div class="space-y-1 md:space-y-2 z-10">
                       <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 opacity-80">Máquinas Produciendo</span>

@@ -51,6 +51,11 @@ export class ApiService {
     activate: (id: string) => this.request<any>('POST', `${API_ENDPOINTS.BUSINESSES.LIST}/${id}/activate`),
     update: (id: string, data: any) => this.request<any>('PATCH', API_ENDPOINTS.BUSINESSES.ONE(id), data),
     delete: (id: string) => this.request<any>('DELETE', API_ENDPOINTS.BUSINESSES.ONE(id)),
+    billing: {
+      getPlans: (category?: string) => this.request<any[]>('GET', `/admin/plans${category ? '?category=' + category : ''}`),
+      preflight: (id: string, plan: string) => this.request<any>('GET', `/businesses/${id}/subscription/preflight?plan=${plan}`),
+      changePlan: (id: string, plan: string) => this.request<any>('PATCH', `/businesses/${id}/subscription/plan`, { plan }),
+    }
   };
 
   users = {

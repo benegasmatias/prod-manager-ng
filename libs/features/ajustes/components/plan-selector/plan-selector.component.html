@@ -1,0 +1,198 @@
+<div class="fixed inset-0 z-[100] flex justify-center items-start overflow-y-auto bg-zinc-950/60 backdrop-blur-md p-4 sm:p-12 animate-in fade-in duration-300">
+  <div class="bg-[#F9FAFB] w-full max-w-[1200px] sm:rounded-[4rem] shadow-2xl flex flex-col animate-in zoom-in-95 slide-in-from-top-20 duration-500 relative overflow-hidden my-auto">
+    
+    <!-- Design Accents -->
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
+    
+    <!-- Top Nav (Mobile/Web Sync) -->
+    <div class="sticky top-0 bg-white/80 backdrop-blur-md z-40 px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="h-8 w-8 bg-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
+          <lucide-angular [img]="icons.Zap" class="h-4 w-4"></lucide-angular>
+        </div>
+        <span class="font-black text-zinc-900 tracking-tight">ProdManager</span>
+      </div>
+      <button (click)="close()" class="h-10 w-10 rounded-full hover:bg-zinc-100 flex items-center justify-center transition-colors">
+        <lucide-angular [img]="icons.X" class="h-5 w-5 text-zinc-400"></lucide-angular>
+      </button>
+    </div>
+
+    <!-- Header Section -->
+    <div class="px-6 py-12 sm:py-20 text-center max-w-3xl mx-auto">
+      <div class="inline-flex items-center px-4 py-1.5 bg-zinc-100 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6">
+        Planes & Precios
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-zinc-900 mb-6 leading-[1.1]">
+        Elige el plan ideal para tu <span class="text-purple-600 italic">producción.</span>
+      </h1>
+      <p class="text-base sm:text-lg text-zinc-500 font-medium leading-relaxed px-4">
+        Potencia tu flujo de trabajo de fabricación con herramientas diseñadas para la precisión y la escala.
+      </p>
+    </div>
+
+    <!-- Plans Grid -->
+    <div class="px-6 pb-20 flex-1">
+      @if (loading()) {
+        <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+           <div class="h-16 w-16 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin"></div>
+           <p class="text-xs font-black uppercase text-purple-600 tracking-[0.2em] animate-pulse">Sincronizando con BDD...</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-[1100px] mx-auto items-stretch">
+          @for (plan of plans(); track plan.id) {
+            @let isPro = plan.id.includes('pro');
+            @let isBusiness = plan.id.includes('business');
+            
+            <div 
+              class="relative flex flex-col p-10 rounded-[2.5rem] bg-white border transition-all duration-500 group overflow-hidden"
+              [ngClass]="{
+                'border-purple-200 shadow-2xl shadow-purple-500/10 scale-105 z-10': isPro,
+                'border-zinc-100 hover:border-purple-200 hover:shadow-xl': !isPro
+              }"
+            >
+              @if (isPro) {
+                <div class="absolute top-0 right-0 left-0 bg-purple-600 text-white text-[9px] font-black uppercase tracking-[0.2em] py-2 text-center">
+                  Más Popular
+                </div>
+              }
+
+              <!-- Icon & Title -->
+              <div class="mb-10 pt-4">
+                 <lucide-angular 
+                  [img]="isPro ? icons.Rocket : (isBusiness ? icons.Diamond : icons.Sparkles)" 
+                  class="h-8 w-8 mb-6"
+                  [ngClass]="isPro ? 'text-purple-600' : 'text-zinc-400'"
+                 ></lucide-angular>
+                 <h2 class="text-2xl font-black text-zinc-900">{{ plan.name }}</h2>
+                 <div class="mt-4 flex items-baseline gap-1">
+                    <span class="text-4xl font-black text-zinc-900">${{ getPlanPrice(plan.id) }}</span>
+                    <span class="text-xs font-bold text-zinc-400">/mes</span>
+                 </div>
+              </div>
+
+              <!-- Features List -->
+              <div class="flex-1 space-y-5 mb-12">
+                 @for (feat of plan.features; track feat) {
+                   <div class="flex items-start gap-4">
+                      <lucide-angular [img]="icons.CheckCircle2" class="h-4 w-4 text-purple-600 mt-0.5 shrink-0"></lucide-angular>
+                      <span class="text-[13px] font-medium text-zinc-600 leading-tight">{{ feat }}</span>
+                   </div>
+                 }
+              </div>
+
+              <!-- Button -->
+              <button 
+                [disabled]="isCurrentPlan(plan.id) || selecting()"
+                (click)="selectPlan(plan.id)"
+                class="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all active:scale-[0.98] flex items-center justify-center gap-2 group-hover:shadow-lg"
+                [ngClass]="{
+                  'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200': isCurrentPlan(plan.id),
+                  'bg-purple-600 text-white shadow-purple-500/30': isPro && !isCurrentPlan(plan.id),
+                  'bg-purple-50 text-purple-600 border border-purple-100': !isPro && !isCurrentPlan(plan.id)
+                }"
+              >
+                @if (selecting() === plan.id) {
+                  <div class="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                } @else if (isCurrentPlan(plan.id)) {
+                  Tu Plan Actual
+                } @else {
+                  {{ isBusiness ? 'Contactar Ventas' : (isPro ? 'Seleccionar Plan' : 'Empezar Gratis') }}
+                }
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Comparison Table (Desktop Only) -->
+        <div class="mt-32 hidden sm:block max-w-[1000px] mx-auto">
+           <h3 class="text-3xl font-black text-center text-zinc-900 mb-16">Compara todas las funciones</h3>
+           
+           <div class="bg-white rounded-[2.5rem] border border-zinc-100 overflow-hidden shadow-sm">
+              <table class="w-full text-left border-collapse">
+                 <thead>
+                    <tr class="bg-zinc-50/50">
+                       <th class="p-8 text-[10px] font-black uppercase tracking-widest text-zinc-400">Característica</th>
+                       <th class="p-8 text-[10px] font-black uppercase tracking-widest text-zinc-400 text-center">Gratis</th>
+                       <th class="p-8 text-[10px] font-black uppercase tracking-widest text-purple-600 text-center">Taller Inicial</th>
+                       <th class="p-8 text-[10px] font-black uppercase tracking-widest text-zinc-400 text-center">Alto en Producción</th>
+                    </tr>
+                 </thead>
+                 <tbody class="divide-y divide-zinc-50">
+                    @for (feature of dynamicFeatures(); track feature.name) {
+                      <tr class="hover:bg-zinc-50/30 transition-colors">
+                        <td class="p-8 text-sm font-bold text-zinc-600">{{ feature.name }}</td>
+                        <td class="p-8 text-center text-sm font-bold text-zinc-400">
+                          @if (feature.free === true) { <lucide-angular [img]="icons.Check" class="h-4 w-4 mx-auto text-purple-600"></lucide-angular> }
+                          @else if (feature.free === false) { <lucide-angular [img]="icons.X" class="h-4 w-4 mx-auto text-zinc-300"></lucide-angular> }
+                          @else { {{ feature.free }} }
+                        </td>
+                        <td class="p-8 text-center text-sm font-black text-purple-600 bg-purple-50/20">
+                          @if (feature.pro === true) { <lucide-angular [img]="icons.Check" class="h-4 w-4 mx-auto text-purple-600"></lucide-angular> }
+                          @else if (feature.pro === false) { <lucide-angular [img]="icons.X" class="h-4 w-4 mx-auto text-zinc-300"></lucide-angular> }
+                          @else { {{ feature.pro }} }
+                        </td>
+                        <td class="p-8 text-center text-sm font-bold text-zinc-600">
+                          @if (feature.biz === true) { <lucide-angular [img]="icons.Check" class="h-4 w-4 mx-auto text-purple-600"></lucide-angular> }
+                          @else if (feature.biz === false) { <lucide-angular [img]="icons.X" class="h-4 w-4 mx-auto text-zinc-300"></lucide-angular> }
+                          @else { {{ feature.biz }} }
+                        </td>
+                      </tr>
+                    }
+                 </tbody>
+              </table>
+           </div>
+        </div>
+
+        <!-- Security / Info Section -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-12 sm:mt-24 max-w-[1000px] mx-auto">
+           <div class="p-10 rounded-[2.5rem] bg-purple-50 border border-purple-100 flex flex-col gap-6">
+              <div class="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-purple-600 shadow-sm">
+                 <lucide-angular [img]="icons.ShieldCheck" class="h-6 w-6"></lucide-angular>
+              </div>
+              <div>
+                <h4 class="text-xl font-black text-zinc-900 mb-2">Seguridad de Grado Bancario</h4>
+                <p class="text-sm text-zinc-500 font-medium leading-relaxed">
+                  Todos nuestros planes incluyen encriptación de punto a punto y backups diarios automáticos para que tu contenido esté siempre a salvo.
+                </p>
+              </div>
+           </div>
+           <div class="p-10 rounded-[2.5rem] bg-purple-600 border border-purple-700 flex flex-col gap-6 text-white overflow-hidden relative">
+              <div class="absolute -right-10 -bottom-10 opacity-10">
+                 <lucide-angular [img]="icons.Rocket" class="h-64 w-64"></lucide-angular>
+              </div>
+              <div class="h-12 w-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white">
+                 <lucide-angular [img]="icons.Zap" class="h-6 w-6"></lucide-angular>
+              </div>
+              <div class="relative z-10">
+                <h4 class="text-xl font-black mb-2">Ecosistema Abierto</h4>
+                <p class="text-sm text-purple-100 font-medium leading-relaxed">
+                  Conecta ProdManager con más de 200 aplicaciones externas mediante webhooks y nuestra API REST robusta incluida en planes Pro+.
+                </p>
+              </div>
+           </div>
+        </div>
+
+        <!-- Help Link -->
+        <div class="mt-20 text-center pb-20">
+           <p class="text-sm font-bold text-zinc-400 mb-6">¿Tienes dudas sobre qué plan elegir?</p>
+           <div class="flex items-center justify-center gap-4">
+              <button class="px-8 h-12 rounded-full border border-zinc-200 text-xs font-black text-zinc-600 uppercase tracking-widest hover:bg-zinc-50 transition-all">Hablar con Ventas</button>
+              <button class="px-8 h-12 rounded-full text-xs font-black text-purple-600 uppercase tracking-widest hover:bg-purple-50 transition-all">Ver FAQ</button>
+           </div>
+        </div>
+      }
+    </div>
+
+    <!-- Mobile Sticky Action Bar -->
+    <div class="sticky bottom-0 bg-white/90 backdrop-blur-xl border-t border-zinc-100 p-6 flex items-center justify-between z-50 sm:hidden">
+       <div>
+         <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">Desde</p>
+         <p class="text-xl font-black text-zinc-900">$8.900<span class="text-[10px] font-bold text-zinc-400">/mo</span></p>
+       </div>
+       <button (click)="loadPlans()" class="px-8 h-12 bg-purple-600 text-white rounded-full text-xs font-black uppercase tracking-widest shadow-xl shadow-purple-500/20">
+         Elegir Plan
+       </button>
+    </div>
+
+  </div>
+</div>

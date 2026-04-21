@@ -14,12 +14,18 @@
     <!-- Active Text -->
     <div class="hidden sm:flex flex-col items-start leading-none gap-1">
       <span class="text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50">{{ active.nombre }}</span>
-      <div class="flex items-center gap-1.5">
-        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">{{ active.rubro }}</span>
-        <div class="w-1 h-1 rounded-full bg-zinc-300"></div>
-        <span class="text-[9px] font-black uppercase tracking-widest text-primary/80">{{ active.userRole }}</span>
+        <div class="flex items-center gap-1.5">
+          @if (sessionService.activeSubscription(); as sub) {
+            <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase tracking-widest border border-amber-500/30">
+              {{ sub.planName }}
+            </span>
+            <div class="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+          }
+          <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">{{ active.rubro }}</span>
+          <div class="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+          <span class="text-[9px] font-black uppercase tracking-widest text-primary/80">{{ active.userRole }}</span>
+        </div>
       </div>
-    </div>
 
     <lucide-angular [img]="icons.ChevronDown" class="h-4 w-4 text-zinc-400 transition-transform duration-300" [class.rotate-180]="dropdownOpen()"></lucide-angular>
   </button>
@@ -57,6 +63,12 @@
             <div class="flex flex-col items-start leading-tight">
               <span class="text-xs font-black uppercase text-zinc-700 dark:text-zinc-200">{{ negocio.nombre }}</span>
               <div class="flex items-center gap-1.5">
+                @if (negocio.plan) {
+                  <span class="px-1.5 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-[8px] font-black uppercase tracking-widest text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                    {{ negocio.plan }}
+                  </span>
+                  <div class="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-800"></div>
+                }
                 <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400">{{ negocio.rubro }}</span>
                 <span class="text-[9px] font-black uppercase tracking-widest text-primary/60">{{ negocio.userRole }}</span>
               </div>

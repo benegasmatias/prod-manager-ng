@@ -144,6 +144,66 @@
         </div>
       </div>
     </div>
+    
+    <!-- Plan y Suscripción -->
+    <div class="border border-zinc-100 dark:border-zinc-800/50 shadow-sm overflow-hidden rounded-[2.5rem] bg-white dark:bg-zinc-900/40 backdrop-blur-sm">
+      <div class="bg-zinc-50/30 dark:bg-zinc-900/10 border-b border-zinc-50 dark:border-zinc-800/50 p-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="p-3 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-700">
+              <lucide-angular [img]="icons.Zap" class="h-5 w-5 text-amber-500"></lucide-angular>
+            </div>
+            <div>
+              <h3 class="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Plan y Suscripción</h3>
+              <p class="text-xs font-medium text-zinc-500">Gestiona tu nivel de servicio y límites del sistema.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-8">
+        <div class="flex flex-col md:flex-row items-center justify-between p-8 bg-zinc-50/50 dark:bg-zinc-950/50 rounded-[2rem] border border-zinc-100 dark:border-zinc-800 gap-8">
+          <div class="flex items-center gap-6">
+            <div class="h-16 w-16 bg-amber-500/10 rounded-3xl flex items-center justify-center border border-amber-500/20 shrink-0">
+               <lucide-angular [img]="icons.Zap" class="h-8 w-8 text-amber-500"></lucide-angular>
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Plan Actual</span>
+              <div class="flex items-center gap-3">
+                <h4 class="text-3xl font-black text-zinc-900 dark:text-zinc-50 capitalize">{{ currentPlanLimits()?.name || sessionService.activeSubscription()?.planName || 'Gratuito' }}</h4>
+                <span class="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">Activo</span>
+              </div>
+            </div>
+          </div>
+          
+          <button (click)="handleUpgrade()" class="w-full md:w-auto flex items-center justify-center gap-3 px-10 h-14 rounded-2xl bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 text-sm font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all active:scale-[0.98]">
+             Cambiar de Plan
+             <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4"></lucide-angular>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+          <div class="p-6 bg-zinc-50/30 dark:bg-zinc-900/40 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
+            <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 block mb-2">Capacidad Máquinas</span>
+            <span class="text-xl font-black text-zinc-700 dark:text-zinc-300">
+              {{ currentPlanLimits() ? (currentPlanLimits().maxMachines === 0 ? 'Ilimitadas' : currentPlanLimits().maxMachines + ' Unidades') : 'Cargando...' }}
+            </span>
+          </div>
+          <div class="p-6 bg-zinc-50/30 dark:bg-zinc-900/40 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
+            <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 block mb-2">Pedidos Mensuales</span>
+            <span class="text-xl font-black text-zinc-700 dark:text-zinc-300">
+              {{ currentPlanLimits() ? (currentPlanLimits().maxOrdersPerMonth === 0 ? 'Ilimitados' : currentPlanLimits().maxOrdersPerMonth) : 'Cargando...' }}
+            </span>
+          </div>
+          <div class="p-6 bg-zinc-50/30 dark:bg-zinc-900/40 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
+            <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 block mb-2">Usuarios / Equipo</span>
+            <span class="text-xl font-black text-zinc-700 dark:text-zinc-300">
+              {{ currentPlanLimits() ? (currentPlanLimits().maxUsers === 0 ? 'Ilimitados' : currentPlanLimits().maxUsers + ' Usuarios') : 'Cargando...' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Danger Zone -->
     <div class="border border-rose-100 dark:border-rose-900/30 shadow-sm overflow-hidden rounded-[2.5rem] bg-rose-50/30 dark:bg-rose-950/10 backdrop-blur-sm mt-12">
@@ -193,3 +253,7 @@
     </div>
   </div>
 </div>
+
+@if (showPricingModal()) {
+  <app-plan-selector></app-plan-selector>
+}

@@ -20,7 +20,14 @@
     class="absolute top-13 right-0 w-64 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
     <div class="bg-primary/5 p-4 mb-2 rounded-xl border border-primary/10">
       <div class="flex flex-col gap-1">
-        <span class="text-[10px] font-black uppercase tracking-tight text-primary">Mi Perfil</span>
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-black uppercase tracking-tight text-primary">Mi Perfil</span>
+          @if (sessionService.activeSubscription(); as sub) {
+            <span class="px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-md text-[8px] font-black uppercase tracking-widest leading-none">
+              {{ sub.planName }}
+            </span>
+          }
+        </div>
         <span class="text-[10px] font-bold text-zinc-500 truncate whitespace-nowrap">{{ user()?.email }}</span>
       </div>
     </div>

@@ -50,6 +50,10 @@ export const routes: Routes = [
     loadComponent: () => import('../../libs/features/auth/pages/waiting-room/waiting-room.component').then(m => m.WaitingRoomComponent)
   },
   {
+    path: 'subscription-expired',
+    loadComponent: () => import('../../libs/features/auth/pages/subscription-expired/subscription-expired.component').then(m => m.SubscriptionExpiredComponent)
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard, userStatusGuard, businessGuard],

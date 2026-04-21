@@ -22,6 +22,7 @@ export interface Negocio {
   createdAt: string;
   userRole?: 'OWNER' | 'ADMIN' | 'OPERATOR' | 'VIEWER';
   capabilities?: string[];
+  plan?: string;
 }
 
 export interface BusinessConfig {

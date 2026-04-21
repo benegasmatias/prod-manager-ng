@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LucideAngularModule, User, ChevronDown, Settings, LogOut, X } from 'lucide-angular';
 import { AuthService } from '../../../auth/auth.service';
 import { LayoutService } from '../../layout.service';
+import { SessionService } from '../../../session/session.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -19,6 +20,7 @@ export class UserProfileComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   layoutService = inject(LayoutService);
+  sessionService = inject(SessionService);
   private elementRef = inject(ElementRef);
   
   user = this.authService.user;

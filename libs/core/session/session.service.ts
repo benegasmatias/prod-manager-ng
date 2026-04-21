@@ -30,6 +30,7 @@ export class SessionService {
 
   // New Dynamic Module Config
   businessConfig = signal<BusinessConfig | null>(null);
+  activeSubscription = computed(() => this.businessConfig()?.['subscription']);
 
   activeNegocio = computed(() => {
     const id = this._activeId();
@@ -159,6 +160,7 @@ export class SessionService {
             subscriptionExpiresAt: b.subscriptionExpiresAt,
             createdAt: b.createdAt,
             userRole: b.userRole,
+            plan: b.plan,
             capabilities: this.resolveCapabilities(rubro, b.capabilities || []),
             config: getNegocioConfig(rubro)
           };
