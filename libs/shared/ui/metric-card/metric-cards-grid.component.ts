@@ -27,13 +27,13 @@ export class MetricCardsGridComponent {
     const specificCols = {
       1: 'grid grid-cols-1',
       2: 'grid grid-cols-1 sm:grid-cols-2',
-      3: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+      3: 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3',
       4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
     };
 
     return cn(
-      'w-full max-w-full overflow-visible px-4 py-6',
-      specificCols[this.columns()] || defaultCols,
+      'w-full max-w-full overflow-visible py-6',
+      specificCols[this.columns()] || 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
       gaps[this.gap()]
     );
   });

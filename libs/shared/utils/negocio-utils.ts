@@ -33,6 +33,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'PENDING', label: 'Pendiente', color: 'bg-zinc-100' },
           { key: 'DESIGN', label: 'En Diseño', color: 'bg-indigo-500' },
           { key: 'IN_PROGRESS', label: 'Imprimiendo', color: 'bg-blue-500' },
+          { key: 'READY', label: 'Listo', color: 'bg-emerald-500' },
           { key: 'FAILED', label: 'Fallo de Impresión', color: 'bg-red-500' },
           { key: 'REPRINT_PENDING', label: 'Pendiente Reimpresión', color: 'bg-orange-400' },
           { key: 'POST_PROCESS', label: 'Post-Proceso', color: 'bg-amber-500' },
@@ -399,7 +400,19 @@ export function getStatusStyles(status: string, rubro?: Rubro): string {
   const config = getNegocioConfig(rubro || 'GENERICO');
   const stage = config.productionStages.find((s) => s.key === status);
 
-  const color = stage?.color || (status === 'CANCELLED' ? 'bg-red-500' : 'bg-zinc-100');
+  let color = stage?.color;
+  
+  if (!color) {
+    const fallbacks: Record<string, string> = {
+      READY: 'bg-emerald-500',
+      DONE: 'bg-emerald-500',
+      IN_PROGRESS: 'bg-blue-500',
+      PENDING: 'bg-zinc-100',
+      CANCELLED: 'bg-red-500',
+      FAILED: 'bg-red-500'
+    };
+    color = fallbacks[status] || 'bg-zinc-100';
+  }
 
   const parts = color.split('-');
   const baseColor = parts.length > 1 ? parts[1] : 'zinc';

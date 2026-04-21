@@ -68,6 +68,13 @@ export const API_ENDPOINTS = {
     RESOURCES: (id: string) => `/production-jobs/${id}/resources`,
     PRIORITY: (id: string) => `/production-jobs/${id}/priority`,
     STAGE: (id: string) => `/production-jobs/${id}/stage`,
+  },
+  CALIBRATIONS: {
+    LIST: '/calibrations',
+    ONE: (id: string) => `/calibrations/${id}`,
+    CREATE: '/calibrations',
+    UPDATE: (id: string) => `/calibrations/${id}`,
+    REMOVE: (id: string) => `/calibrations/${id}`,
   }
 } as const;
 

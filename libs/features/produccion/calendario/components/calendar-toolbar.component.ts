@@ -9,14 +9,14 @@ import { CalendarViewMode } from '../models/calendar.models';
   imports: [CommonModule, LucideAngularModule],
   template: `
     <header [class]="cn(
-      'bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm animate-in slide-in-from-top-4 duration-500',
-      isMobile() ? 'fixed top-3 left-3 right-3 z-[100] p-2 rounded-3xl flex items-center justify-between gap-2 overflow-hidden' : 'flex flex-col md:flex-row md:items-center justify-between gap-6 p-4 lg:p-6 rounded-[2.5rem]'
+      'bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-md animate-in slide-in-from-top-4 duration-500',
+      isMobile() ? 'sticky top-2 z-[40] mx-2 p-2 rounded-2xl flex items-center justify-between gap-2' : 'flex flex-col md:flex-row md:items-center justify-between gap-6 p-4 lg:p-6 rounded-[2.5rem]'
     )">
       
       <!-- 1. MOBILE-ONLY: Date Context Badge -->
-      <div *ngIf="isMobile()" class="flex flex-col pl-3">
-         <p class="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400">Rango Actual</p>
-         <span class="text-xs font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tight truncate max-w-[120px]">{{ currentRangeLabel() }}</span>
+      <div *ngIf="isMobile()" class="flex flex-col pl-2 min-w-0 flex-1">
+         <p class="text-[7px] font-black uppercase tracking-[0.1em] text-zinc-400 truncate">Rango</p>
+         <span class="text-[10px] font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tight truncate max-w-[80px]">{{ currentRangeLabel() }}</span>
       </div>
 
       <!-- 2. Date Navigation Controls -->
@@ -31,8 +31,8 @@ import { CalendarViewMode } from '../models/calendar.models';
           <button 
             (click)="onToday.emit()"
             [class]="cn(
-              'flex items-center justify-center rounded-xl bg-white dark:bg-zinc-700 text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-zinc-100 shadow-sm active:scale-95 transition-all',
-              isMobile() ? 'h-9 px-2 text-[8px]' : 'h-10 px-4'
+              'flex items-center justify-center rounded-xl bg-white dark:bg-zinc-700 text-[9px] font-black uppercase tracking-tighter text-zinc-900 dark:text-zinc-100 shadow-sm active:scale-95 transition-all',
+              isMobile() ? 'h-9 px-2' : 'h-10 px-4 tracking-widest'
             )">
             Hoy
           </button>
@@ -52,7 +52,7 @@ import { CalendarViewMode } from '../models/calendar.models';
 
       <!-- 3. View Selector -->
       <div [class]="cn(
-        'flex items-center gap-1 p-1 bg-zinc-100/50 dark:bg-zinc-800/50 rounded-2xl transition-all',
+        'flex items-center gap-0.5 p-0.5 bg-zinc-100/50 dark:bg-zinc-800/50 rounded-2xl transition-all',
         isMobile() ? 'order-2' : 'order-3 justify-center'
       )">
         @for (mode of viewModes; track mode.mode) {
@@ -60,22 +60,21 @@ import { CalendarViewMode } from '../models/calendar.models';
             (click)="onViewChange.emit(mode.mode)"
             [class]="cn(
               'rounded-xl flex items-center gap-2 transition-all duration-300 active:scale-95',
-              isMobile() ? 'h-9 w-9 justify-center' : 'h-10 px-4',
+              isMobile() ? (currentView() === mode.mode ? 'h-9 px-3 bg-zinc-900 dark:bg-white' : 'h-9 w-9 justify-center') : 'h-10 px-4',
               currentView() === mode.mode 
                 ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-lg shadow-zinc-900/10' 
                 : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
             )"
           >
             <lucide-angular [img]="mode.icon" [class]="isMobile() ? 'h-3.5 w-3.5' : 'h-4 w-4'"></lucide-angular>
-            <span *ngIf="!isMobile()" class="hidden lg:block text-[10px] font-black uppercase tracking-widest">{{ mode.label }}</span>
+            <span *ngIf="!isMobile() || currentView() === mode.mode" class="text-[8px] sm:text-[10px] font-black uppercase tracking-widest" [class.hidden]="isMobile() && currentView() !== mode.mode">
+              {{ mode.label }}
+            </span>
           </button>
         }
       </div>
 
     </header>
-    
-    <!-- Header Spacer for Mobile Fixed Position -->
-    <div *ngIf="isMobile()" class="h-16"></div>
   `,
   styles: [`:host { display: block; }`]
 })

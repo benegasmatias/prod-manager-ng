@@ -398,8 +398,8 @@
 
       <!-- Payment Summary: Context for delivery -->
       @if (!isPaymentMode() && !isFailureMode()) {
-      <div class="px-6 py-4 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
-        <div class="flex items-center gap-6">
+      <div class="px-5 py-4 sm:px-8 sm:py-4 bg-zinc-50/50 dark:bg-zinc-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="grid grid-cols-2 sm:flex items-center gap-4 sm:gap-6">
           <div class="flex items-center gap-2.5">
             <div
               class="h-8 w-8 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center text-zinc-400">
@@ -411,9 +411,9 @@
             </div>
           </div>
 
-          <div class="h-8 w-px bg-zinc-200/60 dark:bg-zinc-800/60"></div>
+          <div class="hidden sm:block h-8 w-px bg-zinc-200/60 dark:bg-zinc-800/60"></div>
 
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2.5 border-l border-zinc-100 sm:border-0 pl-4 sm:pl-0">
             <div
               class="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
               <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
@@ -426,7 +426,7 @@
         </div>
 
         <div (click)="!isPaymentMode() && !isFailureMode() && !isFullyPaid() && isPaymentMode.set(true)"
-             [class]="cn('flex flex-col items-end transition-all duration-200', !isFullyPaid() && !isPaymentMode() && 'cursor-pointer hover:scale-105 active:scale-95 group')">
+             [class]="cn('flex items-center justify-between sm:flex-col sm:items-end transition-all duration-200 p-3 sm:p-0 rounded-2xl bg-white sm:bg-transparent border border-zinc-100 sm:border-0', !isFullyPaid() && !isPaymentMode() && 'cursor-pointer hover:scale-[1.02] active:scale-95 group shadow-sm sm:shadow-none')">
           <div class="flex items-center gap-2 mb-0.5">
             @if (!isFullyPaid()) {
             <lucide-angular [img]="icons.AlertOctagon" class="h-3 w-3 text-amber-500" [class.animate-pulse]="!isPaymentMode()"></lucide-angular>
@@ -443,7 +443,7 @@
                    <span class="text-[9px] font-black uppercase tracking-widest">Cobrar</span>
                 </div>
              }
-             <span class="text-xl font-black tracking-tighter tabular-nums"
+             <span class="text-lg sm:text-xl font-black tracking-tighter tabular-nums"
                [class]="isFullyPaid() ? 'text-emerald-600' : 'text-amber-600'">
                {{ balanceVal() | currency }}
              </span>
