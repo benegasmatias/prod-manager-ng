@@ -105,19 +105,14 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl">
             @for (curr of currencies; track curr.code) {
               <button
-                (click)="moneda.set(curr.code)"
+                (click)="!curr.disabled && moneda.set(curr.code)"
+                [disabled]="curr.disabled"
                 class="flex flex-col items-start p-5 rounded-[1.5rem] border-2 transition-all text-left"
-                [class.border-primary]="moneda() === curr.code"
-                [class.bg-primary/5]="moneda() === curr.code"
-                [class.text-primary]="moneda() === curr.code"
-                [class.shadow-lg]="moneda() === curr.code"
-                [class.shadow-primary/10]="moneda() === curr.code"
-                [class.border-zinc-100]="moneda() !== curr.code"
-                [class.bg-zinc-50/50]="moneda() !== curr.code"
-                [class.hover:border-zinc-200]="moneda() !== curr.code"
-                [class.dark:border-zinc-800]="moneda() !== curr.code"
-                [class.dark:bg-zinc-950/50]="moneda() !== curr.code"
-                [class.dark:hover:border-zinc-700]="moneda() !== curr.code"
+                [ngClass]="{
+                  'border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10': moneda() === curr.code,
+                  'border-zinc-100 bg-zinc-50/50 hover:border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950/50 dark:hover:border-zinc-700': moneda() !== curr.code && !curr.disabled,
+                  'opacity-40 cursor-not-allowed border-zinc-100 bg-zinc-50/20 grayscale': curr.disabled
+                }"
               >
                 <span class="text-2xl font-black mb-1" 
                       [class.text-primary]="moneda() === curr.code"
@@ -133,7 +128,7 @@
                 <span class="text-[10px] mt-2 font-mono font-bold"
                       [class.text-primary]="moneda() === curr.code"
                       [class.text-zinc-400]="moneda() !== curr.code">
-                  {{ curr.code }}
+                   {{ curr.code }} @if (curr.disabled) { (Próximamente) }
                 </span>
               </button>
             }

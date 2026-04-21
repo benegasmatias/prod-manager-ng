@@ -41,10 +41,10 @@ export class AjustesComponent {
 
   readonly currencies = [
     { code: 'ARS', label: 'Pesos Argentinos', symbol: '$' },
-    { code: 'USD', label: 'Dólares Estadounidenses', symbol: 'US$' },
-    { code: 'EUR', label: 'Euros', symbol: '€' },
-    { code: 'CLP', label: 'Pesos Chilenos', symbol: 'CLP$' },
-    { code: 'UYU', label: 'Pesos Uruguayos', symbol: '$U' },
+    { code: 'USD', label: 'Dólares Estadounidenses', symbol: 'US$', disabled: true },
+    { code: 'EUR', label: 'Euros', symbol: '€', disabled: true },
+    { code: 'CLP', label: 'Pesos Chilenos', symbol: 'CLP$', disabled: true },
+    { code: 'UYU', label: 'Pesos Uruguayos', symbol: '$U', disabled: true },
   ];
 
   constructor() {
