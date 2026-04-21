@@ -17,7 +17,7 @@ import { cn } from '@shared/utils/cn';
             [queryParams]="getQueryParams(alert)"
             [class]="cn(
               'p-6 rounded-[2rem] border transition-all duration-500 relative group overflow-hidden',
-              (alert.orderId || alert.searchQuery) ? 'cursor-pointer hover:shadow-xl hover:shadow-black/5 active:scale-[0.98]' : 'cursor-default',
+              (alert.orderId || alert.searchQuery || alert.actionLink) ? 'cursor-pointer hover:shadow-xl hover:shadow-black/5 active:scale-[0.98]' : 'cursor-default',
               alert.type === 'error' 
                 ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/40 text-zinc-900 dark:text-zinc-100' 
                 : alert.type === 'critical'
@@ -37,7 +37,7 @@ import { cn } from '@shared/utils/cn';
                       <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{{ alert.timestamp }}</p>
                    </div>
                    
-                   @if (alert.orderId || alert.searchQuery) {
+                   @if (alert.orderId || alert.searchQuery || alert.actionLink) {
                      <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-primary transition-all">
                         <span>Ver detalle</span>
                         <lucide-angular [img]="icons.ArrowRight" class="h-3 w-3 group-hover:translate-x-1 transition-transform"></lucide-angular>
@@ -58,11 +58,13 @@ export class AlertsPriorityWidgetComponent {
 
   getRoute(alert: any): any[] | null {
     if (alert.orderId) return ['/pedidos', alert.orderId];
+    if (alert.actionLink) return [alert.actionLink];
     if (alert.searchQuery) return ['/pedidos'];
     return null;
   }
 
   getQueryParams(alert: any): any | null {
+    if (alert.queryParams) return alert.queryParams;
     if (!alert.orderId && alert.searchQuery) {
       return { search: alert.searchQuery };
     }

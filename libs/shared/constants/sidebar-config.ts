@@ -77,7 +77,7 @@ export const SIDEBAR_MENU_CONFIG: MenuGroupMetadata[] = [
         icon: Calendar
       },
       { 
-        label: 'Stock de Taller', 
+        label: 'Inventario', 
         href: '/stock', 
         icon: Grid
       },

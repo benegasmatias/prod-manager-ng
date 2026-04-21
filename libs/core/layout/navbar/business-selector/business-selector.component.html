@@ -44,13 +44,17 @@
         @for (negocio of sessionService.negocios(); track negocio.id) {
           <button
             (click)="handleSelect(negocio.id)"
-            class="w-full flex items-center gap-4 p-3 rounded-2xl transition-all group relative overflow-hidden text-left"
-            [class.bg-primary/5]="active.id === negocio.id"
-            [class.border-l-4]="active.id === negocio.id"
-            [class.border-primary]="active.id === negocio.id"
+            class="w-full flex items-center gap-4 p-3 rounded-2xl transition-all group relative overflow-hidden text-left mb-1"
+            [class.bg-zinc-50]="active.id === negocio.id"
+            [class.dark:bg-white/5]="active.id === negocio.id"
             [class.hover:bg-zinc-50]="active.id !== negocio.id"
             [class.dark:hover:bg-zinc-800/80]="active.id !== negocio.id"
           >
+            <!-- Selection Indicator Bar (Rounded) -->
+            <div *ngIf="active.id === negocio.id" 
+                 class="absolute left-0 top-3 bottom-3 w-1.5 bg-primary rounded-r-full shadow-[2px_0_8px_rgba(var(--primary-rgb),0.4)]">
+            </div>
+
             <!-- Badge for active -->
             <div *ngIf="active.id === negocio.id" class="absolute right-4 top-1/2 -translate-y-1/2">
               <lucide-angular [img]="icons.CheckCircle2" class="h-4 w-4 text-primary"></lucide-angular>
