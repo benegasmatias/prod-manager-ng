@@ -4,11 +4,12 @@ import { Machine } from '@shared/models';
 import { LucideAngularModule, X, Edit2, Trash2, Package, Calendar } from 'lucide-angular';
 import { SessionService } from '@core/session/session.service';
 import { cn } from '@shared/utils/cn';
+import { CalibrationsListComponent } from './calibrations-list.component';
 
 @Component({
   selector: 'app-machine-detail-sheet',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, CalibrationsListComponent],
   template: `
     <div class="fixed inset-0 z-[9999] flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       <div (click)="onClose.emit()" class="absolute inset-0"></div>
@@ -78,6 +79,10 @@ import { cn } from '@shared/utils/cn';
                   </div>
                 }
               </div>
+            </section>
+
+            <section>
+              <app-calibrations-list [machineId]="machine.id"></app-calibrations-list>
             </section>
 
             <section class="space-y-6">

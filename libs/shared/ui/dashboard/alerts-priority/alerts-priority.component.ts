@@ -20,13 +20,15 @@ import { cn } from '@shared/utils/cn';
               (alert.orderId || alert.searchQuery) ? 'cursor-pointer hover:shadow-xl hover:shadow-black/5 active:scale-[0.98]' : 'cursor-default',
               alert.type === 'error' 
                 ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/40 text-zinc-900 dark:text-zinc-100' 
+                : alert.type === 'critical'
+                ? 'bg-orange-50/50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/40 text-zinc-900 dark:text-zinc-100'
                 : 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/40 text-zinc-900 dark:text-zinc-100'
             )"
           >
              <div class="flex items-start gap-4">
                 <div [class]="cn(
                   'h-2.5 w-2.5 rounded-full mt-2 shrink-0 animate-pulse',
-                  alert.type === 'error' ? 'bg-rose-500' : 'bg-amber-500 shadow-sm shadow-amber-500/30'
+                  alert.type === 'error' ? 'bg-rose-500' : alert.type === 'critical' ? 'bg-orange-500 shadow-sm shadow-orange-500/30' : 'bg-amber-500 shadow-sm shadow-amber-500/30'
                 )"></div>
                 
                 <div class="flex-1 space-y-3">
