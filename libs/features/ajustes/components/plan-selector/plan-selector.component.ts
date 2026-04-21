@@ -4,11 +4,12 @@ import { LucideAngularModule, Check, Zap, X, ShieldCheck, Star, Rocket, ChevronR
 import { ApiService } from '@core/api/api.service';
 import { SessionService } from '@core/session/session.service';
 import { ToastService } from '@shared/services/toast.service';
+import { LoadingSpinnerComponent } from '@shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-plan-selector',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, LoadingSpinnerComponent],
   templateUrl: './plan-selector.component.html'
 })
 export class PlanSelectorModalComponent implements OnInit {
