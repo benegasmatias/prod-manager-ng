@@ -13,12 +13,24 @@
         Seguimiento en tiempo real y optimización de carga de trabajo por unidad operativa.
       </p>
     </div>
-    <button
-      (click)="openNew()"
-      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2"
-    >
-      <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nueva Unidad
-    </button>
+    <div class="flex items-center gap-4">
+      @if (planUsage() && !canAddMachine()) {
+        <div class="hidden lg:flex items-center gap-3 px-4 py-2 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 rounded-xl">
+          <div class="h-2 w-2 rounded-full bg-amber-500 animate-pulse"></div>
+          <span class="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+            Límite de unidades alcanzado ({{ planUsage()?.usage?.machines }}/{{ planUsage()?.limits?.machines }})
+          </span>
+          <a routerLink="/ajustes" class="text-[10px] font-black text-amber-800 dark:text-amber-300 underline underline-offset-2 hover:text-primary transition-colors cursor-pointer">MEJORAR PLAN</a>
+        </div>
+      }
+      <button
+        (click)="openNew()"
+        [disabled]="!canAddMachine()"
+        class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed gap-2"
+      >
+        <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nueva Unidad
+      </button>
+    </div>
   </div>
 
   <!-- Filters Section -->

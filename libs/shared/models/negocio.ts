@@ -25,6 +25,29 @@ export interface Negocio {
   plan?: string;
 }
 
+export interface PlanUsage {
+  plan: {
+    id: string;
+    name: string;
+    category: Rubro;
+  };
+  limits: {
+    users: number;
+    machines: number;
+    orders: number;
+  };
+  usage: {
+    users: number;
+    machines: number;
+    ordersThisMonth: number;
+  };
+  canCreate: {
+    users: boolean;
+    machines: boolean;
+    orders: boolean;
+  };
+}
+
 export interface BusinessConfig {
   businessId: string;
   config: NegocioConfig;

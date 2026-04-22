@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, effect, OnDestroy, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PersonalService } from '@core/api/personal.service';
 import { SessionService } from '@core/session/session.service';
@@ -13,7 +14,7 @@ import { cn } from '@shared/utils/cn';
 @Component({
   selector: 'app-personal',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
+  imports: [CommonModule, RouterLink, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
   templateUrl: './personal.component.html'
 })
 export class PersonalPageComponent implements OnDestroy {
@@ -41,6 +42,10 @@ export class PersonalPageComponent implements OnDestroy {
   resendingId = signal<string | null>(null);
   resendCooldowns = signal<Record<string, number>>({});  // invitationId -> seconds remaining
   private cooldownInterval: any = null;
+
+  // Plan Usage
+  planUsage = this.sessionService.planUsage;
+  canAddMember = computed(() => this.planUsage()?.canCreate.users ?? true);
 
   // For Legacy/Edit mode (if needed later)
   editingStaffId = signal<string | null>(null);
@@ -167,6 +172,7 @@ export class PersonalPageComponent implements OnDestroy {
       } else {
         await this.invitationsService.invite(businessId, email, role);
       }
+      await this.sessionService.refreshPlanUsage();
       this.isFormOpen.set(false);
       this.personalService.loadPersonal(true);
     } catch (err) {
@@ -247,5 +253,6 @@ export class PersonalPageComponent implements OnDestroy {
     });
     if (!confirmed) return;
     await this.personalService.removeEmployee(staff.id);
+    await this.sessionService.refreshPlanUsage();
   }
 }

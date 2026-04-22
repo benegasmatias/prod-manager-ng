@@ -47,6 +47,7 @@ export class ApiService {
     getOne: (id: string) => this.request<any>('GET', API_ENDPOINTS.BUSINESSES.ONE(id)),
     getConfig: (id: string) => this.request<any>('GET', API_ENDPOINTS.BUSINESSES.CONFIG(id)),
     getDashboardSummary: (id: string, context?: any) => this.request<DashboardSummary>('GET', API_ENDPOINTS.BUSINESSES.DASHBOARD(id), null, context),
+    getPlanUsage: (id: string) => this.request<import('@shared/models').PlanUsage>('GET', API_ENDPOINTS.BUSINESSES.PLAN_USAGE(id)),
     create: (data: any) => this.request<any>('POST', API_ENDPOINTS.BUSINESSES.LIST, data),
     activate: (id: string) => this.request<any>('POST', `${API_ENDPOINTS.BUSINESSES.LIST}/${id}/activate`),
     update: (id: string, data: any) => this.request<any>('PATCH', API_ENDPOINTS.BUSINESSES.ONE(id), data),

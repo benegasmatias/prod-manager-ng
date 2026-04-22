@@ -13,6 +13,7 @@ import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, Pagi
 import { PedidoSortKey, PedidoSortDir } from '../../shared/models/pedido';
 import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
+import { cn } from '@shared/utils/cn';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -41,6 +42,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private confirm = inject(ConfirmService);
+  cn = cn;
 
   // Labels and Icons for Template
   protected readonly labels = PEDIDOS_LABELS;
@@ -64,6 +66,10 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   tecnicoFilter = signal('all');
   dateDesde = signal('');
   dateHasta = signal('');
+
+  // Plan Usage
+  planUsage = this.session.planUsage;
+  canAddOrder = computed(() => this.planUsage()?.canCreate.orders ?? true);
 
   // UI State
   selectedOrder = signal<Pedido | null>(null);
@@ -231,6 +237,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   async loadData(options: { initial?: boolean } = {}) {
     // Global data is always needed
     this.loadGlobalData();
+    this.session.refreshPlanUsage();
 
     // 1. Always load production (Table 1)
     this.loadProduction();

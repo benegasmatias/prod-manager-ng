@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MaquinasService } from '@core/api/maquinas.service';
 import { SessionService } from '@core/session/session.service';
@@ -20,6 +21,7 @@ import { MachineDetailSheetComponent } from './components/machine-detail-sheet.c
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     FormsModule,
     LucideAngularModule,
 
@@ -58,6 +60,10 @@ export class MaquinasPageComponent {
   pendingOrders = signal<Pedido[]>([]);
   availableMaterials = signal<Material[]>([]);
   loadingOrders = signal(false);
+
+  // Plan Usage
+  planUsage = this.sessionService.planUsage;
+  canAddMachine = computed(() => this.planUsage()?.canCreate.machines ?? true);
 
   // Detail states
   isDetailSheetOpen = signal(false);
@@ -116,6 +122,7 @@ export class MaquinasPageComponent {
         active: true
       };
       await this.maquinasService.create(payload);
+      await this.sessionService.refreshPlanUsage();
     }
     this.isDialogOpen.set(false);
   }
@@ -131,6 +138,7 @@ export class MaquinasPageComponent {
     });
     if (!confirmed) return;
     await this.maquinasService.remove(machineId);
+    await this.sessionService.refreshPlanUsage();
     this.isDetailSheetOpen.set(false);
   }
 
