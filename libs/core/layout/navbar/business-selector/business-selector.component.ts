@@ -1,7 +1,7 @@
 import { Component, inject, computed, ElementRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { LucideAngularModule, Building2, ChevronDown, CheckCircle2, X } from 'lucide-angular';
+import { LucideAngularModule, Building2, ChevronDown, CheckCircle2, X, Briefcase, Printer, Store, Box, Plus, LogOut, ChevronRight, User } from 'lucide-angular';
 import { SessionService } from '../../../session/session.service';
 import { LayoutService } from '../../layout.service';
 import { AuthService } from '@core/auth/auth.service';
@@ -21,7 +21,10 @@ export class BusinessSelectorComponent {
   private elementRef = inject(ElementRef);
 
   dropdownOpen = computed(() => this.layoutService.activeDropdown() === 'business');
-  protected readonly icons = { Building2, ChevronDown, CheckCircle2, X };
+  protected readonly icons = { 
+    Building2, ChevronDown, CheckCircle2, X, Briefcase, 
+    Printer, Store, Box, Plus, LogOut, ChevronRight, User 
+  };
 
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent) {

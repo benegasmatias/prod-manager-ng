@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, effect, ViewChild, ElementRef, mod
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LucideAngularModule, User, ChevronDown, Settings, LogOut, X } from 'lucide-angular';
+import { LucideAngularModule, User, ChevronDown, Settings, LogOut, X, BadgeCheck, Briefcase, LineChart, Shield, HelpCircle, ChevronRight } from 'lucide-angular';
 import { AuthService } from '../../../auth/auth.service';
 import { LayoutService } from '../../layout.service';
 import { SessionService } from '../../../session/session.service';
@@ -36,7 +36,7 @@ export class UserProfileComponent {
   profileName = model('');
   isSaving = signal(false);
 
-  readonly icons = { User, ChevronDown, Settings, LogOut, X };
+  readonly icons = { User, ChevronDown, Settings, LogOut, X, BadgeCheck, Briefcase, LineChart, Shield, HelpCircle, ChevronRight };
 
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent) {
