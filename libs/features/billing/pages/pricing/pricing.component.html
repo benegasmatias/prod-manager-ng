@@ -1,0 +1,115 @@
+<div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-6 md:p-12 overflow-x-hidden">
+  <!-- Header Section -->
+  <div class="max-w-4xl mx-auto text-center mb-16 space-y-4">
+    <h1 class="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tight">
+      Escalá tu producción al <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">siguiente nivel</span>
+    </h1>
+    <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+      Elegí el plan que mejor se adapte a tu taller. Cambiá o cancelá en cualquier momento.
+    </p>
+  </div>
+
+  @if (billing.error()) {
+    <div class="max-w-md mx-auto mb-8 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-center text-sm">
+      {{ billing.error() }}
+    </div>
+  }
+
+  <!-- Pricing Grid -->
+  <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+    @for (plan of plans; track plan.id) {
+      <div 
+        class="relative group p-8 rounded-3xl border transition-all duration-500 hover:scale-[1.02]"
+        [ngClass]="{
+          'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none': !plan.popular,
+          'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white shadow-2xl shadow-indigo-500/20': plan.popular
+        }"
+      >
+        <!-- Popular Badge -->
+        @if (plan.popular) {
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+            Más Popular
+          </div>
+        }
+
+        <!-- Plan Meta -->
+        <div class="mb-8">
+          <h3 
+            class="text-xs font-black uppercase tracking-[0.2em] mb-2"
+            [ngClass]="plan.popular ? 'text-indigo-400 dark:text-indigo-600' : 'text-indigo-500'"
+          >
+            {{ plan.name }}
+          </h3>
+          <div class="flex items-baseline gap-1 mb-4">
+            <span 
+              class="text-4xl font-black tracking-tighter"
+              [ngClass]="plan.popular ? 'text-white dark:text-zinc-900' : 'text-zinc-900 dark:text-zinc-100'"
+            >
+              @if (plan.price > 0) {
+                ${{ plan.price | number }}
+              } @else {
+                Gratis
+              }
+            </span>
+            @if (plan.price > 0) {
+              <span class="text-sm font-medium opacity-60" [ngClass]="plan.popular ? 'text-zinc-400 dark:text-zinc-600' : 'text-zinc-500'">/ mes</span>
+            }
+          </div>
+          <p class="text-sm leading-relaxed" [ngClass]="plan.popular ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-500 dark:text-zinc-400'">
+            {{ plan.description }}
+          </p>
+        </div>
+
+        <!-- Divider -->
+        <div 
+          class="h-px w-full mb-8"
+          [ngClass]="plan.popular ? 'bg-zinc-800 dark:bg-zinc-200' : 'bg-zinc-100 dark:bg-zinc-800'"
+        ></div>
+
+        <!-- Features List -->
+        <ul class="space-y-4 mb-10">
+          @for (feature of plan.features; track feature) {
+            <li class="flex items-start gap-3">
+              <div class="mt-1 flex-shrink-0 w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <svg class="w-2.5 h-2.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span 
+                class="text-sm font-medium tracking-tight"
+                [ngClass]="plan.popular ? 'text-zinc-300 dark:text-zinc-700' : 'text-zinc-600 dark:text-zinc-400'"
+              >
+                {{ feature }}
+              </span>
+            </li>
+          }
+        </ul>
+
+        <!-- Action Button -->
+        <app-button-spinner
+          [loading]="billing.loading()"
+          [disabled]="billing.planId() === plan.id"
+          [className]="plan.popular ? 'bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white hover:bg-zinc-100' : 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800'"
+          (onClick)="onSelectPlan(plan)"
+        >
+          {{ billing.planId() === plan.id ? 'Plan Actual' : plan.buttonText }}
+        </app-button-spinner>
+      </div>
+    }
+  </div>
+
+  <!-- Footer Info -->
+  <div class="max-w-2xl mx-auto mt-16 text-center">
+    <p class="text-xs text-zinc-500 dark:text-zinc-600 uppercase font-bold tracking-[3px] mb-4">Preguntas Frecuentes</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+      <div class="space-y-2">
+        <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-200">¿Cómo funciona el pago?</h4>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">Usamos Mercado Pago para asegurar que tus datos estén protegidos. Podés pagar con tarjeta, transferencia o saldo.</p>
+      </div>
+      <div class="space-y-2">
+        <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-200">¿Puedo cancelar en cualquier momento?</h4>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">Sí, no hay contratos a largo plazo. Si cancelás, mantendrás acceso al plan hasta el final de tu período facturado.</p>
+      </div>
+    </div>
+  </div>
+</div>

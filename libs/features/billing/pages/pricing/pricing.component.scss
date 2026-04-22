@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+// Micro-animations for the cards
+.group {
+  &:hover {
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.1);
+  }
+}
+
+// Background blur effect for glassmorphism if needed later
+.glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}

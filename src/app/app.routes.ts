@@ -115,6 +115,10 @@ export const routes: Routes = [
         loadChildren: () => import('../../libs/features/ajustes/ajustes.routes').then(m => m.AJUSTES_ROUTES)
       },
       {
+        path: 'billing',
+        loadChildren: () => import('../../libs/features/billing/billing.routes').then(m => m.BILLING_ROUTES)
+      },
+      {
         path: 'kiosco',
         loadChildren: () => import('./pages/retail/retail.routes').then(m => m.RETAIL_ROUTES)
       },
