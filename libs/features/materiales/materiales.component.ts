@@ -9,19 +9,30 @@ import { ButtonSpinnerComponent } from '../../shared/ui/button-spinner/button-sp
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { cn } from '../../shared/utils/cn';
 
+import { MaterialStatsComponent } from './ui/material-stats/material-stats.component';
+import { MaterialCardComponent } from './ui/material-card/material-card.component';
+import { MaterialFormComponent } from './ui/material-form/material-form.component';
+
 @Component({
   selector: 'app-materiales-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    LucideAngularModule, 
+    MaterialStatsComponent, 
+    MaterialCardComponent,
+    MaterialFormComponent
+  ],
   templateUrl: './materiales.component.html',
-  styles: [`:host { display: block; }`]
+  styleUrls: ['./materiales.component.scss']
 })
 export class MaterialesPageComponent implements OnInit {
   private service = inject(MaterialesService);
   public session = inject(SessionService);
   private confirmService = inject(ConfirmService);
 
-  readonly icons = { Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus };
+  readonly icons = { Search, Plus, Package };
 
   // Expose signals from service
   loading = this.service.loading;
@@ -47,6 +58,8 @@ export class MaterialesPageComponent implements OnInit {
   formBedTemp = signal<number | null>(null);
   formNozzleTemp = signal<number | null>(null);
   formCostPerKg = signal(0);
+  
+  suggestedBrands = ['GST', 'Grillon3D', 'PrintALot', '3N3', 'Hellbot', 'Esun', 'Sunlu', 'Creality'];
 
   filteredMaterials = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -60,16 +73,6 @@ export class MaterialesPageComponent implements OnInit {
     );
   });
 
-  presetColors = [
-    { name: 'Negro', hex: '#000000' },
-    { name: 'Blanco', hex: '#ffffff' },
-    { name: 'Gris', hex: '#808080' },
-    { name: 'Rojo', hex: '#ef4444' },
-    { name: 'Azul', hex: '#3b82f6' },
-    { name: 'Verde', hex: '#22c55e' },
-    { name: 'Amarillo', hex: '#eab308' },
-    { name: 'Naranja', hex: '#f97316' },
-  ];
 
   constructor() {
     effect(() => {
@@ -176,14 +179,6 @@ export class MaterialesPageComponent implements OnInit {
     }
   }
 
-  getPercent(mat: Material) {
-    if (!mat.totalWeightGrams) return 0;
-    return Math.round((mat.remainingWeightGrams / mat.totalWeightGrams) * 100);
-  }
-
-  toggleMenuAction(event: Event, detailsElement: HTMLDetailsElement) {
-    // A simple method to handle details if manually used instead of dropdown
-  }
 
   cn = cn;
 }

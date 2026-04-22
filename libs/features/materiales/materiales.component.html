@@ -22,44 +22,7 @@
   </div>
 
   <!-- Dashboard Stats -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-    <!-- Variedad -->
-    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
-      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-        <lucide-angular [img]="icons.Package" class="h-20 w-20 text-primary"></lucide-angular>
-      </div>
-      <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Variedad</span>
-      <div class="flex items-end gap-3">
-        <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().count }}</h3>
-        <span class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full mb-1">Ítems</span>
-      </div>
-    </div>
-
-    <!-- Estado Stock -->
-    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
-      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-        <lucide-angular [img]="icons.Weight" class="h-20 w-20 text-blue-500"></lucide-angular>
-      </div>
-      <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Estado Stock</span>
-      <div class="flex items-end gap-3">
-        <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().critical }}</h3>
-        <span class="text-[10px] font-bold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full mb-1">Críticos</span>
-      </div>
-    </div>
-
-    <!-- Valor Estimado -->
-    <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
-      <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-        <lucide-angular [img]="icons.Activity" class="h-20 w-20 text-emerald-500"></lucide-angular>
-      </div>
-      <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Valor Estimado</span>
-      <div class="flex items-end gap-3">
-        <h3 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {{ stats().estimatedValue | currency:'ARS':'symbol-narrow':'1.0-0' }}
-        </h3>
-      </div>
-    </div>
-  </div>
+  <app-material-stats [stats]="stats()"></app-material-stats>
 
   <!-- Search and Filters Section -->
   <div class="flex flex-col md:flex-row gap-4 items-center bg-white/70 dark:bg-zinc-900/40 p-4 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm uppercase">
@@ -85,90 +48,12 @@
     <!-- Material Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (mat of filteredMaterials(); track mat.id) {
-        <div class="group relative overflow-hidden bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/50 rounded-[2.5rem] p-8 transition-all duration-300 hover:shadow-xl animate-slide-up">
-          <div class="flex items-start justify-between mb-6">
-            <div class="flex items-center gap-3">
-              <div
-                class="h-10 w-10 rounded-xl border border-white/20 shadow-sm"
-                [style.backgroundColor]="mat.color || '#ccc'"
-              ></div>
-              <div>
-                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 line-clamp-1">{{ mat.name }}</h3>
-                <div class="flex items-center gap-2 mt-0.5">
-                  <span class="text-[10px] font-bold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-md uppercase tracking-wide">{{ mat.type }}</span>
-                  <span class="text-[10px] text-zinc-400 font-medium uppercase truncate max-w-[80px]">{{ mat.brand || 'Genérico' }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Actions -->
-            <div class="flex items-center gap-1">
-              <button (click)="editMaterial(mat)" class="p-2 text-zinc-400 hover:text-primary transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg">
-                <lucide-angular [img]="icons.Edit2" class="h-4 w-4"></lucide-angular>
-              </button>
-              <button (click)="handleDelete(mat.id)" class="p-2 text-zinc-400 hover:text-rose-500 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg">
-                <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
-              </button>
-            </div>
-          </div>
-
-          <div class="space-y-5">
-            <div class="flex justify-between items-end">
-              <div class="space-y-0.5">
-                <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Stock Disponible</p>
-                <div class="flex items-baseline gap-1">
-                  <span class="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                    {{ mat.remainingWeightGrams }}
-                  </span>
-                  <span class="text-xs text-zinc-400 font-bold uppercase">{{ mat.unit }}</span>
-                </div>
-              </div>
-              <div class="text-right pb-1">
-                <div [class]="cn(
-                  'text-[10px] font-bold px-3 py-1 rounded-full inline-block uppercase tracking-wider',
-                  getPercent(mat) < 20 ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                )">
-                  {{ getPercent(mat) }}%
-                </div>
-              </div>
-            </div>
-
-            <div class="h-2.5 w-full bg-zinc-100 dark:bg-zinc-800/40 rounded-full overflow-hidden border border-zinc-50 dark:border-zinc-800/30">
-              <div
-                [class]="cn(
-                  'h-full rounded-full transition-all duration-700 ease-out',
-                  getPercent(mat) < 20 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]' : 'bg-primary shadow-[0_0_10px_rgba(var(--primary),0.3)]'
-                )"
-                [style.width.%]="getPercent(mat)"
-              ></div>
-            </div>
-
-            <div class="flex items-center justify-between pt-3 mt-4 border-t border-zinc-100 dark:border-zinc-800/50">
-              <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-500">
-                <lucide-angular [img]="icons.Weight" class="h-3.5 w-3.5 opacity-60"></lucide-angular>
-                <span>{{ mat.costPerKg | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
-                <span class="text-[10px] text-zinc-400 font-medium">/ {{ mat.unit === 'g' ? 'kg' : mat.unit }}</span>
-              </div>
-
-              @if (negocio()?.rubro === 'IMPRESION_3D' && (mat.bedTemperature || mat.nozzleTemperature)) {
-                <div class="flex gap-3">
-                  @if (mat.nozzleTemperature) {
-                    <div class="flex items-center gap-1 text-[10px] font-bold text-zinc-500 bg-zinc-50 dark:bg-zinc-800 px-2 py-1 rounded-lg">
-                      <lucide-angular [img]="icons.Activity" class="h-3 w-3 text-orange-500"></lucide-angular>
-                      {{ mat.nozzleTemperature }}°C
-                    </div>
-                  }
-                  @if (mat.bedTemperature) {
-                    <div class="flex items-center gap-1 text-[10px] font-bold text-zinc-500 bg-zinc-50 dark:bg-zinc-800 px-2 py-1 rounded-lg">
-                      <lucide-angular [img]="icons.Droplets" class="h-3 w-3 text-blue-500 rotate-180"></lucide-angular>
-                      {{ mat.bedTemperature }}°C
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          </div>
-        </div>
+        <app-material-card 
+          [material]="mat" 
+          [config]="config()"
+          (onEdit)="editMaterial($event)"
+          (onDelete)="handleDelete($event)"
+        ></app-material-card>
       }
     </div>
   } @else {
@@ -186,188 +71,23 @@
 </div>
 
 <!-- Modal Creation/Edit -->
-@if (isDialogOpen()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-  <div class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-4 slide-in-from-bottom-4 animate-in duration-300">
-    <div class="p-8 border-b border-zinc-50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
-        <div class="flex items-center gap-4">
-            <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
-              <lucide-angular [img]="icons.Package" class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
-            </div>
-            <div class="space-y-1">
-                <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                  {{ selectedMaterialId() ? 'Editar ' + (config().labels.materiales || 'Material') : 'Nuevo ' + (config().labels.materiales || 'Material') }}
-                </h2>
-                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
-                  Control de Inventario
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Form Body -->
-    <div class="p-8 space-y-8 max-h-[60vh] overflow-y-auto">
-      <div class="space-y-6">
-        <div class="space-y-2.5">
-            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Nombre / Identificación</label>
-            <input
-                [ngModel]="formName()"
-                (ngModelChange)="formName.set($event)"
-                placeholder="Ej. PLA Grillon3D Negro Alta Resolución"
-                class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
-            />
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
-            <div class="space-y-2.5">
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Tipo de Material</label>
-                <div class="relative group">
-                    <select
-                        [ngModel]="formType()"
-                        (ngModelChange)="formType.set($event)"
-                        class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer focus:outline-none"
-                    >
-                        @for (t of config().materialConfig.types; track t.key) {
-                            <option [value]="t.key">{{ t.label }}</option>
-                        }
-                    </select>
-                    <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none"></lucide-angular>
-                </div>
-            </div>
-            <div class="space-y-2.5">
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Unidad</label>
-                <div class="relative group">
-                    <select
-                        [ngModel]="formUnit()"
-                        (ngModelChange)="formUnit.set($event)"
-                        class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer focus:outline-none"
-                    >
-                        @for (u of config().materialConfig.units; track u.key) {
-                            <option [value]="u.key">{{ u.label }}</option>
-                        }
-                    </select>
-                    <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none"></lucide-angular>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6 pt-2">
-            <div class="space-y-2.5">
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Stock Total ({{ formUnit() }})</label>
-                <input
-                    type="number"
-                    [ngModel]="formWeight()"
-                    (ngModelChange)="onWeightChange($event)"
-                    class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
-                />
-            </div>
-            <div class="space-y-2.5">
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Disponible ({{ formUnit() }})</label>
-                <input
-                    type="number"
-                    [ngModel]="formRemainingWeight()"
-                    (ngModelChange)="formRemainingWeight.set($event)"
-                    class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
-                />
-            </div>
-        </div>
-      </div>
-
-      @if (negocio()?.rubro === 'IMPRESION_3D') {
-          <div class="grid grid-cols-2 gap-6 pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
-              <div class="space-y-2.5">
-                  <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Temp. Nozzle (°C)</label>
-                  <input
-                      type="number"
-                      [ngModel]="formNozzleTemp()"
-                      (ngModelChange)="formNozzleTemp.set($event)"
-                      class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
-                  />
-              </div>
-              <div class="space-y-2.5">
-                  <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Temp. Cama (°C)</label>
-                  <input
-                      type="number"
-                      [ngModel]="formBedTemp()"
-                      (ngModelChange)="formBedTemp.set($event)"
-                      class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
-                  />
-              </div>
-          </div>
-      } @else {
-          <div class="space-y-2.5 pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
-              <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Marca / Proveedor</label>
-              <input
-                  [ngModel]="formBrand()"
-                  (ngModelChange)="formBrand.set($event)"
-                  placeholder="Ej. Acindar, Ternium..."
-                  class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
-              />
-          </div>
-      }
-
-      <div class="space-y-3 pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
-          <label class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500 ml-1">Costo de Adquisición</label>
-          <div class="relative group">
-              <span class="absolute left-5 top-1/2 -translate-y-1/2 text-emerald-500 font-bold text-lg pointer-events-none">$</span>
-              <input
-                  type="number"
-                  [ngModel]="formCostPerKg()"
-                  (ngModelChange)="formCostPerKg.set($event)"
-                  placeholder="0.00"
-                  class="w-full h-14 pl-10 rounded-2xl border-none bg-emerald-50/30 dark:bg-emerald-500/5 px-5 text-lg font-black text-emerald-700 dark:text-emerald-400 focus:ring-2 focus:ring-emerald-500/20 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
-              />
-              <span class="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest">
-                  por {{ formUnit() === 'g' ? 'kg' : formUnit() }}
-              </span>
-          </div>
-      </div>
-
-      <div class="space-y-3 pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
-          <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Identificador Visual (Color)</label>
-          <div class="flex flex-wrap gap-3 px-1">
-              @for (c of presetColors; track c.hex) {
-                  <button
-                      type="button"
-                      (click)="formColor.set(c.hex)"
-                      [class]="cn(
-                          'h-8 w-8 rounded-full border shadow-sm transition-all hover:scale-110',
-                          formColor() === c.hex ? 'ring-2 ring-primary ring-offset-4 scale-110' : 'border-zinc-100 dark:border-zinc-800'
-                      )"
-                      [style.backgroundColor]="c.hex"
-                      [title]="c.name"
-                  ></button>
-              }
-              <input
-                  type="color"
-                  [ngModel]="formColor()"
-                  (ngModelChange)="formColor.set($event)"
-                  class="h-8 w-8 p-0 rounded-full border border-zinc-100 dark:border-zinc-800 overflow-hidden cursor-pointer"
-              />
-          </div>
-      </div>
-    </div>
-
-    <!-- Dialog Footer -->
-    <div class="p-8 pt-0 flex flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
-      <button
-          (click)="isDialogOpen.set(false)"
-          [disabled]="saving()"
-          class="rounded-2xl font-bold h-12 px-6 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
-      >
-          Cancelar
-      </button>
-
-      <app-button-spinner
-          [loading]="saving()"
-          loadingText="Guardando..."
-          btnClass="flex items-center justify-center rounded-2xl font-bold h-12 px-10 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50"
-          (onClick)="handleSave()"
-      >
-          {{ selectedMaterialId() ? 'Actualizar Registro' : 'Confirmar y Crear' }}
-      </app-button-spinner>
-
-    </div>
-  </div>
-</div>
-}
+<app-material-form
+  [(isOpen)]="isDialogOpen"
+  [materialId]="selectedMaterialId()"
+  [config]="config()"
+  [saving]="saving()"
+  [suggestedBrands]="suggestedBrands"
+  [(name)]="formName"
+  [(brand)]="formBrand"
+  [(color)]="formColor"
+  [(type)]="formType"
+  [(unit)]="formUnit"
+  [(weight)]="formWeight"
+  [(remainingWeight)]="formRemainingWeight"
+  [(bedTemp)]="formBedTemp"
+  [(nozzleTemp)]="formNozzleTemp"
+  [(costPerKg)]="formCostPerKg"
+  (onSave)="handleSave()"
+  (onCancel)="isDialogOpen.set(false)"
+  (onWeightChange)="onWeightChange($event)"
+></app-material-form>

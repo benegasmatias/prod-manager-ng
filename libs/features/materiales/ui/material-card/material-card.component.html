@@ -1,0 +1,85 @@
+<div class="group relative overflow-hidden bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/50 rounded-[2.5rem] p-8 transition-all duration-300 hover:shadow-xl animate-slide-up">
+  <div class="flex items-start justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <div
+        class="h-10 w-10 rounded-xl border border-white/20 shadow-sm"
+        [style.backgroundColor]="material().color || '#ccc'"
+      ></div>
+      <div>
+        <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 line-clamp-1">{{ material().name }}</h3>
+        <div class="flex items-center gap-2 mt-0.5">
+          <span class="text-[10px] font-bold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-md uppercase tracking-wide">{{ material().type }}</span>
+          <span class="text-[10px] text-zinc-400 font-medium uppercase truncate max-w-[80px]">{{ material().brand || 'Genérico' }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="flex items-center gap-1">
+      <button (click)="onEdit.emit(material())" class="p-2 text-zinc-400 hover:text-primary transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg">
+        <lucide-angular [img]="icons.Edit2" class="h-4 w-4"></lucide-angular>
+      </button>
+      <button (click)="onDelete.emit(material().id)" class="p-2 text-zinc-400 hover:text-rose-500 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg">
+        <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+      </button>
+    </div>
+  </div>
+
+  <div class="space-y-5">
+    <div class="flex justify-between items-end">
+      <div class="space-y-0.5">
+        <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Stock Disponible</p>
+        <div class="flex items-baseline gap-1">
+          <span class="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+            {{ material().remainingWeightGrams }}
+          </span>
+          <span class="text-xs text-zinc-400 font-bold uppercase">{{ material().unit }}</span>
+        </div>
+      </div>
+      <div class="text-right pb-1">
+        <div [class]="cn(
+          'text-[10px] font-bold px-3 py-1 rounded-full inline-block uppercase tracking-wider',
+          getPercent() < 20 ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+        )">
+          {{ getPercent() }}%
+        </div>
+      </div>
+    </div>
+
+    <div class="h-2.5 w-full bg-zinc-100 dark:bg-zinc-800/40 rounded-full overflow-hidden border border-zinc-50 dark:border-zinc-800/30">
+      <div
+        [class]="cn(
+          'h-full rounded-full transition-all duration-700 ease-out',
+          getPercent() < 20 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]' : 'bg-primary shadow-[0_0_10px_rgba(var(--primary),0.3)]'
+        )"
+        [style.width.%]="getPercent()"
+      ></div>
+    </div>
+
+    <div class="flex items-center justify-between pt-3 mt-4 border-t border-zinc-100 dark:border-zinc-800/50">
+      <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-500">
+        <lucide-angular [img]="icons.Weight" class="h-3.5 w-3.5 opacity-60"></lucide-angular>
+        <span>{{ material().costPerKg | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+        <span class="text-[10px] text-zinc-400 font-medium">/ {{ material().unit === 'g' ? 'kg' : material().unit }}</span>
+      </div>
+
+      <!-- Rubro specific check replaced by feature flag -->
+      @if (config().features.hasNozzle && (material().bedTemperature || material().nozzleTemperature)) {
+        <div class="flex gap-3">
+          @if (material().nozzleTemperature) {
+            <div class="flex items-center gap-1 text-[10px] font-bold text-zinc-500 bg-zinc-50 dark:bg-zinc-800 px-2 py-1 rounded-lg">
+              <lucide-angular [img]="icons.Activity" class="h-3 w-3 text-orange-500"></lucide-angular>
+              {{ material().nozzleTemperature }}°C
+            </div>
+          }
+          @if (material().bedTemperature) {
+            <div class="flex items-center gap-1 text-[10px] font-bold text-zinc-500 bg-zinc-50 dark:bg-zinc-800 px-2 py-1 rounded-lg">
+              <lucide-angular [img]="icons.Droplets" class="h-3 w-3 text-blue-500 rotate-180"></lucide-angular>
+              {{ material().bedTemperature }}°C
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
