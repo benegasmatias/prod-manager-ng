@@ -39,6 +39,7 @@ export class MaterialesPageComponent implements OnInit {
   saving = this.service.saving;
   materials = this.service.items;
   stats = this.service.stats;
+  schemaFields = this.service.schemaFields;
   config = computed(() => this.session.config());
   negocio = computed(() => this.session.activeNegocio());
 
@@ -58,6 +59,7 @@ export class MaterialesPageComponent implements OnInit {
   formBedTemp = signal<number | null>(null);
   formNozzleTemp = signal<number | null>(null);
   formCostPerKg = signal(0);
+  formAttributes = signal<Record<string, any>>({});
   
   suggestedBrands = ['GST', 'Grillon3D', 'PrintALot', '3N3', 'Hellbot', 'Esun', 'Sunlu', 'Creality'];
 
@@ -79,6 +81,7 @@ export class MaterialesPageComponent implements OnInit {
       const activeId = this.session.activeNegocio()?.id;
       if (activeId) {
         this.service.loadMateriales();
+        this.service.loadSchema();
         this.resetForm(); // Sync defaults from config
       }
     });
@@ -101,6 +104,7 @@ export class MaterialesPageComponent implements OnInit {
     this.formBedTemp.set(null);
     this.formNozzleTemp.set(null);
     this.formCostPerKg.set(0);
+    this.formAttributes.set({});
   }
 
   openNew() {
@@ -120,6 +124,7 @@ export class MaterialesPageComponent implements OnInit {
     this.formBedTemp.set(mat.bedTemperature || null);
     this.formNozzleTemp.set(mat.nozzleTemperature || null);
     this.formCostPerKg.set(mat.costPerKg || 0);
+    this.formAttributes.set(mat.attributes || {});
     this.isDialogOpen.set(true);
   }
 
@@ -156,6 +161,11 @@ export class MaterialesPageComponent implements OnInit {
       costPerKg: this.formCostPerKg(),
       bedTemperature: this.formBedTemp() || undefined,
       nozzleTemperature: this.formNozzleTemp() || undefined,
+      attributes: {
+        ...(this.formAttributes() || {}),
+        nozzleTemp: this.formNozzleTemp(),
+        bedTemp: this.formBedTemp(),
+      },
       businessId: this.negocio()?.id
     };
 
