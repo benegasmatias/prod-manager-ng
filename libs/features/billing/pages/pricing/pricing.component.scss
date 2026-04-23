@@ -1,7 +1,6 @@
 :host {
     display: block;
-    --primary: #6366f1;
-    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --primary-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
 }
 
 .italic {

@@ -19,7 +19,7 @@ export class BillingService {
   error = signal<string | null>(null);
 
   // Computed
-  planId = computed(() => this.currentSubscription()?.plan || 'FREE');
+  planId = computed(() => this.currentSubscription()?.plan?.id || 'free-3d');
 
   constructor() {
     // Inicializar Mercado Pago si el SDK está cargado

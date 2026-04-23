@@ -3,6 +3,7 @@
 @theme {
   /* Mapping tailwind names to our CSS variables */
   --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -19,13 +20,19 @@
   /* New Semantic Tokens */
   --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-card: var(--card);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-lowest: var(--surface-container-lowest);
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-danger-container: var(--danger-container);
+  --color-on-danger-container: var(--on-danger-container);
+  --color-accent-container: var(--accent-container);
+  --color-on-accent-container: var(--on-accent-container);
 
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
@@ -91,6 +98,7 @@
     --bg: #f9f9ff;
     --surface: #f9f9ff;
     --surface-container: #e7eeff;
+    --surface-container-high: #dde7ff;
     --surface-container-low: #f0f3ff;
     --surface-container-lowest: #ffffff;
     
@@ -100,6 +108,10 @@
     --success: #059669;
     --warning: #f59e0b;
     --danger: #ef4444;
+    --danger-container: #f97386;
+    --on-danger-container: #6e0523;
+    --accent-container: #e9def8;
+    --on-accent-container: #564e63;
 
     /* Spacing & Borders */
     --radius-md: 1.5rem;
@@ -108,13 +120,38 @@
 
   .dark {
     --background: #0a0a1a;
+    --bg: #0a0a1a;
     --foreground: #e2e8f0;
     --primary: #8b5cf6;
     --primary-container: #7c3aed;
-    --surface-container-lowest: #1e1b4b;
+    --primary-foreground: #ffffff;
+    
+    --secondary: #1e1b4b;
+    --secondary-foreground: #e2e8f0;
+
+    --muted: #111827;
+    --muted-foreground: #94a3b8;
+
+    --accent: #2e1065;
+    --accent-foreground: #f5f3ff;
+
+    --surface: #0a0a1a;
+    --surface-container: #161b33;
+    --surface-container-high: #1e2445;
     --surface-container-low: #111827;
+    --surface-container-lowest: #1e1b4b;
+    
     --text: #f8fafc;
     --text-muted: #94a3b8;
+
+    --border: rgba(148, 163, 184, 0.1);
+    --input: #111827;
+    --ring: rgba(139, 92, 246, 0.4);
+
+    --danger-container: #450a0a;
+    --on-danger-container: #f87171;
+    --accent-container: #2e1065;
+    --on-accent-container: #ddd6fe;
   }
 }
 

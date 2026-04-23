@@ -29,24 +29,24 @@
   <!-- Premium Workspace Selector Modal/Dropdown -->
   <div
     *ngIf="dropdownOpen()"
-    class="fixed sm:absolute top-20 sm:top-full left-4 right-4 sm:left-0 sm:right-auto sm:mt-4 w-auto sm:w-[380px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[100] animate-in fade-in slide-in-from-top-4 duration-300 overflow-hidden flex flex-col"
+    class="fixed sm:absolute top-20 sm:top-full left-4 right-4 sm:left-0 sm:right-auto sm:mt-4 w-auto sm:w-[380px] bg-surface-container-lowest border border-border/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[100] animate-in fade-in slide-in-from-top-4 duration-300 overflow-hidden flex flex-col"
   >
     <!-- Header -->
     <div class="px-8 pt-8 pb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-[1.25rem] bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center shadow-inner">
-          <lucide-angular [img]="icons.Briefcase" class="h-6 w-6 text-indigo-600 dark:text-indigo-400"></lucide-angular>
+        <div class="w-12 h-12 rounded-[1.25rem] bg-primary/10 flex items-center justify-center">
+          <lucide-angular [img]="icons.Briefcase" class="h-6 w-6 text-primary"></lucide-angular>
         </div>
         <div class="flex flex-col">
-          <h3 class="text-lg font-black text-slate-800 dark:text-zinc-50 tracking-tight">Mis Negocios</h3>
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Select workspace</span>
+          <h3 class="text-lg font-black text-text tracking-tight">Mis Negocios</h3>
+          <span class="text-[11px] font-bold text-text-muted uppercase tracking-widest">Select workspace</span>
         </div>
       </div>
       <button 
         (click)="layoutService.activeDropdown.set(null)"
-        class="h-10 w-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors group"
+        class="h-10 w-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors group"
       >
-        <lucide-angular [img]="icons.X" class="h-5 w-5 text-slate-300 group-hover:text-slate-500 transition-colors"></lucide-angular>
+        <lucide-angular [img]="icons.X" class="h-5 w-5 text-text-muted group-hover:text-text transition-colors"></lucide-angular>
       </button>
     </div>
 
@@ -60,13 +60,13 @@
           (click)="handleSelect(negocio.id)"
           class="w-full flex items-center gap-4 p-5 rounded-[1.75rem] transition-all relative overflow-hidden text-left group"
           [ngClass]="{
-            'bg-indigo-50/80 dark:bg-indigo-900/10 border-indigo-100 dark:border-indigo-900/20': isActive,
-            'bg-slate-50 dark:bg-zinc-800/40 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all active:scale-[0.98]': !isActive
+            'bg-primary/5 border border-primary/10': isActive,
+            'bg-surface-container-low hover:bg-surface-container transition-all active:scale-[0.98]': !isActive
           }"
         >
           <!-- Active Indicator Check -->
           @if (isActive) {
-            <div class="absolute right-5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <div class="absolute right-5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
               <lucide-angular [img]="icons.CheckCircle2" class="h-3.5 w-3.5 text-white"></lucide-angular>
             </div>
           }
@@ -75,8 +75,8 @@
           <div 
             class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all shadow-sm"
             [ngClass]="{
-              'bg-indigo-600 text-white': isActive,
-              'bg-slate-100 dark:bg-zinc-700 text-slate-400': !isActive
+              'bg-primary text-white': isActive,
+              'bg-surface-container-high text-text-muted': !isActive
             }"
           >
             <lucide-angular [img]="rubroIcon" class="h-5 w-5"></lucide-angular>
@@ -86,11 +86,11 @@
           <div class="flex flex-col items-start leading-tight">
             <span 
               class="text-sm font-black uppercase tracking-tight transition-colors"
-              [ngClass]="isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-zinc-200'"
+              [ngClass]="isActive ? 'text-primary' : 'text-text'"
             >
               {{ negocio.nombre }}
             </span>
-            <span class="text-[10px] font-black uppercase tracking-[0.1em] text-slate-400 mt-0.5">
+            <span class="text-[10px] font-black uppercase tracking-[0.1em] text-text-muted mt-0.5">
               {{ negocio.userRole }}
             </span>
           </div>
@@ -98,46 +98,11 @@
       }
 
       <!-- Add New Business Action -->
-      <button class="w-full flex items-center justify-center gap-3 p-5 border-2 border-dashed border-indigo-100 dark:border-indigo-900/30 rounded-[1.75rem] hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all group mt-2">
-        <div class="h-6 w-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-          <lucide-angular [img]="icons.Plus" class="h-4 w-4 text-indigo-600 dark:text-indigo-400"></lucide-angular>
+      <button class="w-full flex items-center justify-center gap-3 p-5 border-2 border-dashed border-primary/10 rounded-[1.75rem] hover:bg-primary/5 transition-all group mt-2">
+        <div class="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+          <lucide-angular [img]="icons.Plus" class="h-4 w-4 text-primary"></lucide-angular>
         </div>
-        <span class="text-[13px] font-black text-indigo-600 dark:text-indigo-400 tracking-tight">Añadir nuevo negocio</span>
-      </button>
-    </div>
-
-    <!-- Footer Profile & Logout -->
-    <div class="mt-auto bg-slate-50/50 dark:bg-zinc-950/40 p-8 pt-6 space-y-6">
-      
-      <!-- User Info Card -->
-      <div class="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 rounded-[1.5rem] border border-slate-100 dark:border-zinc-800 shadow-sm">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border-2 border-indigo-50 dark:border-indigo-900/20">
-            @if (sessionService.user()?.avatarUrl) {
-              <img [src]="sessionService.user()?.avatarUrl" class="w-full h-full object-cover">
-            } @else {
-              <lucide-angular [img]="icons.User" class="h-5 w-5 text-slate-400"></lucide-angular>
-            }
-          </div>
-          <div class="flex flex-col">
-            <span class="text-[13px] font-black text-slate-800 dark:text-zinc-50 leading-none mb-1">
-              {{ (sessionService.user()?.fullName || 'Usuario').split(' ')[0] }} Admin
-            </span>
-            <span class="text-[10px] font-bold text-slate-400 leading-none">
-              {{ active.plan || 'Free Plan' }}
-            </span>
-          </div>
-        </div>
-        <lucide-angular [img]="icons.ChevronDown" class="h-4 w-4 text-slate-300"></lucide-angular>
-      </div>
-
-      <!-- Logout Button -->
-      <button
-        (click)="handleLogout()"
-        class="w-full h-14 flex items-center justify-center gap-3 rounded-[1.5rem] bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 transition-all font-black uppercase text-[12px] tracking-widest group"
-      >
-        <lucide-angular [img]="icons.LogOut" class="h-4 w-4 group-hover:-translate-x-1 transition-transform"></lucide-angular>
-        Cerrar Sesión
+        <span class="text-[13px] font-black text-primary tracking-tight">Añadir nuevo negocio</span>
       </button>
     </div>
   </div>

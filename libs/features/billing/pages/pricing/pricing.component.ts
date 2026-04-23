@@ -62,7 +62,7 @@ export class PricingComponent implements OnInit {
   async onSelectPlan(plan: any) {
     if (plan.id === this.billing.planId()) return;
     
-    if (plan.id === 'ENTERPRISE') {
+    if (plan.id === 'business-3d') {
       window.open('https://wa.me/5491112345678', '_blank');
       return;
     }
