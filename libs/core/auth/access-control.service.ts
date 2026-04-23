@@ -88,24 +88,27 @@ export class AccessControlService {
   /**
    * Rule engine for menu item visibility.
    * Uses the dynamic config from the backend to determine visibility via href matching.
+   * Implement "Secure by Default": if config is missing, only universal items are shown.
    */
   canViewMenuItem(item: MenuItemMetadata): boolean {
     const config = this.sessionService.businessConfig();
+    const isUniversal = item.href === '/dashboard' || item.href === '/ajustes';
     
-    // 1. Dynamic Path Gating (Root-level filter)
-    if (config?.config?.sidebarItems) {
-      if (!config.config.sidebarItems.includes(item.href)) {
-        return false;
-      }
-    }
-
-    // 2. Global Role-Based Gating (Platform Level)
+    // 1. Global Role-Based Gating (Platform Level) - Highest Priority
     if (item.requiredGlobalRole) {
       if (this.sessionService.user()?.globalRole !== item.requiredGlobalRole) {
         return false;
       }
     }
 
-    return true;
+    // 2. Dynamic Path Gating (Root-level filter)
+    // If config exists, we strictly follow the backend whitelist
+    if (config?.config?.sidebarItems) {
+      return config.config.sidebarItems.includes(item.href);
+    }
+
+    // 3. Fallback/Loading state
+    // If no config is loaded (e.g. API error), we only show universal items for safety
+    return isUniversal;
   }
 }

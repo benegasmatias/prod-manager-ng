@@ -33,7 +33,10 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
              <lucide-angular [img]="icons.RefreshCw" class="h-5 w-5"></lucide-angular>
           </app-button-spinner>
           
-          <button class="px-6 py-3 bg-primary text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2 hover:scale-105 transition-all outline-none">
+          <button 
+            (click)="openEditor({})"
+            class="px-6 py-3 bg-primary text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20 flex items-center gap-2 hover:scale-105 transition-all outline-none"
+          >
             <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular>
             Nuevo Plan
           </button>

@@ -1,16 +1,17 @@
 :host {
-  display: block;
+    display: block;
+    --primary: #6366f1;
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
 }
 
-// Micro-animations for the cards
-.group {
-  &:hover {
-    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.1);
-  }
+.italic {
+    font-style: italic;
 }
 
-// Background blur effect for glassmorphism if needed later
-.glass {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+table {
+    border-spacing: 0;
+}
+
+tr:last-child td {
+    border-bottom: none;
 }
