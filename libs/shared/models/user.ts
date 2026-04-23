@@ -15,6 +15,8 @@ export interface UserProfile {
   approvedAt?: string;
   approvedBy?: string;
   defaultBusinessId?: string;
+  termsAccepted?: boolean;
+  termsAcceptedAt?: string;
 }
 
 export interface BusinessUser {

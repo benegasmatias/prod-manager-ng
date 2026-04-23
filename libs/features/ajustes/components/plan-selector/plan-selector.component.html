@@ -1,5 +1,5 @@
-<div class="fixed inset-0 z-[100] flex justify-center items-start overflow-y-auto bg-zinc-950/60 backdrop-blur-md p-4 sm:p-12 animate-in fade-in duration-300">
-  <div class="bg-[#F9FAFB] w-full max-w-[1200px] sm:rounded-[4rem] shadow-2xl flex flex-col animate-in zoom-in-95 slide-in-from-top-20 duration-500 relative overflow-hidden my-auto">
+<div (click)="close()" class="fixed inset-0 z-[100] flex justify-center items-start overflow-y-auto bg-zinc-950/60 backdrop-blur-md p-4 sm:p-12 animate-in fade-in duration-300">
+  <div (click)="$event.stopPropagation()" class="bg-[#F9FAFB] w-full max-w-[1200px] sm:rounded-[4rem] shadow-2xl flex flex-col animate-in zoom-in-95 slide-in-from-top-20 duration-500 relative overflow-hidden my-auto">
     
     <!-- Design Accents -->
     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
@@ -173,8 +173,10 @@
         <div class="mt-20 text-center pb-20">
            <p class="text-sm font-bold text-zinc-400 mb-6">¿Tienes dudas sobre qué plan elegir?</p>
            <div class="flex items-center justify-center gap-4">
-              <button class="px-8 h-12 rounded-full border border-zinc-200 text-xs font-black text-zinc-600 uppercase tracking-widest hover:bg-zinc-50 transition-all">Hablar con Ventas</button>
-              <button class="px-8 h-12 rounded-full text-xs font-black text-purple-600 uppercase tracking-widest hover:bg-purple-50 transition-all">Ver FAQ</button>
+              <button (click)="talkToSales()" class="px-8 h-12 rounded-full border border-zinc-200 text-xs font-black text-zinc-600 uppercase tracking-widest hover:bg-zinc-50 transition-all flex items-center gap-2">
+                <lucide-angular [img]="icons.MessageCircle" class="h-4 w-4 text-emerald-500"></lucide-angular>
+                Hablar con Ventas
+              </button>
            </div>
         </div>
       }

@@ -61,7 +61,8 @@ export class ApiService {
 
   users = {
     getMe: () => this.request<UserProfile>('GET', API_ENDPOINTS.USERS.ME),
-    setDefaultBusiness: (id: string) => this.request<any>('PUT', API_ENDPOINTS.USERS.SET_DEFAULT_BUSINESS, { businessId: id })
+    setDefaultBusiness: (id: string) => this.request<any>('PUT', API_ENDPOINTS.USERS.SET_DEFAULT_BUSINESS, { businessId: id }),
+    acceptTerms: () => this.request<any>('POST', '/me/accept-terms')
   };
 
   notifications = {

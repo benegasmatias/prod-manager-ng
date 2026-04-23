@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Check, Zap, X, ShieldCheck, Star, Rocket, ChevronRight, Diamond, CheckCircle2, MessageCircle, HelpCircle, Sparkles } from 'lucide-angular';
 import { ApiService } from '@core/api/api.service';
@@ -25,6 +25,11 @@ export class PlanSelectorModalComponent implements OnInit {
   readonly icons: any = { 
     Check, Zap, X, ShieldCheck, Star, Rocket, ChevronRight, Diamond, CheckCircle2, MessageCircle, HelpCircle, Sparkles
   };
+
+  @HostListener('document:keydown.escape')
+  onKeydownHandler() {
+    this.close();
+  }
 
   // Dynamic comparison table derived from loaded plans
   dynamicFeatures = computed(() => {
@@ -82,10 +87,6 @@ export class PlanSelectorModalComponent implements OnInit {
       const category = active?.rubro || 'IMPRESION_3D';
       const allPlans = await this.api.businesses.billing.getPlans(category);
       this.plans.set(allPlans.sort((a: any, b: any) => a.price - b.price));
-      
-      console.log('ID en Sesión:', this.session.activeSubscription()?.planId);
-      console.log('Planes cargados:', this.plans().map(p => p.id));
-      
       this.loading.set(false);
       this.cdr.detectChanges(); 
     } catch (error) {
@@ -130,13 +131,21 @@ export class PlanSelectorModalComponent implements OnInit {
 
       await this.api.businesses.billing.changePlan(active.id, planId);
       this.toast.success('¡Plan actualizado correctamente!');
+      
+      // Force immediate refresh of use and config by calling initialize again
+      // The session service now allows re-init by clearing the promise
       await this.session.initialize();
+      
       this.close();
     } catch (error) {
       this.toast.error('Error al procesar el cambio de plan');
     } finally {
       this.selecting.set(null);
     }
+  }
+
+  talkToSales() {
+    window.open('https://wa.me/5492645656113?text=Hola!%20Quisiera%20más%20información%20sobre%20los%20planes%20de%20ProdManager.', '_blank');
   }
 
   close() {

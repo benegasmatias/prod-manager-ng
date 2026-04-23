@@ -196,11 +196,10 @@ export class SessionService {
         console.log('[SessionService] Initialization complete');
       } catch (error) {
         console.error('[SessionService] Initialization failed:', error);
-        // We still set initialized to true to unblock guards, even if failed
-        // Routing logic will handle missing data (e.g. redirecting to login)
         this.isInitialized.set(true);
       } finally {
         this.isInitializing = false;
+        this.initPromise = null; // Allow re-initialization
       }
     })();
 
