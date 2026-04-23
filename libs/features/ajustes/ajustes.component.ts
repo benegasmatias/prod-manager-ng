@@ -2,7 +2,8 @@ import { Component, inject, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LucideAngularModule, Landmark, Globe, Save, Trash2, Mail, Phone, Zap, CreditCard, ChevronRight } from 'lucide-angular';
+import { LucideAngularModule, Landmark, Globe, Save, Trash2, Mail, Phone, Zap, CreditCard, ChevronRight, Edit3, Info, AlertOctagon, ArrowRight } from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui';
 import { SessionService } from '../../core/session/session.service';
 import { ApiService } from '../../core/api/api.service';
 import { ConfirmService } from '../../shared/ui/confirm-dialog/confirm-dialog.component';
@@ -13,7 +14,7 @@ import { PlanSelectorModalComponent } from './components/plan-selector/plan-sele
 @Component({
   selector: 'app-ajustes',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, PlanSelectorModalComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, PlanSelectorModalComponent, ButtonSpinnerComponent],
   templateUrl: './ajustes.component.html'
 })
 export class AjustesComponent {
@@ -36,7 +37,7 @@ export class AjustesComponent {
   currentPlanLimits = signal<any>(null);
 
   readonly icons = {
-    Landmark, Globe, Save, Trash2, Mail, Phone, Zap, CreditCard, ChevronRight
+    Landmark, Globe, Save, Trash2, Mail, Phone, Zap, CreditCard, ChevronRight, Edit3, Info, AlertOctagon, ArrowRight
   };
 
   readonly currencies = [

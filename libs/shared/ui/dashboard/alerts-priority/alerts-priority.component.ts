@@ -16,33 +16,42 @@ import { cn } from '@shared/utils/cn';
             [routerLink]="getRoute(alert)"
             [queryParams]="getQueryParams(alert)"
             [class]="cn(
-              'p-6 rounded-[2rem] border transition-all duration-500 relative group overflow-hidden',
-              (alert.orderId || alert.searchQuery || alert.actionLink) ? 'cursor-pointer hover:shadow-xl hover:shadow-black/5 active:scale-[0.98]' : 'cursor-default',
-              alert.type === 'error' 
-                ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/40 text-zinc-900 dark:text-zinc-100' 
-                : alert.type === 'critical'
-                ? 'bg-orange-50/50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/40 text-zinc-900 dark:text-zinc-100'
-                : 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/40 text-zinc-900 dark:text-zinc-100'
+              'p-10 rounded-[3rem] bg-surface-container-lowest transition-all duration-700 relative group overflow-hidden shadow-2xl shadow-text/5',
+              (alert.orderId || alert.searchQuery || alert.actionLink) ? 'cursor-pointer hover:shadow-primary/10 active:scale-[0.99]' : 'cursor-default'
             )"
           >
-             <div class="flex items-start gap-4">
+             <!-- EDITORIAL ACCENT BAR -->
+             <div [class]="cn(
+               'absolute left-0 top-0 bottom-0 w-2.5 transition-all duration-700',
+               alert.type === 'error' ? 'bg-danger shadow-[10px_0_30px_rgba(var(--danger-rgb),0.2)]' : 
+               alert.type === 'critical' ? 'bg-primary shadow-[10px_0_30px_rgba(var(--primary-rgb),0.2)]' : 'bg-text-muted/10'
+             )"></div>
+
+             <div class="flex items-start gap-8">
                 <div [class]="cn(
-                  'h-2.5 w-2.5 rounded-full mt-2 shrink-0 animate-pulse',
-                  alert.type === 'error' ? 'bg-rose-500' : alert.type === 'critical' ? 'bg-orange-500 shadow-sm shadow-orange-500/30' : 'bg-amber-500 shadow-sm shadow-amber-500/30'
-                )"></div>
+                  'h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-700 bg-surface-container-low',
+                  alert.type === 'error' ? 'text-danger' : alert.type === 'critical' ? 'text-primary' : 'text-text-muted/20'
+                )">
+                  <lucide-angular [img]="alert.type === 'error' ? icons.AlertCircle : icons.AlertTriangle" class="h-6 w-6"></lucide-angular>
+                </div>
                 
-                <div class="flex-1 space-y-3">
-                   <div class="space-y-0.5">
-                      <p class="text-xs font-black tracking-tight leading-relaxed group-hover:text-primary transition-colors">{{ alert.message }}</p>
-                      <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{{ alert.timestamp }}</p>
+                <div class="flex-1 space-y-6">
+                   <div class="space-y-2">
+                      <p class="text-lg font-black tracking-tighter text-text leading-tight group-hover:text-primary transition-colors uppercase italic">{{ alert.message }}</p>
+                      <div class="flex items-center gap-3">
+                        <span class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
+                        <span class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em]">{{ alert.timestamp }}</span>
+                      </div>
                    </div>
                    
                    @if (alert.orderId || alert.searchQuery || alert.actionLink) {
-                     <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-primary transition-all">
-                        <span>Ver detalle</span>
-                        <lucide-angular [img]="icons.ArrowRight" class="h-3 w-3 group-hover:translate-x-1 transition-transform"></lucide-angular>
-                     </div>
-                   }
+                      <div class="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-text-muted/30 group-hover:text-primary transition-all group/btn">
+                         <span>Explorar registro</span>
+                         <div class="h-8 w-8 rounded-full bg-surface-container-low flex items-center justify-center group-hover/btn:bg-primary group-hover/btn:text-white transition-all duration-500">
+                           <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4 group-hover/btn:translate-x-1 transition-transform"></lucide-angular>
+                         </div>
+                      </div>
+                    }
                 </div>
              </div>
           </div>

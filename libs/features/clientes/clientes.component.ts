@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal, effect, OnDestroy } from '
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star } from 'lucide-angular';
 import { ClientesService } from '../../core/api/clientes.service';
 import { Cliente, ClienteStats } from '../../core/models/cliente.model';
 import { SessionService } from '../../core/session/session.service';
@@ -33,7 +33,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   private confirmService = inject(ConfirmService);
 
   // Icons
-  readonly icons = { Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2 };
+  readonly icons = { Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star };
 
   // Local State
   searchTerm = signal<string>('');

@@ -4,16 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@core/auth';
 import { SessionService } from '@core/index';
+import { LucideAngularModule, AlertCircle, Mail, Lock, AlertTriangle, ArrowRight } from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui';
 
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, ButtonSpinnerComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  icons = { AlertCircle, Mail, Lock, AlertTriangle, ArrowRight };
   authService = inject(AuthService);
   sessionService = inject(SessionService);
   router = inject(Router);

@@ -3,15 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@core/auth';
+import { LucideAngularModule, Sparkles, Mail, AlertTriangle, Check, ArrowRight } from 'lucide-angular';
+import { ButtonSpinnerComponent } from '@shared/ui';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, ButtonSpinnerComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  icons = { Sparkles, Mail, AlertTriangle, Check, ArrowRight };
   authService = inject(AuthService);
   router = inject(Router);
   route = inject(ActivatedRoute);

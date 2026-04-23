@@ -1,130 +1,127 @@
-<div class="flex min-h-screen flex-col bg-background font-sans">
-    <!-- Header -->
-    <header class="flex h-16 items-center bg-primary px-8 dark:bg-card shadow-sm">
-        <div class="flex items-center gap-3 text-white">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
-                <img src="assets/logo.png" alt="Logo" class="h-7 w-7 object-contain"
-                    onerror="this.style.display='none'" />
+<div class="flex min-h-screen flex-col bg-surface font-sans selection:bg-primary/20">
+    <!-- Editorial Header -->
+    <header class="flex h-20 items-center bg-surface px-8 md:px-12 border-b border-border/5">
+        <div class="flex items-center gap-4 group cursor-pointer">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-surface-container-lowest shadow-sm overflow-hidden border border-border/5 group-hover:scale-105 transition-transform duration-500">
+                <img src="assets/logo.png" alt="Logo" class="h-8 w-8 object-contain" />
             </div>
-            <span class="text-xl font-black tracking-tighter uppercase">ProdManager</span>
+            <span class="text-xl font-black tracking-[0.3em] uppercase text-text font-display">ProdManager</span>
         </div>
     </header>
 
-    <main class="flex flex-1 items-center justify-center p-8">
-        <div
-            class="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 lg:flex-row lg:items-start lg:justify-between pt-12">
-            <!-- Left Side: Title -->
-            <div class="max-w-md lg:pt-12 text-center lg:text-left space-y-6">
-                <!-- Using assets/logo.png -->
-                <img src="assets/logo.png" alt="Logo"
-                    class="h-16 w-16 mx-auto lg:mx-0 object-contain rounded-2xl shadow-xl shadow-primary/20 mb-4" />
-                <h1 class="text-4xl font-black leading-tight tracking-tight text-foreground sm:text-5xl">
-                    Iniciá sesión en tu panel de <span class="text-primary italic">Producción</span>
-                </h1>
+    <main class="flex flex-1 items-center justify-center p-6 md:p-12">
+        <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-16 lg:flex-row lg:items-start lg:justify-between pt-8">
+            
+            <!-- Left Side: Editorial Content -->
+            <div class="max-w-xl lg:pt-16 text-center lg:text-left space-y-12">
+                <div class="space-y-6">
+                    <div class="inline-flex items-center px-5 py-2 bg-primary/5 rounded-full text-[9px] font-black uppercase tracking-[0.4em] text-primary">Círculo de Producción</div>
+                    <h1 class="text-5xl md:text-8xl font-black leading-[0.85] tracking-tighter text-text font-display">
+                        Accede a tu <br>
+                        <span class="text-primary italic">Arquitectura.</span>
+                    </h1>
+                    <p class="text-xl text-text-muted font-medium leading-relaxed max-w-md mx-auto lg:mx-0">
+                        Gestiona el pulso de tu fabricación digital con herramientas de precisión quirúrgica.
+                    </p>
+                </div>
 
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-6">
                     <a href="https://wa.me/..." target="_blank"
-                        class="flex items-center gap-4 rounded-3xl bg-card p-6 shadow-sm border border-border transition-all hover:shadow-md group max-w-sm mx-auto lg:mx-0">
-                        <div
-                            class="h-10 w-10 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
-                            <!-- SVG Icon for AlertCircle -->
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10" />
-                                <line x1="12" y1="8" x2="12" y2="12" />
-                                <line x1="12" y1="16" x2="12.01" y2="16" />
-                            </svg>
+                        class="flex items-center gap-6 rounded-[2rem] bg-surface-container-low p-8 shadow-sm border border-border/5 transition-all duration-500 hover:bg-surface-container group max-w-md mx-auto lg:mx-0">
+                        <div class="h-14 w-14 rounded-2xl bg-surface-container-lowest flex items-center justify-center text-text-muted group-hover:text-primary transition-all duration-500 shadow-sm">
+                            <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
                         </div>
-                        <div class="text-left">
-                            <p class="text-sm font-bold text-foreground">¿Tenés problemas?</p>
-                            <p class="text-xs text-muted-foreground font-medium">Contactá con soporte técnico</p>
+                        <div class="text-left space-y-1">
+                            <p class="text-sm font-black text-text uppercase tracking-widest">¿Tenés problemas?</p>
+                            <p class="text-xs text-text-muted font-bold uppercase tracking-tight opacity-60">Soporte Técnico Especializado</p>
                         </div>
                     </a>
                 </div>
             </div>
 
-            <!-- Right Side: Login Card -->
-            <div class="w-full max-w-[440px]">
-                <div
-                    class="rounded-[2.5rem] bg-card p-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-border">
-                    <form (submit)="handleSubmit(); $event.preventDefault()" class="space-y-8">
-                        <div class="space-y-2">
-                            <label for="email"
-                                class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">
-                                E-mail o usuario
+            <!-- Right Side: Luxury Login Card -->
+            <div class="w-full max-w-[480px]">
+                <div class="rounded-[3rem] bg-surface-container-low p-10 md:p-14 shadow-2xl shadow-text/5 border border-border/5 relative overflow-hidden group">
+                    <!-- Subtle Glow -->
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl transition-opacity duration-1000 group-hover:opacity-100 opacity-0"></div>
+
+                    <form (submit)="handleSubmit(); $event.preventDefault()" class="space-y-10 relative z-10">
+                        <div class="space-y-3">
+                            <label for="email" class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted/60 ml-2">
+                                Identidad
                             </label>
-                            <input id="email" name="email" type="email" [ngModel]="email()"
-                                (ngModelChange)="email.set($event)" required placeholder="Ingresá tu correo"
-                                class="flex h-14 w-full rounded-2xl border-2 border-border bg-transparent px-5 text-sm font-bold transition-all focus:border-primary focus:ring-4 focus:ring-primary/5" />
+                            <div class="relative group/input">
+                                <input id="email" name="email" type="email" [ngModel]="email()"
+                                    (ngModelChange)="email.set($event)" required placeholder="email@negocio.com"
+                                    class="flex h-16 w-full rounded-2xl border border-border/5 bg-surface-container-lowest px-6 text-sm font-black transition-all focus:border-primary/20 focus:ring-[12px] focus:ring-primary/5 outline-none placeholder:text-text-muted/30 placeholder:uppercase placeholder:tracking-widest" />
+                                <div class="absolute right-6 top-1/2 -translate-y-1/2 h-5 w-5 text-text-muted/20 group-focus-within/input:text-primary transition-colors">
+                                    <lucide-angular [img]="icons.Mail" class="h-5 w-5"></lucide-angular>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between ml-1">
-                                <label for="password"
-                                    class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between ml-2">
+                                <label for="password" class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted/60">
                                     Contraseña
                                 </label>
-                                <a routerLink="/forgot-password"
-                                    class="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:underline">
-                                    ¿Olvidaste?
+                                <a routerLink="/forgot-password" class="text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:underline underline-offset-4">
+                                    Recuperar
                                 </a>
                             </div>
-                            <input id="password" name="password" type="password" [ngModel]="password()"
-                                (ngModelChange)="password.set($event)" required placeholder="••••••••"
-                                class="flex h-14 w-full rounded-2xl border-2 border-border bg-transparent px-5 text-sm font-bold transition-all focus:border-primary focus:ring-4 focus:ring-primary/5" />
+                            <div class="relative group/input">
+                                <input id="password" name="password" type="password" [ngModel]="password()"
+                                    (ngModelChange)="password.set($event)" required placeholder="••••••••"
+                                    class="flex h-16 w-full rounded-2xl border border-border/5 bg-surface-container-lowest px-6 text-sm font-black transition-all focus:border-primary/20 focus:ring-[12px] focus:ring-primary/5 outline-none" />
+                                <div class="absolute right-6 top-1/2 -translate-y-1/2 h-5 w-5 text-text-muted/20 group-focus-within/input:text-primary transition-colors">
+                                    <lucide-angular [img]="icons.Lock" class="h-5 w-5"></lucide-angular>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Error Message -->
                         @if (error()) {
-                        <div
-                            class="flex items-center gap-3 rounded-2xl bg-red-50 p-4 text-xs font-bold text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                        <div class="flex items-center gap-4 rounded-2xl bg-danger-container/10 p-5 text-[10px] font-black uppercase tracking-widest text-danger-container border border-danger-container/20 animate-in shake duration-500">
+                            <lucide-angular [img]="icons.AlertTriangle" class="h-4 w-4"></lucide-angular>
                             <span>{{ error() }}</span>
                         </div>
                         }
 
-                        <div class="space-y-4 pt-2">
-                            <button type="submit" [disabled]="loading()"
-                                class="h-14 w-full rounded-2xl bg-primary px-6 font-black text-sm uppercase tracking-[0.1em] text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3">
-                                @if (loading()) {
-                                <span>Entrando...</span>
-                                } @else {
-                                <span>Continuar</span>
-                                }
-                            </button>
+                        <div class="space-y-6 pt-4">
+                            <app-button-spinner
+                                [loading]="loading()"
+                                (onClick)="handleSubmit()"
+                                [btnClass]="'h-16 w-full rounded-2xl bg-primary px-8 font-black text-xs uppercase tracking-[0.3em] text-white shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4'"
+                            >
+                                <span>Iniciar Sesión</span>
+                                <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4"></lucide-angular>
+                            </app-button-spinner>
 
-                            <div class="pt-2 text-center">
-                                <a [routerLink]="'/register'" [queryParams]="{ returnUrl: returnUrl !== '/dashboard' ? returnUrl : null }" class="text-sm font-bold text-primary hover:underline">
-                                    Crear cuenta
+                            <div class="text-center">
+                                <a [routerLink]="'/register'" [queryParams]="{ returnUrl: returnUrl !== '/dashboard' ? returnUrl : null }" 
+                                    class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-primary transition-colors">
+                                    Solicitar Acceso
                                 </a>
                             </div>
                         </div>
 
                         <div class="relative py-4">
                             <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-zinc-100 dark:border-zinc-800"></div>
+                                <div class="w-full border-t border-border/5"></div>
                             </div>
-                            <div class="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
-                                <span class="bg-card px-4 text-muted-foreground">O</span>
+                            <div class="relative flex justify-center text-[8px] font-black uppercase tracking-[0.4em]">
+                                <span class="bg-surface-container-low px-4 text-text-muted/40">Alternativas</span>
                             </div>
                         </div>
 
                         <button type="button" (click)="handleGoogleSignIn()" [disabled]="googleLoading() || loading()"
-                            class="h-14 w-full rounded-2xl border-2 border-border bg-card px-6 font-bold text-sm text-foreground hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all flex items-center justify-center gap-4">
+                            class="h-16 w-full rounded-2xl border border-border/5 bg-surface-container-lowest px-8 font-black text-[10px] uppercase tracking-[0.2em] text-text hover:bg-surface transition-all flex items-center justify-center gap-4 shadow-sm">
                             <svg class="h-5 w-5" viewBox="0 0 24 24">
-                                <path
-                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                    fill="#4285F4" />
-                                <path
-                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                    fill="#34A853" />
-                                <path
-                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                    fill="#FBBC05" />
-                                <path
-                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                    fill="#EA4335" />
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                             </svg>
-                            <span class="text-zinc-600 dark:text-zinc-300">Continuar con Google</span>
+                            <span>Google Cloud Auth</span>
                         </button>
                     </form>
                 </div>
@@ -132,16 +129,15 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
-        <div
-            class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400 sm:flex-row">
-            <div class="flex items-center gap-6">
-                <a routerLink="/privacy" class="hover:text-primary transition-colors">Privacidad</a>
-                <a routerLink="/terms" class="hover:text-primary transition-colors">Términos y condiciones</a>
-                <a href="https://wa.me/..." target="_blank" class="hover:text-primary transition-colors">Ayuda</a>
+    <!-- Editorial Footer -->
+    <footer class="bg-surface px-8 md:px-12 py-12 border-t border-border/5">
+        <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 sm:flex-row">
+            <div class="flex items-center gap-12">
+                <a routerLink="/privacy" class="hover:text-primary transition-colors underline-offset-4 hover:underline italic">Privacidad</a>
+                <a routerLink="/terms" class="hover:text-primary transition-colors underline-offset-4 hover:underline italic">Términos</a>
+                <a href="https://wa.me/..." target="_blank" class="hover:text-primary transition-colors underline-offset-4 hover:underline italic">Soporte</a>
             </div>
-            <p>© 2024 ProdManager Inc. Todos los derechos reservados.</p>
+            <p>© 2024 ProdManager Inc. Arquitectura de Sistemas de Producción.</p>
         </div>
     </footer>
 </div>

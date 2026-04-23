@@ -15,6 +15,7 @@ import { MachineCardComponent } from './components/machine-card.component';
 import { MachineFormDialogComponent } from './components/machine-form-dialog.component';
 import { MachineAssignmentDialogComponent } from './components/machine-assignment-dialog.component';
 import { MachineDetailSheetComponent } from './components/machine-detail-sheet.component';
+import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
 
 @Component({
   selector: 'app-maquinas',
@@ -24,7 +25,7 @@ import { MachineDetailSheetComponent } from './components/machine-detail-sheet.c
     RouterLink,
     FormsModule,
     LucideAngularModule,
-
+    PageShellComponent,
     MachineCardComponent,
     MachineFormDialogComponent,
     MachineAssignmentDialogComponent,

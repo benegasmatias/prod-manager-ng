@@ -11,8 +11,9 @@ import {
   LucideAngularModule, Play, Pause, AlertCircle, CheckCircle2, 
   Monitor, User, Info, MoreHorizontal, Settings, LayoutGrid, 
   BarChart3, Activity, Box, Layers, RefreshCcw, Square, Clock,
-  Search, Filter, ChevronRight, TrendingUp, List, AlertTriangle
+  Search, Filter, ChevronRight, TrendingUp, List, AlertTriangle, ChevronDown
 } from 'lucide-angular';
+import { cn } from '@shared/utils/cn';
 import { ProductionJob, ProductionJobStatus, ProductionJobPriority } from '../../shared/models/production-job';
 import { Machine, Employee } from '../../shared/models';
 import { StatusBadgeComponent } from '../../shared/ui/badges/status-badge.component';
@@ -60,8 +61,9 @@ export class ProduccionBoardComponent {
     Cog, User, Monitor, Clock, Search, Filter, Box, Layers,
     ChevronRight, AlertCircle, TrendingUp, LayoutGrid, 
     List, CheckCircle2, Play, Pause, Square, AlertTriangle, Activity,
-    RefreshCcw, Info, MoreHorizontal, Settings, BarChart3
+    RefreshCcw, Info, MoreHorizontal, Settings, BarChart3, ChevronDown
   };
+  cn = cn;
 
   constructor() {
     effect(() => {

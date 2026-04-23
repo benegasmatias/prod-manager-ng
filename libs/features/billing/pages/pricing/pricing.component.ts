@@ -2,18 +2,21 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BillingService } from '@core/api/billing.service';
+import { LucideAngularModule, Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule, ButtonSpinnerComponent],
+  imports: [CommonModule, ButtonSpinnerComponent, LucideAngularModule],
   templateUrl: './pricing.component.html',
   styleUrls: ['./pricing.component.scss']
 })
 export class PricingComponent implements OnInit {
   billing = inject(BillingService);
   private router = inject(Router);
+
+  readonly icons = { Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield };
 
   plans = [
     {

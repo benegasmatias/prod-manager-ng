@@ -1,63 +1,52 @@
-<div class="space-y-8 pb-10 px-8 pt-8 animate-in fade-in duration-500">
-  <!-- Header Area -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-    <div class="flex flex-col gap-1">
-      <div class="flex items-center gap-2 mb-1">
-        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{{ config().labels.produccion }}</span>
+<app-page-shell
+  [title]="'Monitor de ' + config().labels.maquinas"
+  [description]="'Seguimiento en tiempo real y optimización de carga de trabajo por unidad operativa.'"
+  [category]="config().labels.produccion"
+>
+  <div actions class="flex items-center gap-4">
+    @if (planUsage()) {
+      <div [class]="cn('flex items-center gap-3 px-4 py-2 border rounded-xl', !canAddMachine() ? 'bg-accent-container/10 border-accent-container/20' : 'bg-surface-container-low border-border/5')">
+        <div [class]="cn('h-2 w-2 rounded-full', !canAddMachine() ? 'bg-accent-container animate-pulse' : 'bg-primary')"></div>
+        <span [class]="cn('text-[10px] md:text-[11px] font-black uppercase tracking-widest leading-none', !canAddMachine() ? 'text-accent-container' : 'text-text-muted')">
+          {{ !canAddMachine() ? 'Límite alcanzado' : config().labels.maquinas }} ({{ planUsage()?.usage?.machines }}/{{ planUsage()?.limits?.machines }})
+        </span>
+        <a routerLink="/ajustes" class="text-[9px] md:text-[10px] font-black text-primary underline underline-offset-2 transition-colors uppercase tracking-widest">MEJORAR</a>
       </div>
-      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-        Monitor de <span class="text-primary italic">{{ config().labels.maquinas }}</span>
-      </h1>
-      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed text-left">
-        Seguimiento en tiempo real y optimización de carga de trabajo por unidad operativa.
-      </p>
-    </div>
-    <div class="flex items-center gap-4">
-      @if (planUsage()) {
-        <div [class]="cn('flex items-center gap-3 px-4 py-2 border rounded-xl', !canAddMachine() ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/20' : 'bg-zinc-50 dark:bg-zinc-900/40 border-zinc-100 dark:border-zinc-800')">
-          <div [class]="cn('h-2 w-2 rounded-full', !canAddMachine() ? 'bg-amber-500 animate-pulse' : 'bg-primary')"></div>
-          <span [class]="cn('text-[10px] md:text-[11px] font-black uppercase tracking-widest leading-none', !canAddMachine() ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-500')">
-            {{ !canAddMachine() ? 'Límite alcanzado' : config().labels.maquinas }} ({{ planUsage()?.usage?.machines }}/{{ planUsage()?.limits?.machines }})
-          </span>
-          <a routerLink="/ajustes" class="text-[9px] md:text-[10px] font-black text-primary underline underline-offset-2 transition-colors uppercase tracking-widest">MEJORAR</a>
-        </div>
-      }
-      <button
-        (click)="openNew()"
-        [disabled]="!canAddMachine()"
-        class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed gap-2"
-      >
-        <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nueva Unidad
-      </button>
-    </div>
+    }
+    <button
+      (click)="openNew()"
+      [disabled]="!canAddMachine()"
+      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-white font-black text-xs shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed gap-2"
+    >
+      <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nueva Unidad
+    </button>
   </div>
 
   <!-- Filters Section -->
-  <div class="flex flex-col sm:flex-row items-center gap-4 bg-white/70 dark:bg-zinc-900/40 p-4 rounded-[2rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm">
+  <div class="flex flex-col sm:flex-row items-center gap-4 bg-surface-container-low/50 p-4 rounded-2xl mb-8">
     <div class="w-full sm:w-[280px] relative group">
       <select 
         [ngModel]="estadoFilter()"
         (ngModelChange)="estadoFilter.set($event)"
-        class="w-full h-11 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-xs font-bold text-zinc-600 dark:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
+        class="w-full h-11 rounded-xl border-none bg-surface-container-lowest px-5 text-[10px] font-black uppercase tracking-widest text-text focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
       >
         <option value="all">TODOS LOS ESTADOS</option>
         <option value="IDLE">OPERATIVA / LIBRE</option>
         <option value="WORKING">EN PRODUCCIÓN / OCUPADA</option>
         <option value="MAINTENANCE">MANTENIMIENTO / FUERA DE LÍNEA</option>
       </select>
-      <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none transition-colors group-hover:text-zinc-500"></lucide-angular>
+      <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none transition-colors group-hover:text-primary"></lucide-angular>
     </div>
   </div>
 
   @if (loading()) {
-    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div class="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
         @for (i of [1,2,3]; track i) {
-          <div class="h-64 bg-zinc-100 dark:bg-zinc-800/20 rounded-[2.5rem] animate-pulse transition-opacity"></div>
+          <div class="h-64 bg-surface-container-low rounded-[2.5rem] animate-pulse"></div>
         }
     </div>
   } @else if (filteredMaquinas().length > 0) {
-    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div class="grid gap-8 md:grid-cols-2 xl:grid-cols-3 pb-20">
       @for (machine of filteredMaquinas(); track machine.id) {
         <app-machine-card
           [machine]="machine"
@@ -70,17 +59,49 @@
     </div>
   } @else {
     <!-- Empty State -->
-    <div class="py-24 text-center flex flex-col items-center justify-center gap-6 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/10 dark:bg-zinc-900/5">
-        <div class="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700">
-            <lucide-angular [img]="icons.Cpu" class="h-7 w-7 text-zinc-300 p-0.5"></lucide-angular>
+    <div class="py-32 text-center flex flex-col items-center justify-center gap-8 border-2 border-dashed rounded-[3rem] border-border/10 bg-surface-container-low/20">
+        <div class="h-20 w-20 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center border border-border/5">
+            <lucide-angular [img]="icons.Cpu" class="h-8 w-8 text-text-muted/20"></lucide-angular>
         </div>
-        <div class="space-y-1 px-8 text-center">
-            <p class="text-lg font-bold text-zinc-400 tracking-tight">Sin {{ config().labels.maquinas.toLowerCase() }} registradas</p>
-            <p class="text-sm text-zinc-500 max-w-sm mx-auto">Comience añadiendo un activo para habilitar el flujo de producción.</p>
+        <div class="space-y-2 px-8 text-center">
+            <p class="text-xl font-black text-text tracking-tight uppercase">Sin {{ config().labels.maquinas.toLowerCase() }} registradas</p>
+            <p class="text-sm text-text-muted font-medium max-w-sm mx-auto">Comience añadiendo un activo para habilitar el flujo de producción.</p>
         </div>
     </div>
   }
-</div>
+
+</app-page-shell>
+
+@if (isDialogOpen()) {
+  <app-machine-form-dialog
+    [machineId]="selectedMachineId()"
+    [initialData]="selectedMachineData()"
+    [saving]="saving()"
+    (onSave)="handleSave($event)"
+    (onCancel)="isDialogOpen.set(false)"
+  ></app-machine-form-dialog>
+}
+
+@if (isAssignDialogOpen()) {
+  <app-machine-assignment-dialog
+    [pendingOrders]="pendingOrders()"
+    [availableMaterials]="availableMaterials()"
+    [loading]="loadingOrders()"
+    [saving]="saving()"
+    (onAssign)="handleAssign($event)"
+    (onCancel)="isAssignDialogOpen.set(false)"
+  ></app-machine-assignment-dialog>
+}
+
+@if (isDetailSheetOpen()) {
+  <app-machine-detail-sheet
+    [machine]="selectedMachineDetail()"
+    [loading]="loadingDetail() || saving()"
+    (onClose)="isDetailSheetOpen.set(false)"
+    (onEdit)="editMachine($event)"
+    (onDelete)="handleDelete($event)"
+  ></app-machine-detail-sheet>
+}
 
 @if (isDialogOpen()) {
   <app-machine-form-dialog
