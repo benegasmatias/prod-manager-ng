@@ -25,12 +25,6 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
             Desempeño operativo, rentabilidad por unidad y proyecciones estratégicas de manufactura.
           </p>
         </div>
-        <button
-          class="h-11 px-6 lg:h-12 lg:px-8 rounded-xl border border-border font-black text-[10px] uppercase tracking-widest bg-background hover:bg-muted transition-all flex items-center gap-2 shadow-sm whitespace-nowrap"
-          (click)="printReport()"
-        >
-          <lucide-angular [img]="icons.Calendar" class="h-4 w-4"></lucide-angular> Exportar Reporte
-        </button>
       </div>
 
       @if (loading()) {
@@ -190,7 +184,42 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
       0% { transform: translateX(-100%) skewX(-12deg); }
       100% { transform: translateX(200%) skewX(-12deg); }
     }
-      
+
+    @media print {
+      /* Ocultar elementos de la interfaz que no son del reporte */
+      :host-context(app-sidebar), 
+      :host-context(app-navbar),
+      button, 
+      .h-px,
+      .animate-pulse {
+        display: none !important;
+      }
+
+      /* Ajustar el contenedor para que ocupe toda la hoja */
+      .space-y-10 {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+
+      /* Forzar que los fondos se impriman (importante para gráficos) */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* Evitar cortes feos en medio de los gráficos */
+      .bg-white, .grid {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #eee !important;
+        box-shadow: none !important;
+      }
+
+      /* Títulos más sobrios para el papel */
+      h1 { font-size: 24pt !important; color: black !important; }
+      .text-primary { color: #4f46e5 !important; }
+    }
   `]
 })
 export class ReportesPageComponent implements OnInit {

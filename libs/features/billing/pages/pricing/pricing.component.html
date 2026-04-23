@@ -31,13 +31,13 @@
         }"
       >
         @if (plan.popular) {
-          <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg">
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg">
             Recomendado
           </div>
         }
 
         <div class="mb-10 text-center">
-          <h3 class="text-xs font-black uppercase tracking-[0.3em] mb-4 text-indigo-500">
+          <h3 class="text-xs font-black uppercase tracking-[0.3em] mb-4 text-amber-600">
             {{ plan.name }}
           </h3>
           <div class="flex items-center justify-center gap-1 mb-4">
@@ -96,7 +96,7 @@
                     <tr class="bg-zinc-50/50 dark:bg-zinc-950/50">
                         <th class="p-8 text-xs font-black uppercase tracking-widest text-zinc-400">Característica</th>
                         <th class="p-8 text-xs font-black uppercase tracking-widest text-zinc-400 text-center">Gratis</th>
-                        <th class="p-8 text-xs font-black uppercase tracking-widest text-indigo-500 text-center">Taller Inicial</th>
+                        <th class="p-8 text-xs font-black uppercase tracking-widest text-amber-600 text-center">Taller Inicial</th>
                         <th class="p-8 text-xs font-black uppercase tracking-widest text-zinc-400 text-center">Alto en Producción</th>
                     </tr>
                 </thead>
@@ -117,8 +117,8 @@
                             </td>
                             <td class="p-8 text-center text-sm font-bold text-zinc-900 dark:text-white">
                                 @if (feature.pro === true) {
-                                    <div class="mx-auto w-6 h-6 bg-indigo-500/20 rounded-full flex items-center justify-center">
-                                        <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    <div class="mx-auto w-6 h-6 bg-amber-500/20 rounded-full flex items-center justify-center">
+                                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                     </div>
                                 } @else {
                                     {{ feature.pro }}

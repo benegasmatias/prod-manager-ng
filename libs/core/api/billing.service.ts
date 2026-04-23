@@ -1,6 +1,9 @@
 import { Injectable, signal, inject, computed } from '@angular/core';
 import { BillingApiService } from './billing.api.service';
 import { SessionService } from '@core/session/session.service';
+import { environment } from '../../../src/environments/environment';
+
+declare var MercadoPago: any;
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +11,7 @@ import { SessionService } from '@core/session/session.service';
 export class BillingService {
   private api = inject(BillingApiService);
   private session = inject(SessionService);
+  private mp: any;
 
   // States
   currentSubscription = signal<any>(null);
@@ -16,6 +20,14 @@ export class BillingService {
 
   // Computed
   planId = computed(() => this.currentSubscription()?.plan || 'FREE');
+
+  constructor() {
+    // Inicializar Mercado Pago si el SDK está cargado
+    // Nota: Reemplazar 'YOUR_PUBLIC_KEY' con la key real
+    if (typeof MercadoPago !== 'undefined') {
+      this.mp = new MercadoPago(environment.mpPublicKey || 'TEST-4806384774334416-081118-ee7378f294423fc65bd7b38266f4b109-278341531'); 
+    }
+  }
 
   async loadSubscription() {
     const businessId = this.session.activeNegocio()?.id;
@@ -45,10 +57,21 @@ export class BillingService {
       }
 
       // 2. Create MP Preference
-      const { initPoint } = await this.api.createCheckout(businessId, plan, price, description);
+      const { preferenceId } = await this.api.createCheckout(businessId, plan, price, description);
       
-      // 3. Redirect to Mercado Pago
-      window.location.href = initPoint;
+      // 3. Open Modal instead of redirecting
+      if (this.mp) {
+        this.mp.checkout({
+          preference: {
+            id: preferenceId
+          },
+          autoOpen: true, // Abre el modal automáticamente
+        });
+      } else {
+        // Fallback si el SDK no cargó por algún motivo
+        const { initPoint } = await this.api.createCheckout(businessId, plan, price, description);
+        window.location.href = initPoint;
+      }
     } catch (e: any) {
       this.error.set(e.message || 'Error al iniciar el proceso de pago');
       throw e;

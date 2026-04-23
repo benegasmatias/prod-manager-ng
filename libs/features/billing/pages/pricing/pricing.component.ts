@@ -15,30 +15,30 @@ export class PricingComponent implements OnInit {
 
   plans = [
     {
-      id: 'FREE',
-      name: 'Gratis',
+      id: 'free-3d',
+      name: 'Free por Siempre',
       price: 0,
-      description: 'Para emprendedores y pequeños talleres que recién comienzan.',
-      features: ['2 Máquinas', '3 Empleados', 'Gestión de pedidos básica'],
-      buttonText: 'Plan Actual',
+      description: 'Ideal para hobbistas y makers solitarios.',
+      features: ['30 pedidos / mes', '1 impresora', '1 Usuario', 'Smart Dashboard'],
+      buttonText: 'Cambiar a Gratis',
       popular: false
     },
     {
-      id: 'PRO',
+      id: 'pro-3d',
       name: 'Taller Inicial',
-      price: 15000,
-      description: 'La herramienta definitiva para profesionalizar tu producción.',
-      features: ['Máquinas ilimitadas', '10 Empleados', 'Reportes avanzados', 'Soporte prioritario'],
+      price: 8900,
+      description: 'Para pequeños talleres que empiezan a crecer.',
+      features: ['60 pedidos / mes', '2 impresoras', '2 Usuarios', 'Control de materiales', 'Soporte prioritario'],
       buttonText: 'Cambiarse a Pro',
       popular: true
     },
     {
-      id: 'ENTERPRISE',
-      name: 'Alto en Producción',
-      price: 45000,
+      id: 'business-3d',
+      name: 'Pequeñas Granja Produccion',
+      price: 29500,
       description: 'Control total y escalabilidad para fábricas de gran escala.',
-      features: ['Todo lo de Pro', 'Empleados ilimitados', 'API de integración', 'Account Manager'],
-      buttonText: 'Contactar Ventas',
+      features: ['Pedidos ilimitados', '5 impresoras', '5 Usuarios', 'Reportes avanzados', 'Soporte prioritario'],
+      buttonText: 'Mejorar a Business',
       popular: false
     }
   ];
