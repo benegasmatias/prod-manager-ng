@@ -142,10 +142,15 @@ import { ToastService } from '@shared/services/toast.service';
             </div>
 
             <!-- Options -->
-            <div class="flex items-center gap-8 pt-4 ml-1">
+            <div class="flex flex-wrap items-center gap-x-8 gap-y-4 pt-4 ml-1">
               <label class="flex items-center gap-3 cursor-pointer group">
                 <input type="checkbox" formControlName="isRecommended" class="w-5 h-5 rounded-lg bg-zinc-800 border-zinc-700 text-primary focus:ring-0 focus:ring-offset-0 transition-all border-2">
                 <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest group-hover:text-white transition-colors">Destacar como recomendado</span>
+              </label>
+
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" formControlName="hasTrial" class="w-5 h-5 rounded-lg bg-zinc-800 border-zinc-700 text-amber-500 focus:ring-0 focus:ring-offset-0 transition-all border-2">
+                <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest group-hover:text-white transition-colors">Habilitar Prueba (Trial)</span>
               </label>
 
               <label class="flex items-center gap-3 cursor-pointer group">
@@ -234,6 +239,25 @@ export class PlanEditorModalComponent implements OnInit {
         this.plan.features.forEach((f: string) => this.addFeature(f));
       }
     }
+
+    // Sync trialDays with hasTrial flag
+    this.form.get('trialDays')?.valueChanges.subscribe(val => {
+      const hasTrial = this.form.get('hasTrial');
+      if (val > 0 && !hasTrial?.value) {
+        hasTrial?.setValue(true, { emitEvent: false });
+      } else if (val <= 0 && hasTrial?.value) {
+        hasTrial?.setValue(false, { emitEvent: false });
+      }
+    });
+
+    this.form.get('hasTrial')?.valueChanges.subscribe(val => {
+      const trialDays = this.form.get('trialDays');
+      if (!val && trialDays?.value > 0) {
+        trialDays?.setValue(0, { emitEvent: false });
+      } else if (val && trialDays?.value <= 0) {
+        trialDays?.setValue(7, { emitEvent: false }); // Default to 7 days if enabled
+      }
+    });
   }
 
   addFeature(value: string = '') {

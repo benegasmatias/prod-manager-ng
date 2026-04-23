@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Machine } from '@shared/models';
-import { LucideAngularModule, Cpu, Settings, Activity, PlayCircle, AlertTriangle, Check, MoreHorizontal } from 'lucide-angular';
+import { LucideAngularModule, Cpu, Settings, Activity, PlayCircle, AlertTriangle, Check, MoreHorizontal, Lock } from 'lucide-angular';
 import { cn } from '@shared/utils/cn';
 import { SessionService } from '@core/session/session.service';
 
@@ -12,8 +12,19 @@ import { SessionService } from '@core/session/session.service';
   template: `
     <div [class]="cn(
       'group relative overflow-hidden bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800/50 rounded-[2.5rem] p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-slide-up',
-      machine.status === 'MAINTENANCE' && 'opacity-75 grayscale-[0.3]'
+      (machine.status === 'MAINTENANCE' || machine.blockedByQuota) && 'opacity-75 grayscale-[0.3]'
     )">
+      <!-- Blocked Overlay -->
+      @if (machine.blockedByQuota) {
+        <div class="absolute inset-0 z-10 bg-zinc-900/40 dark:bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+           <div class="h-14 w-14 rounded-2xl bg-white dark:bg-zinc-900 flex items-center justify-center text-primary shadow-2xl mb-4 border border-zinc-100 dark:border-zinc-800">
+             <lucide-angular [img]="icons.Lock" class="h-7 w-7"></lucide-angular>
+           </div>
+           <h4 class="text-white font-black uppercase tracking-widest text-sm mb-1">Unidad Bloqueada</h4>
+           <p class="text-[10px] text-zinc-300 font-bold uppercase tracking-tight max-w-[200px]">Excede los límites de tu plan actual</p>
+           <a routerLink="/ajustes" class="mt-4 px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">Mejorar Plan</a>
+        </div>
+      }
       <div class="flex items-start justify-between mb-6">
         <div class="space-y-1.5 text-left">
           <div class="flex items-center gap-2">
@@ -129,7 +140,7 @@ export class MachineCardComponent {
   config = this.session.config;
   cn = cn;
 
-  readonly icons = { Cpu, Settings, Activity, PlayCircle, AlertTriangle, Check, MoreHorizontal };
+  readonly icons = { Cpu, Settings, Activity, PlayCircle, AlertTriangle, Check, MoreHorizontal, Lock };
 
   get activeJob() {
     return (this.machine.productionJobs || []).find(j => j.status !== 'COMPLETED' && j.status !== 'CANCELLED');

@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BillingService } from '@core/api/billing.service';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
@@ -12,6 +13,7 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
 })
 export class PricingComponent implements OnInit {
   billing = inject(BillingService);
+  private router = inject(Router);
 
   plans = [
     {
@@ -66,7 +68,9 @@ export class PricingComponent implements OnInit {
     }
 
     try {
-      await this.billing.startCheckout(plan.id, plan.price, `Plan ${plan.name} - Suscripción mensual`);
+      this.router.navigate(['/billing/checkout'], { 
+        queryParams: { plan: plan.id } 
+      });
     } catch (e) {
       console.error('Checkout error:', e);
     }

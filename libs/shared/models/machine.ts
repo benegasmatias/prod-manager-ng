@@ -22,6 +22,7 @@ export interface Machine {
   model: string | null;
   status: MachineStatus;
   active: boolean;
+  blockedByQuota?: boolean;
   businessId?: string;
   type?: string;     // Generic type or model specifier
 

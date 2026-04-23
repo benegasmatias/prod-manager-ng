@@ -77,7 +77,7 @@ export class AjustesComponent {
   }
 
   handleUpgrade() {
-    this.showPricingModal.set(true);
+    this.router.navigate(['/billing']);
   }
 
   async loadPlanDetails(planId: string) {

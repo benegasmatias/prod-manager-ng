@@ -19,5 +19,9 @@ export const BILLING_ROUTES: Routes = [
     path: 'pending',
     loadComponent: () => import('./pages/status/status.component').then(m => m.StatusComponent),
     data: { status: 'pending' }
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./pages/checkout/checkout.component').then(m => m.CheckoutComponent)
   }
 ];

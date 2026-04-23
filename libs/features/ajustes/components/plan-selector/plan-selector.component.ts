@@ -1,6 +1,8 @@
 import { Component, inject, signal, OnInit, computed, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
+import { BillingService } from '@core/api/billing.service';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Check, Zap, X, ShieldCheck, Star, Rocket, ChevronRight, Diamond, CheckCircle2, MessageCircle, HelpCircle, Sparkles } from 'lucide-angular';
+import { LucideAngularModule, Check, Zap, X, ShieldCheck, Star, Rocket, ChevronRight, Diamond, CheckCircle2, MessageCircle, HelpCircle, Sparkles, Lock } from 'lucide-angular';
 import { ApiService } from '@core/api/api.service';
 import { SessionService } from '@core/session/session.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -14,6 +16,7 @@ import { LoadingSpinnerComponent } from '@shared/ui/loading-spinner/loading-spin
 })
 export class PlanSelectorModalComponent implements OnInit {
   private api = inject(ApiService);
+  private router = inject(Router);
   private session = inject(SessionService);
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
@@ -23,7 +26,7 @@ export class PlanSelectorModalComponent implements OnInit {
   selecting = signal<string | null>(null);
 
   readonly icons: any = { 
-    Check, Zap, X, ShieldCheck, Star, Rocket, ChevronRight, Diamond, CheckCircle2, MessageCircle, HelpCircle, Sparkles
+    Check, Zap, X, ShieldCheck, Star, Rocket, ChevronRight, Diamond, CheckCircle2, MessageCircle, HelpCircle, Sparkles, Lock
   };
 
   @HostListener('document:keydown.escape')
@@ -106,42 +109,36 @@ export class PlanSelectorModalComponent implements OnInit {
     return plan ? Math.floor(plan.price).toLocaleString() : '0';
   }
 
+  private billing = inject(BillingService);
+
   async selectPlan(planId: string) {
-    console.log('Iniciando cambio de plan a:', planId);
     if (this.isCurrentPlan(planId)) return;
     
-    this.selecting.set(planId);
-    try {
-      const active = this.session.activeNegocio();
-      if (!active) return;
+    const plan = this.plans().find(p => p.id === planId);
+    if (!plan) return;
 
+    if (plan.price === 0) {
+      // For free plans, use the direct change method
+      this.selecting.set(planId);
       try {
-        const preflight = await this.api.businesses.billing.preflight(active.id, planId);
-        if (!preflight.isAllowed) {
-            this.toast.error(`No puedes cambiar al plan: ${preflight.violations.join(', ')}`);
-            return;
-        }
-      } catch (e: any) {
-         if (e.status === 400 && e.error?.violations) {
-             this.toast.error(`Límites excedidos: ${e.error.violations.join(', ')}`);
-             return;
-         }
-         throw e;
+        const active = this.session.activeNegocio();
+        if (!active) return;
+        await this.api.businesses.billing.changePlan(active.id, planId);
+        this.toast.success('¡Plan actualizado correctamente!');
+        await this.session.initialize();
+        this.close();
+      } catch (error) {
+        this.toast.error('Error al procesar el cambio de plan');
+      } finally {
+        this.selecting.set(null);
       }
-
-      await this.api.businesses.billing.changePlan(active.id, planId);
-      this.toast.success('¡Plan actualizado correctamente!');
-      
-      // Force immediate refresh of use and config by calling initialize again
-      // The session service now allows re-init by clearing the promise
-      await this.session.initialize();
-      
-      this.close();
-    } catch (error) {
-      this.toast.error('Error al procesar el cambio de plan');
-    } finally {
-      this.selecting.set(null);
+      return;
     }
+
+    // For paid plans, navigate to the premium checkout page
+    this.router.navigate(['/billing/checkout'], { 
+      queryParams: { plan: plan.id } 
+    });
   }
 
   talkToSales() {

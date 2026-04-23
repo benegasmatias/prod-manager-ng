@@ -40,6 +40,8 @@ export interface PlanUsage {
     users: number;
     machines: number;
     ordersThisMonth: number;
+    blockedUsers?: number;
+    blockedMachines?: number;
   };
   canCreate: {
     users: boolean;

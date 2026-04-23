@@ -1,0 +1,28 @@
+node:internal/modules/cjs/loader:1225
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module 'semver'
+Require stack:
+- /usr/share/nodejs/npm/lib/utils/unsupported.js
+- /usr/share/nodejs/npm/lib/cli.js
+- /usr/share/nodejs/npm/bin/npm-cli.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/usr/share/nodejs/npm/lib/utils/unsupported.js:2:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/usr/share/nodejs/npm/lib/utils/unsupported.js',
+    '/usr/share/nodejs/npm/lib/cli.js',
+    '/usr/share/nodejs/npm/bin/npm-cli.js'
+  ]
+}
+
+Node.js v20.17.0

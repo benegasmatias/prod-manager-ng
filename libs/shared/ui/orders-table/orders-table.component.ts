@@ -46,12 +46,12 @@ import { UI_LABELS } from '../../config/ui-labels.config';
           </thead>
           <tbody>
             @for (order of orders; track order.id) {
-              <tr class="group bg-white dark:bg-zinc-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-all rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all duration-300">
+              <tr class="group bg-white dark:bg-zinc-900/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all duration-300">
                 <td class="px-6 py-5 first:rounded-l-2xl border-y border-l border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700 transition-colors">
                   <div class="flex flex-col">
-                    <span class="text-[10px] font-black tabular-nums text-zinc-400">#{{ order.code }}</span>
+                    <span class="text-[10px] font-black tabular-nums text-zinc-400 dark:text-zinc-500">#{{ order.code }}</span>
                     @if (hideClientColumn) {
-                      <span class="text-xs font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[180px] mt-0.5">
+                      <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[180px] mt-0.5">
                         {{ order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
                       </span>
                     }
@@ -66,10 +66,10 @@ import { UI_LABELS } from '../../config/ui-labels.config';
  
                  <td *ngIf="!hideClientColumn" class="px-6 py-5 border-y border-transparent group-hover:border-zinc-200 dark:group-hover:border-zinc-700">
                    <div class="flex flex-col">
-                     <span class="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px]">
+                     <span class="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[200px]">
                        {{ order.clientName || order.items[0]?.name || order.items[0]?.nombreProducto || fallbackClientName || 'S/N' }}
                      </span>
-                     <span class="text-[10px] text-zinc-400 line-clamp-1">
+                     <span class="text-[10px] text-zinc-400 dark:text-zinc-500 line-clamp-1">
                        {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' productos adicionales)' : 'Referencia de Stock') }}
                        {{ order.clientName && order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
                      </span>
@@ -160,7 +160,7 @@ import { UI_LABELS } from '../../config/ui-labels.config';
       <!-- CARD VIEW (Mobile) -->
       <div class="md:hidden space-y-2">
         @for (order of orders; track order.id) {
-          <div class="bg-white dark:bg-zinc-900/40 rounded-2xl md:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 p-4 shadow-sm active:scale-[0.98] transition-all" (click)="viewClick.emit(order)">
+          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl md:rounded-[2rem] border border-zinc-100 dark:border-zinc-800 p-4 shadow-sm active:scale-[0.98] transition-all" (click)="viewClick.emit(order)">
             <div class="flex items-start justify-between gap-3 mb-2">
               <div class="flex flex-col gap-0.5 min-w-0">
                 <div class="flex items-center gap-1.5">
@@ -169,10 +169,10 @@ import { UI_LABELS } from '../../config/ui-labels.config';
                     <span class="text-[7px] font-black text-purple-600 bg-purple-100 px-1.5 py-0.5 rounded-full uppercase">Stock</span>
                   }
                 </div>
-                <h3 class="text-xs md:text-sm font-black text-zinc-900 dark:text-zinc-50 truncate">
+                <h3 class="text-xs md:text-sm font-black text-zinc-900 dark:text-zinc-100 truncate">
                   {{ order.clientName || order.items[0]?.name || order.items[0]?.nombreProducto || fallbackClientName || 'S/N' }}
                 </h3>
-                <p class="text-[9px] font-bold text-zinc-400 line-clamp-1 italic">
+                <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 line-clamp-1 italic">
                   {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' productos adicionales)' : 'Referencia de Stock') }}
                   {{ order.clientName && order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
                 </p>
