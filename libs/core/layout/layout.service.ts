@@ -1,5 +1,7 @@
 import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { LAYOUT_CONSTANTS } from '../../shared/constants';
 
 @Injectable({
@@ -7,6 +9,8 @@ import { LAYOUT_CONSTANTS } from '../../shared/constants';
 })
 export class LayoutService {
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
+  private location = inject(Location);
   
   // Responsive state
   isMobile = signal(false);
@@ -17,10 +21,30 @@ export class LayoutService {
   // UI overlay state
   activeDropdown = signal<'business' | 'notifications' | 'user' | null>(null);
 
+  // Back button state for mobile/global header
+  showBackButton = signal(false);
+  backAction = signal<(() => void) | null>(null);
+  headerTitle = signal<string | null>(null);
+
+  // Contextual bottom bar
+  customBottomAction = signal<{ label: string, icon: any, action: () => void } | null>(null);
+
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.checkMobile();
       window.addEventListener('resize', () => this.checkMobile());
+
+      // Auto-detect back button necessity
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe((event: any) => {
+        const url = event.urlAfterRedirects || event.url;
+        const segments = url.split('/').filter((s: string) => s.length > 0);
+        
+        // Show back button if we are deep in a module (e.g. /pedidos/nuevo)
+        const shouldShow = segments.length > 1;
+        this.showBackButton.set(shouldShow);
+      });
     }
   }
 

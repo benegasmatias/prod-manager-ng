@@ -1,22 +1,22 @@
-<div class="group relative overflow-hidden bg-surface-container-low border border-border/5 rounded-[3rem] shadow-2xl shadow-text/5 transition-all duration-700 hover:shadow-text/10">
+<div class="group relative overflow-hidden bg-surface-container-low border border-border/5 rounded-[2rem] sm:rounded-[3rem] shadow-2xl shadow-text/5 transition-all duration-700 hover:shadow-text/10">
   <!-- Status Accent -->
   <div [class]="cn('absolute top-0 left-0 w-2 h-full opacity-10 group-hover:opacity-100 transition-opacity duration-700', rubro() === 'METALURGICA' ? 'bg-indigo-500' : 'bg-primary')"></div>
 
-  <div class="p-8 md:p-12 space-y-10 md:space-y-16">
+  <div class="p-6 sm:p-12 space-y-8 sm:space-y-16">
     <div class="flex items-center justify-between">
-      <div class="flex items-center gap-6">
-        <div [class]="cn('h-12 w-12 rounded-2xl flex items-center justify-center text-sm font-black font-display shadow-lg transition-transform group-hover:scale-110', rubro() === 'METALURGICA' ? 'bg-indigo-500 text-white shadow-indigo-500/20' : 'bg-primary text-white shadow-primary/20')">
+      <div class="flex items-center gap-4 sm:gap-6">
+        <div [class]="cn('h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-black font-display shadow-lg transition-transform group-hover:scale-110', rubro() === 'METALURGICA' ? 'bg-indigo-500 text-white shadow-indigo-500/20' : 'bg-primary text-white shadow-primary/20')">
           {{ index() + 1 }}
         </div>
-        <div class="space-y-1">
-          <h3 class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Parámetros Técnicos</h3>
-          <p class="text-[9px] text-text-muted/40 font-bold uppercase tracking-widest italic">Configuración de Unidad #{{ index() + 1 }}</p>
+        <div class="space-y-0.5 sm:space-y-1">
+          <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-text-muted">Parámetros Técnicos</h3>
+          <p class="text-[8px] text-text-muted/40 font-bold uppercase tracking-widest italic">Unidad #{{ index() + 1 }}</p>
         </div>
       </div>
       @if (canRemove()) {
         <button type="button" [disabled]="isSaving()" (click)="onRemove.emit()" 
-          class="h-12 w-12 rounded-2xl text-danger/40 hover:text-danger hover:bg-danger/5 transition-all flex items-center justify-center disabled:opacity-10 group/trash">
-          <lucide-angular [img]="icons.Trash2" class="h-5 w-5 transition-transform group-hover/trash:scale-110"></lucide-angular>
+          class="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl text-danger/40 hover:text-danger hover:bg-danger/5 transition-all flex items-center justify-center disabled:opacity-10 group/trash border border-danger/5 sm:border-none">
+          <lucide-angular [img]="icons.Trash2" class="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover/trash:scale-110"></lucide-angular>
         </button>
       }
     </div>
@@ -29,17 +29,17 @@
     }
 
     <!-- DYNAMIC FIELDS BY SECTION -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 sm:gap-x-12 sm:gap-y-12">
       @for (section of sectionedFields(); track section.name) {
-        <div [class]="cn('space-y-8', section.name === 'OPCIONALES' ? 'md:col-span-1' : 'md:col-span-2')">
-          <h4 class="text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/40 pb-4 border-b border-border/5">
+        <div [class]="cn('space-y-6 sm:space-y-8', section.name === 'OPCIONALES' ? 'md:col-span-1' : 'md:col-span-2')">
+          <h4 class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] sm:tracking-[0.5em] text-text-muted/40 pb-3 border-b border-border/5">
             {{ section.name }}
           </h4>
-          <div [class]="cn('grid gap-8', section.name === 'OPCIONALES' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2')">
+          <div [class]="cn('grid gap-6 sm:gap-8', section.name === 'OPCIONALES' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2')">
             @for (f of section.fields; track f.key) {
               @if (isFieldVisible(f)) {
-                <div [class]="cn('space-y-3', (f.key === 'nombreProducto' || f.tipo === 'textarea' || f.key === 'url_stl' || f.key === 'reference_image') ? 'sm:col-span-2' : '')">
-                  <label class="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">
+                <div [class]="cn('space-y-2 sm:space-y-3', (f.key === 'nombreProducto' || f.tipo === 'textarea' || f.key === 'url_stl' || f.key === 'reference_image') ? 'sm:col-span-2' : '')">
+                  <label class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-text-muted/60 ml-1">
                     {{ f.label }} @if (f.required) { <span class="text-danger">*</span> }
                   </label>
 
@@ -48,7 +48,7 @@
                       <select
                         [(ngModel)]="item[f.key]"
                         (ngModelChange)="onUpdate.emit()"
-                        class="flex h-14 w-full rounded-2xl border border-border/5 bg-surface-container-lowest px-6 py-2 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all cursor-pointer appearance-none outline-none"
+                        class="flex h-12 sm:h-14 w-full rounded-xl sm:rounded-2xl border border-border/5 bg-surface-container-lowest px-4 sm:px-6 py-2 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all cursor-pointer appearance-none outline-none"
                       >
                         <option value="">Seleccionar...</option>
                         @for (opt of f.options; track opt) {
@@ -61,20 +61,20 @@
                       type="button"
                       (click)="item[f.key] = !item[f.key]; onUpdate.emit()"
                       [class]="cn(
-                        'flex items-center gap-4 h-14 w-full rounded-2xl border px-6 transition-all duration-500',
+                        'flex items-center gap-4 h-12 sm:h-14 w-full rounded-xl sm:rounded-2xl border px-5 sm:px-6 transition-all duration-500 text-[9px] sm:text-[10px]',
                         item[f.key] ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'bg-surface-container-lowest border-border/5 text-text-muted/40'
                       )"
                     >
-                      <div [class]="cn('h-6 w-10 rounded-full p-1 transition-colors flex items-center', item[f.key] ? 'bg-white/20' : 'bg-border/5')">
-                         <div [class]="cn('h-4 w-4 rounded-full transition-transform duration-500 shadow-sm', item[f.key] ? 'translate-x-4 bg-white' : 'translate-x-0 bg-text-muted/20')"></div>
+                      <div [class]="cn('h-5 sm:h-6 w-9 sm:w-10 rounded-full p-1 transition-colors flex items-center', item[f.key] ? 'bg-white/20' : 'bg-border/5')">
+                         <div [class]="cn('h-3.5 sm:h-4 w-3.5 sm:w-4 rounded-full transition-transform duration-500 shadow-sm', item[f.key] ? 'translate-x-4 bg-white' : 'translate-x-0 bg-text-muted/20')"></div>
                       </div>
-                      <span class="text-[9px] font-black uppercase tracking-[0.2em]">{{ item[f.key] ? 'Activo' : 'Inactivo' }}</span>
+                      <span class="font-black uppercase tracking-widest">{{ item[f.key] ? 'Activo' : 'Inactivo' }}</span>
                     </button>
                   } @else if (f.tipo === 'textarea') {
                     <textarea
                       [(ngModel)]="item[f.key]"
                       (ngModelChange)="onUpdate.emit()"
-                      class="flex min-h-[160px] w-full rounded-3xl border border-border/5 bg-surface-container-lowest px-6 py-6 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all resize-none outline-none placeholder:opacity-20 uppercase tracking-widest"
+                      class="flex min-h-[120px] sm:min-h-[160px] w-full rounded-2xl sm:rounded-3xl border border-border/5 bg-surface-container-lowest px-5 sm:px-6 py-5 sm:py-6 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all resize-none outline-none placeholder:opacity-20 uppercase tracking-widest"
                       [placeholder]="f.placeholder || 'ESPECIFICACIONES TÉCNICAS...'"
                     ></textarea>
                   } @else if (f.tipo === 'money') {
@@ -87,17 +87,17 @@
                   } @else if (f.tipo === 'number') {
                      <div class="relative group">
                         @if (f.key === 'duracion_estimada_minutos') {
-                           <div class="flex items-center gap-4">
+                           <div class="flex items-center gap-3 sm:gap-4">
                               <div class="relative flex-1">
                                  <input 
                                    type="number"
                                    [ngModel]="getHoursValue($any(item[f.key]))"
                                    (ngModelChange)="updateMinutesFromHs($event)"
                                    min="0"
-                                   class="h-14 w-full pl-6 pr-10 rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all font-mono outline-none"
+                                   class="h-12 sm:h-14 w-full pl-5 pr-9 rounded-xl sm:rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all font-mono outline-none"
                                    placeholder="00"
                                  >
-                                 <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[8px] font-black text-text-muted/20 uppercase tracking-tighter">HS</span>
+                                 <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-[7px] sm:text-[8px] font-black text-text-muted/20 uppercase tracking-tighter">HS</span>
                               </div>
                               <div class="relative flex-1">
                                  <input 
@@ -106,10 +106,10 @@
                                    (ngModelChange)="updateMinutesFromMin($event)"
                                    min="0"
                                    max="59"
-                                   class="h-14 w-full pl-6 pr-12 rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all font-mono outline-none"
+                                   class="h-12 sm:h-14 w-full pl-5 pr-10 sm:pr-12 rounded-xl sm:rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all font-mono outline-none"
                                    placeholder="00"
                                  >
-                                 <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[8px] font-black text-text-muted/20 uppercase tracking-tighter">MIN</span>
+                                 <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-[7px] sm:text-[8px] font-black text-text-muted/20 uppercase tracking-tighter">MIN</span>
                               </div>
                            </div>
                         } @else {
@@ -118,7 +118,7 @@
                             [(ngModel)]="item[f.key]"
                             (ngModelChange)="onUpdate.emit()"
                             min="0"
-                            class="h-14 w-full rounded-2xl border border-border/5 bg-surface-container-lowest px-6 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all font-mono outline-none"
+                            class="h-12 sm:h-14 w-full rounded-xl sm:rounded-2xl border border-border/5 bg-surface-container-lowest px-5 sm:px-6 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all font-mono outline-none"
                             [placeholder]="f.placeholder || '0'"
                           >
                         }
@@ -138,7 +138,7 @@
                         type="text"
                         [(ngModel)]="item[f.key]"
                         (ngModelChange)="onUpdate.emit()"
-                        class="flex h-14 w-full rounded-2xl border border-border/5 bg-surface-container-lowest px-6 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all outline-none placeholder:opacity-20 uppercase tracking-widest"
+                        class="flex h-12 sm:h-14 w-full rounded-xl sm:rounded-2xl border border-border/5 bg-surface-container-lowest px-5 sm:px-6 text-sm font-black focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all outline-none placeholder:opacity-20 uppercase tracking-widest"
                         [placeholder]="f.placeholder || ''"
                       >
                     }
@@ -153,48 +153,47 @@
   </div>
 
   <!-- PREMIUM ITEM FOOTER -->
-  <div class="px-8 md:px-12 pb-12 pt-4 space-y-8">
+  <div class="px-6 sm:px-12 pb-8 sm:pb-12 pt-2 sm:pt-4 space-y-6 sm:space-y-8">
     
     <!-- 3D PRINTING CALCULATOR BANNER -->
-    <!-- 3D PRINTING CALCULATOR BANNER -->
     @if (rubro() === 'IMPRESION_3D' || isArgentina()) {
-      <div class="p-6 md:p-8 rounded-[2.5rem] bg-surface-container-lowest border border-primary/5 shadow-xl shadow-text/5 relative overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-1000">
+      <div class="p-6 sm:p-8 rounded-2xl sm:rounded-[2.5rem] bg-surface-container-lowest border border-primary/5 shadow-xl shadow-text/5 relative overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-1000">
         <!-- Decoration -->
         <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
+        <div class="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 items-center relative z-10">
           
           <!-- Header Column -->
-          <div class="md:col-span-4 flex items-center gap-5">
-            <div class="h-14 w-14 shrink-0 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-xl shadow-primary/5">
-              <lucide-angular [img]="icons.Zap" class="h-6 w-6"></lucide-angular>
+          <div class="lg:col-span-4 flex items-center self-start lg:self-center gap-4 sm:gap-5 w-full">
+            <div class="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl sm:rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-lg">
+              <lucide-angular [img]="icons.Zap" class="h-5 w-5 sm:h-6 sm:w-6"></lucide-angular>
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="text-[11px] font-black uppercase tracking-[0.3em] text-text leading-tight truncate">Matriz de Costeo {{ rubro() === 'IMPRESION_3D' ? '3D' : '' }}</span>
-              <span class="text-[8px] font-bold text-text-muted/40 uppercase tracking-[0.2em] italic mt-1">Proyección Algorítmica</span>
+              <span class="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-text leading-tight truncate">Matriz de Costeo {{ rubro() === 'IMPRESION_3D' ? '3D' : '' }}</span>
+              <span class="text-[8px] font-bold text-text-muted/40 uppercase tracking-[0.1em] sm:tracking-[0.2em] italic mt-1">Proyección Algorítmica</span>
             </div>
           </div>
 
           <!-- Input Column -->
-          <div class="md:col-span-4">
+          <div class="lg:col-span-4 w-full">
             <app-money-input
               label="Mercado / Kg"
               [(value)]="item.precioBobinaKg"
               (valueChange)="onUpdate.emit()"
-              inputClassName="h-12 text-sm bg-surface-container-lowest border-border/10 rounded-xl"
+              inputClassName="h-11 sm:h-12 text-sm bg-surface-container-lowest border-border/10 rounded-lg sm:rounded-xl"
               labelClassName="text-[8px] font-black uppercase tracking-[0.3em] text-text-muted/40 mb-2 ml-1"
               placeholder="0,00"
             ></app-money-input>
           </div>
 
           <!-- Suggestion Column -->
-          <div class="md:col-span-4 flex flex-col items-start md:items-end">
-            <span class="text-[8px] font-black uppercase tracking-[0.3em] text-text-muted/40 mb-2 ml-1 md:mr-2">Sugerencia de Sistema</span>
+          <div class="lg:col-span-4 flex flex-col items-start lg:items-end w-full">
+            <span class="text-[8px] font-black uppercase tracking-[0.3em] text-text-muted/40 mb-2 ml-1 lg:mr-2 text-left lg:text-right">Sugerencia de Sistema</span>
             <button 
               type="button" 
               (click)="applySuggestedPrice()"
               [disabled]="getSuggestedPrice() <= 0 || isSaving()"
-              class="h-12 px-8 w-full md:w-auto rounded-xl bg-text text-surface font-black text-[12px] tabular-nums tracking-tighter shadow-lg shadow-text/10 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-10 flex items-center justify-center gap-3 group/btn overflow-hidden"
+              class="h-11 sm:h-12 px-6 sm:px-8 w-full lg:w-auto rounded-lg sm:rounded-xl bg-text text-surface font-black text-xs sm:text-[12px] tabular-nums tracking-tighter shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-10 flex items-center justify-center gap-3 group/btn overflow-hidden"
             >
               <span>{{ getSuggestedPrice() || 0 | currency:'':'symbol':'1.0-0' }}</span>
               <lucide-angular [img]="icons.Check" class="h-4 w-4 opacity-40 group-hover/btn:opacity-100 transition-all"></lucide-angular>
@@ -206,14 +205,14 @@
     }
 
     <!-- STANDARD FOOTER TOTALS -->
-    <div class="p-8 md:p-10 rounded-[3rem] bg-surface-container-lowest border border-border/5 flex flex-col xl:flex-row items-stretch xl:items-end gap-10">
-      <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-8">
+    <div class="p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] bg-surface-container-lowest border border-border/5 flex flex-col xl:flex-row items-stretch xl:items-end gap-8 sm:gap-10">
+      <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
         <div class="relative group">
           <app-money-input
             [label]="orderType() === 'STOCK' ? 'Valor Venta Unitario ($)' : 'Inversión por Unidad ($)'"
             [(value)]="item.precioUnitario"
             (valueChange)="onUpdate.emit()"
-            inputClassName="h-14 text-sm bg-surface"
+            inputClassName="h-12 sm:h-14 text-sm bg-surface rounded-xl sm:rounded-2xl"
             [disabled]="isSaving()"
           ></app-money-input>
         </div>
@@ -225,15 +224,15 @@
             (valueChange)="onUpdate.emit()"
             [color]="rubro() === 'METALURGICA' ? 'indigo' : 'primary'"
             placeholder="0,00"
-            inputClassName="h-14 text-sm bg-surface"
+            inputClassName="h-12 sm:h-14 text-sm bg-surface rounded-xl sm:rounded-2xl"
             [disabled]="isSaving()"
           ></app-money-input>
         }
       </div>
       
-      <div class="flex flex-col items-center xl:items-end justify-center w-full xl:w-auto xl:min-w-[240px] px-4 shrink-0 space-y-4">
-        <span class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic">Consolidado por Ítem</span>
-        <div class="h-16 sm:h-20 w-full xl:w-auto px-8 sm:px-12 rounded-[1.5rem] sm:rounded-[2rem] bg-text text-surface flex items-center justify-center font-black text-2xl sm:text-4xl tabular-nums shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] relative overflow-hidden group/total transition-all hover:scale-[1.02]">
+      <div class="flex flex-col items-center xl:items-end justify-center w-full xl:w-auto xl:min-w-[240px] px-2 sm:px-4 shrink-0 space-y-3 sm:space-y-4">
+        <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic">Consolidado por Ítem</span>
+        <div class="h-14 sm:h-20 w-full xl:w-auto px-6 sm:px-12 rounded-2xl sm:rounded-[2rem] bg-text text-surface flex items-center justify-center font-black text-xl sm:text-4xl tabular-nums shadow-xl relative overflow-hidden group/total transition-all hover:scale-[1.02]">
            <div class="absolute inset-x-0 bottom-0 h-1 bg-primary group-hover/total:h-full transition-all duration-700 opacity-20"></div>
            <span class="relative z-10">{{ getItemTotal() | currency:'':'symbol':'1.0-0' }}</span>
         </div>

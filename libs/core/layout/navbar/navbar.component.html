@@ -4,12 +4,26 @@
   [style.left.px]="layoutService.isMobile() ? 0 : (layoutService.isPinned() ? layoutService.constants.SIDEBAR_WIDTH_EXPANDED : layoutService.constants.SIDEBAR_WIDTH_COLLAPSED)">
   
   <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-    <!-- Menu Button -->
-    <button (click)="layoutService.toggleMobileMenu()"
+    <!-- Back Button (Mobile ONLY) -->
+    <button *ngIf="layoutService.isMobile() && layoutService.showBackButton()" (click)="handleBack()"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors active:scale-95">
+      <lucide-angular [img]="icons.ArrowLeft" class="h-5 w-5 text-primary"></lucide-angular>
+    </button>
+
+    <!-- Contextual Title (Mobile) -->
+    <div *ngIf="layoutService.isMobile() && layoutService.headerTitle()" 
+      class="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500">
+      <span class="text-[10px] font-black uppercase tracking-[0.2em] text-text leading-none">
+        {{ layoutService.headerTitle() }}
+      </span>
+    </div>
+
+    <!-- Menu Button (Desktop Only) -->
+    <button *ngIf="!layoutService.isMobile()" (click)="layoutService.togglePinned()"
       class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors active:scale-95">
       <lucide-angular [img]="icons.Menu" 
-        [class.text-primary]="layoutService.isMobileMenuOpen() || layoutService.isPinned()"
-        [class.text-text-muted/40]="!layoutService.isMobileMenuOpen() && !layoutService.isPinned()"
+        [class.text-primary]="layoutService.isPinned()"
+        [class.text-text-muted/40]="!layoutService.isPinned()"
         class="h-5 w-5 transition-all"></lucide-angular>
     </button>
 

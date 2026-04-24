@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, inject, signal, computed, effect, OnDestroy, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, computed, effect, OnDestroy, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X } from 'lucide-angular';
 import { Router, RouterModule } from '@angular/router';
 import { SessionService } from '@core/session/session.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
@@ -17,6 +17,7 @@ import { FilesApiService } from '@core/api/files.api.service';
 import { cn } from '@shared/utils/cn';
 import { OrderCalculatorService } from '../../services/order-calculator.service';
 import { ButtonSpinnerComponent } from '@shared/ui';
+import { LayoutService } from '@core/layout/layout.service';
 
 @Component({
   selector: 'app-order-form',
@@ -34,26 +35,27 @@ import { ButtonSpinnerComponent } from '@shared/ui';
     ButtonSpinnerComponent
   ],
   template: `
-    <form (submit)="handleSave($event)" class="space-y-16 pb-40 relative max-w-6xl mx-auto animate-in fade-in duration-1000 px-4 sm:px-8">
+    <form (submit)="handleSave($event)" class="space-y-12 sm:space-y-16 pb-40 relative max-w-6xl mx-auto animate-in fade-in duration-1000 px-4 sm:px-8">
       
       <!-- EDITORIAL CONTEXTUAL HEADER -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-10 pt-8 border-b border-border/5 pb-12">
-        <div class="flex items-start gap-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-10 pt-4 sm:pt-8 border-b border-border/5 pb-8 sm:pb-12">
+        <div class="flex items-start gap-4 sm:gap-8">
+          <!-- Back Button (Desktop ONLY) -->
           <button
             type="button"
             (click)="goBack()"
-            class="h-14 w-14 rounded-2xl bg-surface-container-lowest border border-border/5 shadow-sm hover:bg-surface transition-all active:scale-95 flex items-center justify-center text-text-muted hover:text-text group"
+            class="hidden sm:flex h-14 w-14 rounded-2xl bg-surface-container-lowest border border-border/5 shadow-sm hover:bg-surface transition-all active:scale-95 items-center justify-center text-text-muted hover:text-text group"
           >
             <lucide-angular [img]="icons.ArrowLeft" class="h-6 w-6 transition-transform group-hover:-translate-x-1"></lucide-angular>
           </button>
-          <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <div [class]="cn('h-2 w-2 rounded-full animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]', forcedStatus === 'QUOTATION' ? 'bg-blue-500 shadow-blue-500/50' : 'bg-primary shadow-primary/50')"></div>
-              <span [class]="cn('text-[9px] font-black uppercase tracking-[0.4em]', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
+          <div class="space-y-1 sm:space-y-3">
+            <div class="flex items-center gap-2 sm:gap-3">
+              <div [class]="cn('h-1.5 w-1.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]', forcedStatus === 'QUOTATION' ? 'bg-blue-500 shadow-blue-500/50' : 'bg-primary shadow-primary/50')"></div>
+              <span [class]="cn('text-[7px] sm:text-[9px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em]', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
                 {{ forcedStatus === 'QUOTATION' ? 'Propuesta Comercial' : 'Carga de Registro Operativo' }}
               </span>
             </div>
-            <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-text uppercase leading-none font-display">
+            <h1 class="text-3xl md:text-6xl font-black tracking-tighter text-text uppercase leading-none font-display">
               {{ forcedStatus === 'QUOTATION' ? 'Nuevo' : (orderType() === 'CLIENT' ? 'Nuevo' : 'Producción de') }} 
               <span [class]="cn('italic', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
                 {{ forcedStatus === 'QUOTATION' ? 'Presupuesto' : (orderType() === 'CLIENT' ? 'Pedido' : 'Stock') }}
@@ -64,25 +66,25 @@ import { ButtonSpinnerComponent } from '@shared/ui';
       </div>
 
       <!-- SYSTEM ARCHITECTURE LAYOUT -->
-      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-start">
         
         <!-- MAIN COLUMN: FORM ARCHITECTURE -->
-        <div class="lg:col-span-8 space-y-16">
+        <div class="lg:col-span-8 space-y-12 sm:space-y-16">
           
           <!-- SECCIÓN 1: IDENTIDAD DE LA ORDEN -->
-          <div class="rounded-[3rem] border border-border/5 bg-surface-container-low p-10 md:p-14 shadow-2xl shadow-text/5 transition-all duration-700 hover:shadow-text/10">
-             <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-12 flex items-center gap-4">
-                <span class="w-8 h-px bg-border/10"></span>
+          <div class="rounded-[2rem] sm:rounded-[3rem] border border-border/5 bg-surface-container-low p-6 sm:p-14 shadow-2xl shadow-text/5 transition-all duration-700 hover:shadow-text/10">
+             <h2 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-8 sm:mb-12 flex items-center gap-4">
+                <span class="w-6 sm:w-8 h-px bg-border/10"></span>
                 Identificación del Sistema
              </h2>
              
-             <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
                 @if (!forcedType) {
-                  <div class="sm:col-span-2 space-y-4">
-                    <label class="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Propósito de Carga</label>
-                    <div class="grid grid-cols-2 gap-4 p-2 rounded-[2rem] bg-surface-container-lowest border border-border/5">
-                      <button type="button" (click)="orderType.set('CLIENT')" [class]="cn('h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'CLIENT' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Externo (Cliente)</button>
-                      <button type="button" (click)="orderType.set('STOCK')" [class]="cn('h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'STOCK' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Interno (Stock)</button>
+                  <div class="sm:col-span-2 space-y-3 sm:space-y-4">
+                    <label class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Propósito de Carga</label>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 p-1.5 rounded-2xl sm:rounded-[2rem] bg-surface-container-lowest border border-border/5">
+                      <button type="button" (click)="orderType.set('CLIENT')" [class]="cn('h-12 sm:h-14 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'CLIENT' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Externo (Cliente)</button>
+                      <button type="button" (click)="orderType.set('STOCK')" [class]="cn('h-12 sm:h-14 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'STOCK' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Interno (Stock)</button>
                     </div>
                   </div>
                 }
@@ -113,36 +115,31 @@ import { ButtonSpinnerComponent } from '@shared/ui';
                   [disabled]="isSaving()"
                 ></app-employee-selector>
 
-                <div class="sm:col-span-2 space-y-4">
-                  <label class="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Manifiesto / Observaciones</label>
+                <div class="sm:col-span-2 space-y-3 sm:space-y-4">
+                  <label class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Manifiesto / Observaciones</label>
                   <input [(ngModel)]="observaciones" name="notas" placeholder="DETALLES TÉCNICOS O LOGÍSTICOS..." 
-                    class="w-full h-16 px-6 rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black outline-none focus:border-primary/20 focus:ring-[12px] focus:ring-primary/5 transition-all placeholder:opacity-20 uppercase tracking-widest">
+                    class="w-full h-14 sm:h-16 px-6 rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black outline-none focus:border-primary/20 focus:ring-[12px] focus:ring-primary/5 transition-all placeholder:opacity-20 uppercase tracking-widest">
                 </div>
              </div>
           </div>
 
           <!-- SECCIÓN 2: LÍNEAS DE CONFIGURACIÓN -->
-          <div class="space-y-10">
-            <div class="flex items-end justify-between px-4">
-              <div class="space-y-2">
-                <h3 class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Componentes de Producción</h3>
-                <p class="text-xs text-text-muted font-medium italic opacity-60">Configuración detallada de {{ items().length }} unidades.</p>
+          <div class="space-y-8 sm:space-y-10">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between px-4 gap-6">
+              <div class="space-y-1 sm:space-y-2">
+                <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Componentes de Producción</h3>
+                <p class="text-[10px] sm:text-xs text-text-muted font-medium italic opacity-60">Configuración detallada de {{ items().length }} unidades.</p>
               </div>
-              <div class="flex gap-4">
+              <div class="flex gap-3 sm:gap-4">
                 @if (items().length > 5) {
-                  <button type="button" (click)="removeDuplicates()" class="text-[9px] font-black uppercase tracking-[0.3em] px-6 py-2 rounded-full border border-danger/10 text-danger hover:bg-danger/5 transition-all italic underline-offset-4 hover:underline">
+                  <button type="button" (click)="removeDuplicates()" class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] px-4 sm:px-6 py-2 rounded-full border border-danger/10 text-danger hover:bg-danger/5 transition-all italic">
                     Limpiar Duplicados
                   </button>
                 }
-                <button type="button" (click)="addItem()" 
-                    class="h-14 px-8 rounded-2xl bg-text text-surface text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-text/10 group">
-                  <lucide-angular [img]="icons.Plus" class="h-4 w-4 group-hover:rotate-90 transition-transform duration-700"></lucide-angular>
-                  <span>Anexar Ítem</span>
-                </button>
               </div>
             </div>
 
-            <div class="space-y-12">
+            <div class="space-y-8 sm:space-y-12">
               @for (item of items(); track $index) {
                 <app-item-details-form
                   [index]="$index"
@@ -158,62 +155,71 @@ import { ButtonSpinnerComponent } from '@shared/ui';
                   (onFileDelete)="untrackFile($event)"
                 ></app-item-details-form>
               }
+
+              <!-- ADD ITEM BUTTON (PERSISTENT FLOW) -->
+              <div class="flex justify-center pt-4">
+                <button type="button" (click)="addItem()" 
+                    class="h-14 w-14 sm:w-auto sm:px-10 rounded-full bg-zinc-900 text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:scale-[1.05] active:scale-[0.95] transition-all shadow-xl shadow-zinc-900/10 group">
+                  <lucide-angular [img]="icons.Plus" class="h-5 w-5 sm:h-4 sm:w-4 transition-transform group-hover:rotate-90"></lucide-angular>
+                  <span class="hidden sm:inline">Anexar Ítem</span>
+                </button>
+              </div>
             </div>
 
           </div>
         </div>
 
-        <!-- SIDEBAR: MATRIZ DE VALORES (FLOTANTE STICKY) -->
-        <div class="lg:col-span-4 h-full relative overflow-visible">
+        <!-- SIDEBAR: MATRIZ DE VALORES (FLOTANTE STICKY EN DESKTOP) -->
+        <div class="lg:col-span-4 h-full relative overflow-visible mt-8 lg:mt-0">
            <div class="sticky top-24 space-y-10">
               
               <!-- Luxury Summary Matrix -->
-              <div class="p-12 rounded-[3.5rem] bg-surface-container-low border border-border/5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] relative overflow-hidden group">
+              <div class="p-8 sm:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] bg-surface-container-low border border-border/5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] relative overflow-hidden group">
                  <!-- Subtle Branding Accent -->
                  <div [class]="cn('absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity duration-1000 group-hover:opacity-20', forcedStatus === 'QUOTATION' ? 'bg-blue-500' : 'bg-primary')"></div>
 
-                 <h3 class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-12 flex items-center gap-4">
+                 <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-8 sm:mb-12 flex items-center gap-4">
                    <div [class]="cn('w-2 h-2 rounded-full', forcedStatus === 'QUOTATION' ? 'bg-blue-500' : 'bg-primary')"></div>
                    Arquitectura de Costos
                  </h3>
                  
-                 <div class="space-y-10">
+                 <div class="space-y-8 sm:space-y-10">
                      <div class="flex justify-between items-center group/row">
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Volumen Config</span>
-                        <span class="text-xl font-black text-text tabular-nums tracking-tighter">{{ items().length }} UN.</span>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Volumen Config</span>
+                        <span class="text-lg sm:text-xl font-black text-text tabular-nums tracking-tighter">{{ items().length }} UN.</span>
                      </div>
 
                      <div class="flex justify-between items-center group/row">
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Masa Crítica</span>
-                        <span class="text-xl font-black text-text tabular-nums tracking-tighter">{{ totales().unidades }} PIEZAS</span>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Masa Crítica</span>
+                        <span class="text-lg sm:text-xl font-black text-text tabular-nums tracking-tighter">{{ totales().unidades }} PIEZAS</span>
                      </div>
 
                     <div class="h-px bg-border/5"></div>
 
-                    <div class="space-y-3">
-                       <span class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40">Inversión Bruta</span>
+                    <div class="space-y-2 sm:space-y-3">
+                       <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40">Inversión Bruta</span>
                        <div class="flex items-baseline gap-1">
-                          <span class="text-5xl font-black text-text tabular-nums tracking-tighter leading-none">
+                          <span class="text-4xl sm:text-5xl font-black text-text tabular-nums tracking-tighter leading-none">
                             {{ totales().total | currency:'':'symbol':'1.0-0' }}
                           </span>
                        </div>
                     </div>
 
                     @if (orderType() !== 'STOCK') {
-                      <div class="space-y-6 pt-4 animate-in fade-in duration-700">
+                      <div class="space-y-4 sm:space-y-6 pt-2 sm:pt-4 animate-in fade-in duration-700">
                          <div class="flex items-center justify-between px-1">
-                            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/40">Adelantos Registrados</span>
-                            <span class="text-xs font-black text-success tabular-nums">- {{ totales().totalSenias | currency:'':'symbol':'1.0-0' }}</span>
+                            <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/40">Adelantos Registrados</span>
+                            <span class="text-[10px] sm:text-xs font-black text-success tabular-nums">- {{ totales().totalSenias | currency:'':'symbol':'1.0-0' }}</span>
                          </div>
                          
-                         <div class="p-8 rounded-[2rem] bg-surface-container-lowest border border-primary/5 space-y-2">
-                            <span class="text-[9px] font-black uppercase tracking-[0.5em] text-primary">Saldo en Entrega</span>
-                            <div class="text-4xl font-black text-primary tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency:'':'symbol':'1.0-0' }}</div>
+                         <div class="p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-surface-container-lowest border border-primary/5 space-y-1 sm:space-y-2">
+                            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.5em] text-primary">Saldo en Entrega</span>
+                            <div class="text-3xl sm:text-4xl font-black text-primary tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency:'':'symbol':'1.0-0' }}</div>
                          </div>
                       </div>
                     }
 
-                    <div class="pt-8">
+                    <div class="hidden sm:block pt-8">
                       <app-button-spinner
                         [loading]="isSaving()"
                         (onClick)="handleSave($event)"
@@ -227,7 +233,7 @@ import { ButtonSpinnerComponent } from '@shared/ui';
                       </app-button-spinner>
                     </div>
 
-                    <p class="text-[8px] font-black text-center text-text-muted/40 uppercase tracking-[0.3em] leading-relaxed pt-4 px-6">
+                    <p class="text-[8px] font-black text-center text-text-muted/40 uppercase tracking-[0.3em] leading-relaxed pt-2 sm:pt-4 px-4 sm:px-6">
                       {{ orderType() === 'STOCK' ? 'El registro impactará el inventario en tiempo real.' : 'Notificaciones automatizadas tras la firma digital.' }}
                     </p>
                  </div>
@@ -236,45 +242,65 @@ import { ButtonSpinnerComponent } from '@shared/ui';
         </div>
       </fieldset>
 
-      <!-- EDITORIAL FLOATING DOCK -->
+      <!-- EDITORIAL FLOATING DOCK (DESKTOP ONLY) -->
       @if (showFloatingFooter()) {
-        <div class="fixed bottom-6 sm:bottom-24 left-0 right-0 px-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-auto z-[100] flex items-center justify-center animate-in slide-in-from-bottom-20 duration-1000">
-           <div class="h-16 sm:h-20 w-full sm:w-auto pl-8 sm:pl-12 pr-4 sm:pr-6 rounded-[2rem] sm:rounded-full bg-surface/80 backdrop-blur-3xl border border-border/5 shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex items-center justify-between sm:justify-start gap-6 sm:gap-10">
+        <div class="hidden sm:flex fixed bottom-24 left-1/2 -translate-x-1/2 w-auto z-[100] items-center justify-center animate-in slide-in-from-bottom-20 duration-1000">
+           <div class="h-20 w-auto pl-12 pr-6 rounded-full bg-surface/90 backdrop-blur-3xl border border-border/5 shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex items-center justify-start gap-10">
               <div class="flex flex-col">
-                 <span class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/60 leading-none mb-1 sm:mb-2 italic">Valor Acumulado</span>
-                 <span class="text-xl sm:text-2xl font-black text-text leading-none tabular-nums tracking-tighter">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
+                 <span class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/60 leading-none mb-2 italic">Total Acumulado</span>
+                 <span class="text-2xl font-black text-text leading-none tabular-nums tracking-tighter">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
               </div>
               
-              <div class="hidden sm:block w-px h-10 bg-border/5"></div>
+              <div class="w-px h-10 bg-border/5"></div>
               
               <app-button-spinner
                 [loading]="isSaving()"
                 (onClick)="handleSave($event)"
-                [btnClass]="'h-10 sm:h-12 px-6 sm:px-10 rounded-full bg-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-3 shadow-2xl shadow-primary/20'"
+                [btnClass]="'h-12 px-10 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-3 shadow-2xl shadow-primary/20'"
               >
                 <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
-                <span class="hidden xs:inline">{{ id ? 'Guardar' : 'Finalizar' }}</span>
+                <span class="inline">{{ id ? 'Guardar' : 'Finalizar' }}</span>
               </app-button-spinner>
            </div>
         </div>
       }
 
-      <app-floating-calculator></app-floating-calculator>
+      <!-- MOBILE CALCULATOR FAB -->
+      <button 
+        type="button" 
+        (click)="calcTrigger.isOpen.set(true)"
+        class="sm:hidden fixed bottom-28 right-4 h-14 w-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 bg-primary/80 backdrop-blur-3xl border border-white/20 text-white z-[120]"
+      >
+        <lucide-angular [img]="icons.Calculator" class="h-6 w-6"></lucide-angular>
+      </button>
+
+      <app-floating-calculator #calcTrigger [hideTrigger]="layoutService.isMobile()"></app-floating-calculator>
     </form>
   `,
   styles: [`
     :host { display: block; }
   `]
 })
-export class OrderFormComponent implements OnDestroy {
+export class OrderFormComponent implements OnInit, OnDestroy {
   private api = inject(PedidosApiService);
   private filesApi = inject(FilesApiService);
   private clientesApi = inject(ClientesApiService);
   private session = inject(SessionService);
+  public layoutService = inject(LayoutService);
   private router = inject(Router);
   private calculator = inject(OrderCalculatorService);
 
-  readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw };
+  readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X };
+
+  ngOnInit() {
+    this.layoutService.backAction.set(() => this.goBack());
+    this.layoutService.headerTitle.set(this.forcedStatus === 'QUOTATION' ? 'NUEVO PRESUPUESTO' : 'NUEVO PEDIDO');
+    this.layoutService.customBottomAction.set({
+      label: this.id ? 'GUARDAR CAMBIOS' : 'FINALIZAR PEDIDO',
+      icon: Save,
+      action: () => this.handleSave()
+    });
+  }
 
   @Input() set forcedType(val: 'CLIENT' | 'STOCK' | undefined) {
     if (val) this.orderType.set(val);
@@ -295,6 +321,8 @@ export class OrderFormComponent implements OnDestroy {
   observaciones = '';
   isSaving = signal(false);
   showFloatingFooter = signal(false);
+  isAtBottom = signal(false);
+  actionsOpen = signal(false);
   isSaved = false;
   pendingFiles: string[] = [];
   vErrors: Record<string, string> = {};
@@ -385,12 +413,23 @@ export class OrderFormComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
+    this.layoutService.backAction.set(null);
+    this.layoutService.headerTitle.set(null);
+    this.layoutService.customBottomAction.set(null);
     this.cleanupFiles();
   }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    this.showFloatingFooter.set(window.scrollY > 400);
+    this.showFloatingFooter.set(window.scrollY > 300);
+    
+    // Check if near bottom to hide the quick-scroll arrow
+    const threshold = 150;
+    const scrollPos = window.scrollY || window.pageYOffset;
+    const windowHeight = window.innerHeight;
+    const docHeight = document.documentElement.scrollHeight;
+    
+    this.isAtBottom.set((scrollPos + windowHeight) >= (docHeight - threshold));
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -474,12 +513,19 @@ export class OrderFormComponent implements OnDestroy {
     this.totales.set(this.calculator.calculateOrder(this.items(), this.rubro()));
   }
 
+  scrollToBottom() {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth'
+    });
+  }
+
   goBack() {
     this.router.navigate([this.returnUrl]);
   }
 
-  async handleSave(e: Event) {
-    e.preventDefault();
+  async handleSave(e?: Event) {
+    if (e) e.preventDefault();
     if (this.isSaving()) return;
     if (this.orderType() === 'CLIENT' && !this.clienteId) {
       alert('Debe seleccionar un cliente');

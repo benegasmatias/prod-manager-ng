@@ -1,6 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Menu, Sun, Moon, Search } from 'lucide-angular';
+import { LucideAngularModule, Menu, Sun, Moon, Search, ArrowLeft } from 'lucide-angular';
 import { LayoutService } from '../layout.service';
 import { ThemeService } from '../theme.service';
 import { NotificationDropdownComponent } from './notifications/notification-dropdown.component';
@@ -27,7 +27,16 @@ export class NavbarComponent {
   navbarVisible = signal(true);
   private lastScroll = 0;
   
-  readonly icons = { Menu, Sun, Moon, Search };
+  readonly icons = { Menu, Sun, Moon, Search, ArrowLeft };
+
+  handleBack() {
+    const action = this.layoutService.backAction();
+    if (action) {
+      action();
+    } else {
+      window.history.back();
+    }
+  }
 
   toggleTheme() {
     this.themeService.toggleTheme();
