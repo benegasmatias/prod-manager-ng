@@ -10,12 +10,13 @@
       <lucide-angular [img]="icons.ArrowLeft" class="h-5 w-5 text-primary"></lucide-angular>
     </button>
 
-    <!-- Contextual Title (Mobile) -->
+    <!-- Contextual Title (Mobile Center) -->
     <div *ngIf="layoutService.isMobile() && layoutService.headerTitle()" 
-      class="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500">
-      <span class="text-[10px] font-black uppercase tracking-[0.2em] text-text leading-none">
+      class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 pointer-events-none">
+      <span class="text-[11px] font-black uppercase tracking-[0.3em] text-text whitespace-nowrap">
         {{ layoutService.headerTitle() }}
       </span>
+      <div class="h-1 w-4 rounded-full bg-primary/20 mt-1"></div>
     </div>
 
     <!-- Menu Button (Desktop Only) -->

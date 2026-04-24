@@ -52,7 +52,7 @@ import { MetricCardComponent } from '@shared/ui/metric-card/metric-card.componen
       [loading]="loading()"
     >
       <!-- HEADER ACTIONS -->
-      <div actions>
+      <div actions class="hidden sm:block">
         <app-quick-actions [actions]="activeConfig().quickActions"></app-quick-actions>
       </div>
 

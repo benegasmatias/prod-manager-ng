@@ -1,25 +1,54 @@
 <aside
-  class="fixed left-0 z-[var(--z-sidebar)] bg-surface border-r border-border/5 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden will-change-[width,transform]"
-  [style.width.px]="layoutService.isMobile() ? 300 : layoutService.sidebarWidth()"
-  [style.top.px]="0"
-  [style.height]="'100dvh'"
+  class="fixed left-0 z-[var(--z-sidebar)] bg-surface border-r border-border/5 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden will-change-[width,transform] lg:rounded-none rounded-none shadow-none"
+  [style.width]="layoutService.isMobile() ? '100%' : layoutService.sidebarWidth() + 'px'" [style.top.px]="0"
+  [style.height]="'100dvh'" [class.backdrop-blur-3xl]="layoutService.isMobile()"
+  [class.bg-surface/95]="layoutService.isMobile()"
   [class.-translate-x-full]="layoutService.isMobile() && !layoutService.isMobileMenuOpen()"
   (mouseenter)="layoutService.setHovered(true)" (mouseleave)="layoutService.setHovered(false)">
-  
-  <div class="h-full flex flex-col px-4 py-3 w-full min-w-[280px] shrink-0 gap-4">
+
+  <div class="h-full flex flex-col px-4 py-3 w-full min-w-[280px] shrink-0 sm:gap-1 gap-4">
     @if (!sessionService.isInitialized()) {
-      <app-sidebar-skeleton></app-sidebar-skeleton>
+    <app-sidebar-skeleton></app-sidebar-skeleton>
     } @else {
-      <!-- EDITORIAL LOGO SYSTEM -->
-      <div class="flex items-center justify-between px-2 py-0 relative animate-in fade-in slide-in-from-top-4 duration-1000">
+      <!-- MOBILE MENU PAGE HEADER (Refined Meli Style) -->
+      <div *ngIf="layoutService.isMobile()" class="mb-4 -mx-4 -mt-3 animate-in fade-in duration-700">
+        <a routerLink="/ajustes" (click)="layoutService.closeMobileMenu()" 
+           class="block px-6 py-12 bg-primary rounded-b-[3rem] shadow-xl shadow-primary/20 relative overflow-hidden active:opacity-90 transition-all">
+          
+          <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent animate-pulse"></div>
+          
+          <div class="flex items-center gap-6 relative z-10">
+            <div class="h-20 w-20 rounded-3xl bg-white shadow-2xl flex items-center justify-center font-black text-3xl text-primary">
+              MB
+            </div>
+            <div class="flex flex-col">
+              <h2 class="text-2xl font-black text-white tracking-tight leading-tight">Matias Miguel</h2>
+              <p class="text-[11px] font-black uppercase tracking-[0.3em] text-white/60 mt-1 flex items-center gap-2">
+                MI PERFIL 
+                <lucide-angular [img]="icons.ChevronRight" class="h-3 w-3 text-white"></lucide-angular>
+              </p>
+            </div>
+          </div>
+          
+          <button (click)="$event.stopPropagation(); layoutService.closeMobileMenu()"
+            class="absolute top-6 right-6 h-12 w-12 flex items-center justify-center rounded-2xl bg-white/10 text-white hover:bg-white/20 transition-all">
+            <lucide-angular [img]="icons.X" class="h-6 w-6"></lucide-angular>
+          </button>
+        </a>
+      </div>
+
+      <!-- EDITORIAL LOGO SYSTEM (Desktop Only) -->
+      <div *ngIf="!layoutService.isMobile()"
+        class="flex items-center justify-between px-2 py-0 relative animate-in fade-in slide-in-from-top-4 duration-1000">
         <div class="flex items-center gap-5 overflow-hidden">
           <div
             class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.5rem] bg-surface-container-low shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] active:scale-95 transition-all duration-500 overflow-hidden border border-border/5 group">
-            <img src="assets/logo.png" alt="Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform duration-700" />
+            <img src="assets/logo.png" alt="Logo"
+              class="h-10 w-10 object-contain group-hover:scale-110 transition-transform duration-700" />
           </div>
           <div class="flex flex-col truncate transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
-            [class.lg:opacity-0]="!layoutService.isMobile() && layoutService.isCollapsed()"
-            [class.lg:-translate-x-8]="!layoutService.isMobile() && layoutService.isCollapsed()">
+            [class.lg:opacity-0]="layoutService.isCollapsed()"
+            [class.lg:-translate-x-8]="layoutService.isCollapsed()">
             <span class="text-lg font-black tracking-tighter leading-none text-text uppercase font-display">PROD<span class="text-primary italic">MGR</span></span>
             <div class="flex items-center gap-2 mt-2">
               <span class="h-1 w-1 rounded-full bg-primary animate-pulse"></span>
@@ -28,72 +57,73 @@
             </div>
           </div>
         </div>
-
-        @if (layoutService.isMobile()) {
-          <button (click)="layoutService.closeMobileMenu()"
-            class="h-12 w-12 flex items-center justify-center rounded-2xl text-text-muted hover:bg-surface-container-low hover:text-text transition-all border border-transparent hover:border-border/10">
-            <lucide-angular [img]="icons.X" class="h-6 w-6"></lucide-angular>
-          </button>
-        }
       </div>
 
       <!-- NAVIGATION ARCHITECTURE -->
-      <div class="flex flex-col gap-2 overflow-y-auto no-scrollbar pb-4 flex-1 animate-in fade-in slide-in-from-left-4 duration-1000 delay-150">
+      <div
+        class="flex flex-col gap-2 overflow-y-auto no-scrollbar flex-1 animate-in fade-in slide-in-from-left-4 duration-1000 delay-150"
+        [ngClass]="layoutService.isMobile() ? 'pb-40' : 'pb-4'">
         @for (group of sidebarMenu(); track group.title) {
-          <nav class="space-y-1">
-            <span
-              class="px-4 text-[8px] font-black uppercase tracking-[0.5em] text-text-muted/30 mb-1.5 block whitespace-nowrap transition-all duration-500 italic"
-              [class.lg:opacity-0]="!layoutService.isMobile() && layoutService.isCollapsed()"
-              [class.lg:-translate-x-8]="!layoutService.isMobile() && layoutService.isCollapsed()">
-              {{ group.title }}
-            </span>
-
+        <nav class="space-y-1 sm:mb-2 mb-8">
+          <span
+            class="px-4 text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/30 mb-3 block whitespace-nowrap transition-all duration-500 italic"
+            [class.lg:opacity-0]="layoutService.isCollapsed()"
+            [class.lg:-translate-x-8]="layoutService.isCollapsed()">
+            {{ group.title }}
+          </span>
+          <div class="space-y-1 sm:space-y-0">
             @for (item of group.items; track item.href) {
-              <a [routerLink]="item.href" routerLinkActive="active-link" #rla="routerLinkActive"
-                class="group flex items-center gap-4 rounded-xl px-4 py-1.5 text-xs font-bold relative overflow-hidden transition-all duration-500"
-                [class.bg-primary]="rla.isActive" 
-                [class.text-white]="rla.isActive"
-                [class.shadow-[0_20px_40px_-12px_rgba(var(--primary-rgb),0.4)]]="rla.isActive" 
-                [class.scale-[1.02]]="rla.isActive"
-                [class.text-text-muted]="!rla.isActive" 
-                [class.hover:bg-surface-container-low]="!rla.isActive"
-                [class.hover:text-text]="!rla.isActive">
-                
-                <div class="shrink-0 flex items-center justify-center w-6 h-6 relative z-10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                  <lucide-angular [img]="item.icon" class="h-5.5 w-5.5 transition-colors duration-500"
-                    [ngClass]="rla.isActive ? 'text-white' : 'text-text-muted/30 group-hover:text-primary'"></lucide-angular>
-                </div>
+            <a [routerLink]="item.href" routerLinkActive="active-link" #rla="routerLinkActive"
+              class="group flex items-center gap-5 rounded-2xl px-5 transition-all duration-500 relative overflow-hidden"
+              [ngClass]="{
+                    'py-4 border-b border-border/5' : layoutService.isMobile(),
+                    'py-1.5' : !layoutService.isMobile(),
+                    'bg-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : rla.isActive,
+                    'text-text-muted hover:bg-surface-container-low hover:text-text' : !rla.isActive
+                  }">
 
-                <span class="truncate whitespace-nowrap transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] tracking-tight font-display uppercase text-xs"
-                  [class.lg:opacity-0]="!layoutService.isMobile() && layoutService.isCollapsed()"
-                  [class.lg:-translate-x-8]="!layoutService.isMobile() && layoutService.isCollapsed()">
-                  {{ item.label }}
-                </span>
+              <div
+                class="shrink-0 flex items-center justify-center w-8 h-8 relative z-10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                <lucide-angular [img]="item.icon" class="h-6 w-6 transition-colors duration-500"
+                  [ngClass]="rla.isActive ? 'text-white' : 'text-text-muted/20 group-hover:text-primary'"></lucide-angular>
+              </div>
 
-                @if (rla.isActive) {
-                  <div class="ml-auto h-2 w-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-700"
-                    [class.scale-0]="!layoutService.isMobile() && layoutService.isCollapsed()"></div>
-                }
-              </a>
+              <span
+                class="truncate whitespace-nowrap transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] tracking-tight font-display uppercase text-sm font-bold"
+                [class.lg:opacity-0]="layoutService.isCollapsed()"
+                [class.lg:hidden]="!layoutService.isMobile() && layoutService.isCollapsed()">
+                {{ item.label }}
+              </span>
+
+              @if (rla.isActive) {
+              <div
+                class="ml-auto h-2.5 w-2.5 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] transition-all duration-700">
+              </div>
+              } @else if (layoutService.isMobile()) {
+              <lucide-angular [img]="icons.ChevronRight" class="ml-auto h-4 w-4 text-text-muted/10"></lucide-angular>
+              }
+            </a>
             }
-          </nav>
+          </div>
+        </nav>
         }
       </div>
 
-      <!-- SYSTEM CONTROL FOOTER -->
-      @if (!layoutService.isMobile()) {
-        <div class="pt-8 mt-auto border-t border-border/5 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-          <button (click)="layoutService.togglePinned()"
-            class="w-full flex items-center gap-4 rounded-xl px-4 py-2 text-text-muted/40 hover:text-primary hover:bg-surface-container-low transition-all duration-500 overflow-hidden group border border-transparent hover:border-primary/10">
-            <lucide-angular [img]="layoutService.isPinned() ? icons.Pin : icons.PinOff"
-              class="h-5.5 w-5.5 shrink-0 group-hover:rotate-12 transition-transform duration-500"></lucide-angular>
-            <span class="text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-700 italic"
-              [class.opacity-0]="layoutService.isCollapsed()">
-              {{ layoutService.isPinned() ? 'Fijar Sistema' : 'Expandir Vista' }}
-            </span>
-          </button>
-        </div>
-      }
+    <!-- SYSTEM CONTROL FOOTER -->
+    @if (!layoutService.isMobile()) {
+    <div
+      class="pt-8 mt-auto border-t border-border/5 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+      <button (click)="layoutService.togglePinned()"
+        class="w-full flex items-center gap-4 rounded-xl px-4 py-2 text-text-muted/40 hover:text-primary hover:bg-surface-container-low transition-all duration-500 overflow-hidden group border border-transparent hover:border-primary/10">
+        <lucide-angular [img]="layoutService.isPinned() ? icons.Pin : icons.PinOff"
+          class="h-5.5 w-5.5 shrink-0 group-hover:rotate-12 transition-transform duration-500"></lucide-angular>
+        <span class="text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-700 italic"
+          [class.opacity-0]="layoutService.isCollapsed()">
+          {{ layoutService.isPinned() ? 'Fijar Sistema' : 'Expandir Vista' }}
+        </span>
+      </button>
+    </div>
+    }
     }
   </div>
-</aside>
+</aside>

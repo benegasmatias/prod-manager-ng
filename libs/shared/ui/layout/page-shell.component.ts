@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
     <div class="space-y-12 animate-in fade-in duration-1000">
       <!-- HEADER LAYER -->
       <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 px-0">
-        <div class="space-y-2">
+        <div class="hidden md:block space-y-2">
           <div class="flex items-center gap-4 mb-2">
             <div class="h-1.5 w-10 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]"></div>
             <span class="text-[10px] font-black uppercase tracking-[0.5em] text-primary italic">
@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
           <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-text uppercase italic font-display leading-none">
             {{ title() }} <span class="text-primary">{{ titleAccent() }}</span>
           </h1>
-          <p class="hidden md:block text-[10px] font-black text-text-muted/40 uppercase tracking-[0.4em] leading-relaxed max-w-2xl italic">
+          <p class="text-[10px] font-black text-text-muted/40 uppercase tracking-[0.4em] leading-relaxed max-w-2xl italic">
             {{ description() }}
           </p>
         </div>

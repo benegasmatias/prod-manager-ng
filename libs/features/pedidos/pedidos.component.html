@@ -76,7 +76,7 @@
   <!-- MAIN LISTING -->
   <div class="space-y-12 pb-32">
     
-    <div class="flex items-center justify-between px-2">
+    <div class="hidden sm:flex items-center justify-between px-2">
        <div>
          <h2 class="text-3xl font-black text-text tracking-tighter uppercase font-display italic">
            Pedidos <span class="text-primary italic">Recientes</span>
@@ -84,7 +84,7 @@
          <p class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em] mt-1">{{ productionTotal() + commercialTotal() }} Activos en Sistema</p>
        </div>
        
-       <button *ngIf="!isMobile()" (click)="clearFilters()" class="text-[9px] font-black text-primary uppercase tracking-widest bg-primary/5 px-4 py-2 rounded-full border border-primary/10 hover:bg-primary/10 transition-all">
+       <button (click)="clearFilters()" class="text-[9px] font-black text-primary uppercase tracking-widest bg-primary/5 px-4 py-2 rounded-full border border-primary/10 hover:bg-primary/10 transition-all">
          Refrescar
        </button>
     </div>

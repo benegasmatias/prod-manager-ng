@@ -34,7 +34,7 @@ export class LayoutService {
       this.checkMobile();
       window.addEventListener('resize', () => this.checkMobile());
 
-      // Auto-detect back button necessity
+      // Auto-detect back button necessity and page title
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
       ).subscribe((event: any) => {
@@ -44,6 +44,23 @@ export class LayoutService {
         // Show back button if we are deep in a module (e.g. /pedidos/nuevo)
         const shouldShow = segments.length > 1;
         this.showBackButton.set(shouldShow);
+
+        // Set Title based on the main segment
+        if (segments.length > 0) {
+          const mainSegment = segments[0].toLowerCase();
+          const titles: Record<string, string> = {
+            'dashboard': 'DASHBOARD',
+            'pedidos': 'PEDIDOS',
+            'clientes': 'CLIENTES',
+            'produccion': 'PRODUCCIÓN',
+            'stock': 'INVENTARIO',
+            'ajustes': 'AJUSTES',
+            'equipo': 'EQUIPO'
+          };
+          this.headerTitle.set(titles[mainSegment] || mainSegment.toUpperCase());
+        } else {
+          this.headerTitle.set('PROD MANAGER');
+        }
       });
     }
   }
