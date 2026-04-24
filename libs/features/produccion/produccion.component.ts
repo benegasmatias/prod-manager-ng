@@ -18,11 +18,12 @@ import { ProductionJob, ProductionJobStatus, ProductionJobPriority } from '../..
 import { Machine, Employee } from '../../shared/models';
 import { StatusBadgeComponent } from '../../shared/ui/badges/status-badge.component';
 import { FilterByStatusPipe } from './pipes/filter-by-status.pipe';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 
 @Component({
   selector: 'app-produccion-board',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, QuickResourcePickerComponent, StatusBadgeComponent, FormsModule, FilterByStatusPipe],
+  imports: [CommonModule, LucideAngularModule, QuickResourcePickerComponent, StatusBadgeComponent, FormsModule, FilterByStatusPipe, PageShellComponent],
   templateUrl: './produccion.component.html',
   styleUrls: ['./produccion.component.css']
 })

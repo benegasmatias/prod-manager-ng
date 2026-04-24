@@ -1,18 +1,10 @@
-<div class="p-8 sm:p-12 space-y-12 animate-in fade-in duration-1000 bg-surface min-h-screen">
-  
-  <!-- SYSTEM CONTROL INTERFACE -->
-  <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-10">
-    <div class="space-y-4">
-      <div class="flex items-center gap-4">
-        <div class="h-2 w-10 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]"></div>
-        <h2 class="text-4xl font-black tracking-tighter text-text font-display uppercase leading-none italic">
-          Centro de <span class="text-primary italic">Manufactura</span>
-        </h2>
-      </div>
-      <p class="text-[10px] font-black text-text-muted/40 uppercase tracking-[0.4em] ml-14 italic">Monitoreo Operativo de Flujo de Planta</p>
-    </div>
-
-    <div class="flex flex-wrap items-center gap-6">
+<app-page-shell
+  title="Centro de"
+  titleAccent="Manufactura"
+  category="OPERATIONAL PROTOCOL"
+  description="Monitoreo Operativo de Flujo de Planta"
+>
+  <div actions class="flex flex-wrap items-center gap-6">
        <!-- VISUALIZATION PROTOCOL -->
        <div class="flex p-1.5 bg-surface-container-low/50 rounded-[1.5rem] border border-border/5 shadow-2xl shadow-text/5 backdrop-blur-xl">
           <button (click)="toggleView()" 
@@ -50,7 +42,6 @@
           </select>
           <lucide-angular [img]="icons.ChevronDown" class="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted/20 pointer-events-none group-hover:text-primary transition-colors"></lucide-angular>
        </div>
-    </div>
   </div>
 
   <!-- KANBAN PRODUCTION STREAM -->
@@ -66,39 +57,39 @@
         <div class="flex items-center justify-between px-6">
            <div class="flex items-center gap-4">
               <div class="h-1.5 w-1.5 rounded-full" [class]="column.text.replace('text-', 'bg-')"></div>
-              <h3 class="text-[10px] font-black uppercase tracking-[0.4em] font-display italic" [class]="column.text">{{ column.label }}</h3>
+              <h3 class="text-[10px] font-black uppercase tracking-[0.5em] font-display italic" [class]="column.text">{{ column.label }}</h3>
            </div>
            <div class="px-3 py-1 rounded-full bg-surface-container-low border border-border/5">
-             <span class="text-[9px] font-black text-text-muted/40 tabular-nums">{{ (filteredJobs() | filterByStatus:column.id).length }}</span>
+              <span class="text-[9px] font-black text-text-muted/30 tabular-nums">{{ (filteredJobs() | filterByStatus:column.id).length }}</span>
            </div>
         </div>
 
-        <div class="space-y-6">
+        <div class="space-y-8">
            @for (job of filteredJobs() | filterByStatus:column.id; track job.id) {
-             <div class="group relative bg-surface-container-low border border-border/5 rounded-[2.5rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] hover:scale-[1.02] transition-all duration-700 overflow-hidden"
+             <div class="group relative bg-surface-container-low/30 border border-border/5 rounded-[3.5rem] shadow-2xl shadow-text/5 hover:scale-[1.02] transition-all duration-1000 overflow-hidden backdrop-blur-3xl"
                   [ngClass]="{'industrial-pulse border-primary/20': job.status === 'IN_PROGRESS'}">
                 
                 <!-- HIERARCHY ACCENT -->
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-20 rounded-r-full transition-all duration-700 group-hover:h-32"
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-24 rounded-r-full transition-all duration-1000 group-hover:h-32 shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)]"
                      [ngClass]="{
-                       'bg-error shadow-[0_0_15px_rgba(var(--error-rgb),0.5)]': job.priority === 'URGENT',
-                       'bg-accent shadow-[0_0_15px_rgba(var(--accent-rgb),0.5)]': job.priority === 'HIGH',
+                       'bg-error': job.priority === 'URGENT',
+                       'bg-accent': job.priority === 'HIGH',
                        'bg-primary/20': job.priority === 'NORMAL'
                      }">
                 </div>
 
-                <div class="p-8 space-y-6 relative z-10">
+                <div class="p-10 space-y-8 relative z-10">
                   <!-- CARD ARCHITECTURE -->
                   <div class="flex items-start justify-between gap-6">
-                    <div class="min-w-0 space-y-3">
-                       <h4 class="text-[11px] font-black text-text truncate leading-none uppercase tracking-[0.2em] font-display italic group-hover:text-primary transition-colors">
+                    <div class="min-w-0 space-y-4">
+                       <h4 class="text-xs font-black text-text truncate leading-none uppercase tracking-[0.3em] font-display italic group-hover:text-primary transition-colors">
                           {{ job.orderItem?.productName || 'UNIDAD SIN IDENTIFICAR' }}
                        </h4>
-                       <div class="flex items-center gap-4">
-                          <span class="text-[9px] font-black px-3 py-1 bg-surface-container-lowest border border-border/5 rounded-full text-text-muted/40 tabular-nums italic">#{{ job.order?.orderNumber || '---' }}</span>
+                       <div class="flex items-center gap-5">
+                          <span class="text-[9px] font-black px-4 py-1.5 bg-surface-container-low border border-border/5 rounded-full text-text-muted/40 tabular-nums italic">#{{ job.order?.orderNumber || '---' }}</span>
                           
                           <!-- ANALYTIC TIMER -->
-                          <div class="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
+                          <div class="flex items-center gap-3 px-4 py-1.5 bg-primary/5 rounded-full border border-primary/10 shadow-sm">
                              <lucide-angular [img]="icons.Clock" class="h-3 w-3 text-primary/40"></lucide-angular>
                              <span class="text-[9px] font-black text-primary tabular-nums">{{ formatMinutes(getJobTotalMinutes(job)) }}</span>
                           </div>
@@ -107,24 +98,24 @@
                     
                     <!-- PROTOCOL TRIGGER -->
                     <button (click)="toggleStatus(job)" 
-                         class="h-14 w-14 shrink-0 rounded-2xl flex items-center justify-center transition-all shadow-2xl active:scale-90 border border-border/5 group/btn"
+                         class="h-16 w-16 shrink-0 rounded-[1.8rem] flex items-center justify-center transition-all shadow-2xl active:scale-90 border border-border/5 group/btn"
                          [ngClass]="job.status === 'IN_PROGRESS' ? 'bg-accent/10 text-accent hover:bg-accent hover:text-white shadow-accent/20' : 'bg-primary text-white hover:scale-110 shadow-primary/30'">
-                       <lucide-angular [img]="job.status === 'IN_PROGRESS' ? icons.Pause : icons.Play" class="h-7 w-7 group-hover/btn:scale-125 transition-transform"></lucide-angular>
+                       <lucide-angular [img]="job.status === 'IN_PROGRESS' ? icons.Pause : icons.Play" class="h-8 w-8 group-hover/btn:scale-125 transition-transform"></lucide-angular>
                     </button>
                   </div>
 
                   <!-- ASSET GRID -->
-                  <div class="grid grid-cols-1 gap-3 pb-4 border-b border-border/5">
+                  <div class="grid grid-cols-1 gap-4 pb-6 border-b border-border/5">
                     <!-- UNIT ASSIGNMENT -->
                     <div (click)="openPicker(job, 'MACHINE')" 
-                         class="flex items-center gap-4 p-2 hover:bg-surface-container-lowest rounded-2xl cursor-pointer transition-all duration-500 border border-transparent hover:border-border/5 group/res">
-                       <div class="h-10 w-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-text-muted/20 group-hover/res:text-primary transition-colors shadow-sm border border-border/5">
-                          <lucide-angular [img]="icons.Monitor" class="h-5 w-5"></lucide-angular>
+                         class="flex items-center gap-5 p-3 hover:bg-surface-container-low rounded-3xl cursor-pointer transition-all duration-700 border border-transparent hover:border-border/5 group/res">
+                       <div class="h-12 w-12 rounded-2xl bg-surface flex items-center justify-center text-text-muted/20 group-hover/res:text-primary transition-colors shadow-2xl shadow-text/5 border border-border/5">
+                          <lucide-angular [img]="icons.Monitor" class="h-6 w-6"></lucide-angular>
                        </div>
                        <div class="flex flex-col">
-                          <span class="text-[7px] font-black text-text-muted/20 uppercase tracking-[0.3em] leading-none mb-1">Unidad Operativa</span>
-                          <span class="text-[9px] font-black uppercase tracking-[0.2em] truncate"
-                                [ngClass]="job.machineId ? 'text-text' : 'text-text-muted/20 italic'">
+                          <span class="text-[8px] font-black text-text-muted/20 uppercase tracking-[0.4em] leading-none mb-2 italic">Unidad Operativa</span>
+                          <span class="text-[10px] font-black uppercase tracking-[0.3em] truncate"
+                                [ngClass]="job.machineId ? 'text-text' : 'text-text-muted/10 italic'">
                             {{ job.machine?.name || 'VINCULAR ACTIVO' }}
                           </span>
                        </div>
@@ -132,14 +123,14 @@
                     
                     <!-- OPERATOR ASSIGNMENT -->
                     <div (click)="openPicker(job, 'OPERATOR')" 
-                         class="flex items-center gap-4 p-2 hover:bg-surface-container-lowest rounded-2xl cursor-pointer transition-all duration-500 border border-transparent hover:border-border/5 group/res">
-                       <div class="h-10 w-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-text-muted/20 group-hover/res:text-primary transition-colors shadow-sm border border-border/5">
-                          <lucide-angular [img]="icons.User" class="h-5 w-5"></lucide-angular>
+                         class="flex items-center gap-5 p-3 hover:bg-surface-container-low rounded-3xl cursor-pointer transition-all duration-700 border border-transparent hover:border-border/5 group/res">
+                       <div class="h-12 w-12 rounded-2xl bg-surface flex items-center justify-center text-text-muted/20 group-hover/res:text-primary transition-colors shadow-2xl shadow-text/5 border border-border/5">
+                          <lucide-angular [img]="icons.User" class="h-6 w-6"></lucide-angular>
                        </div>
                        <div class="flex flex-col">
-                          <span class="text-[7px] font-black text-text-muted/20 uppercase tracking-[0.3em] leading-none mb-1">Especialista</span>
-                          <span class="text-[9px] font-black uppercase tracking-[0.2em] truncate"
-                                [ngClass]="job.operatorId ? 'text-text' : 'text-text-muted/20 italic'">
+                          <span class="text-[8px] font-black text-text-muted/20 uppercase tracking-[0.4em] leading-none mb-2 italic">Especialista</span>
+                          <span class="text-[10px] font-black uppercase tracking-[0.3em] truncate"
+                                [ngClass]="job.operatorId ? 'text-text' : 'text-text-muted/10 italic'">
                             {{ job.responsable?.firstName || 'ASIGNAR CARGO' }}
                           </span>
                        </div>
@@ -147,35 +138,35 @@
 
                     <!-- INVENTORY PROTOCOL -->
                     <div (click)="openPicker(job, 'MATERIAL')" 
-                         class="flex items-center gap-4 p-2 hover:bg-surface-container-lowest rounded-2xl cursor-pointer transition-all duration-500 border border-transparent hover:border-border/5 group/res">
-                       <div class="h-10 w-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-text-muted/20 group-hover/res:text-indigo-500 transition-colors shadow-sm border border-border/5">
-                          <lucide-angular [img]="icons.Box" class="h-5 w-5"></lucide-angular>
+                         class="flex items-center gap-5 p-3 hover:bg-surface-container-low rounded-3xl cursor-pointer transition-all duration-700 border border-transparent hover:border-border/5 group/res">
+                       <div class="h-12 w-12 rounded-2xl bg-surface flex items-center justify-center text-text-muted/20 group-hover/res:text-indigo-500 transition-colors shadow-2xl shadow-text/5 border border-border/5">
+                          <lucide-angular [img]="icons.Box" class="h-6 w-6"></lucide-angular>
                        </div>
                        <div class="flex flex-col">
-                          <span class="text-[7px] font-black text-text-muted/20 uppercase tracking-[0.3em] leading-none mb-1">Recurso Crítico</span>
-                          <span class="text-[9px] font-black uppercase tracking-[0.2em] truncate"
-                                [ngClass]="job.jobMaterials?.[0] ? 'text-text' : 'text-text-muted/20 italic'">
-                            {{ job.jobMaterials?.[0]?.material?.name || 'SIN INSUMO VINCULADO' }}
+                          <span class="text-[8px] font-black text-text-muted/20 uppercase tracking-[0.4em] leading-none mb-2 italic">Recurso Crítico</span>
+                          <span class="text-[10px] font-black uppercase tracking-[0.3em] truncate"
+                                [ngClass]="job.jobMaterials?.[0] ? 'text-text' : 'text-text-muted/10 italic'">
+                            {{ job.jobMaterials?.[0]?.material?.name || 'SIN_INSUMO' }}
                           </span>
                        </div>
                     </div>
                   </div>
 
                   <!-- STAGE ARCHITECTURE -->
-                  <div class="flex items-center justify-between gap-4 pt-2">
+                  <div class="flex items-center justify-between gap-5 pt-2">
                     <div (click)="openPicker(job, 'STAGE')" 
-                         class="flex items-center gap-4 px-5 py-2.5 bg-surface-container-lowest border border-border/5 rounded-full cursor-pointer hover:bg-primary/5 transition-all duration-500 group/st shadow-xl shadow-text/5">
+                         class="flex items-center gap-4 px-6 py-3 bg-surface border border-border/5 rounded-full cursor-pointer hover:bg-primary/5 transition-all duration-700 group/st shadow-2xl shadow-text/5">
                        <lucide-angular [img]="icons.Layers" class="h-4 w-4 text-text-muted/20 group-hover/st:text-primary transition-colors"></lucide-angular>
-                       <span class="text-[9px] font-black uppercase tracking-[0.3em] italic"
+                       <span class="text-[9px] font-black uppercase tracking-[0.4em] italic"
                              [ngClass]="job.currentStage ? 'text-primary' : 'text-text-muted/20'">
-                         {{ job.currentStage || 'DEFINIR ETAPA' }}
+                         {{ job.currentStage || 'ETAPA' }}
                        </span>
                     </div>
                     <app-status-badge [status]="job.status"></app-status-badge>
                   </div>
                 </div>
 
-                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
              </div>
            }
         </div>
@@ -183,7 +174,7 @@
     }
 
   </div>
-</div>
+</app-page-shell>
 
 <!-- ANALYTIC RESOURCE PICKER -->
 @if (activePickerJob() && pickerType()) {

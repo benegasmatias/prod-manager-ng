@@ -8,13 +8,13 @@ import { SessionService } from '../../core/session/session.service';
 import { ApiService } from '../../core/api/api.service';
 import { ConfirmService } from '../../shared/ui/confirm-dialog/confirm-dialog.component';
 import { ToastService } from '../../shared/services/toast.service';
-import { Negocio } from '../../shared/models';
 import { PlanSelectorModalComponent } from './components/plan-selector/plan-selector.component';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 
 @Component({
   selector: 'app-ajustes',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, PlanSelectorModalComponent, ButtonSpinnerComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, PlanSelectorModalComponent, ButtonSpinnerComponent, PageShellComponent],
   templateUrl: './ajustes.component.html'
 })
 export class AjustesComponent {

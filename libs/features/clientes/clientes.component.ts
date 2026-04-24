@@ -10,6 +10,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { ClienteFormDialogComponent } from '../../shared/ui/clientes/cliente-form-dialog/cliente-form-dialog.component';
 import { PaginatorComponent } from '../../shared/ui/paginator/paginator.component';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 
 @Component({
   selector: 'app-clientes',
@@ -20,7 +21,8 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
     FormsModule, 
     LucideAngularModule,
     ClienteFormDialogComponent,
-    PaginatorComponent
+    PaginatorComponent,
+    PageShellComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.css']
