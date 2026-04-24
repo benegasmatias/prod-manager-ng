@@ -41,9 +41,9 @@ import { LayoutService } from '../../layout.service';
         }
       </button>
 
-      <!-- Dropdown Content -->
+      <!-- Dropdown Content: App-style Responsive -->
       @if (isOpen()) {
-        <div class="absolute top-13 right-0 w-[380px] bg-white dark:bg-zinc-950 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+        <div class="fixed inset-x-4 top-16 md:absolute md:top-13 md:right-0 md:inset-x-auto md:w-[380px] bg-white dark:bg-zinc-950 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl z-[150] animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
           <div class="p-6 pb-4 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/10">
             <div>
               <h3 class="text-sm font-black uppercase tracking-tight text-zinc-900 dark:text-zinc-50">Notificaciones</h3>

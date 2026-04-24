@@ -1,42 +1,42 @@
-<app-page-shell
-  [title]="labels.TITLE"
-  [description]="labels.SUBTITLE"
-  [category]="labels.CATEGORY"
->
+<app-page-shell [title]="labels.TITLE" [description]="labels.SUBTITLE" [category]="labels.CATEGORY">
   <div actions class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 md:gap-6 w-full sm:w-auto">
     <!-- PREMIUM USAGE MONITOR -->
     @if (planUsage()) {
-      <div [class]="cn('flex items-center gap-4 px-6 py-3 rounded-[1.5rem] border transition-all duration-700', !canAddOrder() ? 'bg-danger/5 border-danger/20' : 'bg-surface-container-low border-border/5 shadow-xl shadow-text/5')">
-        <div [class]="cn('h-2 w-2 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]', !canAddOrder() ? 'bg-danger animate-pulse shadow-danger/50' : 'bg-primary shadow-primary/50')"></div>
-        <div class="flex flex-col">
-          <span class="text-[8px] font-black uppercase tracking-[0.3em] text-text-muted/60 leading-none mb-1">
-            {{ !canAddOrder() ? 'Capacidad Agotada' : 'Consumo del Sistema' }}
-          </span>
-          <span [class]="cn('text-[10px] font-black uppercase tracking-widest leading-none', !canAddOrder() ? 'text-danger' : 'text-text')">
-            {{ planUsage()?.usage?.ordersThisMonth }}/{{ planUsage()?.limits?.orders }} <span class="text-[8px] opacity-40 ml-1">UNIDADES</span>
-          </span>
-        </div>
-        <a routerLink="/ajustes" class="ml-2 h-8 px-4 rounded-full bg-primary/10 text-primary text-[8px] font-black flex items-center justify-center hover:bg-primary hover:text-white transition-all uppercase tracking-[0.2em]">Escalar</a>
+    <div
+      [class]="cn('flex items-center gap-4 px-6 py-3 rounded-[1.5rem] border transition-all duration-700', !canAddOrder() ? 'bg-danger/5 border-danger/20' : 'bg-surface-container-low border-border/5 shadow-xl shadow-text/5')">
+      <div
+        [class]="cn('h-2 w-2 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]', !canAddOrder() ? 'bg-danger animate-pulse shadow-danger/50' : 'bg-primary shadow-primary/50')">
       </div>
+      <div class="flex flex-col">
+        <span class="text-[8px] font-black uppercase tracking-[0.3em] text-text-muted/60 leading-none mb-1">
+          {{ !canAddOrder() ? 'Capacidad Agotada' : 'Consumo del Sistema' }}
+        </span>
+        <span
+          [class]="cn('text-[10px] font-black uppercase tracking-widest leading-none', !canAddOrder() ? 'text-danger' : 'text-text')">
+          {{ planUsage()?.usage?.ordersThisMonth }}/{{ planUsage()?.limits?.orders }} <span
+            class="text-[8px] opacity-40 ml-1">UNIDADES</span>
+        </span>
+      </div>
+      <a routerLink="/ajustes"
+        class="ml-2 h-8 px-4 rounded-full bg-primary/10 text-primary text-[8px] font-black flex items-center justify-center hover:bg-primary hover:text-white transition-all uppercase tracking-[0.2em]">Escalar</a>
+    </div>
     }
 
     <!-- EDITORIAL VIEW TOGGLE -->
-    <div class="flex p-1.5 rounded-[1.8rem] bg-surface-container-low border border-border/5 shadow-2xl shadow-text/5 backdrop-blur-3xl">
-      <a routerLink="/pedidos"
-         routerLinkActive="bg-primary text-white shadow-lg shadow-primary/20"
-         [routerLinkActiveOptions]="{exact: true}"
-         class="flex-1 sm:flex-none text-center px-6 py-2.5 rounded-[1.2rem] text-[9px] font-black uppercase tracking-[0.3em] transition-all duration-500">
-         Lista
+    <div
+      class="flex p-1.5 rounded-[1.8rem] bg-surface-container-low border border-border/5 shadow-2xl shadow-text/5 backdrop-blur-3xl">
+      <a routerLink="/pedidos" routerLinkActive="bg-primary text-white shadow-lg shadow-primary/20"
+        [routerLinkActiveOptions]="{exact: true}"
+        class="flex-1 sm:flex-none text-center px-6 py-2.5 rounded-[1.2rem] text-[9px] font-black uppercase tracking-[0.3em] transition-all duration-500">
+        Lista
       </a>
-      <a routerLink="/pedidos/kanban"
-         routerLinkActive="bg-primary text-white shadow-lg shadow-primary/20"
-         class="flex-1 sm:flex-none text-center px-6 py-2.5 rounded-[1.2rem] text-[9px] font-black uppercase tracking-[0.3em] transition-all duration-500">
-         Matriz
+      <a routerLink="/pedidos/kanban" routerLinkActive="bg-primary text-white shadow-lg shadow-primary/20"
+        class="flex-1 sm:flex-none text-center px-6 py-2.5 rounded-[1.2rem] text-[9px] font-black uppercase tracking-[0.3em] transition-all duration-500">
+        Matriz
       </a>
     </div>
 
-    <button routerLink="/pedidos/nuevo"
-      [disabled]="!canAddOrder()"
+    <button routerLink="/pedidos/nuevo" [disabled]="!canAddOrder()"
       class="h-14 px-10 rounded-[1.8rem] bg-text text-surface font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl shadow-text/10 hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center justify-center gap-3 disabled:opacity-10 group">
       <lucide-angular [img]="icons.PLUS" class="h-4 w-4 transition-transform group-hover:rotate-90"></lucide-angular>
       <span>{{ labels.ACTIONS.NEW_ORDER }}</span>
@@ -55,29 +55,35 @@
       <div class="flex items-center gap-6">
         <div class="h-10 w-1 bg-amber-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.5)]"></div>
         <div class="space-y-1">
-          <h2 class="text-2xl font-black text-text uppercase tracking-tighter font-display leading-none flex items-center gap-4">
+          <h2
+            class="text-2xl font-black text-text uppercase tracking-tighter font-display leading-none flex items-center gap-4">
             {{ labels.COMMERCIAL_SECTION }}
-            <span class="text-[10px] font-black bg-amber-500/10 text-amber-600 px-4 py-1.5 rounded-full border border-amber-500/10">{{ commercialTotal() }}</span>
+            <span
+              class="text-[10px] font-black bg-amber-500/10 text-amber-600 px-4 py-1.5 rounded-full border border-amber-500/10">{{
+              commercialTotal() }}</span>
           </h2>
-          <p class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em] italic">{{ labels.COMMERCIAL_SUBTITLE }}</p>
+          <p class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em] italic">{{
+            labels.COMMERCIAL_SUBTITLE }}</p>
         </div>
       </div>
     </div>
 
-    <div class="bg-surface-container-low rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
+    <div
+      class="bg-surface-container-low rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
       <!-- Decoration -->
       <div class="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl"></div>
 
       @if (loadingCommercial()) {
-        <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
+      <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
       }
       <app-orders-table [orders]="sortedCommercial()" [sortKey]="sortKey()" [sortDir]="sortDir()"
         [hideTypeColumn]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
-        (viewClick)="goToDetail($event)" (deleteClick)="handleDelete($event)"></app-orders-table>
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"
+        (deleteClick)="handleDelete($event)"></app-orders-table>
 
       <div class="mt-12 border-t border-border/5 pt-10 px-4 flex flex-col sm:flex-row items-center gap-8">
-        <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
+        <app-page-size-selector [pageSize]="pageSize"
+          (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
         <div class="flex-1 w-full">
           <app-paginator [totalItems]="commercialTotal()" [pageSize]="pageSize" [currentPage]="commercialPage()"
             (pageChange)="onCommercialPageChange($event)"></app-paginator>
@@ -93,113 +99,128 @@
       <div class="flex items-center gap-6">
         <div class="h-10 w-1 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]"></div>
         <div class="space-y-1">
-          <h2 class="text-2xl font-black text-text uppercase tracking-tighter font-display leading-none flex items-center gap-4">
+          <h2
+            class="text-2xl font-black text-text uppercase tracking-tighter font-display leading-none flex items-center gap-4">
             {{ labels.ACTIVE_SECTION }}
-            <span class="text-[10px] font-black bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/10">{{ productionTotal() }}</span>
+            <span
+              class="text-[10px] font-black bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/10">{{
+              productionTotal() }}</span>
           </h2>
-          <p class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em] italic">Seguimiento de Ingeniería y Manufactura</p>
+          <p class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em] italic">Seguimiento de
+            Ingeniería y Manufactura</p>
         </div>
       </div>
     </div>
 
     @if (loadingProduction() && productionOrdersData().length === 0 && commercialOrdersData().length === 0) {
-      <div class="grid grid-cols-1 gap-6 px-4">
-        @for (i of [1,2,3]; track i) {
-          <div class="p-10 rounded-[3rem] bg-surface-container-low border border-border/5 flex items-center justify-between shadow-xl shadow-text/5 animate-pulse">
-            <div class="flex items-center gap-8">
-              <div class="h-16 w-16 bg-surface-container-lowest rounded-2xl"></div>
-              <div class="space-y-3">
-                <div class="h-4 w-48 bg-surface-container-lowest rounded-full"></div>
-                <div class="h-3 w-32 bg-surface-container-lowest rounded-full"></div>
-              </div>
-            </div>
-            <div class="h-12 w-24 bg-surface-container-lowest rounded-2xl"></div>
+    <div class="grid grid-cols-1 gap-6 px-4">
+      @for (i of [1,2,3]; track i) {
+      <div
+        class="p-10 rounded-[3rem] bg-surface-container-low border border-border/5 flex items-center justify-between shadow-xl shadow-text/5 animate-pulse">
+        <div class="flex items-center gap-8">
+          <div class="h-16 w-16 bg-surface-container-lowest rounded-2xl"></div>
+          <div class="space-y-3">
+            <div class="h-4 w-48 bg-surface-container-lowest rounded-full"></div>
+            <div class="h-3 w-32 bg-surface-container-lowest rounded-full"></div>
           </div>
-        }
+        </div>
+        <div class="h-12 w-24 bg-surface-container-lowest rounded-2xl"></div>
       </div>
+      }
+    </div>
     } @else if (productionTotal() > 0) {
-      <div class="bg-surface-container-low rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
-        <!-- Decoration -->
-        <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+    <div
+      class="bg-surface-container-low rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
+      <!-- Decoration -->
+      <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
 
-        @if (loadingProduction()) {
-          <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
-        }
-        <app-orders-table [orders]="sortedProduction()" [sortKey]="sortKey()" [sortDir]="sortDir()"
-          [hideTypeColumn]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-          (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
-          (viewClick)="goToDetail($event)" (deleteClick)="handleDelete($event)"></app-orders-table>
+      @if (loadingProduction()) {
+      <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
+      }
+      <app-orders-table [orders]="sortedProduction()" [sortKey]="sortKey()" [sortDir]="sortDir()"
+        [hideTypeColumn]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"
+        (deleteClick)="handleDelete($event)"></app-orders-table>
 
-        <div class="mt-12 border-t border-border/5 pt-10 px-4 flex flex-col sm:flex-row items-center gap-8">
-          <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
-          <div class="flex-1 w-full">
-            <app-paginator [totalItems]="productionTotal()" [pageSize]="pageSize" [currentPage]="productionPage()"
-              (pageChange)="onProductionPageChange($event)"></app-paginator>
-          </div>
+      <div class="mt-12 border-t border-border/5 pt-10 px-4 flex flex-col sm:flex-row items-center gap-8">
+        <app-page-size-selector [pageSize]="pageSize"
+          (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
+        <div class="flex-1 w-full">
+          <app-paginator [totalItems]="productionTotal()" [pageSize]="pageSize" [currentPage]="productionPage()"
+            (pageChange)="onProductionPageChange($event)"></app-paginator>
         </div>
       </div>
+    </div>
     } @else if (commercialTotal() === 0) {
-      <div class="py-24 text-center flex flex-col items-center justify-center gap-8 border-2 border-dashed rounded-[4rem] border-border/10 bg-surface-container-low/30 mx-4">
-        <div class="h-20 w-20 rounded-[2rem] bg-surface-container-low shadow-2xl shadow-text/5 flex items-center justify-center border border-border/5 text-text-muted/20">
-          <lucide-angular [img]="icons.CLOCK" class="h-10 w-10"></lucide-angular>
-        </div>
-        <p class="text-[11px] font-black text-text-muted/40 uppercase tracking-[0.5em] px-12 leading-relaxed">
-          {{ labels.EMPTY_ACTIVE }}
-        </p>
+    <div
+      class="py-24 text-center flex flex-col items-center justify-center gap-8 border-2 border-dashed rounded-[4rem] border-border/10 bg-surface-container-low/30 mx-4">
+      <div
+        class="h-20 w-20 rounded-[2rem] bg-surface-container-low shadow-2xl shadow-text/5 flex items-center justify-center border border-border/5 text-text-muted/20">
+        <lucide-angular [img]="icons.CLOCK" class="h-10 w-10"></lucide-angular>
       </div>
+      <p class="text-[11px] font-black text-text-muted/40 uppercase tracking-[0.5em] px-12 leading-relaxed">
+        {{ labels.EMPTY_ACTIVE }}
+      </p>
+    </div>
     }
   </div>
-  
+
   <!-- ARCHIVE SECTOR -->
   <div class="pt-24 space-y-10">
     <div class="flex items-center gap-8 px-4">
       <div class="flex items-center gap-6">
         <div class="h-10 w-1 bg-text-muted/20 rounded-full"></div>
-        <h2 class="text-2xl font-black text-text-muted uppercase tracking-tighter font-display leading-none flex items-center gap-4">
+        <h2
+          class="text-2xl font-black text-text-muted uppercase tracking-tighter font-display leading-none flex items-center gap-4">
           {{ labels.HISTORY_SECTION }}
           @if (archivedTotal() > 0) {
-            <span class="text-[10px] font-black bg-surface-container-low text-text-muted/60 px-4 py-1.5 rounded-full border border-border/5">{{ archivedTotal() }}</span>
+          <span
+            class="text-[10px] font-black bg-surface-container-low text-text-muted/60 px-4 py-1.5 rounded-full border border-border/5">{{
+            archivedTotal() }}</span>
           }
         </h2>
       </div>
       <div class="h-px flex-1 bg-border/5"></div>
-      <p class="text-[9px] font-black text-text-muted/20 uppercase tracking-[0.4em] italic hidden sm:block">Registros de Ciclos Finalizados</p>
+      <p class="text-[9px] font-black text-text-muted/20 uppercase tracking-[0.4em] italic hidden sm:block">Registros de
+        Ciclos Finalizados</p>
     </div>
 
     <!-- Lazy Load Trigger & Loading Feedback -->
     @if (!archivedLoaded() && !loadingArchived()) {
-       <div #historyTrigger class="h-40 w-full flex flex-col items-center justify-center gap-6 opacity-20 py-12 grayscale">
-          <app-loading-spinner [overlay]="false" message=""></app-loading-spinner>
-          <span class="text-[9px] font-black uppercase tracking-[0.5em] text-text-muted">Desencriptando Historial...</span>
-       </div>
+    <div #historyTrigger class="h-40 w-full flex flex-col items-center justify-center gap-6 opacity-20 py-12 grayscale">
+      <app-loading-spinner [overlay]="false" message=""></app-loading-spinner>
+      <span class="text-[9px] font-black uppercase tracking-[0.5em] text-text-muted">Desencriptando Historial...</span>
+    </div>
     }
 
     @if (loadingArchived() || archivedTotal() > 0) {
-      <div class="bg-surface-container-low/30 rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 backdrop-blur-3xl shadow-2xl shadow-text/5 relative min-h-[300px]">
-        @if (loadingArchived()) {
-          <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
-          
-          <div class="space-y-6 animate-pulse opacity-20">
-            <div class="h-24 bg-surface-container-lowest rounded-[2rem]"></div>
-            <div class="h-24 bg-surface-container-lowest rounded-[2rem]"></div>
-          </div>
-        }
+    <div
+      class="bg-surface-container-low/30 rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 backdrop-blur-3xl shadow-2xl shadow-text/5 relative min-h-[300px]">
+      @if (loadingArchived()) {
+      <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
 
-        @if (archivedOrdersData().length > 0) {
-          <app-orders-table [orders]="sortedArchived()" [sortKey]="sortKey()" [sortDir]="sortDir()" [hideTypeColumn]="true"
-            [hideUrgency]="true" [hideDelivery]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
-            (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)"
-            (viewClick)="goToDetail($event)" (deleteClick)="handleDelete($event)"></app-orders-table>
-    
-          <div class="mt-12 border-t border-border/5 pt-10 px-4 flex flex-col sm:flex-row items-center gap-8">
-            <app-page-size-selector [pageSize]="pageSize" (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
-            <div class="flex-1 w-full">
-              <app-paginator [totalItems]="archivedTotal()" [pageSize]="pageSize" [currentPage]="archivedPage()"
-                (pageChange)="onArchivedPageChange($event)"></app-paginator>
-            </div>
-          </div>
-        }
+      <div class="space-y-6 animate-pulse opacity-20">
+        <div class="h-24 bg-surface-container-lowest rounded-[2rem]"></div>
+        <div class="h-24 bg-surface-container-lowest rounded-[2rem]"></div>
       </div>
+      }
+
+      @if (archivedOrdersData().length > 0) {
+      <app-orders-table [orders]="sortedArchived()" [sortKey]="sortKey()" [sortDir]="sortDir()" [hideTypeColumn]="true"
+        [hideUrgency]="true" [hideDelivery]="true" [rubro]="session.rubro()" (sortChange)="onSort($event)"
+        (statusClick)="openManageModal($event)" (manageClick)="openManageModal($event)" (viewClick)="goToDetail($event)"
+        (deleteClick)="handleDelete($event)"></app-orders-table>
+
+      <div class="mt-12 border-t border-border/5 pt-10 px-4 flex flex-col sm:flex-row items-center gap-8">
+        <app-page-size-selector [pageSize]="pageSize"
+          (pageSizeChange)="onPageSizeChange($event)"></app-page-size-selector>
+        <div class="flex-1 w-full">
+          <app-paginator [totalItems]="archivedTotal()" [pageSize]="pageSize" [currentPage]="archivedPage()"
+            (pageChange)="onArchivedPageChange($event)"></app-paginator>
+        </div>
+      </div>
+      }
+    </div>
     }
   </div>
 

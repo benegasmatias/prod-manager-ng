@@ -10,128 +10,130 @@ import { CalendarEventCardComponent, CardDensity } from './calendar-event-card.c
   imports: [CommonModule, LucideAngularModule, CalendarEventCardComponent],
   template: `
     <!-- MOBILE VIEW: Horizontal Day Picker + Selected Day List -->
-    <div *ngIf="isMobile()" class="space-y-6 animate-in fade-in duration-500">
+    <div *ngIf="isMobile()" class="space-y-10 animate-in fade-in duration-1000">
       <!-- Sticky Day Picker -->
-      <div class="sticky top-0 z-30 -mx-3 px-3 py-4 bg-[#fafbfc]/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50">
-        <div class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+      <div class="sticky top-0 z-30 -mx-3 px-3 py-6 bg-surface/80 backdrop-blur-2xl border-b border-border/5">
+        <div class="flex items-center gap-4 overflow-x-auto no-scrollbar pb-2 px-2">
           @for (day of columns(); track day.date) {
             <button 
               (click)="selectedMobileDay.set(day.date)"
               [class]="cn(
-                'flex flex-col items-center justify-center min-w-[4.5rem] h-20 rounded-2xl transition-all duration-300 relative',
+                'flex flex-col items-center justify-center min-w-[5rem] h-24 rounded-[1.8rem] transition-all duration-700 relative border italic',
                 isSameDay(selectedMobileDay(), day.date) 
-                  ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105 z-10' 
-                  : 'bg-white dark:bg-zinc-900 text-zinc-400 border border-zinc-100 dark:border-zinc-800'
+                  ? 'bg-primary border-primary text-white shadow-2xl shadow-primary/40 scale-105 z-10' 
+                  : 'bg-surface-container-low text-text-muted/30 border-border/5'
               )"
             >
-              <span class="text-[10px] font-black uppercase tracking-tighter opacity-60">{{ day.date | date:'EEE' }}</span>
-              <span class="text-xl font-black tracking-tighter">{{ day.date | date:'dd' }}</span>
+              <span class="text-[9px] font-black uppercase tracking-[0.2em] opacity-60 mb-1 leading-none">{{ day.date | date:'EEE' }}</span>
+              <span class="text-2xl font-black tracking-tighter tabular-nums leading-none">{{ day.date | date:'dd' }}</span>
               
               @if (day.events.length > 0 && !isSameDay(selectedMobileDay(), day.date)) {
-                <div class="absolute bottom-2 h-1 w-1 rounded-full bg-primary/50"></div>
+                <div class="absolute bottom-3 h-1.5 w-1.5 rounded-full bg-primary/40 shadow-sm"></div>
               }
             </button>
           }
         </div>
       </div>
-
+ 
       <!-- Events for Selected Day -->
-      <div class="space-y-4 px-1 min-h-[400px]">
+      <div class="space-y-6 px-1 min-h-[400px]">
         @let activeDay = getSelectedDayColumn();
         @if (activeDay) {
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tight">
+          <div class="flex items-center justify-between mb-6 px-4">
+            <h3 class="text-xs font-black text-text uppercase tracking-[0.3em] italic font-display">
               {{ activeDay.date | date:'EEEE, d MMMM' }}
             </h3>
-            <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{{ activeDay.events.length }} compromisos</span>
+            <span class="text-[9px] font-black text-text-muted/20 uppercase tracking-[0.4em] italic">{{ activeDay.events.length }} ítems</span>
           </div>
-
-          @for (event of activeDay.events; track event.id) {
-            <app-calendar-event-card 
-              [event]="event" 
-              density="AGENDA"
-              (onClick)="onEventClick.emit($event)"
-              class="animate-in slide-in-from-bottom-4 duration-500"
-            ></app-calendar-event-card>
-          }
-
+ 
+          <div class="grid grid-cols-1 gap-6">
+            @for (event of activeDay.events; track event.id) {
+              <app-calendar-event-card 
+                [event]="event" 
+                density="AGENDA"
+                (onClick)="onEventClick.emit($event)"
+                class="animate-in slide-in-from-bottom-6 duration-700"
+              ></app-calendar-event-card>
+            }
+          </div>
+ 
           @if (activeDay.events.length === 0) {
-            <div class="flex flex-col items-center justify-center py-20 opacity-30">
-              <div class="h-16 w-16 bg-zinc-100 dark:bg-zinc-900 rounded-[2rem] flex items-center justify-center text-zinc-300 mb-4">
+            <div class="flex flex-col items-center justify-center py-32 opacity-20">
+              <div class="h-20 w-20 bg-surface-container-low rounded-[2.5rem] flex items-center justify-center text-text-muted/20 border border-border/5 mb-6">
                 <lucide-angular [img]="icons.Info" class="h-8 w-8"></lucide-angular>
               </div>
-              <p class="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Día sin programaciones</p>
+              <p class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic">Ciclo de Producción Despejado</p>
             </div>
           }
         }
       </div>
     </div>
-
+ 
     <!-- DESKTOP VIEW: 7 Column Grid -->
-    <div *ngIf="!isMobile()" class="grid grid-cols-1 md:grid-cols-7 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-[2.5rem] overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl">
+    <div *ngIf="!isMobile()" class="grid grid-cols-1 md:grid-cols-7 gap-px bg-border/5 rounded-[4rem] overflow-hidden border border-border/5 shadow-2xl backdrop-blur-3xl group">
       
       @for (day of columns(); track day.date) {
         <div 
           [class]="cn(
-            'min-h-[600px] flex flex-col bg-zinc-50/80 dark:bg-zinc-950/40 backdrop-blur-md transition-colors',
-            day.isToday ? 'bg-primary/5 dark:bg-primary/10' : ''
+            'min-h-[700px] flex flex-col transition-all duration-1000 border-r border-border/5 last:border-r-0',
+            day.isToday ? 'bg-primary/5' : 'bg-surface-container-low/20 hover:bg-surface-container-low/40'
           )"
         >
           <!-- Column Header -->
           <div [class]="cn(
-            'p-6 text-center border-b border-zinc-100 dark:border-zinc-800/50 space-y-1 transition-all',
-            day.isToday ? 'bg-white dark:bg-zinc-900 shadow-sm' : ''
+            'p-8 text-center border-b border-border/5 space-y-3 transition-all duration-700',
+            day.isToday ? 'bg-surface shadow-2xl shadow-primary/5' : ''
           )">
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{{ day.date | date:'EEEE' }}</p>
-            <div class="flex items-center justify-center gap-2">
+            <p class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/20 italic">{{ day.date | date:'EEEE' }}</p>
+            <div class="flex items-center justify-center gap-3">
                <span [class]="cn(
-                 'text-2xl font-black tracking-tighter tabular-nums',
-                 day.isToday ? 'text-primary' : 'text-zinc-900 dark:text-zinc-100'
+                 'text-4xl font-black tracking-tighter tabular-nums font-display italic leading-none',
+                 day.isToday ? 'text-primary' : 'text-text'
                )">
                  {{ day.date | date:'dd' }}
                </span>
-               <span *ngIf="day.isToday" class="px-2 py-0.5 bg-primary/20 text-primary text-[8px] font-black uppercase rounded-full">Hoy</span>
+               <div *ngIf="day.isToday" class="px-3 py-1 bg-primary text-white text-[8px] font-black uppercase rounded-full shadow-2xl shadow-primary/40 italic">Hoy</div>
             </div>
-            <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{{ day.date | date:'MMMM' }}</p>
+            <p class="text-[9px] font-black text-text-muted/30 uppercase tracking-[0.5em] italic">{{ day.date | date:'MMMM' }}</p>
           </div>
-
+ 
           <!-- Column Tasks -->
-          <div class="flex-1 p-4 space-y-4 overflow-y-auto max-h-[1000px] hide-scrollbar custom-scroll">
+          <div class="flex-1 p-6 space-y-6 overflow-y-auto max-h-[1200px] hide-scrollbar custom-scroll">
             @for (event of day.events; track event.id) {
                <app-calendar-event-card 
                  [event]="event" 
                  [density]="density()"
                  (onClick)="onEventClick.emit($event)"
-                 class="animate-in slide-in-from-bottom-4 duration-500"
+                 class="animate-in slide-in-from-bottom-8 duration-1000"
                ></app-calendar-event-card>
             }
-
+ 
             @if (day.events.length === 0) {
-              <div class="flex flex-col items-center justify-center py-20 opacity-20 grayscale transition-all hover:opacity-40">
-                 <div class="h-10 w-10 rounded-2xl border-2 border-dashed border-zinc-400 mb-2 flex items-center justify-center">
-                    <lucide-angular [img]="icons.Info" class="h-4 w-4 text-zinc-400"></lucide-angular>
+              <div class="flex flex-col items-center justify-center py-24 opacity-10 grayscale transition-all duration-1000 hover:opacity-30">
+                 <div class="h-14 w-14 rounded-[1.8rem] border-2 border-dashed border-text-muted/20 mb-4 flex items-center justify-center">
+                    <lucide-angular [img]="icons.Info" class="h-5 w-5 text-text-muted/30"></lucide-angular>
                  </div>
-                 <p class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Sin Entregas</p>
+                 <p class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic">Sin Actividad</p>
               </div>
             }
           </div>
-
+ 
           <!-- Column Footer: Summary -->
-          <div class="p-4 bg-white/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-             <div class="flex items-center gap-1.5">
-                <div class="h-1.5 w-1.5 rounded-full bg-zinc-300"></div>
-                <span class="text-[9px] font-black tabular-nums text-zinc-400">{{ day.events.length }} ítems</span>
+          <div class="p-6 bg-surface/50 border-t border-border/5 flex items-center justify-between">
+             <div class="flex items-center gap-3">
+                <div [class]="cn('h-2 w-2 rounded-full', day.events.length > 0 ? 'bg-primary animate-pulse' : 'bg-text-muted/10')"></div>
+                <span class="text-[11px] font-black tabular-nums text-text-muted/40 uppercase tracking-widest italic">{{ day.events.length }} ítems</span>
              </div>
              @if (hasCriticalTask(day)) {
-               <div class="flex items-center gap-1.5">
-                  <div class="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping"></div>
-                  <span class="text-[9px] font-black tabular-nums text-red-500 uppercase tracking-tighter">Acción Requerida</span>
+               <div class="flex items-center gap-2">
+                  <div class="h-2 w-2 rounded-full bg-error animate-ping"></div>
+                  <span class="text-[9px] font-black tabular-nums text-error uppercase tracking-[0.2em] italic">Intervención</span>
                </div>
              }
           </div>
         </div>
       }
-
+ 
     </div>
   `,
   styles: [`
