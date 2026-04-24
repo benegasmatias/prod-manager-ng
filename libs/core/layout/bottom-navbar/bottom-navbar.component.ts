@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Home, ShoppingCart, Bell, Settings, Plus, Menu } from 'lucide-angular';
+import { RouterModule, Router } from '@angular/router';
+import { LucideAngularModule, Home, ShoppingCart, Bell, Settings, Plus, Menu, Users, Package } from 'lucide-angular';
 import { LayoutService } from '../layout.service';
 
 @Component({
@@ -16,46 +16,45 @@ import { LayoutService } from '../layout.service';
         <div class="flex items-center justify-around w-full animate-in fade-in duration-500">
           <!-- INICIO -->
           <a routerLink="/dashboard" routerLinkActive="text-primary" class="flex flex-col items-center gap-1 transition-all duration-300">
-            <div class="p-1.5 rounded-xl transition-all" [class.bg-primary/10]="isRouteActive('/dashboard')">
-              <lucide-angular [img]="icons.Home" [class]="isRouteActive('/dashboard') ? 'h-5 w-5 text-primary' : 'h-5 w-5 text-text-muted/40'"></lucide-angular>
+            <div class="p-1.5 rounded-xl transition-all" routerLinkActive="bg-primary/10">
+              <lucide-angular [img]="icons.Home" class="h-5 w-5 text-text-muted/40" routerLinkActive="text-primary"></lucide-angular>
             </div>
-            <span class="text-[8px] font-black uppercase tracking-widest" [class.text-primary]="isRouteActive('/dashboard')" [class.text-text-muted/40]="!isRouteActive('/dashboard')">Inicio</span>
+            <span class="text-[8px] font-black uppercase tracking-widest text-text-muted/40" routerLinkActive="text-primary">Inicio</span>
           </a>
 
           <!-- PEDIDOS -->
           <a routerLink="/pedidos" routerLinkActive="text-primary" class="flex flex-col items-center gap-1 transition-all duration-300">
-            <div class="p-1.5 rounded-xl transition-all" [class.bg-primary/10]="isRouteActive('/pedidos')">
-              <lucide-angular [img]="icons.ShoppingCart" [class]="isRouteActive('/pedidos') ? 'h-5 w-5 text-primary' : 'h-5 w-5 text-text-muted/40'"></lucide-angular>
+            <div class="p-1.5 rounded-xl transition-all" routerLinkActive="bg-primary/10">
+              <lucide-angular [img]="icons.ShoppingCart" class="h-5 w-5 text-text-muted/40" routerLinkActive="text-primary"></lucide-angular>
             </div>
-            <span class="text-[8px] font-black uppercase tracking-widest" [class.text-primary]="isRouteActive('/pedidos')" [class.text-text-muted/40]="!isRouteActive('/pedidos')">Pedidos</span>
+            <span class="text-[8px] font-black uppercase tracking-widest text-text-muted/40" routerLinkActive="text-primary">Pedidos</span>
           </a>
 
           <!-- SPACER FOR FAB -->
           <div class="w-16"></div>
 
-          <!-- NOTIFICACIONES -->
-          <button (click)="layout.activeDropdown.set('notifications')" class="flex flex-col items-center gap-1 transition-all duration-300 relative">
-            <div class="p-1.5 rounded-xl transition-all">
-              <lucide-angular [img]="icons.Bell" class="h-5 w-5 text-text-muted/40"></lucide-angular>
-              <div class="absolute top-1.5 right-1.5 h-1.5 w-1.5 bg-danger rounded-full border-2 border-white"></div>
+          <!-- INVENTARIO (Stock) -->
+          <a routerLink="/stock" routerLinkActive="text-primary" class="flex flex-col items-center gap-1 transition-all duration-300">
+            <div class="p-1.5 rounded-xl transition-all" routerLinkActive="bg-primary/10">
+              <lucide-angular [img]="icons.Package" class="h-5 w-5 text-text-muted/40" routerLinkActive="text-primary"></lucide-angular>
             </div>
-            <span class="text-[8px] font-black uppercase tracking-widest text-text-muted/40">Avisos</span>
-          </button>
+            <span class="text-[8px] font-black uppercase tracking-widest text-text-muted/40" routerLinkActive="text-primary">Stock</span>
+          </a>
 
-          <!-- MENÚ / AJUSTES (HAMBURGUESA) -->
+          <!-- MENÚ -->
           <button (click)="layout.toggleMobileMenu()" class="flex flex-col items-center gap-1 transition-all duration-300">
             <div class="p-1.5 rounded-xl transition-all" [class.bg-primary/10]="layout.isMobileMenuOpen()">
               <lucide-angular [img]="icons.Menu" [class]="layout.isMobileMenuOpen() ? 'h-5 w-5 text-primary' : 'h-5 w-5 text-text-muted/40'"></lucide-angular>
             </div>
-            <span class="text-[8px] font-black uppercase tracking-widest" [class.text-primary]="layout.isMobileMenuOpen()" [class.text-text-muted/40]="!layout.isMobileMenuOpen()">Menú</span>
+            <span class="text-[8px] font-black uppercase tracking-widest" [class.text-primary]="layout.isMobileMenuOpen()" [class.text-text-muted/40]="!layout.isMobileMenuOpen()">Menu</span>
           </button>
         </div>
 
         <!-- THE FAB (CENTER) -->
-        <a routerLink="/pedidos/nuevo" 
-           class="absolute left-1/2 -top-7 -translate-x-1/2 h-16 w-16 rounded-3xl bg-primary text-white shadow-[0_15px_35px_-5px_rgba(116,47,229,0.4)] border-[5px] border-white flex items-center justify-center active:scale-95 transition-all group">
-          <lucide-angular [img]="icons.Plus" class="h-6 w-6 transition-transform group-hover:rotate-90"></lucide-angular>
-        </a>
+        <button (click)="layout.customBottomAction() ? layout.customBottomAction()?.action() : router.navigate(['/pedidos/nuevo'])" 
+           class="absolute left-1/2 -top-7 -translate-x-1/2 h-16 w-16 rounded-3xl bg-primary text-white shadow-[0_15px_35px_-5px_rgba(var(--primary-rgb),0.4)] border-[5px] border-white flex items-center justify-center active:scale-95 transition-all group z-[110]">
+          <lucide-angular [img]="layout.customBottomAction()?.icon || icons.Plus" class="h-6 w-6 transition-transform group-hover:rotate-90"></lucide-angular>
+        </button>
       } @else {
         <!-- CONTEXTUAL ACTION(S) -->
         <div class="flex items-center justify-center w-full px-4 animate-in slide-in-from-bottom-5 duration-300">
@@ -79,8 +78,9 @@ import { LayoutService } from '../layout.service';
 })
 export class BottomNavbarComponent {
   layout = inject(LayoutService);
+  router = inject(Router);
   
-  icons = { Home, ShoppingCart, Bell, Settings, Plus, Menu };
+  icons = { Home, ShoppingCart, Bell, Settings, Plus, Menu, Users, Package };
 
   isRouteActive(route: string): boolean {
     return window.location.pathname.startsWith(route);

@@ -158,77 +158,71 @@ import { cn } from '../../utils/cn';
       </div>
 
       <!-- CARD ARCHITECTURE (Mobile: Mockup Style) -->
-      <div class="lg:hidden space-y-8 px-4">
+      <div class="lg:hidden space-y-6 px-4">
         @for (order of orders; track order.id) {
           <div 
-            class="group bg-white rounded-[2.5rem] p-8 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.04)] border border-border/5 active:scale-[0.98] transition-all duration-500 relative overflow-hidden" 
+            class="group bg-white rounded-[2.5rem] p-5 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.03)] border border-border/5 active:scale-[0.98] transition-all duration-500 relative overflow-hidden" 
             (click)="viewClick.emit(order)"
           >
-            <!-- Design Decoration -->
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-
-            <!-- Header: Icon, Client, Status -->
-            <div class="flex items-start gap-5 mb-8 relative z-10">
-               <!-- Product/Type Icon -->
-               <div class="h-14 w-14 shrink-0 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary shadow-sm border border-border/5">
-                  <lucide-angular [img]="icons.Package" class="h-6 w-6 opacity-60"></lucide-angular>
+            <!-- Header: Avatar + Info + Badge -->
+            <div class="flex items-center justify-between mb-4 relative z-10">
+               <div class="flex items-center gap-4 min-w-0">
+                 <!-- Product/Type Icon -->
+                 <div class="h-12 w-12 shrink-0 rounded-full bg-primary/5 flex items-center justify-center text-primary border border-primary/5">
+                    <lucide-angular [img]="icons.Package" class="h-5 w-5 opacity-40"></lucide-angular>
+                 </div>
+                 <div class="flex flex-col min-w-0">
+                    <h3 class="text-base font-black text-text font-display truncate uppercase tracking-tight">
+                      {{ order.clientName || order.items[0]?.name || fallbackClientName || 'Referencia' }}
+                    </h3>
+                    <p class="text-[9px] font-bold text-text-muted/40 uppercase tracking-widest line-clamp-1 italic">
+                      {{ order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
+                    </p>
+                 </div>
                </div>
+               
+               <span [class]="cn('shrink-0 text-[7px] font-black uppercase tracking-[0.2em] px-2.5 py-1.5 rounded-xl border border-border/5 shadow-sm', getStatusStyles(order.status))">
+                 {{ getStatusLabel(order.status) }}
+               </span>
+            </div>
 
-               <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between gap-4 mb-1">
-                     <h3 class="text-xl font-black text-text font-display truncate uppercase tracking-tight">
-                       {{ order.clientName || order.items[0]?.name || fallbackClientName || 'Referencia' }}
-                     </h3>
-                     <span [class]="cn('shrink-0 text-[8px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-border/5 shadow-sm', getStatusStyles(order.status))">
-                       {{ getStatusLabel(order.status) }}
-                     </span>
-                  </div>
-                  <p class="text-[9px] font-bold text-text-muted/40 uppercase tracking-widest line-clamp-1 italic">
-                    {{ order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
-                  </p>
-                  <div class="flex items-center gap-2 mt-2">
-                    <lucide-angular [img]="icons.Calendar" class="h-3 w-3 text-text-muted/20"></lucide-angular>
-                    <span class="text-[8px] font-black text-text-muted/40 uppercase tracking-widest">Entrega: {{ order.dueDate | date:'dd MMM, yyyy' }}</span>
-                  </div>
-               </div>
+            <!-- Meta: Delivery -->
+            <div class="flex items-center gap-2 mb-4 relative z-10">
+              <lucide-angular [img]="icons.Calendar" class="h-3 w-3 text-text-muted/20"></lucide-angular>
+              <span class="text-[8px] font-black text-text-muted/40 uppercase tracking-[0.2em]">Entrega: {{ order.dueDate | date:'dd MMM, yyyy' }}</span>
             </div>
 
             <!-- Optional: Production Progress -->
-            <div *ngIf="order.status === 'IN_PRODUCTION' || order.productionProgress" class="mb-8 relative z-10">
-               <div class="flex items-center justify-between mb-2">
-                  <span class="text-[8px] font-black text-primary uppercase tracking-[0.3em] flex items-center gap-2">
-                    <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-                    Producción {{ order.productionProgress || 35 }}%
-                  </span>
-               </div>
-               <div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
-                  <div class="h-full bg-primary rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" [style.width.%]="order.productionProgress || 35"></div>
+            <div *ngIf="order.status === 'IN_PRODUCTION' || order.productionProgress" class="mb-4 relative z-10">
+               <div class="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
+                  <div class="h-full bg-primary rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" [style.width.%]="order.productionProgress || 35"></div>
                </div>
             </div>
 
-            <!-- Footer: Meta & Amount -->
-            <div class="flex items-center justify-between pt-6 border-t border-border/5 relative z-10">
-               <div class="flex items-center gap-3">
-                  <div (click)="$event.stopPropagation(); _onManageClick(order)" class="h-10 w-10 flex items-center justify-center rounded-xl bg-surface-container-low text-text-muted/40 border border-border/5 shadow-sm active:scale-95 transition-all">
-                    <lucide-angular [img]="icons.Settings" class="h-4 w-4"></lucide-angular>
+            <!-- Footer: Meta & Amount (Integrated) -->
+            <div class="flex items-center justify-between pt-4 border-t border-border/5 relative z-10">
+               <div class="flex items-center gap-2">
+                  <div (click)="$event.stopPropagation(); _onManageClick(order)" class="h-9 w-9 flex items-center justify-center rounded-xl bg-surface-container-low text-text-muted/40 border border-border/5 active:scale-95 transition-all">
+                    <lucide-angular [img]="icons.Settings" class="h-3.5 w-3.5"></lucide-angular>
                   </div>
                   @if (order.status === 'DELIVERED' || order.isFacturado) {
-                    <div class="flex items-center gap-2 px-3 py-1.5 bg-success/5 border border-success/10 rounded-full">
+                    <div class="flex items-center gap-1.5 px-3 py-1 bg-success/5 border border-success/10 rounded-full">
                        <lucide-angular [img]="icons.CheckCircle" class="h-3 w-3 text-success"></lucide-angular>
-                       <span class="text-[7px] font-black text-success uppercase tracking-widest">Facturado</span>
+                       <span class="text-[7px] font-black text-success uppercase tracking-widest">OK</span>
                     </div>
                   }
                </div>
 
-               <div class="flex flex-col items-end">
-                  <span class="text-[8px] font-black text-text-muted/30 uppercase tracking-[0.3em] mb-1">
-                    {{ getBalance(order) > 0 ? 'Pendiente de Pago' : 'Total Pedido' }}
-                  </span>
-                  <span [class]="cn('text-2xl font-black tabular-nums tracking-tighter font-display italic', getBalance(order) > 0 ? 'text-text' : 'text-success')">
+               <div class="flex items-baseline gap-2">
+                  <span class="text-[8px] font-black text-text-muted/30 uppercase tracking-widest">Total</span>
+                  <span [class]="cn('text-xl font-black tabular-nums tracking-tighter font-display', getBalance(order) > 0 ? 'text-text' : 'text-success')">
                     {{ (getBalance(order) > 0 ? getBalance(order) : (order.totalPrice | number)) | currency:'':'symbol':'1.0-0' }}
                   </span>
                </div>
             </div>
+          </div>
+        }
+      </div>
             
             <!-- Context Menu (Optional Overlay) -->
             @if (activeMenuOrderId() === order.id) {

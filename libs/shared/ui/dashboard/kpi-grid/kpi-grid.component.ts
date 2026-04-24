@@ -19,7 +19,7 @@ import { MetricCardComponent } from '@shared/ui/metric-card/metric-card.componen
   standalone: true,
   imports: [CommonModule, LucideAngularModule, MetricCardComponent],
   template: `
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+    <div class="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-8">
       @for (m of metrics(); track m.id) {
         <app-metric-card
           [title]="m.label"

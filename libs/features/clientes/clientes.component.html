@@ -4,7 +4,7 @@
   category="CRM PROTOCOL"
   description="Gestión de Relaciones y Capital Humano Externo"
 >
-  <div actions>
+  <div actions class="hidden md:flex">
     <button
         class="h-14 px-10 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-[0_20px_40px_-12px_rgba(var(--primary-rgb),0.4)] hover:scale-[1.05] active:scale-[0.95] transition-all duration-500 flex items-center gap-4 border border-primary/20 group italic"
         (click)="handleNewClient()"
@@ -14,8 +14,8 @@
     </button>
   </div>
 
-  <!-- TELEMETRY ANALYTICS -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+  <!-- TELEMETRY ANALYTICS (DEKTOP ONLY) -->
+  <div class="hidden sm:grid grid-cols-1 sm:grid-cols-3 gap-8">
       <div class="relative overflow-hidden bg-surface-container-low/50 border border-border/5 p-10 rounded-[3rem] shadow-2xl shadow-text/5 transition-all duration-1000 hover:-translate-y-2 group">
           <div class="absolute -right-10 -top-10 h-40 w-40 bg-primary/5 rounded-full blur-3xl transition-transform group-hover:scale-150 duration-1000"></div>
           <span class="block text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/30 mb-6 italic">Total Activos</span>
@@ -50,21 +50,40 @@
       </div>
   </div>
 
-  <!-- SEARCH & FILTER PROTOCOL -->
-  <div class="flex flex-col md:flex-row gap-8 items-center">
+  <!-- MOBILE STICKY HEADER (Modern Hub Style) -->
+  @if (layoutService.isMobile()) {
+    <div [class]="'fixed top-12 inset-x-0 bg-background/80 backdrop-blur-md z-[60] px-6 py-3 border-b border-border/5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ' + (headerVisible() ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0')">
+      <div class="relative group/search">
+          <lucide-angular [img]="icons.Search" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted/20 group-focus-within/search:text-primary transition-all duration-500"></lucide-angular>
+          <input
+              type="text"
+              [ngModel]="searchTerm()"
+              (ngModelChange)="onSearchChange($event)"
+              placeholder="Localizar aliado..."
+              class="h-12 w-full rounded-2xl border border-border/5 bg-surface-container-low/50 pl-12 pr-6 text-[11px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-lg shadow-text/[0.01] placeholder:text-text-muted/20 italic"
+          />
+      </div>
+    </div>
+    
+    <!-- Spacer for Sticky Header -->
+    <div class="h-10"></div>
+  }
+
+  <!-- SEARCH & FILTER PROTOCOL (DESKTOP) -->
+  <div class="hidden sm:flex flex-col gap-6">
       <div class="relative flex-1 w-full group">
           <lucide-angular [img]="icons.Search" class="absolute left-8 top-1/2 -translate-y-1/2 h-5 w-5 text-text-muted/20 group-focus-within:text-primary transition-all duration-500 group-focus-within:rotate-12"></lucide-angular>
           <input
               type="text"
               [ngModel]="searchTerm()"
               (ngModelChange)="onSearchChange($event)"
-              placeholder="LOCALIZAR POR IDENTIDAD O PROTOCOLO..."
-              class="h-16 w-full rounded-3xl border border-border/5 bg-surface-container-low/50 pl-16 pr-8 text-[10px] font-black uppercase tracking-[0.3em] focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-2xl shadow-text/5 placeholder:text-text-muted/20 italic"
+              placeholder="Localizar aliado..."
+              class="h-16 w-full rounded-3xl border border-border/5 bg-surface-container-low/50 pl-16 pr-8 text-[11px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-xl shadow-text/[0.02] placeholder:text-text-muted/20 sm:rounded-3xl h-16 italic"
           />
       </div>
   </div>
 
-  <!-- TABLE ARCHITECTURE -->
+  <!-- TABLE ARCHITECTURE (DESKTOP) -->
   <div class="hidden md:block overflow-hidden bg-surface-container-low/30 rounded-[4rem] border border-border/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.1)] backdrop-blur-3xl p-1">
       <table class="w-full text-left">
           <thead>
@@ -173,46 +192,55 @@
       }
   </div>
 
-  <!-- MOBILE ARCHITECTURE -->
-  <div class="grid grid-cols-1 gap-10 md:hidden pb-20">
-      @for (client of clientes(); track client.id) {
-          <div class="group relative p-10 rounded-[3.5rem] border border-border/5 bg-surface-container-low/50 shadow-2xl shadow-text/5 transition-all duration-1000">
-              <div class="flex items-start justify-between mb-10">
-                  <div class="flex items-center gap-6">
-                      <div class="h-20 w-20 flex-shrink-0 rounded-[2.5rem] bg-surface border border-border/5 flex items-center justify-center text-2xl font-black text-text-muted/10 group-hover:bg-primary group-hover:text-white transition-all duration-700">
-                          {{ client.name.charAt(0).toUpperCase() }}
-                      </div>
-                      <div class="space-y-3">
-                          <p class="font-black text-text uppercase tracking-tight group-hover:text-primary transition-colors font-display italic text-lg leading-none">{{ client.name }}</p>
-                          <div class="flex items-center gap-3">
-                              <div class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                              <p class="text-[9px] text-text-muted/40 font-black uppercase tracking-[0.3em] italic leading-none text-emerald-500">Aliado Activo</p>
-                          </div>
-                      </div>
-                  </div>
+  <!-- MOBILE ARCHITECTURE (PREMIUM CARDS) -->
+  <div class="grid grid-cols-1 gap-5 md:hidden pb-32">
+    @for (client of clientes(); track client.id) {
+      <div (click)="goToClient(client.id)" 
+           class="bg-surface rounded-[3rem] p-5 shadow-xl shadow-text/[0.03] border border-border/10 active:scale-[0.98] transition-all relative overflow-hidden group">
+        
+        <!-- Header: Avatar + Info + Badge -->
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-4">
+            <!-- Circular Avatar style reference -->
+            <div class="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-black text-primary border border-primary/5">
+              {{ client.name.substring(0, 2).toUpperCase() }}
+            </div>
+            <div class="flex flex-col">
+              <h3 class="text-[15px] font-black text-text leading-tight tracking-tight uppercase">{{ client.name }}</h3>
+              <div class="flex items-center gap-2 mt-0.5">
+                <div class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
+                <span class="text-[10px] font-bold text-text-muted/60 tracking-tight">Protocolo Activo</span>
               </div>
-
-              <div class="grid grid-cols-1 gap-4 mb-10 border-b border-border/5 pb-10">
-                  <div class="flex items-center gap-5 text-[10px] font-black text-text-muted uppercase tracking-widest bg-surface/50 p-5 rounded-3xl border border-border/5 italic">
-                      <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-primary/30"></lucide-angular>
-                      <span class="truncate">{{ client.email || 'SIN_ENLACE' }}</span>
-                  </div>
-                  <div class="flex items-center gap-5 text-[10px] font-black text-text-muted uppercase tracking-widest bg-surface/50 p-5 rounded-3xl border border-border/5">
-                      <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-primary/30"></lucide-angular>
-                      <span>{{ client.phone || '--- --- ---' }}</span>
-                  </div>
-              </div>
-
-              <div class="flex items-center gap-6">
-                  <div class="px-6 py-3 rounded-full bg-primary/10 border border-primary/10 text-[10px] font-black text-primary uppercase tracking-[0.3em] italic">
-                      {{ client.totalOrders || 0 }} PEDIDOS
-                  </div>
-                  <button (click)="goToClient(client.id)" class="flex-1 h-14 rounded-3xl bg-text text-surface font-black text-[10px] uppercase tracking-[0.5em] italic shadow-2xl shadow-text/30 active:scale-95 transition-all">
-                      EXPEDIENTE
-                  </button>
-              </div>
+            </div>
           </div>
-      }
+          
+          <!-- circular Orders Badge -->
+          <div class="h-14 w-14 rounded-full bg-surface-container-low border border-border/5 flex flex-col items-center justify-center">
+            <span class="text-[12px] font-black text-text-muted leading-none">{{ client.totalOrders || 0 }}</span>
+            <span class="text-[7px] font-black text-text-muted/40 uppercase tracking-tighter mt-1">Pedidos</span>
+          </div>
+        </div>
+
+        <div class="h-px bg-border/5 -mx-5 mb-5"></div>
+
+        <!-- Contact Info -->
+        <div class="space-y-2.5">
+          <div class="flex items-center gap-3 text-text-muted/80">
+            <lucide-angular [img]="icons.Mail" class="h-3.5 w-3.5 opacity-60"></lucide-angular>
+            <span class="text-[11px] font-bold tracking-tight truncate">{{ client.email || 'sin correo registrado' }}</span>
+          </div>
+          <div class="flex items-center gap-3 text-text-muted/80">
+            <lucide-angular [img]="icons.Phone" class="h-3.5 w-3.5 opacity-60"></lucide-angular>
+            <span class="text-[11px] font-bold tracking-tight">{{ client.phone || '+54 -- ---- ----' }}</span>
+          </div>
+        </div>
+
+        <!-- Indicator -->
+        <div class="absolute top-0 right-0 p-4 opacity-0 group-active:opacity-100 transition-opacity">
+           <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4 text-text-muted/20"></lucide-angular>
+        </div>
+      </div>
+    }
   </div>
 
   @if(isFormOpen()) {
