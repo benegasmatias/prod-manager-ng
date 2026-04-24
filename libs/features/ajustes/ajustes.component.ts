@@ -35,6 +35,17 @@ export class AjustesComponent {
   saving = signal(false);
   showPricingModal = signal(false);
   currentPlanLimits = signal<any>(null);
+  
+  // Computed helpers for template
+  currentPlanName = computed(() => {
+    return this.currentPlanLimits()?.name || 
+           this.sessionService.activeSubscription()?.planName || 
+           'FREE CORE';
+  });
+
+  goToBilling() {
+    this.handleUpgrade();
+  }
 
   readonly icons = {
     Landmark, Globe, Save, Trash2, Mail, Phone, Zap, CreditCard, ChevronRight, Edit3, Info, AlertOctagon, ArrowRight

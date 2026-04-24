@@ -7,38 +7,38 @@ import { LucideAngularModule, Wallet, CheckCircle, AlertCircle, DollarSign } fro
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="bg-zinc-900 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group h-full">
-      <div class="absolute top-0 right-0 p-8 opacity-5 rotate-12 group-hover:rotate-0 transition-transform duration-1000">
-        <lucide-angular [img]="icons.Wallet" class="h-32 w-32"></lucide-angular>
+    <div class="bg-text rounded-[3rem] p-10 text-white shadow-[0_40px_80px_-20px_rgba(var(--text-rgb),0.3)] relative overflow-hidden group h-full">
+      <div class="absolute -top-10 -right-10 p-8 opacity-5 rotate-12 group-hover:rotate-0 transition-all duration-1000 group-hover:scale-150">
+        <lucide-angular [img]="icons.Wallet" class="h-40 w-40"></lucide-angular>
       </div>
 
-      <div class="relative z-10 space-y-10">
-        <div class="space-y-1">
-          <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Total Presupuestado</span>
-          <p class="text-5xl font-black tabular-nums tracking-tighter">$ {{ totalPrice() | number:'1.2-2' }}</p>
+      <div class="relative z-10 space-y-12">
+        <div class="space-y-3">
+          <span class="text-[9px] font-black uppercase tracking-[0.5em] text-white/30 italic">Presupuesto Consolidado</span>
+          <p class="text-6xl font-black tabular-nums tracking-tighter leading-none">$ {{ totalPrice() | number:'1.0-0' }}</p>
         </div>
 
-        <div class="space-y-6 pt-10 border-t border-white/5">
-          <div class="flex items-center justify-between p-5 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-colors">
+        <div class="space-y-6 pt-12 border-t border-white/5">
+          <div class="flex items-center justify-between p-6 rounded-[2.5rem] bg-white/5 backdrop-blur-3xl hover:bg-white/10 transition-all duration-700 group/row">
             <div>
-              <p class="text-[8px] font-black uppercase tracking-widest text-emerald-400 mb-1">Confirmado / Pagado</p>
-              <p class="text-xl font-black tabular-nums text-white">$ {{ totalPaid() | number:'1.2-2' }}</p>
+              <p class="text-[8px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-2 italic">Flujo Confirmado</p>
+              <p class="text-2xl font-black tabular-nums text-white tracking-tighter">$ {{ totalPaid() | number:'1.0-0' }}</p>
             </div>
-            <lucide-angular [img]="icons.CheckCircle" class="h-6 w-6 text-emerald-500/40"></lucide-angular>
+            <lucide-angular [img]="icons.CheckCircle" class="h-6 w-6 text-emerald-500/20 group-hover/row:scale-110 transition-transform"></lucide-angular>
           </div>
 
-          <div class="flex items-center justify-between p-5 rounded-3xl bg-rose-500/10 backdrop-blur-sm border border-rose-500/20 hover:bg-rose-500/15 transition-colors">
+          <div class="flex items-center justify-between p-6 rounded-[2.5rem] bg-danger-container/10 backdrop-blur-3xl hover:bg-danger-container/20 transition-all duration-700 group/row">
             <div>
-              <p class="text-[8px] font-black uppercase tracking-widest text-rose-400 mb-1">Saldo a Liquidar</p>
-              <p class="text-xl font-black tabular-nums text-rose-400">$ {{ saldo() | number:'1.2-2' }}</p>
+              <p class="text-[8px] font-black uppercase tracking-[0.4em] text-danger mb-2 italic">Saldo a Liquidar</p>
+              <p class="text-2xl font-black tabular-nums text-danger tracking-tighter">$ {{ saldo() | number:'1.0-0' }}</p>
             </div>
-            <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6 text-rose-500/40"></lucide-angular>
+            <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6 text-danger/20 group-hover/row:scale-110 transition-transform"></lucide-angular>
           </div>
 
           @if (hasPendingPayment()) {
-            <button (click)="pay.emit()" class="w-full h-16 rounded-3xl bg-white text-zinc-950 text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-zinc-100 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
+            <button (click)="pay.emit()" class="w-full h-20 rounded-[2.5rem] bg-white text-text text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 italic">
               <lucide-angular [img]="icons.DollarSign" class="h-5 w-5"></lucide-angular>
-              Liquidar Saldo
+              Registrar Cobro
             </button>
           }
         </div>

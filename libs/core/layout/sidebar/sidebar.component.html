@@ -6,7 +6,7 @@
   [class.-translate-x-full]="layoutService.isMobile() && !layoutService.isMobileMenuOpen()"
   (mouseenter)="layoutService.setHovered(true)" (mouseleave)="layoutService.setHovered(false)">
   
-  <div class="h-full flex flex-col px-4 py-4 w-full min-w-[280px] shrink-0 gap-6">
+  <div class="h-full flex flex-col px-4 py-3 w-full min-w-[280px] shrink-0 gap-4">
     @if (!sessionService.isInitialized()) {
       <app-sidebar-skeleton></app-sidebar-skeleton>
     } @else {
@@ -38,7 +38,7 @@
       </div>
 
       <!-- NAVIGATION ARCHITECTURE -->
-      <div class="flex flex-col gap-4 overflow-y-auto no-scrollbar pb-4 flex-1 animate-in fade-in slide-in-from-left-4 duration-1000 delay-150">
+      <div class="flex flex-col gap-2 overflow-y-auto no-scrollbar pb-4 flex-1 animate-in fade-in slide-in-from-left-4 duration-1000 delay-150">
         @for (group of sidebarMenu(); track group.title) {
           <nav class="space-y-1">
             <span
@@ -50,7 +50,7 @@
 
             @for (item of group.items; track item.href) {
               <a [routerLink]="item.href" routerLinkActive="active-link" #rla="routerLinkActive"
-                class="group flex items-center gap-4 rounded-xl px-4 py-2 text-xs font-bold relative overflow-hidden transition-all duration-500"
+                class="group flex items-center gap-4 rounded-xl px-4 py-1.5 text-xs font-bold relative overflow-hidden transition-all duration-500"
                 [class.bg-primary]="rla.isActive" 
                 [class.text-white]="rla.isActive"
                 [class.shadow-[0_20px_40px_-12px_rgba(var(--primary-rgb),0.4)]]="rla.isActive" 

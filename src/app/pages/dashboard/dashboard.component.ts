@@ -1,10 +1,10 @@
 import { Component, inject, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  LucideAngularModule, 
-  ChevronRight, 
-  Activity, 
-  AlertCircle, 
+import {
+  LucideAngularModule,
+  ChevronRight,
+  Activity,
+  AlertCircle,
   LayoutGrid,
   BarChart3,
   Calendar,
@@ -27,19 +27,21 @@ import { HeroSummaryComponent } from '@shared/ui/dashboard/hero-summary/hero-sum
 import { AlertsPriorityWidgetComponent } from '@shared/ui/dashboard/alerts-priority/alerts-priority.component';
 import { RecentOrdersWidgetComponent } from '@shared/ui/dashboard/recent-orders-widget/recent-orders-widget.component';
 import { cn } from '@shared/utils/cn';
+import { MetricCardComponent } from '@shared/ui/metric-card/metric-card.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule, 
-    LucideAngularModule, 
-    PageShellComponent, 
-    KpiGridComponent, 
+    CommonModule,
+    LucideAngularModule,
+    PageShellComponent,
+    KpiGridComponent,
     QuickActionsComponent,
     HeroSummaryComponent,
     AlertsPriorityWidgetComponent,
-    RecentOrdersWidgetComponent
+    RecentOrdersWidgetComponent,
+    MetricCardComponent
   ],
   template: `
     <app-page-shell
@@ -86,26 +88,26 @@ import { cn } from '@shared/utils/cn';
                 ></app-kpi-grid>
               }
               @case ('secondary-metrics') {
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
-                  <div class="p-10 md:p-12 rounded-[2.5rem] bg-surface-container-lowest flex items-center justify-between group overflow-hidden relative transition-all shadow-2xl shadow-text/5 hover:shadow-text/10">
-                    <div class="space-y-3 z-10">
-                      <span class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic">Máquinas Produciendo</span>
-                      <p class="text-3xl md:text-4xl font-black text-text tracking-tighter tabular-nums leading-none">{{ summary()?.activeMachines || 0 }} UNIDADES</p>
-                    </div>
-                    <div class="h-14 w-14 rounded-2xl bg-surface-container-low flex items-center justify-center text-text-muted/20 group-hover:text-primary group-hover:bg-primary/5 transition-all duration-700">
-                      <lucide-angular [img]="icons.Printer" class="h-6 w-6"></lucide-angular>
-                    </div>
-                  </div>
-                  
-                  <div class="p-10 md:p-12 rounded-[2.5rem] bg-surface-container-lowest flex items-center justify-between group overflow-hidden relative transition-all shadow-2xl shadow-text/5 hover:shadow-text/10">
-                    <div class="space-y-3 z-10">
-                      <span class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic">Captación Mensual</span>
-                      <p class="text-3xl md:text-4xl font-black text-emerald-500 tracking-tighter tabular-nums leading-none">+{{ summary()?.newCustomers || 0 }} CLIENTES</p>
-                    </div>
-                    <div class="h-14 w-14 rounded-2xl bg-surface-container-low flex items-center justify-center text-text-muted/20 group-hover:text-emerald-500 group-hover:bg-emerald-500/5 transition-all duration-700">
-                      <lucide-angular [img]="icons.Users" class="h-6 w-6"></lucide-angular>
-                    </div>
-                  </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+                  <app-metric-card
+                    title="Máquinas Produciendo"
+                    [value]="summary()?.activeMachines || 0"
+                    subtitle="UNIDADES ACTIVAS"
+                    [icon]="icons.Printer"
+                    accentColor="primary"
+                    [loading]="loading()"
+                  ></app-metric-card>
+
+                  <app-metric-card
+                    title="Captación Mensual"
+                    [value]="summary()?.newCustomers || 0"
+                    subtitle="CLIENTES NUEVOS"
+                    [icon]="icons.Users"
+                    accentColor="emerald"
+                    [loading]="loading()"
+                    trendText="+12% VS MES ANTERIOR"
+                    trendDirection="up"
+                  ></app-metric-card>
                 </div>
               }
               @case ('recent-orders') {
@@ -149,7 +151,7 @@ export class DashboardComponent {
     const rubro = this.session.rubro();
     const caps = this.session.activeCapabilities();
     const baseConfig = DASHBOARD_CONFIG[rubro] || DEFAULT_DASHBOARD;
-    
+
     return {
       ...baseConfig,
       metrics: baseConfig.metrics.filter(m => !m.requiredCapability || caps.includes(m.requiredCapability)),
@@ -159,21 +161,21 @@ export class DashboardComponent {
   });
 
   readonly icons = {
-    ChevronRight, Activity, AlertCircle, LayoutGrid, BarChart3, Calendar, 
+    ChevronRight, Activity, AlertCircle, LayoutGrid, BarChart3, Calendar,
     Wallet, Printer, Users, AlertTriangle, ArrowRight, TrendingUp, Package, Clock
   };
 
   constructor() {
     // Note: No manual refresh() here. The effect handles both 
     // initial load and business context switches.
-    
+
     effect(() => {
       const activeId = this.session.activeId();
       if (activeId) {
         // Only force if we don't have data yet. 
         // The service's refresh(false) will skip if data exists.
         // If we want a switch-business force, we should compare IDs.
-        this.dashboardService.refresh(); 
+        this.dashboardService.refresh();
       }
     }, { allowSignalWrites: true });
   }

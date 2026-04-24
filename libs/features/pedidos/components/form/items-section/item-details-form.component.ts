@@ -16,6 +16,7 @@ import { MoneyInputComponent } from '@shared/ui/money-input/money-input.componen
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
 import { OrderCalculatorService } from '../../../services/order-calculator.service';
+import { SessionService } from '@core/session/session.service';
 
 // enhancements
 import { MetalurgicaItemEnhancementComponent } from './enhancements/metalurgica-enhancement.component';
@@ -46,6 +47,9 @@ export class ItemDetailsFormComponent {
   isSaving = input(false);
 
   private calculator = inject(OrderCalculatorService);
+  private session = inject(SessionService);
+
+  isArgentina = computed(() => this.session.activeNegocio()?.moneda === 'ARS');
 
   @Output() onRemove = new EventEmitter<void>();
   @Output() onUpdate = new EventEmitter<void>();

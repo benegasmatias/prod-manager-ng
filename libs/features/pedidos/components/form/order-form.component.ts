@@ -238,28 +238,28 @@ import { ButtonSpinnerComponent } from '@shared/ui';
 
       <!-- EDITORIAL FLOATING DOCK -->
       @if (showFloatingFooter()) {
-        <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-6 animate-in slide-in-from-bottom-20 duration-1000">
-           <div class="h-20 pl-12 pr-6 rounded-full bg-surface/80 backdrop-blur-3xl border border-border/5 shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex items-center gap-10">
+        <div class="fixed bottom-6 sm:bottom-24 left-0 right-0 px-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-auto z-[100] flex items-center justify-center animate-in slide-in-from-bottom-20 duration-1000">
+           <div class="h-16 sm:h-20 w-full sm:w-auto pl-8 sm:pl-12 pr-4 sm:pr-6 rounded-[2rem] sm:rounded-full bg-surface/80 backdrop-blur-3xl border border-border/5 shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex items-center justify-between sm:justify-start gap-6 sm:gap-10">
               <div class="flex flex-col">
-                 <span class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/60 leading-none mb-2 italic">Valor Acumulado</span>
-                 <span class="text-2xl font-black text-text leading-none tabular-nums tracking-tighter">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
+                 <span class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/60 leading-none mb-1 sm:mb-2 italic">Valor Acumulado</span>
+                 <span class="text-xl sm:text-2xl font-black text-text leading-none tabular-nums tracking-tighter">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
               </div>
               
-              <div class="w-px h-10 bg-border/5"></div>
+              <div class="hidden sm:block w-px h-10 bg-border/5"></div>
               
               <app-button-spinner
                 [loading]="isSaving()"
                 (onClick)="handleSave($event)"
-                [btnClass]="'h-12 px-10 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-3 shadow-2xl shadow-primary/20'"
+                [btnClass]="'h-10 sm:h-12 px-6 sm:px-10 rounded-full bg-primary text-white text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-3 shadow-2xl shadow-primary/20'"
               >
                 <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
-                <span>{{ id ? 'Guardar' : 'Finalizar' }}</span>
+                <span class="hidden xs:inline">{{ id ? 'Guardar' : 'Finalizar' }}</span>
               </app-button-spinner>
            </div>
-   
-           <app-floating-calculator></app-floating-calculator>
         </div>
       }
+
+      <app-floating-calculator></app-floating-calculator>
     </form>
   `,
   styles: [`

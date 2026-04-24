@@ -15,123 +15,123 @@ import { cn } from '../../utils/cn';
     <div class="space-y-10">
       <!-- TABLE ARCHITECTURE (Desktop) -->
       <div class="hidden lg:block overflow-x-auto pb-40">
-        <table class="w-full border-separate border-spacing-y-4 px-4">
+        <table class="w-full border-separate border-spacing-y-3 px-2">
           <thead>
-            <tr class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/30">
-              <th class="px-8 py-4 text-left cursor-pointer group" (click)="_onSort('code')">
-                <div class="flex items-center gap-3">
+            <tr class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/30">
+              <th class="px-5 py-4 text-left cursor-pointer group" (click)="_onSort('code')">
+                <div class="flex items-center gap-2">
                   {{ labels.TABLE.ORDER_NUMBER }}
                   <ng-container *ngTemplateOutlet="sortIcon; context: { field: 'code' }"></ng-container>
                 </div>
               </th>
-              <th *ngIf="!hideTypeColumn" class="px-8 py-4 text-left">{{ labels.TABLE.TYPE }}</th>
-              <th *ngIf="!hideClientColumn" class="px-8 py-4 text-left">{{ clientLabel || labels.TABLE.CLIENT }}</th>
-              <th class="px-8 py-4 text-left">{{ labels.TABLE.STATUS }}</th>
-              <th class="px-8 py-4 text-left">{{ labels.TABLE.RESPONSIBLE }}</th>
+              <th *ngIf="!hideTypeColumn" class="px-5 py-4 text-left">{{ labels.TABLE.TYPE }}</th>
+              <th *ngIf="!hideClientColumn" class="px-5 py-4 text-left">{{ clientLabel || labels.TABLE.CLIENT }}</th>
+              <th class="px-5 py-4 text-left">{{ labels.TABLE.STATUS }}</th>
+              <th class="px-5 py-4 text-left">{{ labels.TABLE.RESPONSIBLE }}</th>
               
-              <th *ngIf="!hideDelivery" class="px-8 py-4 text-left cursor-pointer group" (click)="_onSort('dueDate')">
-                <div class="flex items-center gap-3">
+              <th *ngIf="!hideDelivery" class="px-5 py-4 text-left cursor-pointer group" (click)="_onSort('dueDate')">
+                <div class="flex items-center gap-2">
                   {{ labels.TABLE.DELIVERY }}
                   <ng-container *ngTemplateOutlet="sortIcon; context: { field: 'dueDate' }"></ng-container>
                 </div>
               </th>
-              <th *ngIf="!hideFinancials" class="px-8 py-4 text-right">{{ labels.TABLE.PAID }}</th>
-              <th *ngIf="!hideFinancials" class="px-8 py-4 text-right cursor-pointer group" (click)="_onSort('saldo')">
-                <div class="flex items-center justify-end gap-3">
+              <th *ngIf="!hideFinancials" class="px-5 py-4 text-right">{{ labels.TABLE.PAID }}</th>
+              <th *ngIf="!hideFinancials" class="px-5 py-4 text-right cursor-pointer group" (click)="_onSort('saldo')">
+                <div class="flex items-center justify-end gap-2">
                   {{ labels.TABLE.BALANCE }}
                   <ng-container *ngTemplateOutlet="sortIcon; context: { field: 'saldo' }"></ng-container>
                 </div>
               </th>
-              <th class="px-8 py-4 text-right">{{ labels.TABLE.ACTIONS }}</th>
+              <th class="px-5 py-4 text-right">{{ labels.TABLE.ACTIONS }}</th>
             </tr>
           </thead>
           <tbody>
             @for (order of orders; track order.id) {
               <tr class="group bg-surface-container-low/40 hover:bg-surface-container-low transition-all duration-700 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-text/5">
-                <td class="px-8 py-8 first:rounded-l-[2.5rem] border-y border-l border-border/5 group-hover:border-primary/10">
+                <td class="px-5 py-6 first:rounded-l-[2.5rem] border-y border-l border-border/5 group-hover:border-primary/10">
                   <div class="flex flex-col">
-                    <span class="text-[9px] font-black tabular-nums text-primary mb-1 uppercase tracking-widest">REG #{{ order.code }}</span>
+                    <span class="text-[8px] font-black tabular-nums text-primary mb-1 uppercase tracking-widest">REG #{{ order.code }}</span>
                     @if (hideClientColumn) {
-                      <span class="text-sm font-black text-text truncate max-w-[200px] font-display uppercase tracking-tight">
+                      <span class="text-sm font-black text-text truncate max-w-[140px] font-display uppercase tracking-tight">
                         {{ order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS }}
                       </span>
                     }
                   </div>
                 </td>
                 
-                <td *ngIf="!hideTypeColumn" class="px-8 py-8 border-y border-border/5 group-hover:border-primary/10">
-                   <div [class]="cn('inline-flex items-center px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-[0.2em] shadow-sm', order.type === 'STOCK' ? 'bg-primary text-white shadow-primary/20' : 'bg-surface-container-lowest text-text-muted/60 border border-border/5')">
+                <td *ngIf="!hideTypeColumn" class="px-5 py-6 border-y border-border/5 group-hover:border-primary/10">
+                   <div [class]="cn('inline-flex items-center px-3 py-1 rounded-full text-[7px] font-black uppercase tracking-[0.2em] shadow-sm', order.type === 'STOCK' ? 'bg-primary text-white shadow-primary/20' : 'bg-surface-container-lowest text-text-muted/60 border border-border/5')">
                       {{ order.type === 'STOCK' ? labels.ORDER_TYPES.STOCK : labels.ORDER_TYPES.CLIENT }}
                    </div>
                 </td>
  
-                 <td *ngIf="!hideClientColumn" class="px-8 py-8 border-y border-border/5 group-hover:border-primary/10">
+                 <td *ngIf="!hideClientColumn" class="px-5 py-6 border-y border-border/5 group-hover:border-primary/10">
                    <div class="flex flex-col min-w-0">
-                     <span class="text-sm font-black text-text truncate max-w-[240px] font-display uppercase tracking-tight leading-tight">
+                     <span class="text-sm font-black text-text truncate max-w-[180px] font-display uppercase tracking-tight leading-tight">
                        {{ order.clientName || order.items[0]?.name || order.items[0]?.nombreProducto || fallbackClientName || 'S/N' }}
                      </span>
-                     <span class="text-[9px] font-bold text-text-muted/40 line-clamp-1 uppercase tracking-widest mt-1 italic">
-                       {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' productos adicionales)' : 'Referencia de Stock') }}
-                       {{ order.clientName && order.items.length > 1 ? '(+' + (order.items.length - 1) + ' más)' : '' }}
+                     <span class="text-[8px] font-bold text-text-muted/40 line-clamp-1 uppercase tracking-widest mt-1 italic">
+                       {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' ítems)' : 'Stock') }}
                      </span>
                    </div>
                  </td>
-   
-                <td class="px-8 py-8 border-y border-border/5 group-hover:border-primary/10">
+    
+                <td class="px-5 py-6 border-y border-border/5 group-hover:border-primary/10">
                   <button 
                     (click)="_onStatusClick(order)"
-                    [class]="cn('text-[8px] font-black uppercase tracking-[0.2em] rounded-2xl px-6 py-2.5 border border-border/5 shadow-sm transition-all hover:scale-[1.05] active:scale-[0.95]', getStatusStyles(order.status))"
+                    [class]="cn('text-[7px] font-black uppercase tracking-[0.2em] rounded-xl px-4 py-2 border border-border/5 shadow-sm transition-all hover:scale-[1.05] active:scale-[0.95]', getStatusStyles(order.status))"
                   >
                     {{ getStatusLabel(order.status) }}
                   </button>
                 </td>
  
-                <td class="px-8 py-8 border-y border-border/5 group-hover:border-primary/10">
+                <td class="px-5 py-6 border-y border-border/5 group-hover:border-primary/10">
                   @if (order.responsableGeneral) {
-                    <div class="flex items-center gap-4">
-                      <div class="h-10 w-10 rounded-2xl bg-surface-container-lowest text-primary flex items-center justify-center text-[10px] font-black shadow-xl shadow-text/5 border border-border/5">
-                        {{ order.responsableGeneral.firstName[0] }}{{ order.responsableGeneral.lastName ? order.responsableGeneral.lastName[0] : '' }}
+                    <div class="flex items-center gap-3">
+                      <div class="h-8 w-8 rounded-xl bg-surface-container-lowest text-primary flex items-center justify-center text-[9px] font-black shadow-xl shadow-text/5 border border-border/5">
+                        {{ order.responsableGeneral.firstName[0] }}
                       </div>
-                      <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">
+                      <span class="text-[9px] font-black text-text-muted uppercase tracking-widest truncate max-w-[80px]">
                         {{ order.responsableGeneral.firstName }}
                       </span>
                     </div>
                   } @else {
-                    <span class="text-[9px] font-black text-text-muted/20 uppercase tracking-[0.4em] italic">Sin Asignar</span>
+                    <span class="text-[8px] font-black text-text-muted/20 uppercase tracking-[0.4em] italic">N/A</span>
                   }
                 </td>
  
-                <td *ngIf="!hideDelivery" class="px-8 py-8 border-y border-border/5 group-hover:border-primary/10">
+                <td *ngIf="!hideDelivery" class="px-5 py-6 border-y border-border/5 group-hover:border-primary/10">
                   <div class="flex flex-col">
                     <span class="text-sm font-black text-text font-display uppercase tracking-tighter">
                       {{ order.dueDate | date:'dd MMM' }}
                     </span>
-                    <span class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.3em]">
-                      {{ order.dueDate | date:'yyyy' }}
+                    <span class="text-[8px] font-black text-text-muted/40 uppercase tracking-[0.3em]">
+                      {{ order.dueDate | date:'yy' }}
                     </span>
                   </div>
                 </td>
  
-                <td *ngIf="!hideFinancials" class="px-8 py-8 text-right border-y border-border/5 group-hover:border-primary/10">
-                  <span class="text-[11px] font-black text-success tabular-nums tracking-widest">
+                <td *ngIf="!hideFinancials" class="px-5 py-6 text-right border-y border-border/5 group-hover:border-primary/10">
+                  <span class="text-[10px] font-black text-success tabular-nums tracking-widest">
                     {{ getTotalPaid(order) | currency:'':'symbol':'1.0-0' }}
                   </span>
                 </td>
-                <td *ngIf="!hideFinancials" class="px-8 py-8 text-right border-y border-border/5 group-hover:border-primary/10">
+                <td *ngIf="!hideFinancials" class="px-5 py-6 text-right border-y border-border/5 group-hover:border-primary/10">
                   <span [class]="cn('text-lg font-black tracking-tighter tabular-nums font-display', getBalance(order) > 0 ? 'text-text' : 'text-success')">
                     {{ getBalance(order) | currency:'':'symbol':'1.0-0' }}
                   </span>
                 </td>
  
-                <td class="px-8 py-8 last:rounded-r-[2.5rem] border-y border-r border-border/5 group-hover:border-primary/10">
-                  <div class="flex items-center justify-end gap-3">
-                    <button (click)="viewClick.emit(order)" class="h-12 w-12 flex items-center justify-center rounded-2xl bg-surface-container-lowest text-text-muted/40 hover:text-primary transition-all shadow-xl shadow-text/5 border border-border/5 hover:scale-110 active:scale-90">
-                      <lucide-angular [img]="icons.Eye" class="h-5 w-5"></lucide-angular>
+                <td class="px-5 py-6 last:rounded-r-[2.5rem] border-y border-r border-border/5 group-hover:border-primary/10">
+                  <div class="flex items-center justify-end gap-2">
+                    <button (click)="viewClick.emit(order)" class="h-10 w-10 flex items-center justify-center rounded-xl bg-surface-container-lowest text-text-muted/40 hover:text-primary transition-all shadow-xl shadow-text/5 border border-border/5 hover:scale-110 active:scale-90">
+                      <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
                     </button>
                     <div class="relative">
-                      <button (click)="_onManageClick(order)" class="h-12 w-12 flex items-center justify-center rounded-2xl bg-surface-container-lowest text-text-muted/40 hover:text-text transition-all shadow-xl shadow-text/5 border border-border/5 hover:scale-110 active:scale-90">
-                        <lucide-angular [img]="icons.MoreVertical" class="h-5 w-5"></lucide-angular>
+                      <button (click)="_onManageClick(order)" class="h-10 w-10 flex items-center justify-center rounded-xl bg-surface-container-lowest text-text-muted/40 hover:text-text transition-all shadow-xl shadow-text/5 border border-border/5 hover:scale-110 active:scale-90">
+                        <lucide-angular [img]="icons.MoreVertical" class="h-4 w-4"></lucide-angular>
                       </button>
+
  
                       <!-- Dropdown Menu Editorial -->
                       @if (activeMenuOrderId() === order.id) {

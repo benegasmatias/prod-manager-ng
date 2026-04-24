@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    <div class="bg-surface-container-low rounded-[3.5rem] border border-border/5 p-4 sm:p-10 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
+    <div class="bg-surface-container-low rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
       <!-- Decoration -->
       <div class="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl"></div>
 
@@ -118,7 +118,7 @@
         }
       </div>
     } @else if (productionTotal() > 0) {
-      <div class="bg-surface-container-low rounded-[3.5rem] border border-border/5 p-4 sm:p-10 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
+      <div class="bg-surface-container-low rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 shadow-2xl shadow-text/5 relative min-h-[300px] overflow-hidden">
         <!-- Decoration -->
         <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
 
@@ -175,7 +175,7 @@
     }
 
     @if (loadingArchived() || archivedTotal() > 0) {
-      <div class="bg-surface-container-low/30 rounded-[3.5rem] border border-border/5 p-4 sm:p-10 pb-32 backdrop-blur-3xl shadow-2xl shadow-text/5 relative min-h-[300px]">
+      <div class="bg-surface-container-low/30 rounded-[3rem] border border-border/5 p-4 sm:p-6 pb-32 backdrop-blur-3xl shadow-2xl shadow-text/5 relative min-h-[300px]">
         @if (loadingArchived()) {
           <app-loading-spinner [overlay]="true" message=""></app-loading-spinner>
           

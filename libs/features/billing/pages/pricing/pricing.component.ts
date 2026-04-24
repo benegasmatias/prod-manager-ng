@@ -5,6 +5,8 @@ import { BillingService } from '@core/api/billing.service';
 import { LucideAngularModule, Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 
+import { cn } from '@shared/utils/cn';
+
 @Component({
   selector: 'app-pricing',
   standalone: true,
@@ -15,6 +17,9 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
 export class PricingComponent implements OnInit {
   billing = inject(BillingService);
   private router = inject(Router);
+
+  cn = cn;
+  activeTab = 'Profesional';
 
   readonly icons = { Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield };
 

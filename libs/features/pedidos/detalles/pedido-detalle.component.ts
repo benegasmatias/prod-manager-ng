@@ -22,7 +22,7 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
     ClientDetailComponent, StockDetailComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#fafbfc] dark:bg-zinc-950 p-6 md:p-10 animate-in fade-in duration-500">
+    <div class="min-h-screen bg-background p-6 md:p-10 animate-in fade-in duration-1000">
       
       @if (loading() || isDeleting()) {
         <div class="flex flex-col items-center justify-center py-40 space-y-6">

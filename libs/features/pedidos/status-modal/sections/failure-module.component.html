@@ -16,30 +16,30 @@
 
   <!-- CAUSAL ANALYSIS INTERFACE -->
   <div class="relative group">
-    <textarea [ngModel]="reason()" (ngModelChange)="reason.set($event)" rows="4"
+    <textarea [ngModel]="reason()" (ngModelChange)="reason.set($event)" rows="3"
       placeholder="Describir naturaleza de la falla técnica..." 
-      class="w-full rounded-[2.5rem] border-none bg-surface-container-lowest px-10 py-10 text-sm font-bold text-text focus:ring-4 focus:ring-error/10 transition-all resize-none shadow-xl shadow-text/5 placeholder:text-text-muted/20 placeholder:italic"></textarea>
-    <lucide-angular [img]="icons.AlertOctagon" class="absolute right-8 top-10 h-6 w-6 text-error/20 group-focus-within:text-error transition-colors"></lucide-angular>
+      class="w-full rounded-[1.5rem] border-none bg-surface-container-lowest px-8 py-8 text-sm font-bold text-text focus:ring-4 focus:ring-error/10 transition-all resize-none shadow-xl shadow-text/5 placeholder:text-text-muted/20 placeholder:italic"></textarea>
+    <lucide-angular [img]="icons.AlertOctagon" class="absolute right-6 top-8 h-5 w-5 text-error/20 group-focus-within:text-error transition-colors"></lucide-angular>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
     <!-- CHRONOLOGICAL LOSS -->
-    <div class="space-y-4">
+    <div class="space-y-3">
       <label class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em] ml-4 italic leading-none">Tiempo Desviado</label>
-      <div class="relative group shadow-xl shadow-text/5 rounded-[1.8rem]">
+      <div class="relative group shadow-xl shadow-text/5 rounded-2xl">
         <input type="number" min="0" [ngModel]="wastedTime()" 
                (ngModelChange)="wastedTime.set(Math.max(0, $event))" 
-               class="h-16 w-full pl-8 pr-16 rounded-[1.8rem] bg-surface-container-lowest border-none text-sm font-black text-text focus:ring-4 focus:ring-error/10 transition-all tabular-nums">
-        <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-black text-text-muted/20 uppercase tracking-widest italic">MIN</span>
+               class="h-14 w-full pl-8 pr-16 rounded-2xl bg-surface-container-lowest border-none text-sm font-black text-text focus:ring-4 focus:ring-error/10 transition-all tabular-nums">
+        <span class="absolute right-6 top-1/2 -translate-y-1/2 text-[9px] font-black text-text-muted/20 uppercase tracking-widest italic">MIN</span>
       </div>
     </div>
 
     <!-- CUMULATIVE WASTE ANALYTICS -->
-    <div class="space-y-4">
+    <div class="space-y-3">
       <label class="text-[9px] font-black text-error/40 uppercase tracking-[0.4em] ml-4 italic leading-none">Masa Total Descartada</label>
-      <div class="h-16 rounded-[1.8rem] bg-error/5 border border-error/10 flex items-center justify-between px-8 shadow-2xl shadow-error/5">
+      <div class="h-14 rounded-2xl bg-error/5 border border-error/10 flex items-center justify-between px-8 shadow-2xl shadow-error/5">
         <span class="text-[9px] font-black text-error/40 uppercase tracking-[0.3em] italic">Consolidado</span>
-        <span class="text-2xl font-black text-error tabular-nums font-display tracking-tighter">{{ getTotalWasted() }}<span class="text-[10px] ml-1 opacity-40">G</span></span>
+        <span class="text-xl font-black text-error tabular-nums font-display tracking-tighter">{{ getTotalWasted() }}<span class="text-[10px] ml-1 opacity-40">G</span></span>
       </div>
     </div>
   </div>
@@ -92,34 +92,34 @@
   </div>
 
   <!-- RESOLUTION STRATEGY ARCHITECTURE -->
-  <div class="grid grid-cols-3 gap-6 pt-4">
+  <div class="grid grid-cols-3 gap-4 pt-2">
     <button (click)="action.set('REDO')"
-      [class]="cn('flex flex-col items-center justify-center p-8 rounded-[2.5rem] transition-all duration-700 border-2 gap-3 group/opt', 
+      [class]="cn('flex flex-col items-center justify-center p-6 rounded-[1.5rem] transition-all duration-700 border-2 gap-3 group/opt', 
                  action() === 'REDO' ? 'bg-primary border-primary text-white shadow-2xl shadow-primary/30 scale-105' : 'bg-surface-container-low border-border/5 text-text-muted hover:border-primary/20')">
-      <lucide-angular [img]="icons.RefreshCw" class="h-8 w-8 opacity-40 group-hover/opt:opacity-100 transition-all" [class.animate-spin]="action() === 'REDO'"></lucide-angular>
+      <lucide-angular [img]="icons.RefreshCw" class="h-6 w-6 opacity-40 group-hover/opt:opacity-100 transition-all" [class.animate-spin]="action() === 'REDO'"></lucide-angular>
       <div class="text-center">
-        <span class="text-[10px] font-black uppercase tracking-[0.3em] font-display block">Relocalizar</span>
-        <span class="text-[7px] font-black uppercase tracking-[0.2em] opacity-40 italic block mt-1">Revertir Etapa</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.3em] font-display block leading-none">Relocalizar</span>
+        <span class="text-[7px] font-black uppercase tracking-[0.2em] opacity-40 italic block mt-1">Revertir</span>
       </div>
     </button>
 
     <button (click)="action.set('DISCARD')"
-      [class]="cn('flex flex-col items-center justify-center p-8 rounded-[2.5rem] transition-all duration-700 border-2 gap-3 group/opt', 
+      [class]="cn('flex flex-col items-center justify-center p-6 rounded-[1.5rem] transition-all duration-700 border-2 gap-3 group/opt', 
                  action() === 'DISCARD' ? 'bg-error border-error text-white shadow-2xl shadow-error/30 scale-105' : 'bg-surface-container-low border-border/5 text-text-muted hover:border-error/20')">
-      <lucide-angular [img]="icons.Trash2" class="h-8 w-8 opacity-40 group-hover/opt:opacity-100 transition-all"></lucide-angular>
+      <lucide-angular [img]="icons.Trash2" class="h-6 w-6 opacity-40 group-hover/opt:opacity-100 transition-all"></lucide-angular>
       <div class="text-center">
-        <span class="text-[10px] font-black uppercase tracking-[0.3em] font-display block">Neutralizar</span>
-        <span class="text-[7px] font-black uppercase tracking-[0.2em] opacity-40 italic block mt-1">Anulación Total</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.3em] font-display block leading-none">Neutralizar</span>
+        <span class="text-[7px] font-black uppercase tracking-[0.2em] opacity-40 italic block mt-1">Anulación</span>
       </div>
     </button>
 
     <button (click)="action.set('KEEP')"
-      [class]="cn('flex flex-col items-center justify-center p-8 rounded-[2.5rem] transition-all duration-700 border-2 gap-3 group/opt', 
+      [class]="cn('flex flex-col items-center justify-center p-6 rounded-[1.5rem] transition-all duration-700 border-2 gap-3 group/opt', 
                  action() === 'KEEP' ? 'bg-accent border-accent text-white shadow-2xl shadow-accent/30 scale-105' : 'bg-surface-container-low border-border/5 text-text-muted hover:border-accent/20')">
-      <lucide-angular [img]="icons.Target" class="h-8 w-8 opacity-40 group-hover/opt:opacity-100 transition-all"></lucide-angular>
+      <lucide-angular [img]="icons.Target" class="h-6 w-6 opacity-40 group-hover/opt:opacity-100 transition-all"></lucide-angular>
       <div class="text-center">
-        <span class="text-[10px] font-black uppercase tracking-[0.3em] font-display block">Mantener</span>
-        <span class="text-[7px] font-black uppercase tracking-[0.2em] opacity-40 italic block mt-1">Falla Parcial</span>
+        <span class="text-[9px] font-black uppercase tracking-[0.3em] font-display block leading-none">Mantener</span>
+        <span class="text-[7px] font-black uppercase tracking-[0.2em] opacity-40 italic block mt-1">Parcial</span>
       </div>
     </button>
   </div>

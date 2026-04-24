@@ -20,11 +20,12 @@ export class BillingApiService {
   /**
    * Genera una preferencia de Mercado Pago para un plan específico.
    */
-  createCheckout(businessId: string, plan: string, price: number, description: string) {
+  createCheckout(businessId: string, plan: string, price: number, description: string, email: string) {
     return firstValueFrom(this.http.post<any>(`${this.apiUrl}/${businessId}/subscription/checkout`, {
       plan,
       price,
-      description
+      description,
+      email
     }));
   }
 

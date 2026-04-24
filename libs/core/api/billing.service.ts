@@ -44,9 +44,14 @@ export class BillingService {
     }
   }
 
-  async startCheckout(plan: string, price: number, description: string) {
+  async startCheckout(plan: string, price: number, description: string, email: string) {
     const businessId = this.session.activeNegocio()?.id;
     if (!businessId) return;
+
+    // 0. Ensure MP is initialized (if script loaded late)
+    if (!this.mp && typeof MercadoPago !== 'undefined') {
+      this.mp = new MercadoPago(environment.mpPublicKey);
+    }
 
     this.loading.set(true);
     try {
@@ -56,20 +61,21 @@ export class BillingService {
         throw new Error(`No puedes cambiar al plan ${plan}: ${check.violations.join(', ')}`);
       }
 
-      // 2. Create MP Preference
-      const { preferenceId } = await this.api.createCheckout(businessId, plan, price, description);
+      // 2. Create MP Preference (passing email and ensuring numeric price)
+      const { preferenceId } = await this.api.createCheckout(businessId, plan, Number(price), description, email);
       
-      // 3. Open Modal instead of redirecting
+      // 3. Open Modal if SDK is available
       if (this.mp) {
+        const bricksBuilder = this.mp.bricks();
         this.mp.checkout({
           preference: {
             id: preferenceId
           },
-          autoOpen: true, // Abre el modal automáticamente
+          autoOpen: true,
         });
       } else {
-        // Fallback si el SDK no cargó por algún motivo
-        const { initPoint } = await this.api.createCheckout(businessId, plan, price, description);
+        // Fallback: Redirect if no SDK
+        const { initPoint } = await this.api.createCheckout(businessId, plan, Number(price), description, email);
         window.location.href = initPoint;
       }
     } catch (e: any) {
