@@ -5,11 +5,13 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { LayoutService } from '../layout.service';
 import { ConfirmDialogComponent } from '../../../shared/ui/confirm-dialog/confirm-dialog.component';
+import { BottomNavbarComponent } from '../bottom-navbar/bottom-navbar.component';
+import { NotificationDropdownComponent } from '../navbar/notifications/notification-dropdown.component';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, NavbarComponent, ConfirmDialogComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, NavbarComponent, ConfirmDialogComponent, BottomNavbarComponent, NotificationDropdownComponent],
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

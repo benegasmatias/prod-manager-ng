@@ -15,6 +15,7 @@ import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
 import { cn } from '@shared/utils/cn';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { LayoutService } from '../../core/layout/layout.service';
 
 @Component({
   selector: 'app-pedidos-page',
@@ -25,11 +26,9 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
     LucideAngularModule,
     FormsModule,
     OrderStatusModalComponent,
-    SearchFilterBarComponent,
     OrdersTableComponent,
     PaginatorComponent,
     LoadingSpinnerComponent,
-    PageSizeSelectorComponent,
     PageShellComponent
   ],
   templateUrl: './pedidos.component.html',
@@ -42,7 +41,13 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private confirm = inject(ConfirmService);
+  public layout = inject(LayoutService);
   cn = cn;
+
+  activeMobileSector = signal<'active' | 'commercial' | 'history'>('active');
+  isMobile = computed(() => this.layout.isMobile());
+  headerVisible = signal(true);
+  private lastScroll = 0;
 
   // Labels and Icons for Template
   protected readonly labels = PEDIDOS_LABELS;
@@ -141,8 +146,45 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  scrollToSector(sector: 'active' | 'commercial' | 'history') {
+    this.activeMobileSector.set(sector);
+    const element = document.getElementById(`${sector}-sector`);
+    if (element) {
+      const offset = 180; // Offset for sticky header
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  }
+
   ngAfterViewInit() {
     this.setupObserver();
+    this.setupScrollListener();
+  }
+
+  private setupScrollListener() {
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll <= 0) {
+        this.headerVisible.set(true);
+        return;
+      }
+      
+      if (currentScroll > this.lastScroll && currentScroll > 100) {
+        // Scrolling down
+        this.headerVisible.set(false);
+      } else if (currentScroll < this.lastScroll) {
+        // Scrolling up
+        this.headerVisible.set(true);
+      }
+      this.lastScroll = currentScroll;
+    }, { passive: true });
   }
 
   ngOnDestroy() {
