@@ -44,18 +44,22 @@
   @if (isMobile()) {
   <div
     [class]="cn('fixed top-14 inset-x-0 bg-background/80 backdrop-blur-md z-[60] px-[var(--page-px)] py-4 border-b border-border/5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]', headerVisible() ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0')">
-    
+
     <!-- MOBILE USAGE MONITOR (Integrated) -->
     @if (planUsage()) {
-      <div class="flex items-center justify-between bg-surface-container-low/50 border border-border/5 rounded-2xl px-4 py-2.5 mb-4 shadow-sm">
-        <div class="flex items-center gap-3">
-          <div [class]="cn('h-1.5 w-1.5 rounded-full', !canAddOrder() ? 'bg-danger animate-pulse' : 'bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]')"></div>
-          <span class="text-[9px] font-black uppercase tracking-widest text-text">
-            Consumo: {{ planUsage()?.usage?.ordersThisMonth }}/{{ planUsage()?.limits?.orders }}
-          </span>
+    <div
+      class="flex items-center justify-between bg-surface-container-low/50 border border-border/5 rounded-2xl px-4 py-2.5 mb-4 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div
+          [class]="cn('h-1.5 w-1.5 rounded-full', !canAddOrder() ? 'bg-danger animate-pulse' : 'bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]')">
         </div>
-        <a routerLink="/ajustes" class="h-6 px-4 rounded-full bg-primary text-white text-[7px] font-black flex items-center justify-center uppercase tracking-widest shadow-md shadow-primary/20 active:scale-95 transition-all">Escalar</a>
+        <span class="text-[9px] font-black uppercase tracking-widest text-text">
+          Consumo: {{ planUsage()?.usage?.ordersThisMonth }}/{{ planUsage()?.limits?.orders }}
+        </span>
       </div>
+      <a routerLink="/ajustes"
+        class="h-6 px-4 rounded-full bg-primary text-white text-[7px] font-black flex items-center justify-center uppercase tracking-widest shadow-md shadow-primary/20 active:scale-95 transition-all">Escalar</a>
+    </div>
     }
 
     <div class="relative group/search">
@@ -94,11 +98,6 @@
         <p class="text-[9px] font-black text-text-muted/40 uppercase tracking-[0.4em] mt-1">{{ productionTotal() +
           commercialTotal() }} Activos en Sistema</p>
       </div>
-
-      <button (click)="clearFilters()"
-        class="text-[9px] font-black text-primary uppercase tracking-widest bg-primary/5 px-4 py-2 rounded-full border border-primary/10 hover:bg-primary/10 transition-all">
-        Refrescar
-      </button>
     </div>
 
     <!-- PRODUCTION SECTOR (Main List) -->

@@ -10,6 +10,8 @@ import { OrdersTableComponent } from '../../shared/ui';
 import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 import { StockSaleDialogComponent } from '../../shared/ui/stock/stock-sale-dialog/stock-sale-dialog.component';
 import { StockProductionModalComponent } from './components/stock-status-modal/stock-production-modal.component';
+import { LayoutService } from '../../core/layout/layout.service';
+import { OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-stock-page',
@@ -22,10 +24,12 @@ import { StockProductionModalComponent } from './components/stock-status-modal/s
   templateUrl: './stock.component.html',
   styleUrls: ['./stock.component.css']
 })
-export class StockPageComponent implements OnInit {
+export class StockPageComponent implements OnInit, OnDestroy {
   public stockService = inject(StockService);
   public session = inject(SessionService);
   private router = inject(Router);
+  public layout = inject(LayoutService);
+
 
   icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers };
 
@@ -106,8 +110,17 @@ export class StockPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Eliminado: La carga ya se realiza en el effect() cuando cambie el businessId
+    this.layout.customBottomAction.set({
+      label: 'Generar Reposición',
+      icon: this.icons.Plus,
+      action: () => this.router.navigate(['/stock/nuevo'])
+    });
   }
+
+  ngOnDestroy() {
+    this.layout.customBottomAction.set(null);
+  }
+
 
   handleSort(key: string) {
     if (this.sortKey() === key) {

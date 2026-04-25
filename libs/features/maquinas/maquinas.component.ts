@@ -7,7 +7,7 @@ import { SessionService } from '@core/session/session.service';
 import { MaterialesService } from '@core/api/materiales.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { Machine, Pedido, Material } from '@shared/models';
-import { LucideAngularModule, Plus, ChevronDown, Cpu } from 'lucide-angular';
+import { LucideAngularModule, Plus, ChevronDown, Cpu, Search, Activity } from 'lucide-angular';
 import { cn } from '@shared/utils/cn';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
@@ -71,7 +71,7 @@ export class MaquinasPageComponent {
   selectedMachineDetail = signal<Machine | null>(null);
   loadingDetail = signal(false);
 
-  readonly icons = { Plus, ChevronDown, Cpu };
+  readonly icons = { Plus, ChevronDown, Cpu, Search, Activity };
 
   filteredMaquinas = computed(() => {
     const all = this.maquinas();

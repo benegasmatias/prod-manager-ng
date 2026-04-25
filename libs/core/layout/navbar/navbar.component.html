@@ -2,7 +2,7 @@
   class="fixed top-0 right-0 z-[var(--z-navbar)] flex h-14 sm:h-16 items-center justify-between border-b border-border/5 bg-background/95 backdrop-blur-xl px-[var(--page-px)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
   [class.-translate-y-full]="layoutService.isMobile() && !navbarVisible()"
   [style.left.px]="layoutService.isMobile() ? 0 : (layoutService.isPinned() ? layoutService.constants.SIDEBAR_WIDTH_EXPANDED : layoutService.constants.SIDEBAR_WIDTH_COLLAPSED)">
-  
+
   <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
     <!-- Back Button (Mobile ONLY) -->
     <button *ngIf="layoutService.isMobile() && layoutService.showBackButton()" (click)="handleBack()"
@@ -11,21 +11,18 @@
     </button>
 
     <!-- Contextual Title (Mobile Center) -->
-    <div *ngIf="layoutService.isMobile() && layoutService.headerTitle()" 
-      class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 pointer-events-none">
-      <span class="text-[11px] font-black uppercase tracking-[0.3em] text-text whitespace-nowrap">
-        {{ layoutService.headerTitle() }}
+    <div *ngIf="layoutService.isMobile() && layoutService.displayHeaderTitle()" 
+      class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 pointer-events-none w-full max-w-[200px]">
+      <span class="text-[11px] font-black uppercase tracking-[0.3em] text-text whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ layoutService.displayHeaderTitle() }}
       </span>
-      <div class="h-1 w-4 rounded-full bg-primary/20 mt-1"></div>
     </div>
 
     <!-- Menu Button (Desktop Only) -->
     <button *ngIf="!layoutService.isMobile()" (click)="layoutService.togglePinned()"
       class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors active:scale-95">
-      <lucide-angular [img]="icons.Menu" 
-        [class.text-primary]="layoutService.isPinned()"
-        [class.text-text-muted/40]="!layoutService.isPinned()"
-        class="h-5 w-5 transition-all"></lucide-angular>
+      <lucide-angular [img]="icons.Menu" [class.text-primary]="layoutService.isPinned()"
+        [class.text-text-muted/40]="!layoutService.isPinned()" class="h-5 w-5 transition-all"></lucide-angular>
     </button>
 
     <!-- DESKTOP ONLY: Business Selector (On mobile we show nothing here to keep header clean) -->
@@ -36,7 +33,7 @@
 
   <!-- Right Section -->
   <div class="flex items-center gap-2 sm:gap-3 ml-2">
-    
+
     <!-- Notifications (Always present for state, but trigger hidden on active mobile header) -->
     <app-notification-dropdown [class.hidden]="layoutService.isMobile()"></app-notification-dropdown>
 
@@ -44,8 +41,10 @@
     <div *ngIf="!layoutService.isMobile()" class="flex items-center gap-1">
       <button (click)="toggleTheme()"
         class="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-muted/50 transition-colors relative active:scale-95">
-        <lucide-angular [img]="icons.Moon" class="h-4 w-4 transition-all scale-100 rotate-0 dark:scale-0 dark:-rotate-90 text-foreground"></lucide-angular>
-        <lucide-angular [img]="icons.Sun" class="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 text-foreground"></lucide-angular>
+        <lucide-angular [img]="icons.Moon"
+          class="h-4 w-4 transition-all scale-100 rotate-0 dark:scale-0 dark:-rotate-90 text-foreground"></lucide-angular>
+        <lucide-angular [img]="icons.Sun"
+          class="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 text-foreground"></lucide-angular>
       </button>
     </div>
 

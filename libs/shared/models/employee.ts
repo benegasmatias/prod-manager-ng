@@ -8,4 +8,5 @@ export interface Employee {
   email?: string;
   specialties?: string;
   role?: string;
+  avatar?: string;
 }

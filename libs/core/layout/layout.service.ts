@@ -25,9 +25,14 @@ export class LayoutService {
   showBackButton = signal(false);
   backAction = signal<(() => void) | null>(null);
   headerTitle = signal<string | null>(null);
+  customHeaderTitle = signal<string | null>(null);
+  displayHeaderTitle = computed(() => this.customHeaderTitle() || this.headerTitle());
+
 
   // Contextual bottom bar
   customBottomAction = signal<{ label: string, icon: any, action: () => void } | null>(null);
+  customBottomItems = signal<{ label: string, icon: any, action: () => void, isActive?: boolean }[] | null>(null);
+  bottomNavHidden = signal(false);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -41,8 +46,8 @@ export class LayoutService {
         const url = event.urlAfterRedirects || event.url;
         const segments = url.split('/').filter((s: string) => s.length > 0);
         
-        // Show back button if we are deep in a module (e.g. /pedidos/nuevo)
-        const shouldShow = segments.length > 1;
+        // Show back button if we are deep in a module or in specific core modules on mobile
+        const shouldShow = segments.length > 1 || ['stock', 'produccion', 'pedidos', 'clientes'].includes(segments[0]);
         this.showBackButton.set(shouldShow);
 
         // Set Title based on the main segment

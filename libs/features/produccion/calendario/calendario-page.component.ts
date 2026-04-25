@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, effect, HostListener } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule, RefreshCw, Layers, TrendingUp, AlertCircle, AlertOctagon, Clock, ChevronLeft, ChevronRight } from 'lucide-angular';
@@ -14,6 +14,7 @@ import { Employee } from '@shared/models';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { getNegocioConfig } from '@shared/utils';
 import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
+import { LayoutService } from '@core/layout/layout.service';
 
 @Component({
   selector: 'app-calendario-page',
@@ -171,7 +172,7 @@ import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
     </div>
 
     <!-- MOBILE FILTERS BOTTOM SHEET -->
-    <div *ngIf="isMobile() && showFilters()" class="fixed inset-0 z-[100] flex flex-col justify-end">
+    <div *ngIf="isMobile() && showFilters()" class="fixed inset-0 z-[200] flex flex-col justify-end">
        <div class="absolute inset-0 bg-text/40 backdrop-blur-sm" (click)="showFilters.set(false)"></div>
        <div class="relative bg-surface rounded-t-[3rem] p-8 max-h-[80vh] overflow-y-auto animate-in slide-in-from-bottom-full duration-500 shadow-[0_-20px_50px_rgba(0,0,0,0.2)]">
           <div class="w-12 h-1.5 bg-border/20 rounded-full mx-auto mb-8"></div>
@@ -184,16 +185,24 @@ import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
        </div>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION BAR -->
-    <div *ngIf="isMobile()" class="fixed bottom-24 left-6 right-6 z-[40]">
-       <div class="bg-text backdrop-blur-3xl rounded-[2.5rem] h-20 px-4 flex items-center justify-between border border-white/5 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]">
+    <!-- MOBILE BOTTOM NAVIGATION BAR (Contextual & Primary) -->
+    <div *ngIf="isMobile()" 
+         [class.translate-y-full]="showFilters()"
+         class="fixed bottom-0 left-0 right-0 z-[90] pb-safe animate-in slide-in-from-bottom duration-500 transition-transform">
+       <div class="bg-surface/95 backdrop-blur-3xl h-20 px-8 flex items-center justify-between border-t border-border/5 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
           @for (opt of mobileNavOptions; track opt.mode) {
-             <button (click)="setViewMode(opt.mode)" [class]="cn('flex-1 flex flex-col items-center justify-center gap-1.5 transition-all duration-700', viewMode() === opt.mode ? 'scale-105' : 'opacity-40 hover:opacity-100')">
-                <lucide-angular [img]="opt.icon" [class]="cn('h-5 w-5', viewMode() === opt.mode ? 'text-primary' : 'text-white')"></lucide-angular>
-                <span [class]="cn('text-[8px] font-black uppercase tracking-widest italic', viewMode() === opt.mode ? 'text-white' : 'text-white/60')">{{ opt.label }}</span>
-                <div *ngIf="viewMode() === opt.mode" class="h-1 w-1 rounded-full bg-primary mt-0.5 shadow-[0_0_10px_rgba(116,47,229,0.8)]"></div>
+             <button (click)="setViewMode(opt.mode)" [class]="cn('flex-1 flex flex-col items-center justify-center gap-1.5 transition-all duration-500', viewMode() === opt.mode ? 'scale-110' : 'opacity-40')">
+                <lucide-angular [img]="opt.icon" [class]="cn('h-5 w-5 transition-colors', viewMode() === opt.mode ? 'text-primary' : 'text-text-muted')"></lucide-angular>
+                <span [class]="cn('text-[8px] font-black uppercase tracking-widest italic', viewMode() === opt.mode ? 'text-text' : 'text-text-muted/60')">{{ opt.label }}</span>
+                <div *ngIf="viewMode() === opt.mode" class="h-1 w-1 rounded-full bg-primary mt-0.5 shadow-[0_0_10px_rgba(var(--primary-rgb),0.8)]"></div>
              </button>
           }
+          
+          <!-- Contextual Action: Filters -->
+          <button (click)="showFilters.set(true)" class="flex-1 flex flex-col items-center justify-center gap-1.5 transition-all opacity-40 hover:opacity-100">
+             <lucide-angular [img]="icons.Layers" class="h-5 w-5 text-text-muted"></lucide-angular>
+             <span class="text-[8px] font-black uppercase tracking-widest italic text-text-muted/60">Filtros</span>
+          </button>
        </div>
     </div>
 
@@ -257,12 +266,14 @@ import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
     .no-scrollbar::-webkit-scrollbar { display: none; }
   `]
 })
-export class CalendarioPageComponent implements OnInit {
+export class CalendarioPageComponent implements OnInit, OnDestroy {
   private calendarService = inject(CalendarService);
   private store = inject(CalendarStoreService);
   private session = inject(SessionService);
   private api = inject(PedidosApiService);
   private router = inject(Router);
+  layout = inject(LayoutService);
+
 
   // Read signals from Store (Persistence)
   currentDate = this.store.currentDate;
@@ -343,7 +354,13 @@ export class CalendarioPageComponent implements OnInit {
   ngOnInit() {
     this.loadEmployees();
     this.adjustViewForScreen();
+    this.layout.bottomNavHidden.set(true);
   }
+
+  ngOnDestroy() {
+    this.layout.bottomNavHidden.set(false);
+  }
+
 
   private adjustViewForScreen() {
     // We no longer force Agenda, we let WeekView adapt to its own mobile layout

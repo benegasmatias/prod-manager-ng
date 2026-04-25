@@ -25,13 +25,13 @@ import { SessionService } from '@core/session/session.service';
       <!-- EDITORIAL CONTEXTUAL HEADER -->
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-10 pt-4 border-b border-border/5 pb-12">
         <div class="flex items-start gap-8">
-          <a routerLink="/pedidos" class="h-14 w-14 rounded-2xl bg-surface-container-lowest border border-border/5 shadow-sm hover:bg-surface transition-all active:scale-95 flex items-center justify-center text-text-muted hover:text-text group">
+          <a routerLink="/pedidos" class="hidden md:flex h-14 w-14 rounded-2xl bg-surface-container-lowest border border-border/5 shadow-sm hover:bg-surface transition-all active:scale-95 items-center justify-center text-text-muted hover:text-text group">
             <lucide-angular [img]="icons.ArrowLeft" class="h-6 w-6 transition-transform group-hover:-translate-x-1"></lucide-angular>
           </a>
           <div class="space-y-3">
             <div class="flex items-center gap-3">
               <div class="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"></div>
-              <span class="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Expediente de Producción</span>
+              <span class="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Expediente de Pedido</span>
             </div>
             <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-text uppercase leading-none font-display">
               Orden <span class="text-primary italic">#{{ pedido()?.code }}</span>
@@ -39,7 +39,7 @@ import { SessionService } from '@core/session/session.service';
           </div>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-4">
           <button (click)="onDelete.emit()" class="h-14 w-14 rounded-2xl bg-danger-container/10 text-danger hover:bg-danger hover:text-white transition-all flex items-center justify-center group shadow-2xl shadow-danger/5" title="Eliminar Registro">
             <lucide-angular [img]="icons.Trash2" class="h-5 w-5"></lucide-angular>
           </button>
@@ -51,7 +51,7 @@ import { SessionService } from '@core/session/session.service';
 
           <button (click)="openManage('STATUS')" class="h-14 px-10 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_30px_60px_-15px_rgba(var(--primary-rgb),0.4)] hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center gap-4 italic">
             <lucide-angular [img]="icons.Zap" class="h-4 w-4"></lucide-angular>
-            <span>Protocolo de Producción</span>
+            <span>Gestión de Pedido</span>
           </button>
         </div>
       </div>

@@ -13,6 +13,8 @@ import { ClientDetailComponent } from './components/client-detail.component';
 import { StockDetailComponent } from '../../stock/components/stock-detail/stock-detail.component';
 import { SessionService } from '@core/session/session.service';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { LayoutService } from '@core/layout/layout.service';
+
 
 @Component({
   selector: 'app-pedido-detalle',
@@ -81,6 +83,8 @@ export class PedidoDetalleComponent implements OnInit {
   private api = inject(PedidosApiService);
   private session = inject(SessionService);
   private confirm = inject(ConfirmService);
+  public layout = inject(LayoutService);
+
   
   pedido = signal<Pedido | null>(null);
   loading = signal(true);
@@ -161,7 +165,23 @@ export class PedidoDetalleComponent implements OnInit {
   async ngOnInit() {
     await this.loadData();
     this.loadEmployees();
+    
+    // Set Mobile Contextual UI
+    const p = this.pedido();
+    if (p) {
+      this.layout.customHeaderTitle.set(`#${p.code}`);
+      this.layout.customBottomItems.set([
+        { label: 'Editar', icon: this.icons.Edit3, action: () => this.handleEdit() },
+        { label: 'Gestión', icon: this.icons.Zap, action: () => this.openManage('STATUS') }
+      ]);
+    }
   }
+
+  ngOnDestroy() {
+    this.layout.customHeaderTitle.set(null);
+    this.layout.customBottomItems.set(null);
+  }
+
 
   async loadData() {
     const id = this.route.snapshot.paramMap.get('id');

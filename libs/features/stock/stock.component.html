@@ -10,7 +10,7 @@
       <div class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
       <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ filteredInStock().length }} Disponibles</span>
     </div>
-    <a routerLink="/stock/nuevo" class="h-12 px-8 rounded-2xl bg-primary text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+    <a routerLink="/stock/nuevo" class="hidden sm:flex h-12 px-8 rounded-2xl bg-primary text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all items-center gap-3">
       <lucide-angular [img]="icons.Plus" class="h-4.5 w-4.5"></lucide-angular>
       Generar Reposición
     </a>
@@ -73,6 +73,7 @@
             [hideFinancials]="true"
             [hideClientColumn]="true"
             [rubro]="session.rubro()"
+            [isCompact]="layout.isMobile()"
             (statusClick)="openStatusModal($event)"
             (manageClick)="openStatusModal($event)"
             (viewClick)="goToDetail($event)"
@@ -118,6 +119,7 @@
             [hideFinancials]="true"
             [hideClientColumn]="true"
             [rubro]="session.rubro()"
+            [isCompact]="layout.isMobile()"
             (statusClick)="openSellModal($event)"
             (manageClick)="openSellModal($event)"
             (viewClick)="goToDetail($event)"

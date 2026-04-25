@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.font-display {
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+}
+
+.custom-card-shadow {
+  shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.05);
+}
+
+/* Shimmer effect for progress bar */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shimmer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
