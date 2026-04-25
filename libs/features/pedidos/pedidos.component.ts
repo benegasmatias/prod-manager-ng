@@ -16,6 +16,7 @@ import { getStatusLabel, getStatusStyles } from '@shared/utils';
 import { cn } from '@shared/utils/cn';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { LayoutService } from '../../core/layout/layout.service';
+import { StockService } from '../../core/api/stock.service';
 
 @Component({
   selector: 'app-pedidos-page',
@@ -42,6 +43,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private confirm = inject(ConfirmService);
   public layout = inject(LayoutService);
+  public stockService = inject(StockService);
   cn = cn;
 
   activeMobileSector = signal<'active' | 'commercial' | 'history'>('active');
@@ -142,6 +144,17 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       const bid = this.businessId();
       if (bid && bid !== this.lastLoadedBusinessId) {
         this.loadData({ initial: true });
+      }
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.router.navigate(['/pedidos/nuevo']),
+          icon: this.icons.PLUS
+        });
+      } else {
+        this.layout.fabAction.set(null);
       }
     });
   }
@@ -468,6 +481,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       try {
         await this.api.delete(order.id, order.businessId);
         await this.loadData();
+        this.stockService.loadStock();
       } catch (err) {
         console.error('Error deleting order:', err);
         alert('No se pudo eliminar el pedido.');

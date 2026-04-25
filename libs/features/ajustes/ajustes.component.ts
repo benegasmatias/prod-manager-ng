@@ -11,6 +11,8 @@ import { ToastService } from '../../shared/services/toast.service';
 import { PlanSelectorModalComponent } from './components/plan-selector/plan-selector.component';
 import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 
+import { LayoutService } from '../../core/layout/layout.service';
+
 @Component({
   selector: 'app-ajustes',
   standalone: true,
@@ -19,6 +21,7 @@ import { PageShellComponent } from '../../shared/ui/layout/page-shell.component'
 })
 export class AjustesComponent {
   public sessionService = inject(SessionService);
+  public layout = inject(LayoutService);
   private confirmService = inject(ConfirmService);
   private toast = inject(ToastService);
   private router = inject(Router);
@@ -86,6 +89,17 @@ export class AjustesComponent {
     (window as any).closePricingModal = () => {
       this.showPricingModal.set(false);
     };
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.handleSave(),
+          icon: this.icons.Save
+        });
+      } else {
+        this.layout.fabAction.set(null);
+      }
+    });
   }
 
   handleUpgrade() {

@@ -1,7 +1,10 @@
 @if (isOpen()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-  <div class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-4 slide-in-from-bottom-4 animate-in duration-300">
-    <div class="p-8 border-b border-zinc-50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-0 sm:p-4">
+  <div class="bg-white dark:bg-zinc-950 w-full h-full sm:h-auto sm:max-w-lg sm:rounded-[3rem] shadow-2xl flex flex-col overflow-hidden slide-in-from-bottom-4 animate-in duration-300">
+    <div class="p-8 pt-12 sm:pt-8 border-b border-zinc-50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
+        <button (click)="onCancel.emit()" class="absolute right-6 top-8 sm:top-1/2 sm:-translate-y-1/2 p-2 text-zinc-400 hover:text-zinc-600 transition-colors">
+            <lucide-angular [img]="icons.X" class="h-6 w-6"></lucide-angular>
+        </button>
         <div class="flex items-center gap-4">
             <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
               <lucide-angular [img]="icons.Package" class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
@@ -18,7 +21,7 @@
     </div>
 
     <!-- Modal Form Body -->
-    <div class="p-8 space-y-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
+    <div class="p-8 space-y-8 flex-1 overflow-y-auto custom-scrollbar pb-40 sm:pb-8 sm:max-h-[70vh]">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2.5">
                 <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Nombre / Identificación</label>
@@ -186,8 +189,10 @@
     </div>
 
     <!-- Dialog Footer -->
-    <div class="p-8 pt-0 flex flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
+    <!-- Dialog Footer -->
+    <div class="fixed bottom-0 inset-x-0 p-8 pt-4 pb-10 sm:pb-8 flex flex-col sm:flex-row items-center justify-end gap-3 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-t border-border/5 sm:relative sm:inset-auto sm:bg-transparent sm:border-none">
       <button
+          *ngIf="!layout.isMobile()"
           (click)="onCancel.emit()"
           [disabled]="saving()"
           class="rounded-2xl font-bold h-12 px-6 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
@@ -203,8 +208,8 @@
       >
           {{ materialId() ? 'Actualizar Registro' : 'Confirmar y Crear' }}
       </app-button-spinner>
+    </div>
 
     </div>
   </div>
-</div>
 }

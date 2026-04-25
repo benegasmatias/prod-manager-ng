@@ -74,9 +74,9 @@ import { LayoutService } from '../layout.service';
         </div>
 
         <!-- THE FAB (CENTER) -->
-        <button (click)="router.navigate(['/pedidos/nuevo'])" 
+        <button (click)="layout.fabAction() ? layout.fabAction()?.action() : router.navigate(['/pedidos/nuevo'])" 
            class="absolute left-1/2 -top-7 -translate-x-1/2 h-16 w-16 rounded-3xl bg-primary text-white shadow-[0_15px_35px_-5px_rgba(var(--primary-rgb),0.4)] border-[5px] border-white flex items-center justify-center active:scale-95 transition-all group z-[110]">
-          <lucide-angular [img]="icons.Plus" class="h-6 w-6 transition-transform group-hover:rotate-90"></lucide-angular>
+          <lucide-angular [img]="layout.fabAction()?.icon || icons.Plus" class="h-6 w-6 transition-transform group-hover:rotate-90"></lucide-angular>
         </button>
       }
     </nav>

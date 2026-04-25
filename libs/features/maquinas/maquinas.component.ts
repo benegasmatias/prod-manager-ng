@@ -16,6 +16,7 @@ import { MachineFormDialogComponent } from './components/machine-form-dialog.com
 import { MachineAssignmentDialogComponent } from './components/machine-assignment-dialog.component';
 import { MachineDetailSheetComponent } from './components/machine-detail-sheet.component';
 import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
+import { LayoutService } from '../../core/layout/layout.service';
 
 @Component({
   selector: 'app-maquinas',
@@ -39,6 +40,7 @@ export class MaquinasPageComponent {
   private materialesService = inject(MaterialesService);
   private pedidosApi = inject(PedidosApiService);
   private confirmService = inject(ConfirmService);
+  public layout = inject(LayoutService);
 
   // States from service
   loading = this.maquinasService.loading;
@@ -83,6 +85,17 @@ export class MaquinasPageComponent {
   constructor() {
     effect(() => {
       this.maquinasService.loadMaquinas();
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.openNew(),
+          icon: this.icons.Cpu
+        });
+      } else {
+        this.layout.fabAction.set(null);
+      }
     });
   }
 

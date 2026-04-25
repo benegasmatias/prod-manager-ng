@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal, effect, OnDestroy, HostLis
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star, ChevronRight, ChevronLeft } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star, ChevronRight, ChevronLeft, UserPlus } from 'lucide-angular';
 import { ClientesService } from '../../core/api/clientes.service';
 import { Cliente, ClienteStats } from '../../core/models/cliente.model';
 import { SessionService } from '../../core/session/session.service';
@@ -37,7 +37,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   protected layoutService = inject(LayoutService);
 
   // Icons
-  readonly icons = { Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star, ChevronRight, ChevronLeft };
+  readonly icons = { Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star, ChevronRight, ChevronLeft, UserPlus };
 
   // Local State
   searchTerm = signal<string>('');
@@ -71,15 +71,16 @@ export class ClientesComponent implements OnInit, OnDestroy {
     effect(() => {
       // Set contextual FAB action for mobile
       if (this.layoutService.isMobile()) {
-        this.layoutService.customBottomAction.set({
-          label: 'Vincular Aliado',
-          icon: this.icons.Plus,
+        this.layoutService.fabAction.set({
+          icon: this.icons.UserPlus,
           action: () => this.handleNewClient()
         });
         
         // Setup back button to go to Inicio
         this.layoutService.showBackButton.set(true);
         this.layoutService.backAction.set(() => this.router.navigate(['/dashboard']));
+      } else {
+        this.layoutService.fabAction.set(null);
       }
 
       const id = this.activeNegocioId();

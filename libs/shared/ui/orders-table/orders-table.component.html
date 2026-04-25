@@ -143,77 +143,78 @@
     </table>
   </div>
 
-  <!-- CARD ARCHITECTURE (Mobile: Premium Editorial Style) -->
-  <div class="lg:hidden space-y-6 px-4 pb-12">
+  <!-- CARD ARCHITECTURE (Mobile: Premium Editorial Style - Compact Optimized) -->
+  <div class="lg:hidden space-y-4 px-4 pb-12">
     @for (order of orders; track order.id) {
       <div 
-        class="group relative bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.06)] border border-border/5 active:scale-[0.98] transition-all duration-500 overflow-hidden"
+        class="group relative bg-white dark:bg-zinc-900 rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] border border-border/5 active:scale-[0.98] transition-all duration-500 overflow-hidden"
         (click)="viewClick.emit(order)"
       >
         <!-- Content Padding -->
-        <div class="p-8 space-y-8">
-           <!-- Top Row: ID & Status (Split Design) -->
+        <div class="p-6 space-y-5">
+           <!-- Top Row: ID & Status -->
            <div class="flex justify-between items-center relative z-10">
-              <span class="text-[9px] font-black text-text-muted/60 uppercase tracking-[0.2em] bg-zinc-50 dark:bg-zinc-800/50 px-4 py-2 rounded-2xl border border-border/5 shadow-sm">
+              <span class="text-[8px] font-black text-text-muted/60 uppercase tracking-[0.2em] bg-zinc-50 dark:bg-zinc-800/50 px-3 py-1.5 rounded-xl border border-border/5 shadow-sm">
                 #{{ order.code }}
               </span>
               
-              <span [class]="cn('shrink-0 text-[8px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-2xl border border-border/5 shadow-sm backdrop-blur-md', getStatusStyles(order.status))">
+              <span [class]="cn('shrink-0 text-[7px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-xl border border-border/5 shadow-sm backdrop-blur-md', getStatusStyles(order.status))">
                 {{ getStatusLabel(order.status) }}
               </span>
            </div>
 
            <!-- Main Title: STOCK / Product Name -->
            <div class="space-y-1 relative z-10">
-              <h3 class="text-2xl font-black text-text tracking-tighter uppercase font-display leading-tight italic">
+              <h3 class="text-xl font-black text-text tracking-tighter uppercase font-display leading-tight italic line-clamp-2">
                  @if (order.type === 'STOCK') {
                     <span class="text-text-muted/20">STOCK / </span>
                  }
-                 {{ order.items[0]?.name || order.items[0]?.nombreProducto || 'INVENTARIO' }}
+                 {{ (order.clientName && order.type !== 'STOCK') ? order.clientName : (order.items[0]?.name || order.items[0]?.nombreProducto || 'INVENTARIO') }}
               </h3>
-              <div class="h-px w-full bg-zinc-50 dark:bg-zinc-800/50"></div>
+              <div class="h-px w-1/4 bg-zinc-50 dark:bg-zinc-800/50"></div>
            </div>
 
            <!-- Responsable Info Row -->
-           <div class="flex items-center gap-4 relative z-10">
-              <div class="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 overflow-hidden border border-border/5 shadow-inner">
+           <div class="flex items-center gap-3 relative z-10">
+              <div class="h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 overflow-hidden border border-border/5 shadow-inner">
                  @if (order.responsableGeneral?.avatar) {
                     <img [src]="order.responsableGeneral?.avatar" class="h-full w-full object-cover" />
                  } @else {
-                    <lucide-angular [img]="icons.User" class="h-5 w-5"></lucide-angular>
+                    <lucide-angular [img]="icons.User" class="h-4 w-4"></lucide-angular>
                  }
               </div>
               <div>
-                 <p class="text-[8px] font-black text-text-muted/30 uppercase tracking-[0.3em] mb-0.5">Responsable</p>
-                 <p class="text-[11px] font-black text-text uppercase tracking-widest">
-                    {{ order.responsableGeneral?.firstName || 'Ana Valeria Morales' }} {{ order.responsableGeneral?.lastName || '' }}
+                 <p class="text-[7px] font-black text-text-muted/30 uppercase tracking-[0.3em] mb-0.5">Responsable</p>
+                 <p class="text-[10px] font-black text-text uppercase tracking-widest">
+                    {{ order.responsableGeneral?.firstName || 'PROPIETARIO' }}
                  </p>
               </div>
            </div>
 
            <!-- Financial KPI: Saldo Final -->
-           <div class="text-right pt-4 relative z-10">
-              <p class="text-[8px] font-black text-primary uppercase tracking-[0.4em] mb-1 italic">Saldo Final</p>
-              <div class="flex items-baseline gap-2 justify-end">
-                <span class="text-xl font-bold text-text-muted/30 tracking-widest">$</span>
-                <span class="text-5xl font-black text-text tracking-tighter tabular-nums font-display">
+           <div class="text-right relative z-10">
+              <p class="text-[7px] font-black text-primary uppercase tracking-[0.4em] mb-1 italic">Saldo Final</p>
+              <div class="flex items-baseline gap-1.5 justify-end">
+                <span class="text-base font-bold text-text-muted/30 tracking-widest">$</span>
+                <span class="text-3xl font-black text-text tracking-tighter tabular-nums font-display">
                   {{ (getBalance(order) > 0 ? getBalance(order) : order.totalPrice) | number:'1.0-0' }}
                 </span>
               </div>
            </div>
 
            <!-- Action Button -->
-           <button class="w-full h-16 rounded-[1.8rem] bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 shadow-[0_20px_40px_-10px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all">
-              <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+           <button class="w-full h-13 rounded-2xl bg-primary text-white text-[9px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-[0_15px_30px_-5px_rgba(var(--primary-rgb),0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+              <lucide-angular [img]="icons.Eye" class="h-3.5 w-3.5"></lucide-angular>
               Ver Movimientos
            </button>
         </div>
 
         <!-- Glassmorphism Accent -->
-        <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
+        <div class="absolute -right-20 -top-20 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
       </div>
     }
   </div>
+
 </div>
 
 <ng-template #sortIcon let-field="field">

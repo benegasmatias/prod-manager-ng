@@ -13,6 +13,7 @@
     <!-- Contextual Title (Mobile Center) -->
     <div *ngIf="layoutService.isMobile() && layoutService.displayHeaderTitle()" 
       class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 pointer-events-none w-full max-w-[200px]">
+      <img src="assets/logo.png" class="h-5 w-auto mb-1 opacity-90" alt="Logo">
       <span class="text-[11px] font-black uppercase tracking-[0.3em] text-text whitespace-nowrap overflow-hidden text-ellipsis">
         {{ layoutService.displayHeaderTitle() }}
       </span>

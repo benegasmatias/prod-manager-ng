@@ -5,8 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { PersonalService } from '@core/api/personal.service';
 import { SessionService } from '@core/session/session.service';
 import { InvitationsService, InvitationCheckResult } from '@core/api/invitaciones.service';
+import { LayoutService } from '@core/layout/layout.service';
 import { Employee } from '@shared/models';
-import { LucideAngularModule, Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock, UserPlus } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { cn } from '@shared/utils/cn';
@@ -22,6 +23,7 @@ export class PersonalPageComponent implements OnDestroy {
   private sessionService = inject(SessionService);
   private invitationsService = inject(InvitationsService);
   private confirmService = inject(ConfirmService);
+  public layout = inject(LayoutService);
 
   // States
   loading = this.personalService.loading;
@@ -50,7 +52,7 @@ export class PersonalPageComponent implements OnDestroy {
   // For Legacy/Edit mode (if needed later)
   editingStaffId = signal<string | null>(null);
 
-  readonly icons = { Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock };
+  readonly icons = { Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock, UserPlus };
 
   filteredStaff = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -105,6 +107,17 @@ export class PersonalPageComponent implements OnDestroy {
       }
       if (hasNew) {
         this.resendCooldowns.set(cooldowns);
+      }
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.openNew(),
+          icon: this.icons.UserPlus
+        });
+      } else {
+        this.layout.fabAction.set(null);
       }
     });
   }

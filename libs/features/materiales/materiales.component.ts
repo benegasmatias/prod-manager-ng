@@ -1,12 +1,13 @@
 import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus } from 'lucide-angular';
+import { LucideAngularModule, Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus, Filter, Settings, Thermometer } from 'lucide-angular';
 import { MaterialesService } from '../../core/api/materiales.service';
 import { SessionService } from '../../core/session/session.service';
 import { Material } from '../../shared/models/material';
 import { ButtonSpinnerComponent } from '../../shared/ui/button-spinner/button-spinner.component';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { LayoutService } from '../../core/layout/layout.service';
 import { cn } from '../../shared/utils/cn';
 
 import { MaterialStatsComponent } from './ui/material-stats/material-stats.component';
@@ -31,8 +32,9 @@ export class MaterialesPageComponent implements OnInit {
   private service = inject(MaterialesService);
   public session = inject(SessionService);
   private confirmService = inject(ConfirmService);
+  public layout = inject(LayoutService);
 
-  readonly icons = { Search, Plus, Package };
+  readonly icons = { Search, Plus, Package, Filter, Settings, Thermometer, Droplets, Activity };
 
   // Expose signals from service
   loading = this.service.loading;
@@ -45,6 +47,7 @@ export class MaterialesPageComponent implements OnInit {
 
   // UI State
   searchTerm = signal('');
+  typeFilter = signal<'all' | string>('all');
   isDialogOpen = signal(false);
   selectedMaterialId = signal<string | null>(null);
 
@@ -65,7 +68,13 @@ export class MaterialesPageComponent implements OnInit {
 
   filteredMaterials = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    const list = this.materials();
+    const type = this.typeFilter();
+    let list = this.materials();
+
+    if (type !== 'all') {
+      list = list.filter(m => m.type === type);
+    }
+
     if (!term) return list;
 
     return list.filter(m => 
@@ -83,6 +92,17 @@ export class MaterialesPageComponent implements OnInit {
         this.service.loadMateriales();
         this.service.loadSchema();
         this.resetForm(); // Sync defaults from config
+      }
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.openNew(),
+          icon: Package
+        });
+      } else {
+        this.layout.fabAction.set(null);
       }
     });
   }

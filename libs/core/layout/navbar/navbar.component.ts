@@ -1,5 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { LucideAngularModule, Menu, Sun, Moon, Search, ArrowLeft } from 'lucide-angular';
 import { LayoutService } from '../layout.service';
 import { ThemeService } from '../theme.service';
@@ -24,6 +25,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 export class NavbarComponent {
   layoutService = inject(LayoutService);
   themeService = inject(ThemeService);
+  router = inject(Router);
   navbarVisible = signal(true);
   private lastScroll = 0;
   
@@ -34,7 +36,7 @@ export class NavbarComponent {
     if (action) {
       action();
     } else {
-      window.history.back();
+      this.router.navigate(['/dashboard']);
     }
   }
 

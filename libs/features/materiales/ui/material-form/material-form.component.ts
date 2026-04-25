@@ -1,7 +1,8 @@
 import { Component, input, output, model, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Package, ChevronDown } from 'lucide-angular';
+import { LucideAngularModule, Package, ChevronDown, X } from 'lucide-angular';
+import { LayoutService } from '../../../../core/layout/layout.service';
 import { ButtonSpinnerComponent } from '../../../../shared/ui/button-spinner/button-spinner.component';
 import { NegocioConfig } from '../../../../shared/models/negocio';
 import { MaterialFormFieldSchema } from '../../../../shared/models/material';
@@ -15,6 +16,7 @@ import { cn } from '../../../../shared/utils/cn';
   styleUrls: ['./material-form.component.scss']
 })
 export class MaterialFormComponent {
+  layout = inject(LayoutService);
   isOpen = model.required<boolean>();
   materialId = input<string | null>(null);
   config = input.required<NegocioConfig>();
@@ -49,7 +51,7 @@ export class MaterialFormComponent {
   onCancel = output<void>();
   onWeightChange = output<number>();
 
-  readonly icons = { Package, ChevronDown };
+  readonly icons = { Package, ChevronDown, X };
   presetColors = [
     { name: 'Negro', hex: '#000000' },
     { name: 'Blanco', hex: '#ffffff' },

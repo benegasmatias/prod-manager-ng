@@ -23,7 +23,9 @@
           <a routerLink="/ajustes" class="text-[9px] md:text-[10px] font-black text-primary underline underline-offset-2 transition-colors uppercase tracking-widest">MEJORAR</a>
         </div>
       }
-      <button (click)="openNew()"
+      <button 
+        *ngIf="!layout.isMobile()"
+        (click)="openNew()"
         [disabled]="!canAddMember()"
         class="flex items-center justify-center w-full sm:w-auto h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed gap-2">
         <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Invitar Integrante

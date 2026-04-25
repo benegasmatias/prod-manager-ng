@@ -31,6 +31,7 @@ export class LayoutService {
 
   // Contextual bottom bar
   customBottomAction = signal<{ label: string, icon: any, action: () => void } | null>(null);
+  fabAction = signal<{ action: () => void, icon?: any } | null>(null);
   customBottomItems = signal<{ label: string, icon: any, action: () => void, isActive?: boolean }[] | null>(null);
   bottomNavHidden = signal(false);
 
@@ -47,7 +48,7 @@ export class LayoutService {
         const segments = url.split('/').filter((s: string) => s.length > 0);
         
         // Show back button if we are deep in a module or in specific core modules on mobile
-        const shouldShow = segments.length > 1 || ['stock', 'produccion', 'pedidos', 'clientes'].includes(segments[0]);
+        const shouldShow = segments.length > 1 || ['stock', 'produccion', 'pedidos', 'clientes', 'maquinas', 'materiales'].includes(segments[0]);
         this.showBackButton.set(shouldShow);
 
         // Set Title based on the main segment

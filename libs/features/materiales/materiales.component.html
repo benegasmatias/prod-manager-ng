@@ -13,83 +13,93 @@
         Control de inventario, costos de adquisición y trazabilidad de insumos de manufactura.
       </p>
     </div>
-    <button
-      (click)="openNew()"
-      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2"
-    >
+    <button *ngIf="!layout.isMobile()" (click)="openNew()"
+      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2">
       <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nuevo Registro
     </button>
   </div>
 
   <!-- Dashboard Stats -->
-  <app-material-stats [stats]="stats()"></app-material-stats>
+  <app-material-stats *ngIf="!layout.isMobile()" [stats]="stats()"></app-material-stats>
 
-  <!-- Search and Filters Section -->
-  <div class="flex flex-col md:flex-row gap-4 items-center bg-white/70 dark:bg-zinc-900/40 p-4 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm uppercase">
-    <div class="relative flex-1 w-full group">
-      <lucide-angular [img]="icons.Search" class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors duration-200"></lucide-angular>
-      <input
-        type="search"
-        placeholder="Buscar por nombre, marca o tipo..."
-        [ngModel]="searchTerm()" 
-        (ngModelChange)="searchTerm.set($event)"
-        class="h-11 w-full rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-950"
-      />
+  <!-- SEARCH & FILTERS (EDITORIAL STYLE) -->
+  <div class="space-y-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700 uppercase">
+    <!-- Robotic Search Bar -->
+    <div class="relative group">
+      <div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+        <lucide-angular [img]="icons.Search"
+          class="h-5 w-5 text-primary/40 group-focus-within:text-primary transition-colors"></lucide-angular>
+      </div>
+      <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+        placeholder="Buscar por nombre o marca..."
+        class="w-full h-16 bg-zinc-50 dark:bg-zinc-900/50 border-none rounded-[2rem] pl-16 pr-16 text-sm font-bold text-zinc-600 dark:text-zinc-300 focus:ring-4 focus:ring-primary/5 transition-all" />
+      <div class="absolute inset-y-0 right-6 flex items-center">
+        <button class="p-2 text-primary/40 hover:text-primary transition-colors">
+          <lucide-angular [img]="icons.Filter" class="h-5 w-5"></lucide-angular>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Pills (Horizontal Scroll) -->
+    <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <button (click)="typeFilter.set('all')"
+        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
+                           typeFilter() === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
+        Todos
+      </button>
+      <button (click)="typeFilter.set('PLA')"
+        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
+                           typeFilter() === 'PLA' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
+        PLA
+      </button>
+      <button (click)="typeFilter.set('PETG')"
+        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
+                           typeFilter() === 'PETG' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
+        PETG
+      </button>
+      <button (click)="typeFilter.set('Resina')"
+        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
+                           typeFilter() === 'Resina' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
+        Resina
+      </button>
     </div>
   </div>
 
   @if (loading()) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="h-56 bg-zinc-100 dark:bg-zinc-800/20 rounded-2xl animate-pulse"></div>
-      <div class="h-56 bg-zinc-100 dark:bg-zinc-800/20 rounded-2xl animate-pulse"></div>
-      <div class="h-56 bg-zinc-100 dark:bg-zinc-800/20 rounded-2xl animate-pulse"></div>
-    </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="h-56 bg-zinc-100 dark:bg-zinc-800/20 rounded-2xl animate-pulse"></div>
+    <div class="h-56 bg-zinc-100 dark:bg-zinc-800/20 rounded-2xl animate-pulse"></div>
+    <div class="h-56 bg-zinc-100 dark:bg-zinc-800/20 rounded-2xl animate-pulse"></div>
+  </div>
   } @else if (filteredMaterials().length > 0) {
-    <!-- Material Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (mat of filteredMaterials(); track mat.id) {
-        <app-material-card 
-          [material]="mat" 
-          [config]="config()"
-          (onEdit)="editMaterial($event)"
-          (onDelete)="handleDelete($event)"
-        ></app-material-card>
-      }
-    </div>
+  <!-- Material Cards Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (mat of filteredMaterials(); track mat.id) {
+    <app-material-card [material]="mat" [config]="config()" (onEdit)="editMaterial($event)"
+      (onDelete)="handleDelete($event)"></app-material-card>
+    }
+  </div>
   } @else {
-    <!-- Empty State -->
-    <div class="py-24 text-center flex flex-col items-center justify-center gap-6 border-2 border-dashed rounded-[2.5rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/10 dark:bg-zinc-900/5">
-        <div class="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700">
-            <lucide-angular [img]="icons.Package" class="h-7 w-7 text-zinc-300 p-0.5"></lucide-angular>
-        </div>
-        <div class="space-y-1 text-center">
-            <p class="text-lg font-bold text-zinc-400 tracking-tight">Sin registros disponibles</p>
-            <p class="text-sm text-zinc-500 max-w-sm mx-auto">No hay inventario registrado o no coincide con los filtros aplicados.</p>
-        </div>
+  <!-- Empty State -->
+  <div
+    class="py-24 text-center flex flex-col items-center justify-center gap-6 border-2 border-dashed rounded-[2.5rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/10 dark:bg-zinc-900/5">
+    <div
+      class="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700">
+      <lucide-angular [img]="icons.Package" class="h-7 w-7 text-zinc-300 p-0.5"></lucide-angular>
     </div>
+    <div class="space-y-1 text-center">
+      <p class="text-lg font-bold text-zinc-400 tracking-tight">Sin registros disponibles</p>
+      <p class="text-sm text-zinc-500 max-w-sm mx-auto">No hay inventario registrado o no coincide con los filtros
+        aplicados.</p>
+    </div>
+  </div>
   }
 </div>
 
 <!-- Modal Creation/Edit -->
-<app-material-form
-  [(isOpen)]="isDialogOpen"
-  [materialId]="selectedMaterialId()"
-  [config]="config()"
-  [schemaFields]="schemaFields()"
-  [saving]="saving()"
-  [suggestedBrands]="suggestedBrands"
-  [(name)]="formName"
-  [(brand)]="formBrand"
-  [(color)]="formColor"
-  [(type)]="formType"
-  [(unit)]="formUnit"
-  [(weight)]="formWeight"
-  [(remainingWeight)]="formRemainingWeight"
-  [(bedTemp)]="formBedTemp"
-  [(nozzleTemp)]="formNozzleTemp"
-  [(costPerKg)]="formCostPerKg"
-  [(attributes)]="formAttributes"
-  (onSave)="handleSave()"
-  (onCancel)="isDialogOpen.set(false)"
-  (onWeightChange)="onWeightChange($event)"
-></app-material-form>
+<app-material-form [(isOpen)]="isDialogOpen" [materialId]="selectedMaterialId()" [config]="config()"
+  [schemaFields]="schemaFields()" [saving]="saving()" [suggestedBrands]="suggestedBrands" [(name)]="formName"
+  [(brand)]="formBrand" [(color)]="formColor" [(type)]="formType" [(unit)]="formUnit" [(weight)]="formWeight"
+  [(remainingWeight)]="formRemainingWeight" [(bedTemp)]="formBedTemp" [(nozzleTemp)]="formNozzleTemp"
+  [(costPerKg)]="formCostPerKg" [(attributes)]="formAttributes" (onSave)="handleSave()"
+  (onCancel)="isDialogOpen.set(false)" (onWeightChange)="onWeightChange($event)"></app-material-form>

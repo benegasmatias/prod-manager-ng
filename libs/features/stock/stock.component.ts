@@ -2,7 +2,7 @@ import { Component, inject, OnInit, computed, signal, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers, PackagePlus } from 'lucide-angular';
 import { StockService } from '../../core/api/stock.service';
 import { SessionService } from '../../core/session/session.service';
 import { Pedido } from '../../shared/models';
@@ -24,14 +24,14 @@ import { OnDestroy } from '@angular/core';
   templateUrl: './stock.component.html',
   styleUrls: ['./stock.component.css']
 })
-export class StockPageComponent implements OnInit, OnDestroy {
+export class StockPageComponent {
   public stockService = inject(StockService);
   public session = inject(SessionService);
   private router = inject(Router);
   public layout = inject(LayoutService);
 
 
-  icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers };
+  icons = { Plus, Search, ChevronDown, Package2, TrendingUp, Wallet, Cpu, Layers, PackagePlus };
 
   // Expose signals from service
   loading = this.stockService.loading;
@@ -103,23 +103,24 @@ export class StockPageComponent implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      if (this.businessId()) {
+      const bid = this.businessId();
+      if (bid) {
         this.stockService.loadStock();
+      }
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.router.navigate(['/stock/nuevo']),
+          icon: this.icons.PackagePlus
+        });
+      } else {
+        this.layout.fabAction.set(null);
       }
     });
   }
 
-  ngOnInit() {
-    this.layout.customBottomAction.set({
-      label: 'Generar Reposición',
-      icon: this.icons.Plus,
-      action: () => this.router.navigate(['/stock/nuevo'])
-    });
-  }
-
-  ngOnDestroy() {
-    this.layout.customBottomAction.set(null);
-  }
 
 
   handleSort(key: string) {

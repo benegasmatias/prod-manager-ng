@@ -1,8 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Edit2, Trash2, Weight, Activity, Droplets } from 'lucide-angular';
 import { Material } from '../../../../shared/models/material';
 import { NegocioConfig } from '../../../../shared/models/negocio';
+import { LayoutService } from '../../../../core/layout/layout.service';
 import { cn } from '../../../../shared/utils/cn';
 
 @Component({
@@ -13,6 +14,7 @@ import { cn } from '../../../../shared/utils/cn';
   styleUrls: ['./material-card.component.scss']
 })
 export class MaterialCardComponent {
+  layout = inject(LayoutService);
   material = input.required<Material>();
   config = input.required<NegocioConfig>();
   
