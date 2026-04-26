@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BillingService } from '@core/api/billing.service';
+import { LayoutService } from '@core/layout/layout.service';
 import { LucideAngularModule, Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 
@@ -14,9 +15,10 @@ import { cn } from '@shared/utils/cn';
   templateUrl: './pricing.component.html',
   styleUrls: ['./pricing.component.scss']
 })
-export class PricingComponent implements OnInit {
+export class PricingComponent implements OnInit, OnDestroy {
   billing = inject(BillingService);
   private router = inject(Router);
+  layout = inject(LayoutService);
 
   cn = cn;
   activeTab = 'Profesional';
@@ -65,6 +67,14 @@ export class PricingComponent implements OnInit {
 
   ngOnInit() {
     this.billing.loadSubscription().catch(console.error);
+    this.layout.showBackButton.set(true);
+    this.layout.backAction.set(() => {
+      this.router.navigate(['/ajustes']);
+    });
+  }
+
+  ngOnDestroy() {
+    this.layout.backAction.set(null);
   }
 
   async onSelectPlan(plan: any) {

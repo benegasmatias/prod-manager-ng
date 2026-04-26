@@ -10,7 +10,7 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
   standalone: true,
   imports: [CommonModule, MetricCardComponent, MetricCardsGridComponent, LucideAngularModule],
   template: `
-    <div class="space-y-10 pb-16 px-8 pt-8 animate-in fade-in duration-700">
+    <div class="space-y-10 pb-32 sm:pb-16 px-8 pt-8 animate-in fade-in duration-700">
       <!-- Header Area -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div class="flex flex-col gap-1 text-left">

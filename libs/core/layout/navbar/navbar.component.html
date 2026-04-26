@@ -1,6 +1,7 @@
 <header
-  class="fixed top-0 right-0 z-[var(--z-navbar)] flex h-14 sm:h-16 items-center justify-between border-b border-border/5 bg-background/95 backdrop-blur-xl px-[var(--page-px)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-  [class.-translate-y-full]="layoutService.isMobile() && !navbarVisible()"
+  class="fixed right-0 flex h-14 sm:h-16 items-center justify-between border-b border-border/5 bg-background/95 px-[var(--page-px)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+  [ngClass]="layoutService.activeDropdown() ? 'z-[300]' : 'z-[var(--z-navbar)] backdrop-blur-xl'"
+  [style.top]="layoutService.isMobile() && !navbarVisible() ? '-64px' : '0'"
   [style.left.px]="layoutService.isMobile() ? 0 : (layoutService.isPinned() ? layoutService.constants.SIDEBAR_WIDTH_EXPANDED : layoutService.constants.SIDEBAR_WIDTH_COLLAPSED)">
 
   <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
