@@ -1,0 +1,215 @@
+@if (isOpen()) {
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-0 sm:p-4">
+  <div class="bg-white dark:bg-zinc-950 w-full h-full sm:h-auto sm:max-w-lg sm:rounded-[3rem] shadow-2xl flex flex-col overflow-hidden slide-in-from-bottom-4 animate-in duration-300">
+    <div class="p-8 pt-12 sm:pt-8 border-b border-zinc-50 dark:border-zinc-800/50 bg-zinc-50/30 dark:bg-zinc-900/10 text-left relative">
+        <button (click)="onCancel.emit()" class="absolute right-6 top-8 sm:top-1/2 sm:-translate-y-1/2 p-2 text-zinc-400 hover:text-zinc-600 transition-colors">
+            <lucide-angular [img]="icons.X" class="h-6 w-6"></lucide-angular>
+        </button>
+        <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
+              <lucide-angular [img]="icons.Package" class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
+            </div>
+            <div class="space-y-1">
+                <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                  {{ materialId() ? 'Editar ' + (config().labels.materiales || 'Material') : 'Nuevo ' + (config().labels.materiales || 'Material') }}
+                </h2>
+                <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
+                  Control de Inventario
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form Body -->
+    <div class="p-8 space-y-8 flex-1 overflow-y-auto custom-scrollbar pb-40 sm:pb-8 sm:max-h-[70vh]">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2.5">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Nombre / Identificación</label>
+                <input
+                    [(ngModel)]="name"
+                    placeholder="Ej. PLA Negro, Resina eco..."
+                    class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                />
+            </div>
+            <div class="space-y-2.5">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Marca / Proveedor</label>
+                <input
+                    [(ngModel)]="brand"
+                    list="brandSuggestions"
+                    placeholder="Ej. GST, ESUN, 3N3..."
+                    class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                />
+                <datalist id="brandSuggestions">
+                  @for (b of suggestedBrands(); track b) {
+                    <option [value]="b"></option>
+                  }
+                </datalist>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-2.5">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Tipo de Material</label>
+                <div class="relative group">
+                    <select
+                        [(ngModel)]="type"
+                        class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer focus:outline-none"
+                    >
+                        @for (t of config().materialConfig.types; track t.key) {
+                            <option [value]="t.key">{{ t.label }}</option>
+                        }
+                    </select>
+                    <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none"></lucide-angular>
+                </div>
+            </div>
+            <div class="space-y-2.5">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Unidad</label>
+                <div class="relative group">
+                    <select
+                        [(ngModel)]="unit"
+                        class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer focus:outline-none"
+                    >
+                        @for (u of config().materialConfig.units; track u.key) {
+                            <option [value]="u.key">{{ u.label }}</option>
+                        }
+                    </select>
+                    <lucide-angular [img]="icons.ChevronDown" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none"></lucide-angular>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 pt-2">
+            <div class="space-y-2.5">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Stock Total ({{ unit() }})</label>
+                <input
+                    type="number"
+                    [ngModel]="weight()"
+                    (ngModelChange)="onWeightChange.emit($event)"
+                    class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                />
+            </div>
+            <div class="space-y-2.5">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Disponible ({{ unit() }})</label>
+                <input
+                    type="number"
+                    [(ngModel)]="remainingWeight"
+                    class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                />
+            </div>
+        </div>
+
+      @if (config().features.hasNozzle) {
+          <div class="grid grid-cols-2 gap-6 pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
+              <div class="space-y-2.5">
+                  <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Temp. Nozzle (°C)</label>
+                  <input
+                      type="number"
+                      [(ngModel)]="nozzleTemp"
+                      class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                  />
+              </div>
+              <div class="space-y-2.5">
+                  <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Temp. Cama (°C)</label>
+                  <input
+                      type="number"
+                      [(ngModel)]="bedTemp"
+                      class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                  />
+              </div>
+          </div>
+      }
+
+      <div class="space-y-3 pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
+          <label class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500 ml-1">Costo de Adquisición</label>
+          <div class="relative group">
+              <span class="absolute left-5 top-1/2 -translate-y-1/2 text-emerald-500 font-bold text-lg pointer-events-none">$</span>
+              <input
+                  type="number"
+                  [(ngModel)]="costPerKg"
+                  placeholder="0.00"
+                  class="w-full h-14 pl-10 rounded-2xl border-none bg-emerald-50/30 dark:bg-emerald-500/5 px-5 text-lg font-black text-emerald-700 dark:text-emerald-400 focus:ring-2 focus:ring-emerald-500/20 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+              />
+              <span class="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-500/60 uppercase tracking-widest">
+                  por {{ unit() === 'g' ? 'kg' : unit() }}
+              </span>
+          </div>
+      </div>
+      
+      <!-- Industry Specific: Schema Driven -->
+      @if (schemaFields().length > 0) {
+        <div class="pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
+          <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1 mb-4">Información Adicional</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @for (field of schemaFields(); track field.key) {
+              <!-- Fallback check: if it's not handled by legacy UI -->
+              @if (field.key !== 'nozzleTemp' && field.key !== 'bedTemp') {
+                <div class="space-y-2.5">
+                  <label class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider ml-1">
+                    {{ field.label }}
+                    @if (field.required) { <span class="text-rose-500">*</span> }
+                  </label>
+                  <div class="relative group">
+                    <input
+                      [type]="field.type === 'number' ? 'number' : 'text'"
+                      [ngModel]="attributes()[field.key]"
+                      (ngModelChange)="updateAttribute(field.key, $event)"
+                      [placeholder]="field.placeholder || ''"
+                      class="w-full h-12 rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 px-5 text-sm font-bold focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-900 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <div class="space-y-3 pt-8 border-t border-zinc-50 dark:border-zinc-800/50">
+          <label class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Identificador Visual (Color)</label>
+          <div class="flex flex-wrap gap-3 px-1">
+              @for (c of presetColors; track c.hex) {
+                  <button
+                      type="button"
+                      (click)="color.set(c.hex)"
+                      [class]="cn(
+                          'h-8 w-8 rounded-full border shadow-sm transition-all hover:scale-110',
+                          color() === c.hex ? 'ring-2 ring-primary ring-offset-4 scale-110' : 'border-zinc-100 dark:border-zinc-800'
+                      )"
+                      [style.backgroundColor]="c.hex"
+                      [title]="c.name"
+                  ></button>
+              }
+              <input
+                  type="color"
+                  [(ngModel)]="color"
+                  class="h-8 w-8 p-0 rounded-full border border-zinc-100 dark:border-zinc-800 overflow-hidden cursor-pointer"
+              />
+          </div>
+      </div>
+    </div>
+
+    <!-- Dialog Footer -->
+    <!-- Dialog Footer -->
+    <div class="fixed bottom-0 inset-x-0 p-8 pt-4 pb-10 sm:pb-8 flex flex-col sm:flex-row items-center justify-end gap-3 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-t border-border/5 sm:relative sm:inset-auto sm:bg-transparent sm:border-none">
+      <button
+          *ngIf="!layout.isMobile()"
+          (click)="onCancel.emit()"
+          [disabled]="saving()"
+          class="rounded-2xl font-bold h-12 px-6 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
+      >
+          Cancelar
+      </button>
+
+      <app-button-spinner
+          [loading]="saving()"
+          loadingText="Guardando..."
+          btnClass="flex items-center justify-center rounded-2xl font-bold h-12 px-10 bg-primary text-white shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50"
+          (onClick)="onSave.emit()"
+      >
+          {{ materialId() ? 'Actualizar Registro' : 'Confirmar y Crear' }}
+      </app-button-spinner>
+    </div>
+
+    </div>
+  </div>
+}

@@ -25,11 +25,12 @@ export const PEDIDOS_LABELS = {
 
 import {
   Wallet, Package, Clock, Calendar, Box,
-  ExternalLink, Plus, TrendingUp,
+  ExternalLink, Plus, TrendingUp, Search,
   List, LayoutGrid
 } from 'lucide-angular';
 
 export const PEDIDOS_ICONS = {
+  SEARCH: Search,
   WALLET: Wallet,
   PACKAGE: Package,
   CLOCK: Clock,

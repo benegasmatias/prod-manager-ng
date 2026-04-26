@@ -9,74 +9,77 @@ import { cn } from '@shared/utils';
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden animate-in fade-in duration-700">
+    <div class="bg-surface-container-low/30 backdrop-blur-3xl rounded-[4rem] border border-border/5 shadow-2xl shadow-text/5 overflow-hidden animate-in fade-in duration-1000">
       
       <!-- Days of Week Header -->
-      <div class="grid grid-cols-7 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50">
+      <div class="grid grid-cols-7 border-b border-border/5 bg-surface/50">
          @for (day of daysOfWeek; track day) {
-           <div class="py-2 sm:py-4 text-center">
-              <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">
+           <div class="py-4 sm:py-6 text-center">
+              <span class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/20 italic">
                 {{ isMobile() ? day.charAt(0) : day }}
               </span>
            </div>
          }
       </div>
-
+ 
       <!-- Grid -->
       <div [class]="cn(
-        'grid grid-cols-7 gap-px bg-zinc-100 dark:bg-zinc-800',
-        isMobile() ? 'auto-rows-[60px]' : 'auto-rows-[120px] lg:auto-rows-[160px]'
+        'grid grid-cols-7 gap-px bg-border/5',
+        isMobile() ? 'auto-rows-[80px]' : 'auto-rows-[140px] lg:auto-rows-[180px]'
       )">
          @for (cell of calendarCells(); track cell.date.getTime()) {
             <div 
               [class]="cn(
-                'bg-white dark:bg-zinc-950 flex flex-col transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900',
-                isMobile() ? 'p-1 items-center justify-center gap-1' : 'p-2 lg:p-4 gap-1 lg:gap-2',
-                cell.isCurrentMonth ? '' : 'bg-zinc-50/50 dark:bg-zinc-900/50 opacity-40 grayscale',
-                cell.isToday ? 'bg-primary/5 dark:bg-primary/10' : ''
+                'bg-surface/40 flex flex-col transition-all duration-700 hover:bg-surface/80 group/cell',
+                isMobile() ? 'p-2 items-center justify-center gap-2' : 'p-4 lg:p-6 gap-3',
+                cell.isCurrentMonth ? '' : 'bg-surface-container-low/20 opacity-30 grayscale blur-[1px]',
+                cell.isToday ? 'bg-primary/5' : ''
               )"
             >
-              <div [class]="cn('flex items-center justify-between', isMobile() ? 'flex-col gap-1' : 'w-full')">
+              <div [class]="cn('flex items-center justify-between', isMobile() ? 'flex-col gap-2' : 'w-full')">
                  <span [class]="cn(
-                   'font-black tabular-nums',
-                   isMobile() ? 'text-[10px]' : 'text-xs lg:text-sm',
-                   cell.isToday ? 'text-primary' : 'text-zinc-400'
+                   'font-black tabular-nums font-display italic transition-all duration-700',
+                   isMobile() ? 'text-[12px]' : 'text-sm lg:text-base',
+                   cell.isToday ? 'text-primary scale-125' : 'text-text-muted/30 group-hover/cell:text-text'
                  )">{{ cell.date | date:'dd' }}</span>
                  
                  @if (cell.events.length > 0 && isMobile()) {
-                    <div class="flex gap-0.5">
+                    <div class="flex gap-1">
                        @for(dot of cell.events.slice(0, 3); track dot.id) {
-                          <span [class]="cn('h-1 w-1 rounded-full', getStatusDotColor(dot))"></span>
+                          <span [class]="cn('h-1.5 w-1.5 rounded-full shadow-2xl shadow-current', getStatusDotColor(dot))"></span>
                        }
                     </div>
                  }
                  @if (cell.events.length > 0 && !isMobile()) {
-                    <span class="h-1.5 w-1.5 rounded-full bg-primary shadow-sm shadow-primary/40"></span>
+                    <div class="flex items-center gap-2">
+                       <span class="text-[9px] font-black text-text-muted/10 italic">#{{ cell.events.length }}</span>
+                       <span [class]="cn('h-2 w-2 rounded-full shadow-2xl shadow-primary/40', cell.events.some(e => e.risk.level === 'CRITICAL') ? 'bg-error animate-pulse' : 'bg-primary')"></span>
+                    </div>
                  }
               </div>
-
+ 
               <!-- Compact Events List (Desktop Only) -->
-              <div *ngIf="!isMobile()" class="flex-1 space-y-1 lg:space-y-1.5 overflow-y-auto no-scrollbar pt-1 lg:pt-0">
+              <div *ngIf="!isMobile()" class="flex-1 space-y-2 overflow-y-auto no-scrollbar pt-1 lg:pt-0">
                  @for (event of cell.events.slice(0, 3); track event.id) {
                     <div 
                       (click)="onEventClick.emit(event)"
                       [class]="cn(
-                        'px-1.5 py-0.5 lg:py-1 rounded-md text-[7px] lg:text-[8px] font-bold truncate transition-all active:scale-95 cursor-pointer border',
+                        'px-3 py-1.5 rounded-xl text-[8px] lg:text-[9px] font-black truncate transition-all duration-500 active:scale-95 cursor-pointer border uppercase tracking-widest italic',
                         getEventClass(event)
                       )"
                     >
-                       <span class="font-black opacity-50 mr-1 lg:inline hidden">#{{ event.code.slice(-4) }}</span>
+                       <span class="opacity-30 mr-1 lg:inline hidden">#{{ event.code.slice(-2) }}</span>
                        {{ event.items[0]?.nombreProducto || 'Orden' }}
                     </div>
                  }
                  @if (cell.events.length > 3) {
-                    <p class="text-[7px] lg:text-[8px] font-black text-zinc-400 uppercase tracking-tighter pl-1">+ {{ cell.events.length - 3 }} más</p>
+                    <p class="text-[8px] font-black text-text-muted/20 uppercase tracking-[0.2em] pl-2 italic">+ {{ cell.events.length - 3 }} SECUENCIAS</p>
                  }
               </div>
             </div>
          }
       </div>
-
+ 
     </div>
   `,
   styles: [`
@@ -130,19 +133,19 @@ export class CalendarMonthViewComponent {
 
   getEventClass(e: CalendarOrderEvent) {
     if (e.risk.level === 'CRITICAL' || e.urgency === 'OVERDUE') 
-      return 'bg-red-50 text-red-600 border-red-100 dark:bg-red-950/20 dark:border-red-900/40';
+      return 'bg-error/10 text-error border-error/20 shadow-2xl shadow-error/5';
     if (e.risk.level === 'HIGH' || e.urgency === 'TODAY') 
-      return 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/20 dark:border-amber-900/40';
+      return 'bg-accent/10 text-accent border-accent/20 shadow-2xl shadow-accent/5';
     if (e.status === 'DONE' || e.status === 'DELIVERED') 
-      return 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/40';
+      return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-2xl shadow-emerald-500/5';
     
-    return 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-100 dark:border-zinc-700';
+    return 'bg-surface border-border/5 text-text-muted/40 hover:text-text';
   }
 
   getStatusDotColor(e: CalendarOrderEvent) {
-    if (e.risk.level === 'CRITICAL') return 'bg-red-500';
-    if (e.risk.level === 'HIGH') return 'bg-amber-500';
-    return 'bg-zinc-400';
+    if (e.risk.level === 'CRITICAL') return 'bg-error';
+    if (e.risk.level === 'HIGH') return 'bg-accent';
+    return 'bg-primary/20';
   }
 
   cn(...args: any[]) { return cn(...args); }

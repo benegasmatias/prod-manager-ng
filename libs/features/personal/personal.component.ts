@@ -1,11 +1,13 @@
 import { Component, inject, signal, computed, effect, OnDestroy, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PersonalService } from '@core/api/personal.service';
 import { SessionService } from '@core/session/session.service';
 import { InvitationsService, InvitationCheckResult } from '@core/api/invitaciones.service';
+import { LayoutService } from '@core/layout/layout.service';
 import { Employee } from '@shared/models';
-import { LucideAngularModule, Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock, UserPlus } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { cn } from '@shared/utils/cn';
@@ -13,7 +15,7 @@ import { cn } from '@shared/utils/cn';
 @Component({
   selector: 'app-personal',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
+  imports: [CommonModule, RouterLink, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
   templateUrl: './personal.component.html'
 })
 export class PersonalPageComponent implements OnDestroy {
@@ -21,6 +23,7 @@ export class PersonalPageComponent implements OnDestroy {
   private sessionService = inject(SessionService);
   private invitationsService = inject(InvitationsService);
   private confirmService = inject(ConfirmService);
+  public layout = inject(LayoutService);
 
   // States
   loading = this.personalService.loading;
@@ -42,10 +45,14 @@ export class PersonalPageComponent implements OnDestroy {
   resendCooldowns = signal<Record<string, number>>({});  // invitationId -> seconds remaining
   private cooldownInterval: any = null;
 
+  // Plan Usage
+  planUsage = this.sessionService.planUsage;
+  canAddMember = computed(() => this.planUsage()?.canCreate.users ?? true);
+
   // For Legacy/Edit mode (if needed later)
   editingStaffId = signal<string | null>(null);
 
-  readonly icons = { Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock };
+  readonly icons = { Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock, UserPlus };
 
   filteredStaff = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -100,6 +107,17 @@ export class PersonalPageComponent implements OnDestroy {
       }
       if (hasNew) {
         this.resendCooldowns.set(cooldowns);
+      }
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.openNew(),
+          icon: this.icons.UserPlus
+        });
+      } else {
+        this.layout.fabAction.set(null);
       }
     });
   }
@@ -167,6 +185,7 @@ export class PersonalPageComponent implements OnDestroy {
       } else {
         await this.invitationsService.invite(businessId, email, role);
       }
+      await this.sessionService.refreshPlanUsage();
       this.isFormOpen.set(false);
       this.personalService.loadPersonal(true);
     } catch (err) {
@@ -247,5 +266,6 @@ export class PersonalPageComponent implements OnDestroy {
     });
     if (!confirmed) return;
     await this.personalService.removeEmployee(staff.id);
+    await this.sessionService.refreshPlanUsage();
   }
 }

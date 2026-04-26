@@ -1,12 +1,13 @@
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MaquinasService } from '@core/api/maquinas.service';
 import { SessionService } from '@core/session/session.service';
 import { MaterialesService } from '@core/api/materiales.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
 import { Machine, Pedido, Material } from '@shared/models';
-import { LucideAngularModule, Plus, ChevronDown, Cpu } from 'lucide-angular';
+import { LucideAngularModule, Plus, ChevronDown, Cpu, Search, Activity } from 'lucide-angular';
 import { cn } from '@shared/utils/cn';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 
@@ -14,15 +15,18 @@ import { MachineCardComponent } from './components/machine-card.component';
 import { MachineFormDialogComponent } from './components/machine-form-dialog.component';
 import { MachineAssignmentDialogComponent } from './components/machine-assignment-dialog.component';
 import { MachineDetailSheetComponent } from './components/machine-detail-sheet.component';
+import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
+import { LayoutService } from '../../core/layout/layout.service';
 
 @Component({
   selector: 'app-maquinas',
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     FormsModule,
     LucideAngularModule,
-
+    PageShellComponent,
     MachineCardComponent,
     MachineFormDialogComponent,
     MachineAssignmentDialogComponent,
@@ -36,6 +40,7 @@ export class MaquinasPageComponent {
   private materialesService = inject(MaterialesService);
   private pedidosApi = inject(PedidosApiService);
   private confirmService = inject(ConfirmService);
+  public layout = inject(LayoutService);
 
   // States from service
   loading = this.maquinasService.loading;
@@ -59,12 +64,16 @@ export class MaquinasPageComponent {
   availableMaterials = signal<Material[]>([]);
   loadingOrders = signal(false);
 
+  // Plan Usage
+  planUsage = this.sessionService.planUsage;
+  canAddMachine = computed(() => this.planUsage()?.canCreate.machines ?? true);
+
   // Detail states
   isDetailSheetOpen = signal(false);
   selectedMachineDetail = signal<Machine | null>(null);
   loadingDetail = signal(false);
 
-  readonly icons = { Plus, ChevronDown, Cpu };
+  readonly icons = { Plus, ChevronDown, Cpu, Search, Activity };
 
   filteredMaquinas = computed(() => {
     const all = this.maquinas();
@@ -76,6 +85,17 @@ export class MaquinasPageComponent {
   constructor() {
     effect(() => {
       this.maquinasService.loadMaquinas();
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.openNew(),
+          icon: this.icons.Cpu
+        });
+      } else {
+        this.layout.fabAction.set(null);
+      }
     });
   }
 
@@ -116,6 +136,7 @@ export class MaquinasPageComponent {
         active: true
       };
       await this.maquinasService.create(payload);
+      await this.sessionService.refreshPlanUsage();
     }
     this.isDialogOpen.set(false);
   }
@@ -131,6 +152,7 @@ export class MaquinasPageComponent {
     });
     if (!confirmed) return;
     await this.maquinasService.remove(machineId);
+    await this.sessionService.refreshPlanUsage();
     this.isDetailSheetOpen.set(false);
   }
 

@@ -47,15 +47,22 @@ export class ApiService {
     getOne: (id: string) => this.request<any>('GET', API_ENDPOINTS.BUSINESSES.ONE(id)),
     getConfig: (id: string) => this.request<any>('GET', API_ENDPOINTS.BUSINESSES.CONFIG(id)),
     getDashboardSummary: (id: string, context?: any) => this.request<DashboardSummary>('GET', API_ENDPOINTS.BUSINESSES.DASHBOARD(id), null, context),
+    getPlanUsage: (id: string) => this.request<import('@shared/models').PlanUsage>('GET', API_ENDPOINTS.BUSINESSES.PLAN_USAGE(id)),
     create: (data: any) => this.request<any>('POST', API_ENDPOINTS.BUSINESSES.LIST, data),
     activate: (id: string) => this.request<any>('POST', `${API_ENDPOINTS.BUSINESSES.LIST}/${id}/activate`),
     update: (id: string, data: any) => this.request<any>('PATCH', API_ENDPOINTS.BUSINESSES.ONE(id), data),
     delete: (id: string) => this.request<any>('DELETE', API_ENDPOINTS.BUSINESSES.ONE(id)),
+    billing: {
+      getPlans: (category?: string) => this.request<any[]>('GET', `/admin/plans${category ? '?category=' + category : ''}`),
+      preflight: (id: string, plan: string) => this.request<any>('GET', `/businesses/${id}/subscription/preflight?plan=${plan}`),
+      changePlan: (id: string, plan: string) => this.request<any>('PATCH', `/businesses/${id}/subscription/plan`, { plan }),
+    }
   };
 
   users = {
     getMe: () => this.request<UserProfile>('GET', API_ENDPOINTS.USERS.ME),
-    setDefaultBusiness: (id: string) => this.request<any>('PUT', API_ENDPOINTS.USERS.SET_DEFAULT_BUSINESS, { businessId: id })
+    setDefaultBusiness: (id: string) => this.request<any>('PUT', API_ENDPOINTS.USERS.SET_DEFAULT_BUSINESS, { businessId: id }),
+    acceptTerms: () => this.request<any>('POST', '/me/accept-terms')
   };
 
   notifications = {

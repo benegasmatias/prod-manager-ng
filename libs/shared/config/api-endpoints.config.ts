@@ -19,7 +19,8 @@ export const API_ENDPOINTS = {
     TEMPLATES: '/business-templates',
     ONE: (id: string) => `/businesses/${id}`,
     CONFIG: (id: string) => `/businesses/${id}/config`,
-    DASHBOARD: (id: string) => `/businesses/${id}/dashboard-summary`
+    DASHBOARD: (id: string) => `/businesses/${id}/dashboard-summary`,
+    PLAN_USAGE: (id: string) => `/businesses/${id}/plan-usage`
   },
   CUSTOMERS: {
     LIST: '/customers',

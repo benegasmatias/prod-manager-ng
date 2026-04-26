@@ -1,38 +1,53 @@
 import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus } from 'lucide-angular';
+import { LucideAngularModule, Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus, Filter, Settings, Thermometer } from 'lucide-angular';
 import { MaterialesService } from '../../core/api/materiales.service';
 import { SessionService } from '../../core/session/session.service';
 import { Material } from '../../shared/models/material';
 import { ButtonSpinnerComponent } from '../../shared/ui/button-spinner/button-spinner.component';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { LayoutService } from '../../core/layout/layout.service';
 import { cn } from '../../shared/utils/cn';
+
+import { MaterialStatsComponent } from './ui/material-stats/material-stats.component';
+import { MaterialCardComponent } from './ui/material-card/material-card.component';
+import { MaterialFormComponent } from './ui/material-form/material-form.component';
 
 @Component({
   selector: 'app-materiales-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    LucideAngularModule, 
+    MaterialStatsComponent, 
+    MaterialCardComponent,
+    MaterialFormComponent
+  ],
   templateUrl: './materiales.component.html',
-  styles: [`:host { display: block; }`]
+  styleUrls: ['./materiales.component.scss']
 })
 export class MaterialesPageComponent implements OnInit {
   private service = inject(MaterialesService);
   public session = inject(SessionService);
   private confirmService = inject(ConfirmService);
+  public layout = inject(LayoutService);
 
-  readonly icons = { Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus };
+  readonly icons = { Search, Plus, Package, Filter, Settings, Thermometer, Droplets, Activity };
 
   // Expose signals from service
   loading = this.service.loading;
   saving = this.service.saving;
   materials = this.service.items;
   stats = this.service.stats;
+  schemaFields = this.service.schemaFields;
   config = computed(() => this.session.config());
   negocio = computed(() => this.session.activeNegocio());
 
   // UI State
   searchTerm = signal('');
+  typeFilter = signal<'all' | string>('all');
   isDialogOpen = signal(false);
   selectedMaterialId = signal<string | null>(null);
 
@@ -47,10 +62,19 @@ export class MaterialesPageComponent implements OnInit {
   formBedTemp = signal<number | null>(null);
   formNozzleTemp = signal<number | null>(null);
   formCostPerKg = signal(0);
+  formAttributes = signal<Record<string, any>>({});
+  
+  suggestedBrands = ['GST', 'Grillon3D', 'PrintALot', '3N3', 'Hellbot', 'Esun', 'Sunlu', 'Creality'];
 
   filteredMaterials = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    const list = this.materials();
+    const type = this.typeFilter();
+    let list = this.materials();
+
+    if (type !== 'all') {
+      list = list.filter(m => m.type === type);
+    }
+
     if (!term) return list;
 
     return list.filter(m => 
@@ -60,23 +84,25 @@ export class MaterialesPageComponent implements OnInit {
     );
   });
 
-  presetColors = [
-    { name: 'Negro', hex: '#000000' },
-    { name: 'Blanco', hex: '#ffffff' },
-    { name: 'Gris', hex: '#808080' },
-    { name: 'Rojo', hex: '#ef4444' },
-    { name: 'Azul', hex: '#3b82f6' },
-    { name: 'Verde', hex: '#22c55e' },
-    { name: 'Amarillo', hex: '#eab308' },
-    { name: 'Naranja', hex: '#f97316' },
-  ];
 
   constructor() {
     effect(() => {
       const activeId = this.session.activeNegocio()?.id;
       if (activeId) {
         this.service.loadMateriales();
+        this.service.loadSchema();
         this.resetForm(); // Sync defaults from config
+      }
+    });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.openNew(),
+          icon: Package
+        });
+      } else {
+        this.layout.fabAction.set(null);
       }
     });
   }
@@ -98,6 +124,7 @@ export class MaterialesPageComponent implements OnInit {
     this.formBedTemp.set(null);
     this.formNozzleTemp.set(null);
     this.formCostPerKg.set(0);
+    this.formAttributes.set({});
   }
 
   openNew() {
@@ -117,6 +144,7 @@ export class MaterialesPageComponent implements OnInit {
     this.formBedTemp.set(mat.bedTemperature || null);
     this.formNozzleTemp.set(mat.nozzleTemperature || null);
     this.formCostPerKg.set(mat.costPerKg || 0);
+    this.formAttributes.set(mat.attributes || {});
     this.isDialogOpen.set(true);
   }
 
@@ -153,6 +181,11 @@ export class MaterialesPageComponent implements OnInit {
       costPerKg: this.formCostPerKg(),
       bedTemperature: this.formBedTemp() || undefined,
       nozzleTemperature: this.formNozzleTemp() || undefined,
+      attributes: {
+        ...(this.formAttributes() || {}),
+        nozzleTemp: this.formNozzleTemp(),
+        bedTemp: this.formBedTemp(),
+      },
       businessId: this.negocio()?.id
     };
 
@@ -176,14 +209,6 @@ export class MaterialesPageComponent implements OnInit {
     }
   }
 
-  getPercent(mat: Material) {
-    if (!mat.totalWeightGrams) return 0;
-    return Math.round((mat.remainingWeightGrams / mat.totalWeightGrams) * 100);
-  }
-
-  toggleMenuAction(event: Event, detailsElement: HTMLDetailsElement) {
-    // A simple method to handle details if manually used instead of dropdown
-  }
 
   cn = cn;
 }

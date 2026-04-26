@@ -13,10 +13,24 @@
         Administración de integrantes, roles y gestión de acceso para el personal del negocio.
       </p>
     </div>
-    <button (click)="openNew()"
-      class="flex items-center justify-center w-full sm:w-auto h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2">
-      <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Invitar Integrante
-    </button>
+    <div class="flex items-center gap-4">
+      @if (planUsage()) {
+        <div [class]="cn('flex items-center gap-3 px-4 py-2 border rounded-xl', !canAddMember() ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/20' : 'bg-zinc-50 dark:bg-zinc-900/40 border-zinc-100 dark:border-zinc-800')">
+          <div [class]="cn('h-2 w-2 rounded-full', !canAddMember() ? 'bg-amber-500 animate-pulse' : 'bg-primary')"></div>
+          <span [class]="cn('text-[10px] md:text-[11px] font-black uppercase tracking-widest leading-none', !canAddMember() ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-500')">
+            {{ !canAddMember() ? 'Límite de integrantes' : 'Integrantes' }} ({{ planUsage()?.usage?.users }}/{{ planUsage()?.limits?.users }})
+          </span>
+          <a routerLink="/ajustes" class="text-[9px] md:text-[10px] font-black text-primary underline underline-offset-2 transition-colors uppercase tracking-widest">MEJORAR</a>
+        </div>
+      }
+      <button 
+        *ngIf="!layout.isMobile()"
+        (click)="openNew()"
+        [disabled]="!canAddMember()"
+        class="flex items-center justify-center w-full sm:w-auto h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed gap-2">
+        <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Invitar Integrante
+      </button>
+    </div>
   </div>
 
 
@@ -190,13 +204,19 @@
               <div class="flex justify-center">
                 <span [class]="cn(
                     'inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border transform transition-transform group-hover:scale-105',
-                    staff.active
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10'
-                      : 'bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700'
+                    staff.blockedByQuota
+                      ? 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/30'
+                      : (staff.active
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10'
+                          : 'bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700')
                   )">
-                  <span
-                    [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
-                  {{ staff.active ? 'ACTIVO' : 'INACTIVO' }}
+                    <span
+                    [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.blockedByQuota ? 'bg-amber-500' : (staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400'))"></span>
+                  @if (staff.blockedByQuota) {
+                    BLOQUEADO
+                  } @else {
+                    {{ staff.active ? 'ACTIVO' : 'INACTIVO' }}
+                  }
                 </span>
               </div>
             </td>
@@ -272,9 +292,13 @@
               </p>
               <div class="flex items-center gap-2">
                 <span
-                  [class]="cn('h-1.5 w-1.5 rounded-full', staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400')"></span>
+                  [class]="cn('h-1.5 w-1.5 rounded-full', staff.blockedByQuota ? 'bg-amber-500' : (staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400'))"></span>
                 <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest text-left">
-                  {{ staff.active ? 'Activo' : 'Inactivo' }}
+                  @if (staff.blockedByQuota) {
+                    Bloqueado por Plan
+                  } @else {
+                    {{ staff.active ? 'Activo' : 'Inactivo' }}
+                  }
                 </p>
               </div>
             </div>

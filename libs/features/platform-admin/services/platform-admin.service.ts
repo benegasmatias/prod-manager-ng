@@ -111,8 +111,22 @@ export class PlatformAdminService {
     return firstValueFrom(this.http.patch(`${this.apiUrl}/businesses/${id}/status`, { status }));
   }
 
-  async getPlans(): Promise<any[]> {
-    return firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/plans`));
+  async getPlans(category?: string): Promise<any[]> {
+    return firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/plans`, {
+      params: category ? { category } : {}
+    }));
+  }
+
+  async createPlan(data: any): Promise<any> {
+    return firstValueFrom(this.http.post(`${this.apiUrl}/plans`, data));
+  }
+
+  async updatePlan(id: string, data: any): Promise<any> {
+    return firstValueFrom(this.http.patch(`${this.apiUrl}/plans/${id}`, data));
+  }
+
+  async deletePlan(id: string): Promise<any> {
+    return firstValueFrom(this.http.delete(`${this.apiUrl}/plans/${id}`));
   }
 
   async getStats(): Promise<any> {

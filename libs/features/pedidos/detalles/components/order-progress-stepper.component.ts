@@ -1,6 +1,6 @@
 import { Component, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, TrendingUp, CheckCircle, Clock } from 'lucide-angular';
+import { LucideAngularModule, TrendingUp, CheckCircle, Clock, Circle, Edit3, Cog, Truck } from 'lucide-angular';
 import { OrderStatus } from '@shared/models';
 import { getStatusLabel } from '@shared/utils';
 
@@ -15,88 +15,42 @@ interface Step {
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 border border-zinc-100 dark:border-zinc-800 shadow-sm overflow-hidden relative group">
-      <!-- Header -->
-      <div class="flex items-center justify-between mb-10">
-        <div class="space-y-1">
-          <p class="text-[10px] font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-            <lucide-angular [img]="icons.TrendingUp" class="h-4 w-4 text-primary"></lucide-angular>
-            Flujo de Producción
-          </p>
-          <p class="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight">
-            Etapa Actual: <span class="text-primary">{{ currentStepLabel() }}</span>
-          </p>
+    <div class="py-12 animate-in fade-in duration-700">
+      <div class="relative px-4">
+        <!-- Connecting Line -->
+        <div class="absolute top-[22px] left-10 right-10 h-0.5 bg-zinc-100 dark:bg-zinc-800">
+           <div class="h-full bg-primary transition-all duration-1000 ease-out" [style.width.%]="linePercentage()"></div>
         </div>
-        <div class="text-right flex flex-col items-end">
-          <span class="text-2xl font-black tabular-nums text-primary">{{ progressPercentage() }}%</span>
-          <span class="text-[8px] font-black uppercase text-zinc-400 tracking-widest">A completitud</span>
-        </div>
-      </div>
-
-      <!-- Stepper Container -->
-      <div class="relative pt-4 pb-8">
-        <!-- Progress Line Background -->
-        <div class="absolute top-[27px] left-8 right-8 h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full"></div>
-        
-        <!-- Active Progress Line -->
-        <div class="absolute top-[27px] left-8 h-1 bg-primary rounded-full transition-all duration-700 ease-in-out"
-             [style.width.%]="linePercentage()"></div>
 
         <!-- Steps Interaction Area -->
         <div class="relative flex justify-between">
           @for (step of steps; track step.index) {
-            <div class="flex flex-col items-center gap-4 relative z-10">
+            <div class="flex flex-col items-center gap-3 relative z-10 group/step">
               <!-- Node -->
               <div [class]="cn(
-                'h-6 w-6 rounded-full border-4 flex items-center justify-center transition-all duration-500',
-                isCompleted(step.index) ? 'bg-primary border-primary text-white scale-110 shadow-lg shadow-primary/20' : 
-                isCurrent(step.index) ? 'bg-white dark:bg-zinc-900 border-primary shadow-xl shadow-primary/20 scale-125' : 
-                'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800'
+                'h-11 w-11 rounded-full flex items-center justify-center transition-all duration-700 border-2',
+                isCompleted(step.index) ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 
+                isCurrent(step.index) ? 'bg-primary border-primary text-white scale-110 shadow-2xl shadow-primary/40' : 
+                'bg-white dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 text-zinc-300 dark:text-zinc-700'
               )">
-                @if (isCompleted(step.index)) {
-                  <lucide-angular [img]="icons.CheckCircle" class="h-3 w-3"></lucide-angular>
-                } @else if (isCurrent(step.index)) {
-                  <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-                }
+                <lucide-angular [img]="getStepIcon(step.key)" [class]="cn('h-5 w-5', isCurrent(step.index) ? 'animate-pulse' : '')"></lucide-angular>
               </div>
 
               <!-- Label -->
-              <div class="absolute top-10 flex flex-col items-center min-w-[80px]">
-                <p [class]="cn(
-                  'text-[9px] font-black uppercase tracking-tighter transition-colors text-center',
-                  isCurrent(step.index) ? 'text-primary' : 
-                  isCompleted(step.index) ? 'text-zinc-900 dark:text-zinc-200' : 
-                  'text-zinc-400'
-                )">
-                  {{ step.label }}
-                </p>
-              </div>
+              <p [class]="cn(
+                'text-[7px] font-black uppercase tracking-tight transition-all duration-500 whitespace-nowrap',
+                isCurrent(step.index) ? 'text-primary' : 
+                isCompleted(step.index) ? 'text-text' : 
+                'text-zinc-400'
+              )">
+                {{ step.label }}
+              </p>
             </div>
           }
         </div>
       </div>
-      
-      <!-- Footer Details -->
-      <div class="mt-8 flex items-center justify-between pt-6 border-t border-zinc-50 dark:border-zinc-800/50">
-        <div class="flex items-center gap-8">
-           <div class="space-y-1">
-              <p class="text-[8px] font-black uppercase tracking-widest text-zinc-400 leading-none">Antigüedad</p>
-              <p class="text-[11px] font-black text-zinc-700 dark:text-zinc-300">{{ age() || '---' }}</p>
-           </div>
-           <div class="space-y-1">
-              <p class="text-[8px] font-black uppercase tracking-widest text-zinc-400 leading-none">Prometido</p>
-              <p class="text-[11px] font-black text-zinc-700 dark:text-zinc-300">{{ dueDate() || 'Sin fecha' }}</p>
-           </div>
-        </div>
-        
-        @if (isDelayed()) {
-          <div class="flex items-center gap-2 px-3 py-1 bg-rose-50 text-rose-600 rounded-lg border border-rose-100 animate-pulse">
-            <lucide-angular [img]="icons.Clock" class="h-3 w-3"></lucide-angular>
-            <span class="text-[8px] font-black uppercase tracking-widest">Retrasado</span>
-          </div>
-        }
-      </div>
     </div>
+
   `,
   styles: [`
     :host { display: block; }
@@ -109,7 +63,18 @@ export class OrderProgressStepperComponent {
   rubro = input<string | null>(null);
   isStock = input<boolean>(false);
 
-  icons = { TrendingUp, CheckCircle, Clock };
+  icons = { TrendingUp, CheckCircle, Clock, Circle, Edit3, Cog, Truck };
+
+  getStepIcon(key: string) {
+    switch(key) {
+      case 'PENDING': return this.icons.Circle;
+      case 'DESIGN': return this.icons.Edit3;
+      case 'PROD': return this.icons.Cog;
+      case 'DONE': return this.icons.CheckCircle;
+      case 'DELIVERED': return this.icons.Truck;
+      default: return this.icons.Circle;
+    }
+  }
 
   steps: Step[] = [
     { label: 'Pendiente', key: 'PENDING', index: 0 },

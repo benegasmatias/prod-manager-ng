@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import {
   LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
   DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
-  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight, Clock, Truck, XCircle, Plus, Minus, ExternalLink
+  RefreshCw, ChevronDown, ChevronLeft, Check, ChevronRight, Clock, Truck, XCircle, Plus, Minus, ExternalLink, Star
 } from 'lucide-angular';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { ButtonSpinnerComponent } from '@shared/ui';
@@ -23,6 +23,7 @@ import { cn } from '@shared/utils/cn';
 import { AppDatePickerComponent } from '@shared/ui/app-date-picker/app-date-picker.component';
 import { Machine, Material } from '@shared/models';
 import { MaterialSelectorComponent } from '@shared/ui/material-selector/material-selector.component';
+import { LoadingSpinnerComponent } from '@shared/ui/loading-spinner/loading-spinner.component';
 
 // Sections
 import { PaymentModuleComponent } from './sections/payment-module.component';
@@ -40,7 +41,8 @@ import { MultiMaterial } from '@shared/models/material-consumption';
     PaymentModuleComponent,
     FailureModuleComponent,
     AppDatePickerComponent,
-    MaterialSelectorComponent
+    MaterialSelectorComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './status-modal.component.html',
   styleUrls: ['./status-modal.component.css']
@@ -210,7 +212,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   icons: any = {
     Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2,
     User, Calendar, MessageSquare, RefreshCw, ChevronDown, ChevronLeft, Cpu, Check, ChevronRight,
-    Clock, Truck, XCircle, Plus, Minus, ExternalLink
+    Clock, Truck, XCircle, Plus, Minus, ExternalLink, Star
   };
 
   getIcon(name: string): any {

@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, inject, signal, computed, effect, OnDestroy, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, computed, effect, OnDestroy, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X } from 'lucide-angular';
 import { Router, RouterModule } from '@angular/router';
 import { SessionService } from '@core/session/session.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
@@ -16,6 +16,8 @@ import { FloatingCalculatorComponent } from './floating-calculator.component';
 import { FilesApiService } from '@core/api/files.api.service';
 import { cn } from '@shared/utils/cn';
 import { OrderCalculatorService } from '../../services/order-calculator.service';
+import { ButtonSpinnerComponent } from '@shared/ui';
+import { LayoutService } from '@core/layout/layout.service';
 
 @Component({
   selector: 'app-order-form',
@@ -29,29 +31,31 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
     EmployeeSelectorComponent,
     IntelligentDatePickerComponent,
     ItemDetailsFormComponent,
-    FloatingCalculatorComponent
+    FloatingCalculatorComponent,
+    ButtonSpinnerComponent
   ],
   template: `
-    <form (submit)="handleSave($event)" class="space-y-10 pb-40 relative max-w-6xl mx-auto animate-in fade-in duration-700 px-4 sm:px-6">
+    <form (submit)="handleSave($event)" class="space-y-12 sm:space-y-16 pb-40 relative max-w-6xl mx-auto animate-in fade-in duration-1000 px-4 sm:px-8">
       
-      <!-- HEADER CONTEXTUAL -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-4">
-        <div class="flex items-start gap-5">
+      <!-- EDITORIAL CONTEXTUAL HEADER -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-10 pt-4 sm:pt-8 border-b border-border/5 pb-8 sm:pb-12">
+        <div class="flex items-start gap-4 sm:gap-8">
+          <!-- Back Button (Desktop ONLY) -->
           <button
             type="button"
             (click)="goBack()"
-            class="h-12 w-12 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:bg-zinc-50 transition-all active:scale-95 flex items-center justify-center text-zinc-600 dark:text-zinc-400"
+            class="hidden sm:flex h-14 w-14 rounded-2xl bg-surface-container-lowest border border-border/5 shadow-sm hover:bg-surface transition-all active:scale-95 items-center justify-center text-text-muted hover:text-text group"
           >
-            <lucide-angular [img]="icons.ArrowLeft" class="h-5 w-5"></lucide-angular>
+            <lucide-angular [img]="icons.ArrowLeft" class="h-6 w-6 transition-transform group-hover:-translate-x-1"></lucide-angular>
           </button>
-          <div class="space-y-1">
-            <div class="flex items-center gap-2 mb-1">
-              <div [class]="cn('h-1.5 w-1.5 rounded-full animate-pulse', forcedStatus === 'QUOTATION' ? 'bg-blue-500' : 'bg-primary')"></div>
-              <span [class]="cn('text-[10px] font-black uppercase tracking-[0.2em]', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
+          <div class="space-y-1 sm:space-y-3">
+            <div class="flex items-center gap-2 sm:gap-3">
+              <div [class]="cn('h-1.5 w-1.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]', forcedStatus === 'QUOTATION' ? 'bg-blue-500 shadow-blue-500/50' : 'bg-primary shadow-primary/50')"></div>
+              <span [class]="cn('text-[7px] sm:text-[9px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em]', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
                 {{ forcedStatus === 'QUOTATION' ? 'Propuesta Comercial' : 'Carga de Registro Operativo' }}
               </span>
             </div>
-            <h1 class="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 uppercase leading-none">
+            <h1 class="text-3xl md:text-6xl font-black tracking-tighter text-text uppercase leading-none font-display">
               {{ forcedStatus === 'QUOTATION' ? 'Nuevo' : (orderType() === 'CLIENT' ? 'Nuevo' : 'Producción de') }} 
               <span [class]="cn('italic', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
                 {{ forcedStatus === 'QUOTATION' ? 'Presupuesto' : (orderType() === 'CLIENT' ? 'Pedido' : 'Stock') }}
@@ -61,32 +65,33 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
         </div>
       </div>
 
-      <!-- LAYOUT PRINCIPAL -->
-      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <!-- SYSTEM ARCHITECTURE LAYOUT -->
+      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-start">
         
-        <!-- COLUMNA IZQUIERDA: FORMULARIO (Se extiende hacia abajo) -->
-        <div class="lg:col-span-2 space-y-10">
+        <!-- MAIN COLUMN: FORM ARCHITECTURE -->
+        <div class="lg:col-span-8 space-y-12 sm:space-y-16">
           
-          <!-- SECCIÓN 1: CABECERA Y CLIENTE -->
-          <div class="rounded-[2.5rem] border border-zinc-100 bg-white dark:bg-zinc-950 p-8 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:shadow-zinc-200/20">
-             <h2 class="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-8 flex items-center gap-2">
-                Identificación de Orden
+          <!-- SECCIÓN 1: IDENTIDAD DE LA ORDEN -->
+          <div class="rounded-[2rem] sm:rounded-[3rem] border border-border/5 bg-surface-container-low p-6 sm:p-14 shadow-2xl shadow-text/5 transition-all duration-700 hover:shadow-text/10">
+             <h2 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-8 sm:mb-12 flex items-center gap-4">
+                <span class="w-6 sm:w-8 h-px bg-border/10"></span>
+                Identificación del Sistema
              </h2>
              
-             <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
                 @if (!forcedType) {
-                  <div class="sm:col-span-2 space-y-3">
-                    <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Tipo de Operación</label>
-                    <div class="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
-                      <button type="button" (click)="orderType.set('CLIENT')" [class]="cn('h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all', orderType() === 'CLIENT' ? 'bg-white dark:bg-zinc-800 shadow-sm text-primary' : 'text-zinc-400 hover:text-zinc-600')">Externo (Cliente)</button>
-                      <button type="button" (click)="orderType.set('STOCK')" [class]="cn('h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all', orderType() === 'STOCK' ? 'bg-white dark:bg-zinc-800 shadow-sm text-primary' : 'text-zinc-400 hover:text-zinc-600')">Stock (Depósito)</button>
+                  <div class="sm:col-span-2 space-y-3 sm:space-y-4">
+                    <label class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Propósito de Carga</label>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 p-1.5 rounded-2xl sm:rounded-[2rem] bg-surface-container-lowest border border-border/5">
+                      <button type="button" (click)="orderType.set('CLIENT')" [class]="cn('h-12 sm:h-14 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'CLIENT' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Externo (Cliente)</button>
+                      <button type="button" (click)="orderType.set('STOCK')" [class]="cn('h-12 sm:h-14 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'STOCK' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Interno (Stock)</button>
                     </div>
                   </div>
                 }
 
                 @if (orderType() === 'CLIENT') {
                   <app-client-selector
-                    label="Target de Cliente"
+                    label="Entidad Cliente"
                     [value]="clienteId"
                     (valueChange)="clienteId = $event"
                     (clientSelected)="selectedClientName = $event.name"
@@ -99,41 +104,42 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                     label="Promesa de Entrega"
                     [(value)]="fechaEntrega"
                     [disabled]="isSaving()"
-                    placeholder="dd/mm/aaaa"
+                    placeholder="DD/MM/AAAA"
                   ></app-intelligent-date-picker>
                 }
 
                 <app-employee-selector
-                  label="Responsable Operativo"
+                  label="Arquitecto de Producción"
                   [value]="responsableId"
                   (valueChange)="responsableId = $event"
                   [disabled]="isSaving()"
                 ></app-employee-selector>
 
-                <div class="sm:col-span-2 space-y-3">
-                  <label class="text-[11px] font-black uppercase tracking-wider text-zinc-500 ml-1">Instrucciones Generales</label>
-                  <input [(ngModel)]="observaciones" name="notas" placeholder="Ej: Fragilidad, detalles de embalaje, etc..." class="w-full h-12 px-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900 text-sm font-bold outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all">
+                <div class="sm:col-span-2 space-y-3 sm:space-y-4">
+                  <label class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Manifiesto / Observaciones</label>
+                  <input [(ngModel)]="observaciones" name="notas" placeholder="DETALLES TÉCNICOS O LOGÍSTICOS..." 
+                    class="w-full h-14 sm:h-16 px-6 rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black outline-none focus:border-primary/20 focus:ring-[12px] focus:ring-primary/5 transition-all placeholder:opacity-20 uppercase tracking-widest">
                 </div>
              </div>
           </div>
 
-          <!-- SECCIÓN 2: ÍTEMS DE PRODUCCIÓN -->
-          <div class="space-y-6">
-            <div class="flex items-center justify-between px-2">
-              <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Canal de Configuración ({{ items().length }} ítems)</h3>
-              <div class="flex gap-3">
+          <!-- SECCIÓN 2: LÍNEAS DE CONFIGURACIÓN -->
+          <div class="space-y-8 sm:space-y-10">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between px-4 gap-6">
+              <div class="space-y-1 sm:space-y-2">
+                <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Componentes de Producción</h3>
+                <p class="text-[10px] sm:text-xs text-text-muted font-medium italic opacity-60">Configuración detallada de {{ items().length }} unidades.</p>
+              </div>
+              <div class="flex gap-3 sm:gap-4">
                 @if (items().length > 5) {
-                  <button type="button" (click)="removeDuplicates()" class="text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg border border-rose-100 text-rose-500 hover:bg-rose-50 transition-colors">
+                  <button type="button" (click)="removeDuplicates()" class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] px-4 sm:px-6 py-2 rounded-full border border-danger/10 text-danger hover:bg-danger/5 transition-all italic">
                     Limpiar Duplicados
                   </button>
                 }
-                <button type="button" (click)="addItem()" class="h-10 px-6 rounded-2xl bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-lg">
-                  <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nuevo Ítem
-                </button>
               </div>
             </div>
 
-            <div class="space-y-8">
+            <div class="space-y-8 sm:space-y-12">
               @for (item of items(); track $index) {
                 <app-item-details-form
                   [index]="$index"
@@ -149,124 +155,152 @@ import { OrderCalculatorService } from '../../services/order-calculator.service'
                   (onFileDelete)="untrackFile($event)"
                 ></app-item-details-form>
               }
+
+              <!-- ADD ITEM BUTTON (PERSISTENT FLOW) -->
+              <div class="flex justify-center pt-4">
+                <button type="button" (click)="addItem()" 
+                    class="h-14 w-14 sm:w-auto sm:px-10 rounded-full bg-zinc-900 text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:scale-[1.05] active:scale-[0.95] transition-all shadow-xl shadow-zinc-900/10 group">
+                  <lucide-angular [img]="icons.Plus" class="h-5 w-5 sm:h-4 sm:w-4 transition-transform group-hover:rotate-90"></lucide-angular>
+                  <span class="hidden sm:inline">Anexar Ítem</span>
+                </button>
+              </div>
             </div>
 
           </div>
         </div>
 
-        <!-- COLUMNA DERECHA: RESUMEN (FLOTANTE STICKY) -->
-        <div class="h-full relative overflow-visible">
-           <div class="sticky top-24 space-y-8">
+        <!-- SIDEBAR: MATRIZ DE VALORES (FLOTANTE STICKY EN DESKTOP) -->
+        <div class="lg:col-span-4 h-full relative overflow-visible mt-8 lg:mt-0">
+           <div class="sticky top-24 space-y-10">
               
-              <!-- Card Resumen Premium -->
-              <div class="p-10 rounded-[3rem] bg-white border border-zinc-100 shadow-2xl shadow-zinc-200/40 border-t-4 border-t-primary animate-in slide-in-from-right-10 duration-700">
-                 <h3 class="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-10 flex items-center gap-3">
-                   <div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_12px_rgba(var(--primary-rgb),0.5)]"></div>
-                   Resumen Operativo
+              <!-- Luxury Summary Matrix -->
+              <div class="p-8 sm:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] bg-surface-container-low border border-border/5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] relative overflow-hidden group">
+                 <!-- Subtle Branding Accent -->
+                 <div [class]="cn('absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity duration-1000 group-hover:opacity-20', forcedStatus === 'QUOTATION' ? 'bg-blue-500' : 'bg-primary')"></div>
+
+                 <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-8 sm:mb-12 flex items-center gap-4">
+                   <div [class]="cn('w-2 h-2 rounded-full', forcedStatus === 'QUOTATION' ? 'bg-blue-500' : 'bg-primary')"></div>
+                   Arquitectura de Costos
                  </h3>
                  
-                 <div class="space-y-8">
-                     <div class="flex justify-between items-center px-2">
-                        <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Líneas de Pedido</span>
-                        <span class="text-xl font-black text-zinc-950 tabular-nums">{{ items().length }}</span>
+                 <div class="space-y-8 sm:space-y-10">
+                     <div class="flex justify-between items-center group/row">
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Volumen Config</span>
+                        <span class="text-lg sm:text-xl font-black text-text tabular-nums tracking-tighter">{{ items().length }} UN.</span>
                      </div>
 
-                     <div class="flex justify-between items-center px-2">
-                        <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Unidades Totales</span>
-                        <span class="text-xl font-black text-zinc-950 tabular-nums">{{ totales().unidades }}</span>
+                     <div class="flex justify-between items-center group/row">
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Masa Crítica</span>
+                        <span class="text-lg sm:text-xl font-black text-text tabular-nums tracking-tighter">{{ totales().unidades }} PIEZAS</span>
                      </div>
 
-                    <div class="h-px bg-zinc-100 mx-2"></div>
+                    <div class="h-px bg-border/5"></div>
 
-                    <div class="flex flex-col gap-2 px-2">
-                       <span class="text-[11px] font-black uppercase tracking-widest text-zinc-400">Total a Cobrar</span>
-                       <span class="text-4xl font-black text-zinc-950 tabular-nums tracking-tighter leading-none">
-                         {{ totales().total | currency }}
-                       </span>
+                    <div class="space-y-2 sm:space-y-3">
+                       <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40">Inversión Bruta</span>
+                       <div class="flex items-baseline gap-1">
+                          <span class="text-4xl sm:text-5xl font-black text-text tabular-nums tracking-tighter leading-none">
+                            {{ totales().total | currency:'':'symbol':'1.0-0' }}
+                          </span>
+                       </div>
                     </div>
 
                     @if (orderType() !== 'STOCK') {
-                      <div class="flex flex-col gap-2 px-2 pt-2 animate-in fade-in duration-500">
-                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Total Adelantos</span>
-                            <span class="text-sm font-black text-emerald-500">- {{ totales().totalSenias | currency }}</span>
+                      <div class="space-y-4 sm:space-y-6 pt-2 sm:pt-4 animate-in fade-in duration-700">
+                         <div class="flex items-center justify-between px-1">
+                            <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/40">Adelantos Registrados</span>
+                            <span class="text-[10px] sm:text-xs font-black text-success tabular-nums">- {{ totales().totalSenias | currency:'':'symbol':'1.0-0' }}</span>
                          </div>
-                         <div class="h-[1px] bg-zinc-100 w-full opacity-50"></div>
-                         <div class="flex flex-col gap-1 mt-1">
-                            <span class="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Saldo en Entrega</span>
-                            <span class="text-4xl font-black text-primary tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency }}</span>
+                         
+                         <div class="p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-surface-container-lowest border border-primary/5 space-y-1 sm:space-y-2">
+                            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.5em] text-primary">Saldo en Entrega</span>
+                            <div class="text-3xl sm:text-4xl font-black text-primary tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency:'':'symbol':'1.0-0' }}</div>
                          </div>
                       </div>
                     }
 
-                    <div class="pt-6">
-                      <button
-                        type="submit"
-                        [disabled]="isSaving()"
-                        [class]="cn(
-                          'w-full h-16 sm:h-20 rounded-3xl text-white font-black uppercase tracking-wider text-[11px] shadow-2xl transition-all flex items-center justify-center gap-2 group relative overflow-hidden active:scale-95 px-4',
-                          forcedStatus === 'QUOTATION' ? 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700' : 'bg-zinc-950 shadow-zinc-950/20 hover:bg-black'
+                    <div class="hidden sm:block pt-8">
+                      <app-button-spinner
+                        [loading]="isSaving()"
+                        (onClick)="handleSave($event)"
+                        [btnClass]="cn(
+                          'w-full h-20 rounded-[2rem] text-white font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl transition-all flex items-center justify-center gap-4 group relative overflow-hidden active:scale-95',
+                          forcedStatus === 'QUOTATION' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-primary shadow-primary/30'
                         )"
                       >
-                        @if (isSaving()) {
-                          <lucide-angular [img]="icons.RefreshCw" class="h-6 w-6 animate-spin"></lucide-angular>
-                        } @else {
-                          <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                          <span class="relative z-10 whitespace-nowrap">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : (id ? 'Guardar Cambios' : 'Confirmar Orden') }}</span>
-                          <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all relative z-10 shrink-0"></lucide-angular>
-                        }
-                      </button>
+                        <span class="relative z-10 whitespace-nowrap">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : (id ? 'Sincronizar' : 'Finalizar Registro') }}</span>
+                        <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 opacity-40 group-hover:opacity-100 group-hover:scale-125 transition-all relative z-10 shrink-0"></lucide-angular>
+                      </app-button-spinner>
                     </div>
 
-                    <p class="text-[9px] font-black text-center text-zinc-400 uppercase tracking-[0.15em] leading-relaxed pt-2 px-4">
-                      {{ orderType() === 'STOCK' ? 'El registro impactará en el inventario actual.' : 'Se notificará al cliente y al taller tras confirmar.' }}
+                    <p class="text-[8px] font-black text-center text-text-muted/40 uppercase tracking-[0.3em] leading-relaxed pt-2 sm:pt-4 px-4 sm:px-6">
+                      {{ orderType() === 'STOCK' ? 'El registro impactará el inventario en tiempo real.' : 'Notificaciones automatizadas tras la firma digital.' }}
                     </p>
                  </div>
               </div>
-
            </div>
         </div>
       </fieldset>
-    <!-- BARRA DE ACCIÓN FLOTANTE (UX) -->
-     @if (showFloatingFooter()) {
-       <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-700">
-          <div class="h-16 px-8 rounded-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border border-zinc-100 dark:border-zinc-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex items-center gap-6">
-             <div class="flex flex-col">
-                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 leading-none mb-1">Total acumulado</span>
-                <span class="text-lg font-black text-zinc-900 dark:text-white leading-none tabular-nums">{{ totales().total | currency }}</span>
-             </div>
-             
-             <div class="w-px h-8 bg-zinc-100 dark:bg-zinc-800"></div>
-             
-             <button 
-                type="button" 
-                (click)="handleSave($event)" 
-                [disabled]="isSaving()"
-                class="h-10 px-6 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
-             >
-                @if (isSaving()) {
-                   <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4 animate-spin"></lucide-angular>
-                } @else {
-                   <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
-                   <span>{{ id ? 'Guardar' : 'Confirmar' }}</span>
-                }
-             </button>
-          </div>
-  
-          <app-floating-calculator></app-floating-calculator>
-       </div>
-     }
-  `
+
+      <!-- EDITORIAL FLOATING DOCK (DESKTOP ONLY) -->
+      @if (showFloatingFooter()) {
+        <div class="hidden sm:flex fixed bottom-24 left-1/2 -translate-x-1/2 w-auto z-[100] items-center justify-center animate-in slide-in-from-bottom-20 duration-1000">
+           <div class="h-20 w-auto pl-12 pr-6 rounded-full bg-surface/90 backdrop-blur-3xl border border-border/5 shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex items-center justify-start gap-10">
+              <div class="flex flex-col">
+                 <span class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/60 leading-none mb-2 italic">Total Acumulado</span>
+                 <span class="text-2xl font-black text-text leading-none tabular-nums tracking-tighter">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
+              </div>
+              
+              <div class="w-px h-10 bg-border/5"></div>
+              
+              <app-button-spinner
+                [loading]="isSaving()"
+                (onClick)="handleSave($event)"
+                [btnClass]="'h-12 px-10 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-3 shadow-2xl shadow-primary/20'"
+              >
+                <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
+                <span class="inline">{{ id ? 'Guardar' : 'Finalizar' }}</span>
+              </app-button-spinner>
+           </div>
+        </div>
+      }
+
+      <!-- MOBILE CALCULATOR FAB -->
+      <button 
+        type="button" 
+        (click)="calcTrigger.isOpen.set(true)"
+        class="sm:hidden fixed bottom-28 right-4 h-14 w-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 bg-primary/80 backdrop-blur-3xl border border-white/20 text-white z-[120]"
+      >
+        <lucide-angular [img]="icons.Calculator" class="h-6 w-6"></lucide-angular>
+      </button>
+
+      <app-floating-calculator #calcTrigger [hideTrigger]="layoutService.isMobile()"></app-floating-calculator>
+    </form>
+  `,
+  styles: [`
+    :host { display: block; }
+  `]
 })
-export class OrderFormComponent implements OnDestroy {
+export class OrderFormComponent implements OnInit, OnDestroy {
   private api = inject(PedidosApiService);
   private filesApi = inject(FilesApiService);
   private clientesApi = inject(ClientesApiService);
   private session = inject(SessionService);
+  public layoutService = inject(LayoutService);
   private router = inject(Router);
   private calculator = inject(OrderCalculatorService);
 
-  readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw };
+  readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X };
+
+  ngOnInit() {
+    this.layoutService.backAction.set(() => this.goBack());
+    this.layoutService.headerTitle.set(this.forcedStatus === 'QUOTATION' ? 'NUEVO PRESUPUESTO' : 'NUEVO PEDIDO');
+    this.layoutService.customBottomAction.set({
+      label: this.id ? 'GUARDAR CAMBIOS' : 'FINALIZAR PEDIDO',
+      icon: Save,
+      action: () => this.handleSave()
+    });
+  }
 
   @Input() set forcedType(val: 'CLIENT' | 'STOCK' | undefined) {
     if (val) this.orderType.set(val);
@@ -287,6 +321,8 @@ export class OrderFormComponent implements OnDestroy {
   observaciones = '';
   isSaving = signal(false);
   showFloatingFooter = signal(false);
+  isAtBottom = signal(false);
+  actionsOpen = signal(false);
   isSaved = false;
   pendingFiles: string[] = [];
   vErrors: Record<string, string> = {};
@@ -377,12 +413,23 @@ export class OrderFormComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
+    this.layoutService.backAction.set(null);
+    this.layoutService.headerTitle.set(null);
+    this.layoutService.customBottomAction.set(null);
     this.cleanupFiles();
   }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    this.showFloatingFooter.set(window.scrollY > 400);
+    this.showFloatingFooter.set(window.scrollY > 300);
+    
+    // Check if near bottom to hide the quick-scroll arrow
+    const threshold = 150;
+    const scrollPos = window.scrollY || window.pageYOffset;
+    const windowHeight = window.innerHeight;
+    const docHeight = document.documentElement.scrollHeight;
+    
+    this.isAtBottom.set((scrollPos + windowHeight) >= (docHeight - threshold));
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -466,12 +513,19 @@ export class OrderFormComponent implements OnDestroy {
     this.totales.set(this.calculator.calculateOrder(this.items(), this.rubro()));
   }
 
+  scrollToBottom() {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth'
+    });
+  }
+
   goBack() {
     this.router.navigate([this.returnUrl]);
   }
 
-  async handleSave(e: Event) {
-    e.preventDefault();
+  async handleSave(e?: Event) {
+    if (e) e.preventDefault();
     if (this.isSaving()) return;
     if (this.orderType() === 'CLIENT' && !this.clienteId) {
       alert('Debe seleccionar un cliente');

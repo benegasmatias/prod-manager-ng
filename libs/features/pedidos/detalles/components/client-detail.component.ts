@@ -20,68 +20,60 @@ import { SessionService } from '@core/session/session.service';
     OrderItemsWidgetComponent, OrderProgressStepperComponent
   ],
   template: `
-    <div class="space-y-8 animate-in fade-in duration-500">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div class="space-y-4">
-          <a routerLink="/pedidos" class="flex items-center gap-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors group">
-            <lucide-angular [img]="icons.ArrowLeft" class="h-4 w-4 transition-transform group-hover:-translate-x-1"></lucide-angular>
-            <span class="text-xs font-black uppercase tracking-widest">Listado de Pedidos</span>
+    <div class="space-y-12 animate-in fade-in duration-1000">
+      
+      <!-- EDITORIAL CONTEXTUAL HEADER -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-10 pt-4 border-b border-border/5 pb-12">
+        <div class="flex items-start gap-8">
+          <a routerLink="/pedidos" class="hidden md:flex h-14 w-14 rounded-2xl bg-surface-container-lowest border border-border/5 shadow-sm hover:bg-surface transition-all active:scale-95 items-center justify-center text-text-muted hover:text-text group">
+            <lucide-angular [img]="icons.ArrowLeft" class="h-6 w-6 transition-transform group-hover:-translate-x-1"></lucide-angular>
           </a>
-
-          <div class="flex flex-wrap items-center gap-4">
-            <h1 class="text-4xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50 flex items-center gap-4">
-              Orden <span class="text-primary">#{{ pedido()?.code }}</span>
-            </h1>
-            <div class="flex gap-2">
-              <span [class]="cn('px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm', getStatusStyles(pedido()?.status || ''))">
-                {{ getStatusLabel(pedido()?.status || '') }}
-              </span>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"></div>
+              <span class="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Expediente de Pedido</span>
             </div>
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-text uppercase leading-none font-display">
+              Orden <span class="text-primary italic">#{{ pedido()?.code }}</span>
+            </h1>
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
-          <button (click)="onDelete.emit()" class="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center group" title="Eliminar Pedido">
-            <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+        <div class="hidden md:flex items-center gap-4">
+          <button (click)="onDelete.emit()" class="h-14 w-14 rounded-2xl bg-danger-container/10 text-danger hover:bg-danger hover:text-white transition-all flex items-center justify-center group shadow-2xl shadow-danger/5" title="Eliminar Registro">
+            <lucide-angular [img]="icons.Trash2" class="h-5 w-5"></lucide-angular>
           </button>
 
-          <button (click)="onEdit.emit()" class="h-12 px-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-[10px] font-black uppercase tracking-widest hover:border-primary/20 transition-all flex items-center gap-3">
+          <button (click)="onEdit.emit()" class="h-14 px-8 rounded-2xl bg-surface-container-lowest text-[10px] font-black uppercase tracking-[0.3em] hover:bg-surface transition-all flex items-center gap-4 shadow-2xl shadow-text/5 border border-border/5 active:scale-95 italic">
             <lucide-angular [img]="icons.Edit3" class="h-4 w-4"></lucide-angular>
             <span>Editar</span>
           </button>
 
-          @if (hasPendingPayment()) {
-          <button (click)="openManage('PAYMENT')" class="h-12 px-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all flex items-center gap-3">
-            <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
-            <span>Registrar Pago</span>
-          </button>
-          }
-
-          <button (click)="openManage('STATUS')" class="h-12 px-8 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+          <button (click)="openManage('STATUS')" class="h-14 px-10 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_30px_60px_-15px_rgba(var(--primary-rgb),0.4)] hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center gap-4 italic">
             <lucide-angular [img]="icons.Zap" class="h-4 w-4"></lucide-angular>
-            <span>Gestionar Producción</span>
+            <span>Gestión de Pedido</span>
           </button>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div class="lg:col-span-3">
           <app-order-progress-stepper [status]="pedido()!.status" [age]="age()" [dueDate]="pedido()!.dueDate | date:'dd / MM / yyyy'"></app-order-progress-stepper>
         </div>
 
-        <div class="bg-zinc-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden flex flex-col justify-between group">
-          <div class="absolute -top-10 -right-10 h-32 w-32 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
-          <div class="space-y-1 relative z-10">
-            <p class="text-[10px] font-black uppercase tracking-widest text-white/30">Operador a Cargo</p>
-            <h4 class="text-xl font-black leading-tight">{{ pedido()!.responsableGeneral?.firstName || 'Sin' }} {{ pedido()!.responsableGeneral?.lastName || 'Asignar' }}</h4>
+        <div class="bg-text rounded-[3rem] p-10 text-white relative overflow-hidden flex flex-col justify-between group shadow-[0_40px_80px_-20px_rgba(var(--text-rgb),0.3)]">
+          <div class="absolute -top-10 -right-10 h-32 w-32 bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
+          <div class="space-y-2 relative z-10">
+            <p class="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 italic">Curador Responsable</p>
+            <h4 class="text-2xl font-black leading-tight tracking-tight uppercase italic">{{ pedido()!.responsableGeneral?.firstName || 'Sin' }} {{ pedido()!.responsableGeneral?.lastName || 'Asignar' }}</h4>
           </div>
-          <div class="flex items-center gap-3 relative z-10">
-            <div class="h-10 w-10 rounded-2xl bg-white/10 flex items-center justify-center text-white/60">
+          <div class="flex items-center gap-4 relative z-10">
+            <div class="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center text-white/60">
               <lucide-angular [img]="icons.Calendar" class="h-5 w-5"></lucide-angular>
             </div>
             <div>
-              <p class="text-[8px] font-black uppercase tracking-widest text-white/40 leading-none">Prometido para el</p>
-              <p class="text-xs font-black">{{ pedido()!.dueDate | date:'EEEE, dd MMM' }}</p>
+              <p class="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 leading-none mb-1 italic">Promesa Operativa</p>
+              <p class="text-xs font-black uppercase tracking-widest">{{ pedido()!.dueDate | date:'EEEE, dd MMM' }}</p>
             </div>
           </div>
         </div>
@@ -94,30 +86,35 @@ import { SessionService } from '@core/session/session.service';
         </div>
 
         <div class="space-y-8">
-          <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm space-y-8">
-            <div class="flex flex-col items-center text-center space-y-4">
-              <div class="h-24 w-24 rounded-[3rem] bg-primary/5 p-2 ring-1 ring-primary/20">
-                <div class="h-full w-full rounded-[2.5rem] bg-white flex items-center justify-center text-primary shadow-lg">
-                  <lucide-angular [img]="icons.User" class="h-10 w-10"></lucide-angular>
+        <div class="space-y-10">
+          <div class="bg-surface-container-lowest rounded-[3rem] border border-border/5 p-10 shadow-2xl shadow-text/5 space-y-10 relative overflow-hidden group">
+            <div class="absolute -top-20 -left-20 w-40 h-40 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+            
+            <div class="flex flex-col items-center text-center space-y-6 relative z-10">
+              <div class="h-28 w-28 rounded-[3rem] bg-surface-container-low p-3 shadow-inner">
+                <div class="h-full w-full rounded-[2.5rem] bg-surface-container-lowest flex items-center justify-center text-primary shadow-2xl shadow-text/5 group-hover:scale-105 transition-transform duration-700">
+                  <lucide-angular [img]="icons.User" class="h-12 w-12"></lucide-angular>
                 </div>
               </div>
-              <div class="space-y-1">
-                <h2 class="text-2xl font-black text-zinc-900 dark:text-white">{{ pedido()!.clientName || 'Consumidor Final' }}</h2>
-                <div class="flex items-center justify-center gap-2">
-                  <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 px-3 py-1 bg-zinc-50 rounded-lg">ID Cliente: {{ pedido()!.clienteId}}</span>
-                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                  <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Cliente Recurrente</span>
+              <div class="space-y-3">
+                <h2 class="text-3xl font-black text-text tracking-tighter uppercase italic leading-none">{{ pedido()!.clientName || 'Consumidor Final' }}</h2>
+                <div class="flex items-center justify-center gap-4">
+                  <span class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic px-4 py-1 bg-surface-container-low rounded-full">ID: {{ pedido()!.clienteId}}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                    <span class="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-600 italic">Vínculo Activo</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="space-y-4 pt-8 border-t border-zinc-50 dark:border-zinc-800">
-              <div class="flex items-center gap-4 text-left group">
-                <div class="h-10 w-10 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-primary transition-all">
+            <div class="space-y-6 pt-10 border-t border-border/5 relative z-10">
+              <div class="flex items-center gap-6 group/info">
+                <div class="h-14 w-14 rounded-2xl bg-surface-container-low flex items-center justify-center text-text-muted/20 group-hover/info:text-primary group-hover/info:bg-primary/5 transition-all duration-700">
                   <lucide-angular [img]="icons.Phone" class="h-5 w-5"></lucide-angular>
                 </div>
-                <div>
-                  <p class="text-[8px] font-black uppercase text-zinc-400 tracking-widest leading-none">Teléfono</p>
-                  <p class="text-sm font-black text-zinc-700 dark:text-zinc-300">{{ pedido()!.clientPhone || 'No registrado' }}</p>
+                <div class="space-y-1">
+                  <p class="text-[8px] font-black uppercase text-text-muted/40 tracking-[0.4em] leading-none italic">Línea de Contacto</p>
+                  <p class="text-sm font-black text-text tracking-widest">{{ pedido()!.clientPhone || 'NO REGISTRADO' }}</p>
                 </div>
               </div>
             </div>

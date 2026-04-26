@@ -13,22 +13,23 @@ import { SkeletonComponent, SearchFilterBarComponent, OrdersTableComponent, Pagi
 import { PedidoSortKey, PedidoSortDir } from '../../shared/models/pedido';
 import { PEDIDOS_LABELS, PEDIDOS_ICONS } from './pedidos.config';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
+import { cn } from '@shared/utils/cn';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { LayoutService } from '../../core/layout/layout.service';
+import { StockService } from '../../core/api/stock.service';
 
 @Component({
   selector: 'app-pedidos-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    LucideAngularModule, 
-    FormsModule, 
-    OrderStatusModalComponent, 
-    SearchFilterBarComponent, 
-    OrdersTableComponent, 
-    PaginatorComponent, 
-    LoadingSpinnerComponent, 
-    PageSizeSelectorComponent, 
+    CommonModule,
+    RouterModule,
+    LucideAngularModule,
+    FormsModule,
+    OrderStatusModalComponent,
+    OrdersTableComponent,
+    PaginatorComponent,
+    LoadingSpinnerComponent,
     PageShellComponent
   ],
   templateUrl: './pedidos.component.html',
@@ -41,6 +42,14 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private confirm = inject(ConfirmService);
+  public layout = inject(LayoutService);
+  public stockService = inject(StockService);
+  cn = cn;
+
+  activeMobileSector = signal<'active' | 'commercial' | 'history'>('active');
+  isMobile = computed(() => this.layout.isMobile());
+  headerVisible = signal(true);
+  private lastScroll = 0;
 
   // Labels and Icons for Template
   protected readonly labels = PEDIDOS_LABELS;
@@ -65,13 +74,17 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   dateDesde = signal('');
   dateHasta = signal('');
 
+  // Plan Usage
+  planUsage = this.session.planUsage;
+  canAddOrder = computed(() => this.planUsage()?.canCreate.orders ?? true);
+
   // UI State
   selectedOrder = signal<Pedido | null>(null);
   isModalOpen = signal(false);
 
   // Pagination State
   pageSize = 5;
-  
+
   productionOrdersData = signal<Pedido[]>([]);
   productionPage = signal(1);
   productionTotal = signal(0);
@@ -133,10 +146,58 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadData({ initial: true });
       }
     });
+
+    effect(() => {
+      if (this.layout.isMobile()) {
+        this.layout.fabAction.set({
+          action: () => this.router.navigate(['/pedidos/nuevo']),
+          icon: this.icons.PLUS
+        });
+      } else {
+        this.layout.fabAction.set(null);
+      }
+    });
+  }
+
+  scrollToSector(sector: 'active' | 'commercial' | 'history') {
+    this.activeMobileSector.set(sector);
+    const element = document.getElementById(`${sector}-sector`);
+    if (element) {
+      const offset = 180; // Offset for sticky header
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   }
 
   ngAfterViewInit() {
     this.setupObserver();
+    this.setupScrollListener();
+  }
+
+  private setupScrollListener() {
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll <= 0) {
+        this.headerVisible.set(true);
+        return;
+      }
+      
+      if (currentScroll > this.lastScroll && currentScroll > 100) {
+        // Scrolling down
+        this.headerVisible.set(false);
+      } else if (currentScroll < this.lastScroll) {
+        // Scrolling up
+        this.headerVisible.set(true);
+      }
+      this.lastScroll = currentScroll;
+    }, { passive: true });
   }
 
   ngOnDestroy() {
@@ -147,11 +208,11 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.observer = new IntersectionObserver(([entry]) => {
       // REGLA: No cargar historial si las tablas principales todavía están cargando (falsa intersección por skeletons)
       const mainLoading = this.loadingProduction() || this.loadingCommercial();
-      
+
       if (entry.isIntersecting && !mainLoading && !this.loadingArchived() && !this.archivedLoaded()) {
         this.loadArchived();
       }
-    }, { 
+    }, {
       threshold: 0.1,
       rootMargin: '0px 0px -100px 0px' // Forzar a que entre al menos 100px en pantalla
     });
@@ -161,7 +222,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngOnInit() { 
+  ngOnInit() {
     // Handle search from QueryParams (deep linking)
     const initialSearch = this.route.snapshot.queryParamMap.get('search');
     if (initialSearch) {
@@ -202,7 +263,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       const numA = Number(valA);
       const numB = Number(valB);
       if (!isNaN(numA) && !isNaN(numB)) {
-          return dir === 'asc' ? numA - numB : numB - numA;
+        return dir === 'asc' ? numA - numB : numB - numA;
       }
 
       const comparison = String(valA || '').localeCompare(String(valB || ''));
@@ -219,18 +280,19 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'startDate': this.dateDesde.set(value); break;
       case 'endDate': this.dateHasta.set(value); break;
     }
-    
+
     this.productionPage.set(1);
     this.commercialPage.set(1);
     this.archivedPage.set(1);
     this.archivedLoaded.set(false); // REGLA: Resetear carga para forzar lazy loading en scroll
-    
+
     this.loadData();
   }
 
   async loadData(options: { initial?: boolean } = {}) {
     // Global data is always needed
     this.loadGlobalData();
+    this.session.refreshPlanUsage();
 
     // 1. Always load production (Table 1)
     this.loadProduction();
@@ -252,7 +314,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // Se resetea para que el IntersectionObserver lo dispare al scrollear
     if (options.initial) {
       this.archivedOrdersData.set([]);
-      this.archivedTotal.set(0); 
+      this.archivedTotal.set(0);
       this.archivedLoaded.set(false);
       this.loadingArchived.set(false);
     }
@@ -285,11 +347,11 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadingProduction.set(true);
     try {
       const EXCLUDED_PRODUCTION = 'IN_STOCK,DELIVERED,CANCELLED,SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const res = await this.api.getListing({ 
-        ...this.getCommonParams(), 
-        page: this.productionPage(), 
-        pageSize: this.pageSize, 
-        excludeStatuses: EXCLUDED_PRODUCTION 
+      const res = await this.api.getListing({
+        ...this.getCommonParams(),
+        page: this.productionPage(),
+        pageSize: this.pageSize,
+        excludeStatuses: EXCLUDED_PRODUCTION
       });
       this.productionOrdersData.set(res.data);
       this.productionTotal.set(res.total || 0);
@@ -304,11 +366,11 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadingCommercial.set(true);
     try {
       const COMMERCIAL_STATUSES = 'SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const res = await this.api.getListing({ 
-        ...this.getCommonParams(), 
-        page: this.commercialPage(), 
-        pageSize: this.pageSize, 
-        statuses: COMMERCIAL_STATUSES 
+      const res = await this.api.getListing({
+        ...this.getCommonParams(),
+        page: this.commercialPage(),
+        pageSize: this.pageSize,
+        statuses: COMMERCIAL_STATUSES
       });
       this.commercialOrdersData.set(res.data);
       this.commercialTotal.set(res.total || 0);
@@ -323,11 +385,11 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadingArchived.set(true);
     try {
       const HISTORY_STATUSES = 'DELIVERED,CANCELLED';
-      const res = await this.api.getListing({ 
-        ...this.getCommonParams(), 
-        page: this.archivedPage(), 
-        pageSize: this.pageSize, 
-        statuses: HISTORY_STATUSES 
+      const res = await this.api.getListing({
+        ...this.getCommonParams(),
+        page: this.archivedPage(),
+        pageSize: this.pageSize,
+        statuses: HISTORY_STATUSES
       });
       this.archivedOrdersData.set(res.data);
       this.archivedTotal.set(res.total || 0);
@@ -363,7 +425,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private syncSelectedOrder(newData: Pedido[]) {
     const current = this.selectedOrder();
     if (!current) return;
-    
+
     const updated = newData.find(o => o.id === current.id);
     if (updated) {
       this.selectedOrder.set(updated);
@@ -419,6 +481,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       try {
         await this.api.delete(order.id, order.businessId);
         await this.loadData();
+        this.stockService.loadStock();
       } catch (err) {
         console.error('Error deleting order:', err);
         alert('No se pudo eliminar el pedido.');

@@ -134,6 +134,10 @@ export interface Pedido {
   hora_visita?: string;
   direccion_obra?: string;
   observaciones_visita?: string;
+
+  // Mobile Redesign Props
+  productionProgress?: number;
+  isFacturado?: boolean;
 }
 
 export interface StatusHistoryEntry {

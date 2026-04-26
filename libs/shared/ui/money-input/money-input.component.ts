@@ -13,7 +13,8 @@ import { parseMoney, sanitizeMoneyInput } from '@shared/utils/money';
       @if (label) {
         <label [class]="cn(
           'text-[10px] font-black uppercase tracking-[0.2em] ml-1',
-          error ? 'text-rose-500' : 'text-zinc-400'
+          error ? 'text-rose-500' : 'text-zinc-400',
+          labelClassName
         )">
           {{ label }} @if (required) { <span class="text-rose-500">*</span> }
         </label>
@@ -78,6 +79,7 @@ export class MoneyInputComponent implements OnChanges {
   @Input() placeholder: string = '0,00';
   @Input() className: string = '';
   @Input() inputClassName: string = '';
+  @Input() labelClassName: string = '';
 
   displayValue = signal('');
   private isFocused = false;

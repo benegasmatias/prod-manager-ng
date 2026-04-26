@@ -50,6 +50,10 @@ export const routes: Routes = [
     loadComponent: () => import('../../libs/features/auth/pages/waiting-room/waiting-room.component').then(m => m.WaitingRoomComponent)
   },
   {
+    path: 'subscription-expired',
+    loadComponent: () => import('../../libs/features/auth/pages/subscription-expired/subscription-expired.component').then(m => m.SubscriptionExpiredComponent)
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard, userStatusGuard, businessGuard],
@@ -109,6 +113,10 @@ export const routes: Routes = [
       {
         path: 'ajustes',
         loadChildren: () => import('../../libs/features/ajustes/ajustes.routes').then(m => m.AJUSTES_ROUTES)
+      },
+      {
+        path: 'billing',
+        loadChildren: () => import('../../libs/features/billing/billing.routes').then(m => m.BILLING_ROUTES)
       },
       {
         path: 'kiosco',

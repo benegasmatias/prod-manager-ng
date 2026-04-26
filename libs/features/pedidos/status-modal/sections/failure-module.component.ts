@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, AlertTriangle, Trash2, Undo2, Plus } from 'lucide-angular';
+import { LucideAngularModule, AlertTriangle, Trash2, Undo2, Plus, Search, PlusCircle, Clock, Settings, Layers, AlertOctagon, RefreshCw, Target } from 'lucide-angular';
 import { Pedido, Rubro, Material } from '@shared/models';
 import { cn } from '@shared/utils/cn';
 import { getStatusLabel, getStatusStyles } from '@shared/utils/negocio-utils';
@@ -34,6 +34,9 @@ export class FailureModuleComponent {
   @Output() onMaterialChange = new EventEmitter<{ index: number, materialId: string }>();
   @Output() onGramsChange = new EventEmitter<{ index: number, grams: number }>();
 
+  readonly icons = {
+    AlertTriangle, Trash2, Undo2, Plus, Search, PlusCircle, Clock, Settings, Layers, AlertOctagon, RefreshCw, Target
+  };
   readonly Plus = Plus;
   readonly Trash2 = Trash2;
   readonly Math = Math;

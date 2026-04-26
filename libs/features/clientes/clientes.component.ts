@@ -1,8 +1,8 @@
-import { Component, OnInit, computed, inject, signal, effect, OnDestroy } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, effect, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star, ChevronRight, ChevronLeft, UserPlus } from 'lucide-angular';
 import { ClientesService } from '../../core/api/clientes.service';
 import { Cliente, ClienteStats } from '../../core/models/cliente.model';
 import { SessionService } from '../../core/session/session.service';
@@ -10,6 +10,8 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { ClienteFormDialogComponent } from '../../shared/ui/clientes/cliente-form-dialog/cliente-form-dialog.component';
 import { PaginatorComponent } from '../../shared/ui/paginator/paginator.component';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
+import { LayoutService } from '../../core/layout/layout.service';
 
 @Component({
   selector: 'app-clientes',
@@ -20,7 +22,8 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
     FormsModule, 
     LucideAngularModule,
     ClienteFormDialogComponent,
-    PaginatorComponent
+    PaginatorComponent,
+    PageShellComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.css']
@@ -31,15 +34,20 @@ export class ClientesComponent implements OnInit, OnDestroy {
   private sessionService = inject(SessionService);
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
+  protected layoutService = inject(LayoutService);
 
   // Icons
-  readonly icons = { Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2 };
+  readonly icons = { Plus, Search, ExternalLink, Phone, Mail, User, DollarSign, Pencil, Trash2, Star, ChevronRight, ChevronLeft, UserPlus };
 
   // Local State
   searchTerm = signal<string>('');
   isFormOpen = signal<boolean>(false);
   isSaving = signal<boolean>(false);
   editingClient = signal<Cliente | null>(null);
+
+  // Mobile scroll behavior
+  headerVisible = signal<boolean>(true);
+  private lastScrollTop = 0;
   
   // Pagination State
   page = signal<number>(1);
@@ -61,6 +69,20 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
+      // Set contextual FAB action for mobile
+      if (this.layoutService.isMobile()) {
+        this.layoutService.fabAction.set({
+          icon: this.icons.UserPlus,
+          action: () => this.handleNewClient()
+        });
+        
+        // Setup back button to go to Inicio
+        this.layoutService.showBackButton.set(true);
+        this.layoutService.backAction.set(() => this.router.navigate(['/dashboard']));
+      } else {
+        this.layoutService.fabAction.set(null);
+      }
+
       const id = this.activeNegocioId();
       const p = this.page();
       const s = this.searchTerm(); // Tracking these signals triggers the effect
@@ -68,6 +90,20 @@ export class ClientesComponent implements OnInit, OnDestroy {
         this.clientesService.loadClientes(id, s, p, this.pageSize());
       }
     });
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    if (!this.layoutService.isMobile()) return;
+    
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    if (scrollTop > this.lastScrollTop && scrollTop > 100) {
+      this.headerVisible.set(false);
+    } else {
+      this.headerVisible.set(true);
+    }
+    this.lastScrollTop = scrollTop;
   }
 
   ngOnInit(): void {
@@ -85,6 +121,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.layoutService.customBottomAction.set(null);
+    this.layoutService.showBackButton.set(false);
+    this.layoutService.backAction.set(null);
   }
 
   // Actions

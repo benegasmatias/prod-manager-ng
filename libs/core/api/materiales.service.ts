@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { MaterialesApiService } from './materiales.api.service';
 import { SessionService } from '../session/session.service';
-import { Material } from '../../shared/models/material';
+import { Material, MaterialFormFieldSchema } from '../../shared/models/material';
 
 @Injectable({ providedIn: 'root' })
 export class MaterialesService {
@@ -11,6 +11,7 @@ export class MaterialesService {
   loading = signal(false);
   saving = signal(false);
   items = signal<Material[]>([]);
+  schemaFields = signal<MaterialFormFieldSchema[]>([]);
   loadedBusinessId = signal<string | null>(null);
 
   stats = computed(() => {
@@ -36,6 +37,22 @@ export class MaterialesService {
       console.error('Error loadMateriales:', e);
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async loadSchema() {
+    const businessId = this.session.activeNegocio()?.id;
+    const rubro = this.session.activeNegocio()?.rubro;
+    if (!rubro || !businessId) {
+        this.schemaFields.set([]);
+        return;
+    }
+    try {
+      const schema = await this.api.getSchema(rubro, businessId);
+      this.schemaFields.set(schema || []);
+    } catch (e) {
+      console.error('Error loadSchema:', e);
+      this.schemaFields.set([]);
     }
   }
 

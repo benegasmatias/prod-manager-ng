@@ -1,0 +1,38 @@
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+  <!-- Variedad -->
+  <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
+    <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+      <lucide-angular [img]="icons.Package" class="h-20 w-20 text-primary"></lucide-angular>
+    </div>
+    <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Variedad</span>
+    <div class="flex items-end gap-3">
+      <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().count }}</h3>
+      <span class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full mb-1">Ítems</span>
+    </div>
+  </div>
+
+  <!-- Estado Stock -->
+  <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
+    <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+      <lucide-angular [img]="icons.Weight" class="h-20 w-20 text-blue-500"></lucide-angular>
+    </div>
+    <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Estado Stock</span>
+    <div class="flex items-end gap-3">
+      <h3 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{{ stats().critical }}</h3>
+      <span class="text-[10px] font-bold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full mb-1">Críticos</span>
+    </div>
+  </div>
+
+  <!-- Valor Estimado -->
+  <div class="relative group overflow-hidden bg-white dark:bg-zinc-900/40 p-8 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm">
+    <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+      <lucide-angular [img]="icons.Activity" class="h-20 w-20 text-emerald-500"></lucide-angular>
+    </div>
+    <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Valor Estimado</span>
+    <div class="flex items-end gap-3">
+      <h3 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        {{ stats().estimatedValue | currency:'ARS':'symbol-narrow':'1.0-0' }}
+      </h3>
+    </div>
+  </div>
+</div>

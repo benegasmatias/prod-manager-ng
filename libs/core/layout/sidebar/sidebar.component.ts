@@ -39,7 +39,8 @@ import {
   X,
   Wallet,
   Store,
-  Calendar
+  Calendar,
+  ArrowRight
 } from 'lucide-angular';
 import { LayoutService } from '../layout.service';
 import { SessionService } from '../../session/session.service';
@@ -72,7 +73,7 @@ export class SidebarComponent {
     LayoutDashboard, ShoppingCart, Users, Wrench, Cpu, BarChart3, Settings,
     Package, Layers, Box, Printer, FileText, Cog, Grid, ClipboardList,
     Hammer, Trees, Clock, HardHat, PackageSearch, Activity, UserCog, Database, Zap,
-    ChevronLeft, ChevronRight, Pin, PinOff, User, X, Wallet, Store, Calendar
+    ChevronLeft, ChevronRight, Pin, PinOff, User, X, Wallet, Store, Calendar, ArrowRight
   };
 
   constructor() {

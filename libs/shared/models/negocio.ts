@@ -22,6 +22,32 @@ export interface Negocio {
   createdAt: string;
   userRole?: 'OWNER' | 'ADMIN' | 'OPERATOR' | 'VIEWER';
   capabilities?: string[];
+  plan?: string;
+}
+
+export interface PlanUsage {
+  plan: {
+    id: string;
+    name: string;
+    category: Rubro;
+  };
+  limits: {
+    users: number;
+    machines: number;
+    orders: number;
+  };
+  usage: {
+    users: number;
+    machines: number;
+    ordersThisMonth: number;
+    blockedUsers?: number;
+    blockedMachines?: number;
+  };
+  canCreate: {
+    users: boolean;
+    machines: boolean;
+    orders: boolean;
+  };
 }
 
 export interface BusinessConfig {

@@ -1,5 +1,7 @@
 import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { LAYOUT_CONSTANTS } from '../../shared/constants';
 
 @Injectable({
@@ -7,6 +9,8 @@ import { LAYOUT_CONSTANTS } from '../../shared/constants';
 })
 export class LayoutService {
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
+  private location = inject(Location);
   
   // Responsive state
   isMobile = signal(false);
@@ -17,10 +21,53 @@ export class LayoutService {
   // UI overlay state
   activeDropdown = signal<'business' | 'notifications' | 'user' | null>(null);
 
+  // Back button state for mobile/global header
+  showBackButton = signal(false);
+  backAction = signal<(() => void) | null>(null);
+  headerTitle = signal<string | null>(null);
+  customHeaderTitle = signal<string | null>(null);
+  displayHeaderTitle = computed(() => this.customHeaderTitle() || this.headerTitle());
+
+
+  // Contextual bottom bar
+  customBottomAction = signal<{ label: string, icon: any, action: () => void } | null>(null);
+  fabAction = signal<{ action: () => void, icon?: any } | null>(null);
+  customBottomItems = signal<{ label: string, icon: any, action: () => void, isActive?: boolean }[] | null>(null);
+  bottomNavHidden = signal(false);
+
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.checkMobile();
       window.addEventListener('resize', () => this.checkMobile());
+
+      // Auto-detect back button necessity and page title
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe((event: any) => {
+        const url = event.urlAfterRedirects || event.url;
+        const segments = url.split('/').filter((s: string) => s.length > 0);
+        
+        // Show back button if we are deep in a module or in specific core modules on mobile
+        const shouldShow = segments.length > 1 || ['stock', 'produccion', 'pedidos', 'clientes', 'maquinas', 'materiales'].includes(segments[0]);
+        this.showBackButton.set(shouldShow);
+
+        // Set Title based on the main segment
+        if (segments.length > 0) {
+          const mainSegment = segments[0].toLowerCase();
+          const titles: Record<string, string> = {
+            'dashboard': 'DASHBOARD',
+            'pedidos': 'PEDIDOS',
+            'clientes': 'CLIENTES',
+            'produccion': 'PRODUCCIÓN',
+            'stock': 'INVENTARIO',
+            'ajustes': 'AJUSTES',
+            'equipo': 'EQUIPO'
+          };
+          this.headerTitle.set(titles[mainSegment] || mainSegment.toUpperCase());
+        } else {
+          this.headerTitle.set('PROD MANAGER');
+        }
+      });
     }
   }
 

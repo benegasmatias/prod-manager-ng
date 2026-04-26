@@ -34,8 +34,8 @@
       </div>
     </main>
 
-    <!-- System Status Footer -->
-    <footer
+    <!-- System Status Footer (Hidden on Mobile) -->
+    <footer *ngIf="!layoutService.isMobile()"
       class="h-14 sm:h-16 shrink-0 border-t border-border bg-bg/50 backdrop-blur-sm px-4 sm:px-8 flex items-center justify-between text-[9px] font-black uppercase tracking-[0.2em] text-text-muted z-10">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2">
@@ -61,6 +61,12 @@
     </footer>
   </div>
 
+  <!-- Global Bottom Navbar (Mobile only) -->
+  <app-bottom-navbar></app-bottom-navbar>
+
   <!-- Global Confirm Dialog -->
   <app-confirm-dialog></app-confirm-dialog>
-</div>
+
+  <!-- Hidden Notification Dropdown for global state -->
+  <app-notification-dropdown class="hidden" *ngIf="layoutService.isMobile()"></app-notification-dropdown>
+</div>

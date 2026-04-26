@@ -7,43 +7,25 @@ import { LucideAngularModule, Wallet, CheckCircle, AlertCircle, DollarSign } fro
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="bg-zinc-900 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group h-full">
-      <div class="absolute top-0 right-0 p-8 opacity-5 rotate-12 group-hover:rotate-0 transition-transform duration-1000">
-        <lucide-angular [img]="icons.Wallet" class="h-32 w-32"></lucide-angular>
-      </div>
-
-      <div class="relative z-10 space-y-10">
-        <div class="space-y-1">
-          <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Total Presupuestado</span>
-          <p class="text-5xl font-black tabular-nums tracking-tighter">$ {{ totalPrice() | number:'1.2-2' }}</p>
-        </div>
-
-        <div class="space-y-6 pt-10 border-t border-white/5">
-          <div class="flex items-center justify-between p-5 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-colors">
-            <div>
-              <p class="text-[8px] font-black uppercase tracking-widest text-emerald-400 mb-1">Confirmado / Pagado</p>
-              <p class="text-xl font-black tabular-nums text-white">$ {{ totalPaid() | number:'1.2-2' }}</p>
-            </div>
-            <lucide-angular [img]="icons.CheckCircle" class="h-6 w-6 text-emerald-500/40"></lucide-angular>
+    <div class="bg-primary/5 rounded-[2.5rem] p-6 border border-primary/10 flex items-center justify-between gap-6 animate-in fade-in duration-700">
+       <div class="flex items-center gap-6">
+          <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+             <lucide-angular [img]="icons.Wallet" class="h-6 w-6"></lucide-angular>
           </div>
-
-          <div class="flex items-center justify-between p-5 rounded-3xl bg-rose-500/10 backdrop-blur-sm border border-rose-500/20 hover:bg-rose-500/15 transition-colors">
-            <div>
-              <p class="text-[8px] font-black uppercase tracking-widest text-rose-400 mb-1">Saldo a Liquidar</p>
-              <p class="text-xl font-black tabular-nums text-rose-400">$ {{ saldo() | number:'1.2-2' }}</p>
-            </div>
-            <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6 text-rose-500/40"></lucide-angular>
+          <div class="space-y-1">
+             <p class="text-[8px] font-black uppercase tracking-[0.4em] text-primary/40 italic leading-none">Presupuesto Consolidado</p>
+             <p class="text-xl font-black text-text tracking-tighter tabular-nums leading-none">$ {{ totalPrice() | number:'1.0-0' }}</p>
           </div>
+       </div>
 
-          @if (hasPendingPayment()) {
-            <button (click)="pay.emit()" class="w-full h-16 rounded-3xl bg-white text-zinc-950 text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-zinc-100 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
-              <lucide-angular [img]="icons.DollarSign" class="h-5 w-5"></lucide-angular>
-              Liquidar Saldo
-            </button>
-          }
-        </div>
-      </div>
+       <div class="flex items-center gap-4">
+          <div class="px-4 py-1.5 bg-emerald-500/10 text-emerald-600 text-[8px] font-black uppercase tracking-[0.2em] rounded-full border border-emerald-500/20 italic flex items-center gap-2">
+             <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+             Confirmado
+          </div>
+       </div>
     </div>
+
   `,
   styles: [`
     :host { display: block; }

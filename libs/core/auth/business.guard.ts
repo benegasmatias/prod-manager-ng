@@ -30,7 +30,10 @@ export const businessGuard: CanActivateFn = (route, state) => {
 
 function checkBusinessState(session: SessionService, router: Router) {
   const businesses = session.negocios();
+  const activeNegocio = session.activeNegocio();
   const activeId = session.activeId();
+  const user = session.user();
+
   console.log('[BusinessGuard] State:', { businesses: businesses.length, activeId });
 
   // 1. No businesses -> Onboarding
@@ -39,18 +42,34 @@ function checkBusinessState(session: SessionService, router: Router) {
     return router.createUrlTree(['/select-business']);
   }
 
-  // 2. Active business selected -> Proceed
+  // 2. Expiration / Suspension Check
+  if (activeNegocio && user?.globalRole !== 'SUPER_ADMIN') {
+    const isSuspended = activeNegocio.status === 'SUSPENDED';
+    let isExpired = false;
+
+    if (activeNegocio.subscriptionExpiresAt) {
+      const now = new Date();
+      const expiry = new Date(activeNegocio.subscriptionExpiresAt);
+      isExpired = expiry < now;
+    }
+
+    if (isSuspended || isExpired) {
+      console.log('[BusinessGuard] Business is suspended or expired, redirecting');
+      return router.createUrlTree(['/subscription-expired']);
+    }
+  }
+
+  // 3. Active business selected -> Proceed
   if (activeId) {
     console.log('[BusinessGuard] Business active, proceed');
     return true;
   }
 
-  // 3. More than one business but none selected -> Selector
+  // 4. More than one business but none selected -> Selector
   if (businesses.length > 1) {
     console.log('[BusinessGuard] Multiple businesses, no active, redirecting to select-business');
     return router.createUrlTree(['/select-business']);
   }
 
-  // Fallback (redundant with SessionService auto-select logic but safe)
   return true;
 }

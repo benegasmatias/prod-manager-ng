@@ -1,0 +1,16 @@
+:host {
+    display: block;
+    --primary-gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+}
+
+.italic {
+    font-style: italic;
+}
+
+table {
+    border-spacing: 0;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}

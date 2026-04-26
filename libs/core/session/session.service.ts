@@ -30,6 +30,10 @@ export class SessionService {
 
   // New Dynamic Module Config
   businessConfig = signal<BusinessConfig | null>(null);
+  activeSubscription = computed(() => this.businessConfig()?.['subscription']);
+  
+  // Plan usage tracking
+  planUsage = signal<import('../../shared/models').PlanUsage | null>(null);
 
   activeNegocio = computed(() => {
     const id = this._activeId();
@@ -159,6 +163,7 @@ export class SessionService {
             subscriptionExpiresAt: b.subscriptionExpiresAt,
             createdAt: b.createdAt,
             userRole: b.userRole,
+            plan: b.plan,
             capabilities: this.resolveCapabilities(rubro, b.capabilities || []),
             config: getNegocioConfig(rubro)
           };
@@ -191,11 +196,10 @@ export class SessionService {
         console.log('[SessionService] Initialization complete');
       } catch (error) {
         console.error('[SessionService] Initialization failed:', error);
-        // We still set initialized to true to unblock guards, even if failed
-        // Routing logic will handle missing data (e.g. redirecting to login)
         this.isInitialized.set(true);
       } finally {
         this.isInitializing = false;
+        this.initPromise = null; // Allow re-initialization
       }
     })();
 
@@ -291,12 +295,33 @@ export class SessionService {
 
   private async loadBusinessConfig(id: string) {
     try {
-      const resp = await this.api.businesses.getConfig(id);
-      this.businessConfig.set(resp);
-      console.log('[SessionService] Business Config loaded. Sidebar items:', resp.config?.sidebarItems?.length);
+      const [config, usage] = await Promise.all([
+        this.api.businesses.getConfig(id),
+        this.api.businesses.getPlanUsage(id)
+      ]);
+      
+      this.businessConfig.set(config);
+      this.planUsage.set(usage);
+      
+      console.log('[SessionService] Business Context loaded. Plan:', usage.plan.name);
     } catch (error) {
       console.error('[SessionService] Failed to load business config:', error);
       this.businessConfig.set(null);
+      this.planUsage.set(null);
+    }
+  }
+
+  /**
+   * Refreshes usage data from server
+   */
+  async refreshPlanUsage() {
+    const id = this._activeId();
+    if (!id) return;
+    try {
+      const usage = await this.api.businesses.getPlanUsage(id);
+      this.planUsage.set(usage);
+    } catch (e) {
+      console.error('[SessionService] Failed to refresh usage', e);
     }
   }
 }

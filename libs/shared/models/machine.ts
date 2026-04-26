@@ -19,9 +19,11 @@ export interface ProductionJob {
 export interface Machine {
   id: string;
   name: string;
+  brand?: string;
   model: string | null;
   status: MachineStatus;
   active: boolean;
+  blockedByQuota?: boolean;
   businessId?: string;
   type?: string;     // Generic type or model specifier
 

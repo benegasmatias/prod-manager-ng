@@ -7,132 +7,64 @@ import { StatusBadgeComponent } from '@shared/ui/badges/status-badge.component';
 @Component({
   selector: 'app-order-items-widget',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, StatusBadgeComponent],
+  imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm h-full">
-      <div class="flex items-center gap-3 mb-8 px-2">
-        <lucide-angular [img]="icons.Tag" class="h-4 w-4 text-zinc-300"></lucide-angular>
-        <h3 class="text-xs font-black uppercase tracking-widest text-zinc-400">Especificaciones de la Orden</h3>
-        <div class="h-px flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
-      </div>
+    <div class="space-y-6 animate-in fade-in duration-700">
+      @for (item of items(); track item.id) {
+        <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-text/5 border border-zinc-100 dark:border-zinc-800 transition-all hover:scale-[1.01] duration-500 group">
+          <!-- Image Section -->
+          <div class="relative h-64 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+             <img [src]="item.referenceImages?.[0]?.path || item.referenceImages?.[0] || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'" 
+                  class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+             
+             <!-- Overlay Badge -->
+             <div class="absolute top-6 left-6">
+                <span class="px-4 py-1.5 bg-black/60 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-[0.3em] rounded-full border border-white/20 italic">
+                   {{ item.status || 'EDICIÓN LIMITADA' }}
+                </span>
+             </div>
+             
+             <!-- Gradient Overlay -->
+             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          </div>
 
-      <div class="space-y-4">
-        @for (item of items(); track item.id) {
-          <div class="p-6 rounded-[2rem] bg-zinc-50/50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800 hover:border-primary/20 transition-all group">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div class="flex items-start gap-4">
-                <div class="h-14 w-14 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center text-zinc-400 shadow-sm transition-all group-hover:scale-105 group-hover:ring-1 group-hover:ring-primary/20">
-                  <lucide-angular [img]="icons.Package" class="h-6 w-6 text-zinc-300 group-hover:text-primary transition-colors"></lucide-angular>
-                </div>
-                <div class="space-y-1">
-                  <p class="text-lg font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">{{ item.name || item.nombreProducto }}</p>
-                  <div class="flex flex-wrap gap-2 pt-1 items-center">
-                    <app-status-badge [status]="item.status"></app-status-badge>
-                    <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-100 dark:border-zinc-700 text-zinc-400">
-                      Cantidad: {{ item.qty || item.cantidad }} u.
-                    </span>
-                    @if (item.metadata?.['material']) {
-                      <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 bg-primary/5 text-primary rounded-lg border border-primary/10">
-                        Doc: {{ item.metadata?.['material'] }}
-                      </span>
-                    }
-                  </div>
-                </div>
-              </div>
-              
-              <div class="text-right flex flex-col justify-center">
-                <p class="text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">
-                  {{ ((item.price || item.unitPrice || item.precioUnitario || 0) * (item.qty || item.cantidad || 1)) | currency:'ARS' }}
+          <!-- Content Section -->
+          <div class="p-8 space-y-6">
+             <div class="space-y-2">
+                <h3 class="text-2xl font-black text-text tracking-tighter uppercase leading-tight italic">{{ item.name || item.nombreProducto }}</h3>
+                <p class="text-xs text-text-muted/60 font-bold uppercase tracking-tight italic line-clamp-2">
+                  {{ item.description || item.descripcion || 'Impresión Giclée sobre bastidor de madera maciza.' }}
                 </p>
-                <p class="text-[8px] font-black text-zinc-400 uppercase tracking-widest leading-none mt-1">Subtotal Item</p>
-              </div>
-            </div>
+             </div>
 
-            <!-- BLOQUE DE PRODUCCIÓN (Phase 6.1) -->
-            @if (item.job) {
-              <div class="mt-6 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-1000">
-                <div class="flex items-center justify-between gap-4">
-                  <div class="flex items-center gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                       <lucide-angular [img]="icons.Cog" class="h-5 w-5 text-primary"></lucide-angular>
-                    </div>
-                    <div class="space-y-0.5">
-                      <p class="text-[10px] font-black uppercase tracking-widest text-primary/60 leading-none">Etapa Actual</p>
-                      <p class="text-xs font-black text-primary uppercase">{{ item.job.currentStage || 'PENDIENTE' }}</p>
-                    </div>
-                  </div>
-
-                  <div class="flex gap-8">
-                    @if (item.job.responsable) {
-                      <div class="hidden sm:flex items-center gap-3 pr-8 border-r border-primary/10">
-                         <lucide-angular [img]="icons.User" class="h-4 w-4 text-primary/40"></lucide-angular>
-                         <div class="text-left">
-                           <p class="text-[9px] font-black uppercase tracking-widest text-primary/50 leading-none">Asignado</p>
-                           <p class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">{{ item.job.responsable.firstName }} {{ item.job.responsable.lastName }}</p>
-                         </div>
-                      </div>
-                    }
-
-                    @if (item.job.machine) {
-                      <div class="hidden sm:flex items-center gap-3">
-                         <lucide-angular [img]="icons.Monitor" class="h-4 w-4 text-primary/40"></lucide-angular>
-                         <div class="text-left">
-                           <p class="text-[9px] font-black uppercase tracking-widest text-primary/50 leading-none">Máquina / Puesto</p>
-                           <p class="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">{{ item.job.machine.name }}</p>
-                         </div>
-                      </div>
-                    }
-
-                    <div class="flex items-center gap-3">
-                      <app-status-badge [status]="item.job.status"></app-status-badge>
-                    </div>
-                  </div>
+             <!-- Info Row -->
+             <div class="flex items-center justify-between pt-6 border-t border-border/5">
+                <div class="space-y-1">
+                   <p class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/30 italic leading-none">Volumen</p>
+                   <p class="text-sm font-black text-text uppercase tracking-widest">{{ item.qty || item.cantidad || 1 }} UN.</p>
                 </div>
-              </div>
-            }
-
-            @if (item.referenceImages && item.referenceImages.length > 0) {
-              <div class="mt-6 flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-                @for (img of item.referenceImages; track $index) {
-                   <div class="h-16 w-16 rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden flex-shrink-0 group/img cursor-pointer relative bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                      <img [src]="img.path || img.url || img" 
-                           (error)="handleImageError($event)"
-                           class="h-full w-full object-cover transition-transform group-hover/img:scale-110" />
-                      <lucide-angular [img]="icons.Package" class="h-6 w-6 text-zinc-200 dark:text-zinc-700 absolute m-auto z-0"></lucide-angular>
-                      <div class="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity z-10"></div>
-                   </div>
-                }
-              </div>
-            }
-
-            @if (item.descripcion || item.stlUrl) {
-              <div class="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="flex-1">
-                  <div class="flex items-center gap-2 mb-2">
-                    <lucide-angular [img]="icons.Info" class="h-3 w-3 text-zinc-400"></lucide-angular>
-                    <p class="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Requerimientos Técnicos</p>
-                  </div>
-                  <p class="text-xs text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{{ item.description || item.descripcion || 'Sin descripción técnica adicional.' }}</p>
+                <div class="text-right space-y-1">
+                   <p class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/30 italic leading-none">Presupuesto</p>
+                   <p class="text-xl font-black text-primary tracking-tighter tabular-nums leading-none">
+                     {{ ((item.price || item.unitPrice || item.precioUnitario || 0) * (item.qty || item.cantidad || 1)) | currency:'':'symbol':'1.0-0' }}
+                   </p>
                 </div>
+             </div>
 
-                @if (item.stlUrl) {
-                  <a [href]="item.stlUrl" target="_blank" class="h-10 px-4 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all active:scale-95 no-underline">
-                     <lucide-angular [img]="icons.Monitor" class="h-3 w-3"></lucide-angular> Ver Archivo STL
-                  </a>
-                }
-              </div>
-            }
+             <!-- STL and Technical Access -->
+             @if (item.stlUrl) {
+                <div class="pt-6">
+                   <a [href]="item.stlUrl" target="_blank" class="w-full h-12 rounded-2xl bg-zinc-900 text-white text-[9px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-primary transition-all active:scale-95 italic">
+                      <lucide-angular [img]="icons.Monitor" class="h-4 w-4"></lucide-angular>
+                      Acceder Archivo STL
+                   </a>
+                </div>
+             }
           </div>
-        } @empty {
-          <div class="py-16 text-center space-y-4 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-[2rem] border-2 border-dashed border-zinc-100 dark:border-zinc-800">
-            <div class="h-16 w-16 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center mx-auto shadow-sm">
-               <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6 text-zinc-200"></lucide-angular>
-            </div>
-            <p class="text-xs font-black text-zinc-400 uppercase tracking-widest">No hay items registrados en esta orden</p>
-          </div>
-        }
-      </div>
+        </div>
+      }
     </div>
+
   `,
   styles: [`
     :host { display: block; }

@@ -1,67 +1,58 @@
-<header 
-  class="fixed top-0 right-0 z-[var(--z-navbar)] flex h-14 sm:h-16 items-center justify-between border-b border-border bg-background/80 px-[var(--page-px)] backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
-  [style.left.px]="layoutService.isMobile() ? 0 : (layoutService.isPinned() ? layoutService.constants.SIDEBAR_WIDTH_EXPANDED : layoutService.constants.SIDEBAR_WIDTH_COLLAPSED)"
->
-  <div class="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
-    <!-- Mobile Hamburger Menu Button -->
-    @if (layoutService.isMobile()) {
-      <button 
-        (click)="layoutService.toggleMobileMenu()"
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors active:scale-95"
-      >
-        <lucide-angular 
-          [img]="icons.Menu" 
-          [class.text-primary]="layoutService.isMobileMenuOpen()" 
-          [class.text-muted-foreground]="!layoutService.isMobileMenuOpen()"
-          class="h-5 w-5 transition-all"
-        ></lucide-angular>
-      </button>
+<header
+  class="fixed right-0 flex h-14 sm:h-16 items-center justify-between border-b border-border/5 bg-background/95 px-[var(--page-px)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+  [ngClass]="layoutService.activeDropdown() ? 'z-[300]' : 'z-[var(--z-navbar)] backdrop-blur-xl'"
+  [style.top]="layoutService.isMobile() && !navbarVisible() ? '-64px' : '0'"
+  [style.left.px]="layoutService.isMobile() ? 0 : (layoutService.isPinned() ? layoutService.constants.SIDEBAR_WIDTH_EXPANDED : layoutService.constants.SIDEBAR_WIDTH_COLLAPSED)">
 
-      <!-- Mobile Logo -->
-      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
-        <img src="assets/logo.png" alt="Logo" class="h-6 w-6 object-contain" onerror="this.style.display='none'" />
-      </div>
-    } @else {
-      <button 
-        (click)="layoutService.togglePinned()"
-        class="hidden lg:flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors"
-      >
-        <lucide-angular 
-          [img]="icons.Menu" 
-          [class.text-primary]="layoutService.isPinned()" 
-          [class.text-muted-foreground]="!layoutService.isPinned()"
-          class="h-5 w-5 transition-all"
-        ></lucide-angular>
-      </button>
-    }
+  <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+    <!-- Back Button (Mobile ONLY) -->
+    <button *ngIf="layoutService.isMobile() && layoutService.showBackButton()" (click)="handleBack()"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors active:scale-95">
+      <lucide-angular [img]="icons.ArrowLeft" class="h-5 w-5 text-primary"></lucide-angular>
+    </button>
 
-    <!-- Business Selector -->
-    <div class="flex items-center min-w-0">
+    <!-- Contextual Title (Mobile Center) -->
+    <div *ngIf="layoutService.isMobile() && layoutService.displayHeaderTitle()" 
+      class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 pointer-events-none w-full max-w-[200px]">
+      <img src="assets/logo.png" class="h-5 w-auto mb-1 opacity-90" alt="Logo">
+      <span class="text-[11px] font-black uppercase tracking-[0.3em] text-text whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ layoutService.displayHeaderTitle() }}
+      </span>
+    </div>
+
+    <!-- Menu Button (Desktop Only) -->
+    <button *ngIf="!layoutService.isMobile()" (click)="layoutService.togglePinned()"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted/50 transition-colors active:scale-95">
+      <lucide-angular [img]="icons.Menu" [class.text-primary]="layoutService.isPinned()"
+        [class.text-text-muted/40]="!layoutService.isPinned()" class="h-5 w-5 transition-all"></lucide-angular>
+    </button>
+
+    <!-- DESKTOP ONLY: Business Selector (On mobile we show nothing here to keep header clean) -->
+    <div *ngIf="!layoutService.isMobile()" class="flex items-center min-w-0">
       <app-business-selector></app-business-selector>
     </div>
   </div>
 
   <!-- Right Section -->
-  <div class="flex items-center gap-1 sm:gap-3">
-    
-    <div class="flex items-center gap-0.5 sm:gap-1">
-      <!-- Notifications -->
-      <app-notification-dropdown></app-notification-dropdown>
+  <div class="flex items-center gap-2 sm:gap-3 ml-2">
 
-      <!-- Theme Toggle -->
-      <button 
-        (click)="toggleTheme()"
-        class="h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl hover:bg-muted/50 transition-colors relative active:scale-95"
-      >
-        <!-- Icon swap: Sun indicates switching to light, Moon indicates switching to dark -->
-        <lucide-angular [img]="icons.Moon" class="h-4 w-4 transition-all scale-100 rotate-0 dark:scale-0 dark:-rotate-90 text-foreground"></lucide-angular>
-        <lucide-angular [img]="icons.Sun" class="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 text-foreground"></lucide-angular>
+    <!-- Notifications (Always present for state, but trigger hidden on active mobile header) -->
+    <app-notification-dropdown [class.hidden]="layoutService.isMobile()"></app-notification-dropdown>
+
+    <!-- Desktop Only Tools -->
+    <div *ngIf="!layoutService.isMobile()" class="flex items-center gap-1">
+      <button (click)="toggleTheme()"
+        class="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-muted/50 transition-colors relative active:scale-95">
+        <lucide-angular [img]="icons.Moon"
+          class="h-4 w-4 transition-all scale-100 rotate-0 dark:scale-0 dark:-rotate-90 text-foreground"></lucide-angular>
+        <lucide-angular [img]="icons.Sun"
+          class="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 text-foreground"></lucide-angular>
       </button>
     </div>
 
-    <div class="h-5 w-px bg-border mx-1 sm:mx-2"></div>
+    <div *ngIf="!layoutService.isMobile()" class="h-5 w-px bg-border/5 mx-1"></div>
 
-    <!-- User Profile -->
+    <!-- User Profile (Always visible, mockup style) -->
     <app-user-profile></app-user-profile>
   </div>
 </header>

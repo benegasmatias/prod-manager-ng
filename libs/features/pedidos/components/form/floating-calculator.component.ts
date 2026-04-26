@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, OnInit, OnDestroy, inject, ElementRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, OnInit, OnDestroy, inject, ElementRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Calculator, X, Delete } from 'lucide-angular';
 import { cn } from '@shared/utils/cn';
@@ -11,7 +11,7 @@ import { cn } from '@shared/utils/cn';
     <!-- MAIN CALCULATOR OVERLAY -->
     @if (isOpen()) {
       <div 
-        class="fixed bottom-44 right-8 w-72 rounded-[2rem] bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 shadow-2xl shadow-primary/20 p-2 z-[99] flex flex-col gap-1 animate-in slide-in-from-bottom-5 zoom-in-95 duration-200"
+        class="fixed bottom-40 sm:bottom-44 right-4 sm:right-8 w-[calc(100vw-2rem)] sm:w-72 rounded-[2rem] bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 shadow-2xl shadow-primary/20 p-2 z-[120] flex flex-col gap-1 animate-in slide-in-from-bottom-5 zoom-in-95 duration-200"
       >
         <!-- Calculator Header & Display -->
         <div class="px-5 pt-5 pb-3">
@@ -60,19 +60,22 @@ import { cn } from '@shared/utils/cn';
       </div>
     }
 
-    <button 
-      (click)="isOpen.set(!isOpen())"
-      [class]="cn(
-        'fixed bottom-24 right-8 h-14 w-14 rounded-full shadow-2xl flex items-center justify-center transition-all z-[100] active:scale-90',
-        isOpen() ? 'bg-zinc-900 border border-zinc-700 text-white rotate-12 scale-90 opacity-0 pointer-events-none' : 'bg-primary border border-primary-50 text-white hover:scale-110 shadow-primary/30'
-      )"
-    >
-      <lucide-angular [img]="icons.Calculator" class="h-6 w-6"></lucide-angular>
-    </button>
+    @if (!hideTrigger) {
+      <button 
+        (click)="isOpen.set(!isOpen())"
+        [class]="cn(
+          'fixed bottom-44 sm:bottom-24 right-4 sm:right-8 h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-2xl flex items-center justify-center transition-all z-[110] active:scale-90',
+          isOpen() ? 'bg-zinc-900 border border-zinc-700 text-white rotate-12 scale-90 opacity-0 pointer-events-none' : 'bg-primary border border-primary-50 text-white hover:scale-110 shadow-primary/30'
+        )"
+      >
+        <lucide-angular [img]="icons.Calculator" class="h-5 w-5 sm:h-6 sm:w-6"></lucide-angular>
+      </button>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FloatingCalculatorComponent implements OnInit, OnDestroy {
+  @Input() hideTrigger = false;
   private el = inject(ElementRef);
   
   ngOnInit() {
