@@ -25,7 +25,7 @@ export class BillingService {
     // Inicializar Mercado Pago si el SDK está cargado
     // Nota: Reemplazar 'YOUR_PUBLIC_KEY' con la key real
     if (typeof MercadoPago !== 'undefined') {
-      this.mp = new MercadoPago(environment.mpPublicKey || 'TEST-4806384774334416-081118-ee7378f294423fc65bd7b38266f4b109-278341531'); 
+      this.mp = new MercadoPago(environment.mpPublicKey); 
     }
   }
 
@@ -44,14 +44,9 @@ export class BillingService {
     }
   }
 
-  async startCheckout(plan: string, price: number, description: string, email: string) {
+  async getPreferenceId(plan: string, price: number, description: string, email: string): Promise<string> {
     const businessId = this.session.activeNegocio()?.id;
-    if (!businessId) return;
-
-    // 0. Ensure MP is initialized (if script loaded late)
-    if (!this.mp && typeof MercadoPago !== 'undefined') {
-      this.mp = new MercadoPago(environment.mpPublicKey);
-    }
+    if (!businessId) throw new Error('Business no seleccionado');
 
     this.loading.set(true);
     try {
@@ -61,28 +56,45 @@ export class BillingService {
         throw new Error(`No puedes cambiar al plan ${plan}: ${check.violations.join(', ')}`);
       }
 
-      // 2. Create MP Preference (passing email and ensuring numeric price)
+      // 2. Create MP Preference
       const { preferenceId } = await this.api.createCheckout(businessId, plan, Number(price), description, email);
-      
-      // 3. Open Modal if SDK is available
-      if (this.mp) {
-        const bricksBuilder = this.mp.bricks();
-        this.mp.checkout({
-          preference: {
-            id: preferenceId
-          },
-          autoOpen: true,
-        });
-      } else {
-        // Fallback: Redirect if no SDK
-        const { initPoint } = await this.api.createCheckout(businessId, plan, Number(price), description, email);
-        window.location.href = initPoint;
-      }
+      return preferenceId;
     } catch (e: any) {
       this.error.set(e.message || 'Error al iniciar el proceso de pago');
       throw e;
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async renderWalletBrick(containerId: string, preferenceId: string) {
+    if (!this.mp && typeof MercadoPago !== 'undefined') {
+      this.mp = new MercadoPago(environment.mpPublicKey);
+    }
+    
+    if (this.mp) {
+      try {
+        const bricksBuilder = this.mp.bricks();
+        await bricksBuilder.create("wallet", containerId, {
+          initialization: {
+            preferenceId: preferenceId,
+          },
+          customization: {
+            texts: {
+              valueProp: 'security_safety'
+            },
+            visual: {
+              buttonBackground: 'black',
+              borderRadius: '24px'
+            }
+          }
+        });
+      } catch (e: any) {
+         console.error('Error rendering wallet brick:', e);
+         this.error.set('Error al cargar la pasarela de pagos.');
+      }
+    } else {
+      this.error.set('El SDK de MercadoPago no está disponible');
     }
   }
 }

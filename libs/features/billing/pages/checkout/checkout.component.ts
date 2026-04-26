@@ -114,14 +114,24 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
                <span class="text-xl font-black text-text">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') || '$0' }}</span>
             </div>
             
-            <app-button-spinner
-                [loading]="billingService.loading()"
-                (onClick)="processPayment()"
-                btnClass="w-full py-5 rounded-full bg-primary text-white font-black text-[12px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
-            >
-                <span>Continuar al Pago</span>
-                <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4"></lucide-angular>
-            </app-button-spinner>
+            @if (!brickRendered()) {
+              <app-button-spinner
+                  [loading]="billingService.loading()"
+                  (onClick)="processPaymentMobile()"
+                  btnClass="w-full py-5 rounded-full bg-primary text-white font-black text-[12px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+              >
+                  <span>Continuar al Pago</span>
+                  <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4"></lucide-angular>
+              </app-button-spinner>
+            } @else {
+              <div class="w-full relative">
+                 <div id="walletBrick_container_mobile" class="w-full relative z-10"></div>
+                 <div class="mt-3 flex items-center justify-center gap-2">
+                     <lucide-angular [img]="icons.ShieldCheck" class="h-3 w-3 text-emerald-500"></lucide-angular>
+                     <span class="text-[9px] font-black text-text-muted uppercase tracking-[0.2em]">Conexión Segura</span>
+                 </div>
+              </div>
+            }
          </div>
       </div>
     </div>
@@ -215,31 +225,12 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="p-8 rounded-[2.5rem] border-2 border-primary bg-surface flex items-center justify-between cursor-pointer shadow-xl shadow-primary/10 transition-all active:scale-95">
-                        <div class="flex items-center gap-6">
-                             <div class="h-12 w-12 bg-sky-50 dark:bg-sky-500/10 rounded-2xl flex items-center justify-center">
-                                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#009EE3"/>
-                                    <path d="M14.5 9.5H9.5V14.5H14.5V9.5Z" fill="white"/>
-                                </svg>
-                             </div>
-                             <span class="text-sm font-black text-text uppercase tracking-widest">Mercado Pago</span>
-                        </div>
-                        <div class="h-6 w-6 rounded-full border-4 border-primary flex items-center justify-center p-1">
-                            <div class="w-full h-full bg-primary rounded-full"></div>
-                        </div>
-                    </div>
-
-                    <div class="p-8 rounded-[2.5rem] bg-surface-container-low flex items-center justify-between cursor-not-allowed opacity-40 border border-border/5">
-                        <div class="flex items-center gap-6">
-                             <div class="h-12 w-12 bg-surface rounded-2xl flex items-center justify-center">
-                                <lucide-angular [img]="icons.CreditCard" class="h-6 w-6 text-text-muted"></lucide-angular>
-                             </div>
-                             <span class="text-sm font-black text-text-muted uppercase tracking-widest">Tarjeta</span>
-                        </div>
-                        <div class="h-6 w-6 rounded-full border-2 border-border"></div>
-                    </div>
+                <div class="p-8 rounded-[2.5rem] border border-border/10 bg-surface flex flex-col items-center justify-center text-center gap-4 shadow-sm relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-50"></div>
+                    <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.5/mercadopago/logo__large.png" alt="Mercado Pago" class="h-8 object-contain relative z-10">
+                    <p class="text-xs font-medium text-text-muted relative z-10 max-w-sm">
+                        La transacción se procesará a través de la pasarela oficial de Mercado Pago para garantizar la máxima seguridad de tus datos.
+                    </p>
                 </div>
               </div>
             }
@@ -280,22 +271,34 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
                     </div>
 
                     <!-- The Signature Primary CTA -->
-                    <app-button-spinner
-                        [loading]="billingService.loading()"
-                        (onClick)="nextStep()"
-                        btnClass="w-full py-6 rounded-full bg-gradient-to-br from-primary to-primary-container text-white font-black text-xs uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 active:scale-[0.98] transition-all group"
-                    >
-                        <span>{{ step() === 1 ? 'Continuar al Pago' : 'Confirmar & Pagar' }}</span>
-                        @if (step() === 1) {
+                    @if (step() === 1) {
+                        <app-button-spinner
+                            [loading]="billingService.loading()"
+                            (onClick)="nextStep()"
+                            btnClass="w-full py-6 rounded-full bg-gradient-to-br from-primary to-primary-container text-white font-black text-xs uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 active:scale-[0.98] transition-all group"
+                        >
+                            <span>Continuar al Pago</span>
                             <lucide-angular [img]="icons.ArrowRight" class="h-5 w-5 transition-transform group-hover:translate-x-2"></lucide-angular>
-                        } @else {
-                            <lucide-angular [img]="icons.ShieldCheck" class="h-5 w-5"></lucide-angular>
-                        }
-                    </app-button-spinner>
+                        </app-button-spinner>
 
-                    <p class="mt-8 text-[11px] text-text-muted text-center font-bold px-12 leading-relaxed uppercase tracking-[0.1em] italic opacity-60">
-                        Seguridad de grado bancario garantizada. <br> Al confirmar, aceptas nuestros términos.
-                    </p>
+                        <p class="mt-8 text-[11px] text-text-muted text-center font-bold px-12 leading-relaxed uppercase tracking-[0.1em] italic opacity-60">
+                            Seguridad de grado bancario garantizada. <br> Al confirmar, aceptas nuestros términos.
+                        </p>
+                    } @else {
+                        <div class="relative w-full p-2 bg-surface rounded-[2rem] border border-border/10 shadow-inner">
+                            <div id="walletBrick_container_desktop" class="w-full min-h-[55px] relative z-10 flex items-center justify-center"></div>
+                            @if (billingService.loading() && !brickRendered()) {
+                               <div class="absolute inset-0 flex justify-center items-center bg-surface rounded-[2rem] z-20">
+                                  <div class="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                               </div>
+                            }
+                        </div>
+                        
+                        <div class="mt-6 flex items-center justify-center gap-2">
+                            <lucide-angular [img]="icons.ShieldCheck" class="h-4 w-4 text-emerald-500"></lucide-angular>
+                            <span class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Transacción 100% Segura</span>
+                        </div>
+                    }
                 </div>
 
                 <!-- Surface Decoration (Tonal Layering) -->
@@ -330,6 +333,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   planId = signal<string | null>(null);
   plan = signal<any>(null);
   step = signal<number>(1);
+  brickRendered = signal<boolean>(false);
 
   async ngOnInit() {
     this.layout.customHeaderTitle.set('CHECKOUT');
@@ -413,28 +417,56 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  async nextStep() {
-    if (this.step() === 1) {
-      this.step.set(2);
-      window.scrollTo(0, 0);
-    } else {
-      await this.processPayment();
-    }
-  }
-
-  async processPayment() {
+  async processPaymentMobile() {
     const currentPlan = this.plan();
     if (!currentPlan) return;
 
     try {
-      await this.billingService.startCheckout(
+      const prefId = await this.billingService.getPreferenceId(
         currentPlan.id, 
         currentPlan.price, 
         `Suscripción Plan ${currentPlan.name}`,
         this.session.user()?.email || ''
       );
+      
+      this.brickRendered.set(true);
+      
+      setTimeout(() => {
+         this.billingService.renderWalletBrick('walletBrick_container_mobile', prefId);
+      }, 50);
+
     } catch (error: any) {
       this.toast.error(error.message || 'Error al iniciar pago');
+      this.brickRendered.set(false);
+    }
+  }
+
+  async nextStep() {
+    if (this.step() === 1) {
+      this.step.set(2);
+      window.scrollTo(0, 0);
+      
+      // Initialize Wallet Brick for Desktop
+      const currentPlan = this.plan();
+      if (!currentPlan) return;
+      
+      try {
+        const prefId = await this.billingService.getPreferenceId(
+          currentPlan.id, 
+          currentPlan.price, 
+          `Suscripción Plan ${currentPlan.name}`,
+          this.session.user()?.email || ''
+        );
+        
+        setTimeout(() => {
+           this.billingService.renderWalletBrick('walletBrick_container_desktop', prefId);
+           this.brickRendered.set(true);
+        }, 50);
+
+      } catch (error: any) {
+        this.toast.error(error.message || 'Error al inicializar pago');
+        this.step.set(1);
+      }
     }
   }
 }

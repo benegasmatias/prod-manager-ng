@@ -45,6 +45,22 @@ export class RegisterComponent {
       return;
     }
 
+    const emailStr = this.email().toLowerCase().trim();
+    const domain = emailStr.split('@')[1];
+    
+    // Lista de dominios de correos temporales conocidos
+    const disposableDomains = [
+      'yopmail.com', 'mailinator.com', 'guerrillamail.com', '10minutemail.com', 
+      'tempmail.com', 'temp-mail.org', 'throwawaymail.com', 'fakemail.net', 
+      'dropmail.me', 'dispostable.com', 'maildrop.cc', 'sharklasers.com',
+      'nada.ltd', 'getairmail.com', 'mohimal.com', 'crazymail.com', '10mail.org'
+    ];
+
+    if (domain && disposableDomains.includes(domain)) {
+      this.error.set('No se permiten correos electrónicos temporales o desechables.');
+      return;
+    }
+
     this.loading.set(true);
     this.error.set(null);
     this.success.set(null);

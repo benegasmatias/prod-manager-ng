@@ -3,5 +3,5 @@ export const environment = {
   apiUrl: 'https://api.prodmanager.com.ar',
   supabaseUrl: 'https://jrcdlzqbadyueodqpsii.supabase.co',
   supabaseAnonKey: 'sb_publishable_Fb1XxcUkSIdPKf1MdWw_BQ_By-uPGdB',
-  mpPublicKey: 'APP_USR-7558661642289662-042218-c51d6501a4577884d43673323565e718-204128521'
+  mpPublicKey: 'TEST-d22651e8-815f-4bd4-99c2-03f0fdec0616'
 };
