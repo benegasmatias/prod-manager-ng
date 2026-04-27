@@ -3,9 +3,9 @@ import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/comm
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { PedidosApiService } from '../../../core/api/pedidos.api.service';
 import { Pedido, Employee } from '@shared/models';
-import { 
-  LucideAngularModule, ArrowLeft, Package, User, Calendar, Clock, 
-  DollarSign, CheckCircle, Info, Tag, History, MessageSquare, 
+import {
+  LucideAngularModule, ArrowLeft, Package, User, Calendar, Clock,
+  DollarSign, CheckCircle, Info, Tag, History, MessageSquare,
   ChevronRight, Edit3, AlertCircle, TrendingUp, Mail, Phone, Zap, Trash2
 } from 'lucide-angular';
 import { getStatusLabel, getStatusStyles } from '@shared/utils';
@@ -20,7 +20,7 @@ import { LayoutService } from '@core/layout/layout.service';
   selector: 'app-pedido-detalle',
   standalone: true,
   imports: [
-    CommonModule, RouterLink, LucideAngularModule, 
+    CommonModule, RouterLink, LucideAngularModule,
     ClientDetailComponent, StockDetailComponent
   ],
   template: `
@@ -30,7 +30,7 @@ import { LayoutService } from '@core/layout/layout.service';
         <div class="flex flex-col items-center justify-center py-40 space-y-6">
           <div class="h-16 w-16 rounded-[2rem] border-4 border-primary/20 border-t-primary animate-spin shadow-xl"></div>
           <div class="text-center">
-            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">{{ isDeleting() ? 'Eliminando Pedido' : 'Levantando Expediente' }}</p>
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">{{ isDeleting() ? 'Eliminando Pedido' : 'Cargando...' }}</p>
             <p class="text-xs font-bold text-zinc-300 mt-2 italic">{{ isDeleting() ? 'Borrando registros permanentemente...' : 'Procesando metadatos y activos...' }}</p>
           </div>
         </div>
@@ -85,7 +85,7 @@ export class PedidoDetalleComponent implements OnInit {
   private confirm = inject(ConfirmService);
   public layout = inject(LayoutService);
 
-  
+
   pedido = signal<Pedido | null>(null);
   loading = signal(true);
   isDeleting = signal(false);
@@ -94,8 +94,8 @@ export class PedidoDetalleComponent implements OnInit {
 
   // Icons for Template
   icons = {
-    ArrowLeft, Package, User, Calendar, Clock, DollarSign, 
-    CheckCircle, Info, Tag, History, MessageSquare, ChevronRight, 
+    ArrowLeft, Package, User, Calendar, Clock, DollarSign,
+    CheckCircle, Info, Tag, History, MessageSquare, ChevronRight,
     Edit3, AlertCircle, TrendingUp, Mail, Phone, Zap, Trash2
   };
 
@@ -139,18 +139,18 @@ export class PedidoDetalleComponent implements OnInit {
   tiempoTranscurrido = computed(() => {
     const p = this.pedido();
     if (!p || !p.fechaCreacion) return null;
-    
+
     const start = new Date(p.fechaCreacion).getTime();
     if (isNaN(start)) return null;
 
-    const end = (p.status === 'DELIVERED' && p.fechaActualizacion) 
-      ? new Date(p.fechaActualizacion).getTime() 
+    const end = (p.status === 'DELIVERED' && p.fechaActualizacion)
+      ? new Date(p.fechaActualizacion).getTime()
       : Date.now();
-    
+
     if (isNaN(end)) return null;
 
     const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 0) return 'Justo ahora';
     if (diffDays === 0) return 'Hoy';
     return `${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
@@ -165,7 +165,7 @@ export class PedidoDetalleComponent implements OnInit {
   async ngOnInit() {
     await this.loadData();
     this.loadEmployees();
-    
+
     // Set Mobile Contextual UI
     const p = this.pedido();
     if (p) {
@@ -193,7 +193,7 @@ export class PedidoDetalleComponent implements OnInit {
     try {
       this.loading.set(true);
       const res = await this.api.findOne(id);
-      
+
       // Phase 6.1: Map Jobs to Items for easy display
       if (res && res.items && res.jobs) {
         res.items = res.items.map(item => ({
