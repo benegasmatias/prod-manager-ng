@@ -9,6 +9,16 @@ import { environment } from '../../../src/environments/environment';
 export class BillingApiService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/businesses`;
+  private publicApiUrl = `${environment.apiUrl}/plans`;
+
+  /**
+   * Obtiene los planes disponibles, opcionalmente filtrados por rubro/categoría.
+   */
+  getPlans(category?: string) {
+    let params: any = {};
+    if (category) params.category = category;
+    return firstValueFrom(this.http.get<any[]>(this.publicApiUrl, { params }));
+  }
 
   /**
    * Obtiene la información actual de la suscripción y uso del negocio.

@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SessionService } from '@core/session/session.service';
 import { BillingService } from '@core/api/billing.service';
+import { BillingApiService } from '@core/api/billing.api.service';
 import { LayoutService } from '@core/layout/layout.service';
-import { LucideAngularModule, Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield } from 'lucide-angular';
+import { LucideAngularModule, Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield, Rocket, Factory, Scissors } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 
 import { cn } from '@shared/utils/cn';
@@ -16,64 +18,74 @@ import { cn } from '@shared/utils/cn';
   styleUrls: ['./pricing.component.scss']
 })
 export class PricingComponent implements OnInit, OnDestroy {
-  billing = inject(BillingService);
+  billing: BillingService = inject(BillingService);
+  private api = inject(BillingApiService);
+  private session = inject(SessionService);
   private router = inject(Router);
   layout = inject(LayoutService);
 
   cn = cn;
   activeTab = 'Profesional';
+  
+  selectedCategory = signal<string>('IMPRESION_3D');
+  plans = signal<any[]>([]);
+  isLoadingPlans = signal<boolean>(false);
 
-  readonly icons = { Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield };
+  comparisonFeatures = computed(() => {
+    const list = this.plans();
+    const free = list.find(p => p.sortOrder === 0);
+    const pro = list.find(p => p.sortOrder === 1);
+    const enterprise = list.find(p => p.sortOrder === 2);
 
-  plans: any[] = [
-    {
-      id: 'free-3d',
-      name: 'Free por Siempre',
-      price: 0,
-      description: 'Ideal para hobbistas y makers solitarios.',
-      features: ['30 pedidos / mes', '1 impresora', '1 Usuario', 'Smart Dashboard'],
-      buttonText: 'Cambiar a Gratis',
-      popular: false
-    },
-    {
-      id: 'pro-3d',
-      name: 'Taller Inicial',
-      price: 8900,
-      promoPrice: 4900,
-      promoDurationMonths: 6,
-      promoLabel: 'Oferta de Lanzamiento',
-      description: 'Para pequeños talleres que empiezan a crecer.',
-      features: ['60 pedidos / mes', '2 impresoras', '2 Usuarios', 'Control de materiales', 'Soporte prioritario'],
-      buttonText: 'Cambiarse a Pro',
-      popular: true
-    },
-    {
-      id: 'business-3d',
-      name: 'Pequeñas Granja Produccion',
-      price: 29500,
-      description: 'Control total y escalabilidad para fábricas de gran escala.',
-      features: ['Pedidos ilimitados', '5 impresoras', '5 Usuarios', 'Reportes avanzados', 'Soporte prioritario'],
-      buttonText: 'Mejorar a Business',
-      popular: false
-    }
-  ];
+    return [
+        { 
+            name: 'Máquinas conectadas', 
+            free: free?.maxMachines || '2', 
+            pro: pro?.maxMachines === 0 ? 'Ilimitadas' : (pro?.maxMachines || 'Ilimitadas'), 
+            enterprise: enterprise?.maxMachines === 0 ? 'Ilimitadas' : (enterprise?.maxMachines || 'Ilimitadas') 
+        },
+        { 
+            name: 'Colaboradores', 
+            free: free?.maxUsers ? `Hasta ${free.maxUsers}` : 'Hasta 1', 
+            pro: pro?.maxUsers === 0 ? 'Ilimitados' : `Hasta ${pro?.maxUsers || 3}`, 
+            enterprise: enterprise?.maxUsers === 0 ? 'Ilimitados' : (enterprise?.maxUsers || 10) 
+        },
+        { name: 'Gestión de Materiales', free: free?.metadata?.gestionMateriales || 'Básica', pro: pro?.metadata?.gestionMateriales || 'Avanzada', enterprise: enterprise?.metadata?.gestionMateriales || 'Avanzada' },
+        { name: 'Trazabilidad de Fallas', free: !!free?.metadata?.trazabilidadFallas, pro: !!pro?.metadata?.trazabilidadFallas, enterprise: !!enterprise?.metadata?.trazabilidadFallas },
+        { name: 'Reportes de Eficiencia', free: !!free?.metadata?.reportesEficiencia, pro: !!pro?.metadata?.reportesEficiencia, enterprise: !!enterprise?.metadata?.reportesEficiencia },
+        { name: 'API & Webhooks', free: !!free?.metadata?.apiWebhooks, pro: !!pro?.metadata?.apiWebhooks, enterprise: !!enterprise?.metadata?.apiWebhooks },
+        { name: 'Soporte 24/7', free: free?.metadata?.soporte || 'Comunidad', pro: pro?.metadata?.soporte || 'Prioritario', enterprise: enterprise?.metadata?.soporte || 'Dedicado' },
+    ];
+  });
 
-  comparisonFeatures = [
-    { name: 'Máquinas conectadas', free: '2', pro: 'Ilimitadas', enterprise: 'Ilimitadas' },
-    { name: 'Colaboradores', free: 'Hasta 3', pro: 'Hasta 10', enterprise: 'Ilimitados' },
-    { name: 'Gestión de Materiales', free: 'Básica', pro: 'Avanzada', enterprise: 'Avanzada' },
-    { name: 'Trazabilidad de Fallas', free: false, pro: true, enterprise: true },
-    { name: 'Reportes de Eficiencia', free: false, pro: true, enterprise: true },
-    { name: 'API & Webhooks', free: false, pro: false, enterprise: true },
-    { name: 'Soporte 24/7', free: false, pro: 'Prioritario', enterprise: 'Dedicado' },
-  ];
+  readonly icons = { Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield, Rocket, Factory, Scissors };
 
-  ngOnInit() {
+  async ngOnInit() {
     this.billing.loadSubscription().catch(console.error);
     this.layout.showBackButton.set(true);
     this.layout.backAction.set(() => {
       this.router.navigate(['/ajustes']);
     });
+    
+    // Auto-detectar rubro del negocio actual
+    const business = this.session.activeNegocio();
+    if (business?.category) {
+      this.selectedCategory.set(business.category);
+    }
+
+    await this.loadPlans();
+  }
+
+  async loadPlans() {
+    this.isLoadingPlans.set(true);
+    try {
+      const data = await this.api.getPlans(this.selectedCategory());
+      this.plans.set(data);
+    } catch (e) {
+      console.error('Error loading plans:', e);
+    } finally {
+      this.isLoadingPlans.set(false);
+    }
   }
 
   ngOnDestroy() {

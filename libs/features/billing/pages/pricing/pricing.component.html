@@ -20,9 +20,16 @@
     </div>
   }
 
-  <!-- PREMIUM PLAN MATRIZ -->
-  <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8 xl:gap-10 items-stretch mb-20 sm:mb-32">
-    @for (plan of plans; track plan.id) {
+
+  @if (isLoadingPlans()) {
+    <div class="flex flex-col items-center justify-center py-40 animate-pulse">
+        <lucide-angular [img]="icons.Rocket" class="h-16 w-16 text-primary/20 mb-8"></lucide-angular>
+        <span class="text-xs font-black uppercase tracking-[0.8em] text-text-muted/30 italic">Sincronizando Matriz de Precios...</span>
+    </div>
+  } @else {
+    <!-- PREMIUM PLAN MATRIZ -->
+    <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8 xl:gap-10 items-stretch mb-20 sm:mb-32 animate-in fade-in duration-700">
+      @for (plan of plans(); track plan.id) {
       <div 
         class="relative group p-6 md:p-12 xl:p-14 rounded-[3rem] transition-all duration-1000 flex flex-col border border-border/5 overflow-hidden"
         [ngClass]="{
@@ -113,6 +120,7 @@
       </div>
     }
   </div>
+}
 
   <!-- EDITORIAL SPECIFICATIONS -->
   <div class="max-w-7xl mx-auto mb-24 sm:mb-48">
@@ -140,7 +148,7 @@
             </div>
 
             <div class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                @for (feature of comparisonFeatures; track feature.name) {
+                @for (feature of comparisonFeatures(); track feature.name) {
                     <div class="flex items-center justify-between p-5 bg-white/50 rounded-2xl border border-border/5 group">
                         <span class="text-xs sm:text-[10px] font-black text-text-muted uppercase tracking-wider italic leading-none">{{ feature.name }}</span>
                         
@@ -177,7 +185,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border/5">
-                    @for (feature of comparisonFeatures; track feature.name) {
+                    @for (feature of comparisonFeatures(); track feature.name) {
                         <tr class="hover:bg-surface-container-low transition-all duration-500 group">
                             <td class="px-10 py-8 text-sm sm:text-[11px] font-black text-text uppercase tracking-[0.2em] font-display italic leading-none">{{ feature.name }}</td>
                             
