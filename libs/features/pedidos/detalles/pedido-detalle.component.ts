@@ -54,7 +54,8 @@ import { LayoutService } from '@core/layout/layout.service';
             [employees]="employees()"
             (onSaved)="loadData()"
             (onEdit)="handleEdit()"
-            (onDelete)="handleDelete()">
+            (onDelete)="handleDelete()"
+            (onRevertPayment)="handleRevertPayment($event)">
           </app-client-detail>
         }
 
@@ -252,6 +253,27 @@ export class PedidoDetalleComponent implements OnInit {
         this.isDeleting.set(false);
         console.error('Error deleting order:', error);
         alert('No se pudo eliminar el pedido. Verifique su conexión o permisos.');
+      }
+    }
+  }
+
+  async handleRevertPayment(paymentId: string) {
+    const p = this.pedido();
+    if (!p) return;
+
+    const ok = await this.confirm.confirm({
+      title: 'Revertir Cobro',
+      message: '¿Estás seguro de que deseas eliminar este registro de cobro? El saldo se actualizará automáticamente.',
+      confirmLabel: 'Revertir',
+      type: 'warning'
+    });
+
+    if (ok) {
+      try {
+        await this.api.removePayment(p.id, paymentId, p.businessId);
+        await this.loadData();
+      } catch (error) {
+        console.error('Error reverting payment:', error);
       }
     }
   }

@@ -724,6 +724,36 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  async handleRemovePayment(paymentId: string) {
+    const order = this.order();
+    if (!order) return;
+
+    const confirmed = await this.confirmService.confirm({
+      title: 'Revertir Cobro',
+      message: '¿Estás seguro de que deseas eliminar este registro de cobro? El saldo pendiente se actualizará automáticamente.',
+      confirmLabel: 'Revertir',
+      type: 'warning'
+    });
+
+    if (!confirmed) return;
+
+    this.isSaving.set(true);
+    try {
+      await this.api.removePayment(order.id, paymentId, order.businessId);
+      this.onSave.emit(); 
+    } catch (err) {
+      console.error('Error removing payment:', err);
+      this.confirmService.confirm({
+        title: 'Error',
+        message: 'No se pudo eliminar el cobro.',
+        hideCancel: true,
+        type: 'danger'
+      });
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+
   getLabel = getStatusLabel;
   getStyles = getStatusStyles;
   cn = cn;

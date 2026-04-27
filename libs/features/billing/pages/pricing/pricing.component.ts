@@ -25,7 +25,7 @@ export class PricingComponent implements OnInit, OnDestroy {
 
   readonly icons = { Zap, Check, Minus, Info, CreditCard, Globe, ArrowRight, Shield };
 
-  plans = [
+  plans: any[] = [
     {
       id: 'free-3d',
       name: 'Free por Siempre',
@@ -39,6 +39,9 @@ export class PricingComponent implements OnInit, OnDestroy {
       id: 'pro-3d',
       name: 'Taller Inicial',
       price: 8900,
+      promoPrice: 4900,
+      promoDurationMonths: 6,
+      promoLabel: 'Oferta de Lanzamiento',
       description: 'Para pequeños talleres que empiezan a crecer.',
       features: ['60 pedidos / mes', '2 impresoras', '2 Usuarios', 'Control de materiales', 'Soporte prioritario'],
       buttonText: 'Cambiarse a Pro',

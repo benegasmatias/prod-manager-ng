@@ -36,8 +36,16 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
           </div>
           
           <div class="flex items-end gap-1 mb-8">
-            <span class="text-5xl font-black text-text tracking-tighter">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') || '$0' }}</span>
-            <span class="text-text-muted font-medium mb-1 italic">/ mes</span>
+            @if (plan()?.promoPrice) {
+              <span class="text-5xl font-black text-text tracking-tighter">{{ (plan()?.promoPrice | currency:plan()?.currency:'symbol':'1.0-0') || '$0' }}</span>
+              <div class="flex flex-col mb-1 ml-2">
+                <span class="text-xs font-bold text-text-muted line-through">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') }}</span>
+                <span class="text-[9px] font-black text-primary uppercase italic">{{ plan()?.promoLabel }}</span>
+              </div>
+            } @else {
+              <span class="text-5xl font-black text-text tracking-tighter">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') || '$0' }}</span>
+              <span class="text-text-muted font-medium mb-1 italic">/ mes</span>
+            }
           </div>
 
           <div class="h-px w-full bg-border/10 mb-8"></div>
@@ -262,8 +270,16 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
 
                     <div class="flex items-center justify-between mb-12">
                         <div>
-                             <p class="text-[11px] font-black uppercase text-text-muted tracking-[0.4em] mb-2">TOTAL</p>
-                             <p class="text-6xl font-black text-text tracking-tighter tabular-nums">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') || '$0' }}</p>
+                             <p class="text-[11px] font-black uppercase text-text-muted tracking-[0.4em] mb-2">{{ plan()?.promoPrice ? 'TOTAL PROMOCIONAL' : 'TOTAL' }}</p>
+                             @if (plan()?.promoPrice) {
+                               <div class="flex items-baseline gap-4">
+                                 <p class="text-6xl font-black text-text tracking-tighter tabular-nums">{{ (plan()?.promoPrice | currency:plan()?.currency:'symbol':'1.0-0') }}</p>
+                                 <p class="text-xl font-bold text-text-muted line-through tracking-tighter tabular-nums opacity-40">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') }}</p>
+                               </div>
+                               <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-2 italic">{{ plan()?.promoLabel }} por {{ plan()?.promoDurationMonths }} meses</p>
+                             } @else {
+                               <p class="text-6xl font-black text-text tracking-tighter tabular-nums">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') }}</p>
+                             }
                         </div>
                         <div class="px-5 py-2 bg-primary/10 text-primary rounded-full text-[11px] font-black uppercase tracking-[0.2em] italic">
                             Mensual
@@ -382,6 +398,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
             id: 'pro-3d',
             name: 'Taller Inicial',
             price: 8900,
+            promoPrice: 4900,
+            promoDurationMonths: 6,
+            promoLabel: 'Oferta de Lanzamiento',
             description: 'Para pequeños talleres que empiezan a crecer.',
             currency: 'ARS',
             features: ['60 pedidos / mes', '2 impresoras', '2 Usuarios', 'Control de materiales', 'Soporte prioritario']
@@ -424,8 +443,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     try {
       const prefId = await this.billingService.getPreferenceId(
         currentPlan.id, 
-        currentPlan.price, 
-        `Suscripción Plan ${currentPlan.name}`,
+        currentPlan.promoPrice || currentPlan.price, 
+        `Suscripción Plan ${currentPlan.name}${currentPlan.promoPrice ? ' (' + currentPlan.promoLabel + ')' : ''}`,
         this.session.user()?.email || ''
       );
       
@@ -453,8 +472,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       try {
         const prefId = await this.billingService.getPreferenceId(
           currentPlan.id, 
-          currentPlan.price, 
-          `Suscripción Plan ${currentPlan.name}`,
+          currentPlan.promoPrice || currentPlan.price, 
+          `Suscripción Plan ${currentPlan.name}${currentPlan.promoPrice ? ' (' + currentPlan.promoLabel + ')' : ''}`,
           this.session.user()?.email || ''
         );
         

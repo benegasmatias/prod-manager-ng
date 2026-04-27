@@ -79,14 +79,23 @@ import { SessionService } from '@core/session/session.service';
         </div>
       </div>
 
+      <app-order-financial-widget 
+        [totalPrice]="Number(pedido()!.totalPrice || 0)" 
+        [totalPaid]="totalPaid()" 
+        [saldo]="balance()" 
+        [hasPendingPayment]="hasPendingPayment()" 
+        [payments]="pedido()!.payments || []"
+        (pay)="openManage('PAYMENT')"
+        (revert)="onRevertPayment.emit($event)">
+      </app-order-financial-widget>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2 space-y-8">
           <app-order-items-widget [items]="pedido()!.items || []"></app-order-items-widget>
           <app-order-timeline [history]="pedido()!.statusHistory || []"></app-order-timeline>
         </div>
 
-        <div class="space-y-8">
-        <div class="space-y-10">
+        <div class="space-y-8 text-center sm:text-left">
           <div class="bg-surface-container-lowest rounded-[3rem] border border-border/5 p-10 shadow-2xl shadow-text/5 space-y-10 relative overflow-hidden group">
             <div class="absolute -top-20 -left-20 w-40 h-40 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
             
@@ -96,30 +105,29 @@ import { SessionService } from '@core/session/session.service';
                   <lucide-angular [img]="icons.User" class="h-12 w-12"></lucide-angular>
                 </div>
               </div>
-              <div class="space-y-3">
-                <h2 class="text-3xl font-black text-text tracking-tighter uppercase italic leading-none">{{ pedido()!.clientName || 'Consumidor Final' }}</h2>
-                <div class="flex items-center justify-center gap-4">
+              <div class="space-y-3 px-4">
+                <h2 class="text-3xl font-black text-text tracking-tighter uppercase italic leading-none truncate w-full">{{ pedido()!.clientName || 'Consumidor Final' }}</h2>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <span class="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic px-4 py-1 bg-surface-container-low rounded-full">ID: {{ pedido()!.clienteId}}</span>
                   <div class="flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                    <span class="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-600 italic">Vínculo Activo</span>
+                    <span class="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-600 italic whitespace-nowrap">Vínculo Activo</span>
                   </div>
                 </div>
               </div>
             </div>
             <div class="space-y-6 pt-10 border-t border-border/5 relative z-10">
-              <div class="flex items-center gap-6 group/info">
-                <div class="h-14 w-14 rounded-2xl bg-surface-container-low flex items-center justify-center text-text-muted/20 group-hover/info:text-primary group-hover/info:bg-primary/5 transition-all duration-700">
+              <div class="flex items-center gap-6 group/info justify-center sm:justify-start px-2">
+                <div class="h-14 w-14 rounded-2xl bg-surface-container-low flex items-center justify-center text-text-muted/20 group-hover/info:text-primary group-hover/info:bg-primary/5 transition-all duration-700 shrink-0">
                   <lucide-angular [img]="icons.Phone" class="h-5 w-5"></lucide-angular>
                 </div>
-                <div class="space-y-1">
+                <div class="space-y-1 min-w-0">
                   <p class="text-[8px] font-black uppercase text-text-muted/40 tracking-[0.4em] leading-none italic">Línea de Contacto</p>
-                  <p class="text-sm font-black text-text tracking-widest">{{ pedido()!.clientPhone || 'NO REGISTRADO' }}</p>
+                  <p class="text-sm font-black text-text tracking-widest truncate">{{ pedido()!.clientPhone || 'NO REGISTRADO' }}</p>
                 </div>
               </div>
             </div>
           </div>
-          <app-order-financial-widget [totalPrice]="Number(pedido()!.totalPrice || 0)" [totalPaid]="totalPaid()" [saldo]="balance()" [hasPendingPayment]="hasPendingPayment()" (pay)="openManage('PAYMENT')"></app-order-financial-widget>
         </div>
       </div>
     </div>
@@ -139,6 +147,7 @@ export class ClientDetailComponent {
   @Output() onDownload = new EventEmitter<string>();
   @Output() onEdit = new EventEmitter<void>();
   @Output() onDelete = new EventEmitter<void>();
+  @Output() onRevertPayment = new EventEmitter<string>();
 
   isManageModalOpen = signal(false);
 

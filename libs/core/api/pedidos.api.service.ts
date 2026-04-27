@@ -115,6 +115,12 @@ export class PedidosApiService {
     return firstValueFrom(this.http.post<Pedido>(url, data));
   }
 
+  async removePayment(orderId: string, paymentId: string, businessId?: string): Promise<void> {
+    let url = `${API_ENDPOINTS.ORDERS.PAYMENTS(orderId)}/${paymentId}`;
+    if (businessId) url += `?businessId=${businessId}`;
+    return firstValueFrom(this.http.delete<void>(url));
+  }
+
   /**
    * Reporta un fallo en un pedido (específicamente Impresión 3D o general).
    */

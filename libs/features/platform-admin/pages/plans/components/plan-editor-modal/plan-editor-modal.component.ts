@@ -111,6 +111,49 @@ import { ToastService } from '@shared/services/toast.service';
               </div>
             </div>
 
+            <!-- Promotional Area -->
+            <div class="p-8 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/10 space-y-6">
+              <div class="flex items-center gap-3 ml-1">
+                <lucide-angular [img]="icons.Sparkles" class="h-4 w-4 text-indigo-400"></lucide-angular>
+                <label class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Configuración de Oferta (Lanzamiento/Promo)</label>
+              </div>
+
+              <div class="grid grid-cols-2 gap-6 text-left">
+                <div class="space-y-2">
+                  <label class="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Precio Promocional</label>
+                  <div class="relative">
+                    <input 
+                      type="number" 
+                      formControlName="promoPrice"
+                      class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-white text-sm font-bold focus:border-indigo-500 focus:ring-0 transition-all pl-10"
+                      placeholder="Ej: 4900"
+                    >
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">$</span>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Duración (Meses)</label>
+                  <input 
+                    type="number" 
+                    formControlName="promoDurationMonths"
+                    class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-white text-sm font-bold focus:border-indigo-500 focus:ring-0 transition-all"
+                    placeholder="Ej: 6"
+                  >
+                </div>
+              </div>
+
+              <div class="space-y-2 text-left">
+                <label class="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Etiqueta de Oferta</label>
+                <input 
+                  type="text" 
+                  formControlName="promoLabel"
+                  class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-white text-sm font-bold focus:border-indigo-500 focus:ring-0 transition-all"
+                  placeholder="Ej: Oferta de Lanzamiento"
+                >
+              </div>
+            </div>
+
             <!-- Features Area -->
             <div class="space-y-4 text-left">
               <div class="flex items-center justify-between ml-1">
@@ -228,6 +271,9 @@ export class PlanEditorModalComponent implements OnInit {
       sortOrder: [0],
       hasTrial: [false],
       trialDays: [0],
+      promoPrice: [null],
+      promoDurationMonths: [null],
+      promoLabel: [''],
       features: this.fb.array([])
     });
   }
@@ -283,6 +329,8 @@ export class PlanEditorModalComponent implements OnInit {
         maxBusinesses: Number(rawValue.maxBusinesses),
         sortOrder: Number(rawValue.sortOrder),
         trialDays: Number(rawValue.trialDays),
+        promoPrice: rawValue.promoPrice ? Number(rawValue.promoPrice) : null,
+        promoDurationMonths: rawValue.promoDurationMonths ? Number(rawValue.promoDurationMonths) : null,
         features: rawValue.features.filter((f: string) => !!f.trim())
       };
 

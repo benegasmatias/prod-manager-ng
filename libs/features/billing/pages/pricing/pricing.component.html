@@ -51,11 +51,22 @@
               </div>
             }
           </div>
-          <div class="flex items-center justify-center gap-2 mb-6">
+          <div class="flex flex-col items-center justify-center gap-2 mb-6">
             @if (plan.price > 0) {
-              <span class="text-xs font-black text-text-muted/30 self-start mt-4 italic uppercase tracking-widest">$</span>
-              <span class="text-5xl md:text-6xl xl:text-7xl font-black tracking-tighter text-text font-display leading-none tabular-nums">{{ plan.price | number }}</span>
-              <span class="text-[11px] sm:text-[9px] font-black text-text-muted/30 self-end mb-2 italic uppercase tracking-[0.3em]">/ ciclo</span>
+              <div class="flex items-center gap-2 flex-col">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-black text-text-muted/30 self-start mt-4 italic uppercase tracking-widest">$</span>
+                  <span [class.text-text-muted]="plan.promoPrice" [class.line-through]="plan.promoPrice" class="text-5xl md:text-6xl xl:text-7xl font-black tracking-tighter text-text font-display leading-none tabular-nums">{{ plan.price | number }}</span>
+                  <span class="text-[11px] sm:text-[9px] font-black text-text-muted/30 self-end mb-2 italic uppercase tracking-[0.3em]">/ ciclo</span>
+                </div>
+
+                @if (plan.promoPrice) {
+                  <div class="px-5 py-2 rounded-full bg-indigo-500 text-white shadow-xl shadow-indigo-500/20 flex items-center gap-3 animate-in zoom-in-95 duration-700">
+                    <lucide-angular [img]="icons.Zap" class="h-3.5 w-3.5"></lucide-angular>
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">{{ plan.promoLabel || 'Oferta' }}: ${{ plan.promoPrice | number }} x {{ plan.promoDurationMonths }} meses</span>
+                  </div>
+                }
+              </div>
             } @else {
               <span class="text-5xl md:text-6xl xl:text-7xl font-black tracking-tighter text-text font-display leading-none uppercase italic">Libre</span>
             }

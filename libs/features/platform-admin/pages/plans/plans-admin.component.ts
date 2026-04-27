@@ -97,10 +97,25 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
                       <p class="text-xs text-zinc-500 font-bold leading-relaxed">{{ plan.description }}</p>
                     </div>
 
-                    <div class="flex items-baseline gap-2 mb-8">
+                    <div class="flex items-baseline gap-2 mb-2">
                       <span class="text-3xl font-black text-white tracking-tighter">{{ (plan.price | currency:plan.currency:'symbol':'1.0-0') || '$0' }}</span>
                       <span class="text-[10px] font-bold text-zinc-600 uppercase">/ Mensual</span>
                     </div>
+
+                    @if (plan.promoPrice) {
+                      <div class="mb-8 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col gap-1">
+                        <div class="flex items-center justify-between">
+                          <span class="text-[8px] font-black uppercase text-indigo-400 tracking-widest">{{ plan.promoLabel || 'Oferta' }}</span>
+                          <span class="text-[8px] font-black text-white/40 uppercase">{{ plan.promoDurationMonths }} Meses</span>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-sm font-black text-indigo-200">{{ plan.promoPrice | currency:plan.currency:'symbol':'1.0-0' }}</span>
+                          <span class="text-[8px] font-bold text-zinc-500 uppercase">precio promo</span>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="mb-8 h-[5.5rem] opacity-0"></div> <!-- Spacer to keep alignment -->
+                    }
 
                     <div class="space-y-4 mb-10 flex-1">
                       @for (feat of plan.features; track feat) {
