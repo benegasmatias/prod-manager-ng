@@ -14,7 +14,6 @@ export interface Negocio {
   id: string;
   nombre: string;
   rubro: Rubro;
-  category?: string;
   moneda?: string;
   status: 'ACTIVE' | 'SUSPENDED' | 'TRIAL';
   phone?: string;

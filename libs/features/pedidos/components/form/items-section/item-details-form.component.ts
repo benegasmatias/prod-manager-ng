@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Trash2, Zap, Check, Settings2, Sparkles, Clock, Layers, MousePointerClick, Info, Award } from 'lucide-angular';
+import { LucideAngularModule, Trash2, Zap, Check } from 'lucide-angular';
 import { MoneyInputComponent } from '@shared/ui/money-input/money-input.component';
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
@@ -56,59 +56,9 @@ export class ItemDetailsFormComponent {
   @Output() onFileUpload = new EventEmitter<string>();
   @Output() onFileDelete = new EventEmitter<string>();
 
-  showAdvanced = signal(false);
-  selectedPreset = signal<string | null>(null);
-
-  applyTemplate(type: 'SMALL' | 'MEDIUM' | 'LARGE') {
-    this.selectedPreset.set(type);
-    
-    if (this.rubro() === 'IMPRESION_3D') {
-      const templates = {
-        'SMALL': { peso: 20, mins: 120, name: 'Pieza Pequeña' },
-        'MEDIUM': { peso: 80, mins: 360, name: 'Pieza Mediana' },
-        'LARGE': { peso: 300, mins: 1200, name: 'Pieza Grande' }
-      };
-      const t = templates[type];
-      this.item.peso_gramos = t.peso;
-      this.item.duracion_estimada_minutos = t.mins;
-      if (!this.item.nombreProducto) this.item.nombreProducto = t.name;
-    } else if (this.rubro() === 'METALURGICA') {
-      const templates = {
-        'SMALL': { hrs: 1, name: 'Reparación / Trabajo Rápido' },
-        'MEDIUM': { hrs: 4, name: 'Fabricación Estándar' },
-        'LARGE': { hrs: 12, name: 'Estructura / Trabajo Complejo' }
-      };
-      const t = templates[type];
-      this.item.duracion_estimada_minutos = t.hrs * 60;
-      if (!this.item.nombreProducto) this.item.nombreProducto = t.name;
-    }
-    
-    // Auto-calculate suggested price if possible
-    const suggested = this.getSuggestedPrice();
-    if (suggested > 0) {
-      this.item.precioUnitario = Math.round(suggested);
-    }
-
-    this.onUpdate.emit();
-    
-    // Auto-focus name field after selection
-    setTimeout(() => {
-      const input = document.querySelector(`[data-item-input="${this.index()}"]`) as HTMLInputElement;
-      if (input) input.focus();
-    }, 100);
-  }
-
   getItemTotal(): number {
     return this.calculator.calculateItem(this.item, this.rubro()).total;
   }
-
-  isItemPending = computed(() => {
-    const total = this.getItemTotal();
-    // Item is pending if total is 0 OR if core technical fields are missing/zero
-    // but the user has started filling it (has a name or description)
-    const hasBasis = !!(this.item.nombreProducto || this.item.descripcion);
-    return hasBasis && (total <= 0 || (!this.item.peso_gramos && this.rubro() === 'IMPRESION_3D'));
-  });
 
   getSuggestedPrice(): number {
     const costoKg = Number(this.item.precioBobinaKg) || 0;
@@ -148,7 +98,7 @@ export class ItemDetailsFormComponent {
     this.onUpdate.emit();
   }
 
-  readonly icons = { Trash2, Zap, Check, Settings2, Sparkles, Clock, Layers, MousePointerClick, Info, Award };
+  readonly icons = { Trash2, Zap, Check };
 
   sectionedFields = computed(() => {
     const sections: { name: string, fields: any[] }[] = [];
@@ -181,17 +131,6 @@ export class ItemDetailsFormComponent {
     }
 
     return true;
-  }
-
-  isFieldBasic(f: any): boolean {
-    const basics = ['nombreProducto', 'descripcion', 'cantidad', 'tipo_trabajo', 'medidas', 'tipo_filamento'];
-    return basics.includes(f.key);
-  }
-
-  hasVisibleFields(section: any): boolean {
-    return section.fields.some((f: any) => 
-      this.isFieldVisible(f) && (this.isFieldBasic(f) || this.showAdvanced())
-    );
   }
 
   applyEnhancement(data: any) {

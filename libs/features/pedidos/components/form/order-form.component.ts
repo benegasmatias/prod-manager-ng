@@ -244,7 +244,7 @@ import { LayoutService } from '@core/layout/layout.service';
 
       <!-- EDITORIAL FLOATING DOCK (DESKTOP ONLY) -->
       @if (showFloatingFooter()) {
-        <div class="hidden sm:flex fixed bottom-1 left-1/2 -translate-x-1/2 w-auto z-[100] items-center justify-center animate-in slide-in-from-bottom-20 duration-1000">
+        <div class="hidden sm:flex fixed bottom-24 left-1/2 -translate-x-1/2 w-auto z-[100] items-center justify-center animate-in slide-in-from-bottom-20 duration-1000">
            <div class="h-20 w-auto pl-12 pr-6 rounded-full bg-surface/90 backdrop-blur-3xl border border-border/5 shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex items-center justify-start gap-10">
               <div class="flex flex-col">
                  <span class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/60 leading-none mb-2 italic">Total Acumulado</span>
@@ -353,7 +353,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
         this.lastNegocioLoaded = bid;
         this.loadEmployees();
       }
-
+      
       if (this.id && this.id !== this.orderLoadedId) {
         this.orderLoadedId = this.id;
         this.loadOrderForEditing();
@@ -368,14 +368,14 @@ export class OrderFormComponent implements OnInit, OnDestroy {
     try {
       this.isSaving.set(true);
       const order = await this.api.findOne(this.id);
-
+      
       this.orderType.set(order.type);
       this.clienteId = order.customerId || (order as any).clienteId;
       this.selectedClientName = order.clientName;
       this.fechaEntrega = order.dueDate ? new Date(order.dueDate).toISOString().split('T')[0] : '';
       this.responsableId = order.responsableGeneralId || (order as any).responsableId || (order as any).operatorId || order.responsableGeneral?.id || '';
       this.observaciones = order.notes || '';
-
+      
       // Phase 7: Integrity Sanitization
       const mappedItems = order.items.map(it => ({
         id: it.id,
@@ -402,7 +402,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
           sanitizedItems.push(it);
         }
       });
-
+      
       this.items.set(sanitizedItems);
       this.recalcTotales();
     } catch (e) {
@@ -422,13 +422,13 @@ export class OrderFormComponent implements OnInit, OnDestroy {
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.showFloatingFooter.set(window.scrollY > 300);
-
+    
     // Check if near bottom to hide the quick-scroll arrow
     const threshold = 150;
     const scrollPos = window.scrollY || window.pageYOffset;
     const windowHeight = window.innerHeight;
     const docHeight = document.documentElement.scrollHeight;
-
+    
     this.isAtBottom.set((scrollPos + windowHeight) >= (docHeight - threshold));
   }
 
@@ -572,7 +572,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
         totalPrice: this.totales().total,
         totalSenias: this.totales().totalSenias
       };
-
+      
       if (this.id) {
         // Keep businessId for role validation in guards
         delete payload.customerId;
