@@ -100,6 +100,21 @@ export class ItemDetailsFormComponent {
 
   readonly icons = { Trash2, Zap, Check };
 
+  isItemPending = computed(() => {
+    const r = this.rubro();
+    const it = this.item;
+    
+    if (r === 'IMPRESION_3D') {
+      return !it.peso_gramos || !it.duracion_estimada_minutos || (!it.url_stl && !it.stlFile);
+    }
+    
+    if (r === 'METALURGICA') {
+      return !it.duracion_estimada_minutos;
+    }
+
+    return false;
+  });
+
   sectionedFields = computed(() => {
     const sections: { name: string, fields: any[] }[] = [];
     const fields = this.config().itemFields || [];
