@@ -138,6 +138,7 @@ export interface Pedido {
   // Mobile Redesign Props
   productionProgress?: number;
   isFacturado?: boolean;
+  priority?: number;
 }
 
 export interface StatusHistoryEntry {

@@ -11,6 +11,7 @@ import { ClienteFormDialogComponent } from './cliente-form-dialog/cliente-form-d
 @Component({
   selector: 'app-client-selector',
   standalone: true,
+  host: { 'class': 'block w-full' },
   imports: [CommonModule, FormsModule, LucideAngularModule, ClienteFormDialogComponent],
   template: `
     <div class="space-y-2 relative" #container>
@@ -79,10 +80,15 @@ import { ClienteFormDialogComponent } from './cliente-form-dialog/cliente-form-d
         <p class="text-[10px] font-bold text-rose-500 ml-2 uppercase tracking-tight">{{ error }}</p>
       }
 
-      <!-- Dropdown Menu -->
+      <!-- Dropdown Menu (Overlay Strategy: Fixed Position) -->
       @if (isOpen()) {
-        <div class="absolute top-[calc(100%+8px)] left-0 w-full bg-white dark:bg-zinc-900 rounded-[2rem] border border-zinc-100 dark:border-zinc-800 shadow-2xl z-[100] max-h-[320px] overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-300">
-          
+        <div 
+          class="fixed bg-white dark:bg-zinc-900 rounded-[2rem] border border-zinc-100 dark:border-zinc-800 shadow-2xl z-[500] max-h-[320px] overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-300"
+          [style.top.px]="overlayCoords().top || 0"
+          [style.left.px]="overlayCoords().left || 0"
+          [style.width.px]="overlayCoords().width || 200"
+          [style.visibility]="overlayCoords().width ? 'visible' : 'hidden'"
+        >
           <div class="overflow-y-auto flex-1 p-2 no-scrollbar">
             @if (filteredClients().length > 0) {
               <div class="space-y-1">
@@ -176,6 +182,22 @@ export class ClientSelectorComponent implements OnInit {
   searchTerm = signal('');
   showForm = signal(false);
   isSaving = signal(false);
+  openChange = output<boolean>();
+
+  // Overlay State
+  overlayCoords = signal({ top: 0, left: 0, width: 0 });
+
+  @HostListener('document:scroll', ['$event', '{ capture: true }'])
+  @HostListener('window:resize')
+  updateOverlayPosition() {
+    if (!this.isOpen()) return;
+    const rect = this.eRef.nativeElement.getBoundingClientRect();
+    this.overlayCoords.set({
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: rect.width
+    });
+  }
 
   // Computed
   filteredClients = computed(() => {
@@ -207,13 +229,21 @@ export class ClientSelectorComponent implements OnInit {
     });
 
     effect(() => {
-      if (this.isOpen()) {
-        setTimeout(() => this.searchInput?.nativeElement.focus(), 0);
+      const open = this.isOpen();
+      this.openChange.emit(open);
+      if (open) {
+        // Garantizar que el DOM se haya actualizado antes de medir
+        setTimeout(() => {
+          this.updateOverlayPosition();
+          this.searchInput?.nativeElement.focus();
+        }, 0);
       }
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    this.loadClients();
+  }
 
   async loadClients() {
     if (!this.businessId()) return;

@@ -7,11 +7,12 @@ import {
   computed,
   input,
   signal,
+  effect,
   ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Trash2, Zap, Check } from 'lucide-angular';
+import { LucideAngularModule, Trash2, Zap, Check, Camera, Link, Lock, Layers, Edit2, PencilLine } from 'lucide-angular';
 import { MoneyInputComponent } from '@shared/ui/money-input/money-input.component';
 import { NegocioConfig, Rubro } from '@shared/models/negocio';
 import { cn } from '@shared/utils/cn';
@@ -45,9 +46,12 @@ export class ItemDetailsFormComponent {
   rubro = input.required<Rubro>();
   orderType = input<'CLIENT' | 'STOCK'>('CLIENT');
   isSaving = input(false);
+  forceEdit = input<boolean>(false);
 
   private calculator = inject(OrderCalculatorService);
   private session = inject(SessionService);
+
+  constructor() {}
 
   isArgentina = computed(() => this.session.activeNegocio()?.moneda === 'ARS');
 
@@ -98,7 +102,9 @@ export class ItemDetailsFormComponent {
     this.onUpdate.emit();
   }
 
-  readonly icons = { Trash2, Zap, Check };
+  readonly icons = { Trash2, Zap, Check, Camera, Link, Lock, Layers, Edit2, PencilLine };
+
+
 
   isItemPending = computed(() => {
     const r = this.rubro();

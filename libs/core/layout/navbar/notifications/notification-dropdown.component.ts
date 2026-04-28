@@ -83,8 +83,8 @@ import { LayoutService } from '../../layout.service';
                     class="p-5 transition-all relative flex gap-4 group"
                     [class.bg-primary/5]="!n.isRead"
                     [class.dark:bg-primary/10]="!n.isRead"
-                    [class.hover:bg-zinc-50\/50]="n.isRead"
-                    [class.dark:hover:bg-zinc-900\/50]="n.isRead"
+                    [class.hover:bg-zinc-50/50]="n.isRead"
+                    [class.dark:hover:bg-zinc-900/50]="n.isRead"
                   >
                     <div class="mt-1 shrink-0">
                       <div 

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, signal, computed, effect, OnDestroy, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X, PlusCircle, ArrowRight, Layers, PencilLine, Trash2 } from 'lucide-angular';
 import { Router, RouterModule } from '@angular/router';
 import { SessionService } from '@core/session/session.service';
 import { PedidosApiService } from '@core/api/pedidos.api.service';
@@ -22,6 +22,7 @@ import { LayoutService } from '@core/layout/layout.service';
 @Component({
   selector: 'app-order-form',
   standalone: true,
+  host: { 'class': 'block' },
   imports: [
     CommonModule,
     FormsModule,
@@ -31,254 +32,294 @@ import { LayoutService } from '@core/layout/layout.service';
     EmployeeSelectorComponent,
     IntelligentDatePickerComponent,
     ItemDetailsFormComponent,
-    FloatingCalculatorComponent,
     ButtonSpinnerComponent
   ],
   template: `
-    <form (submit)="handleSave($event)" class="space-y-12 sm:space-y-16 pb-40 relative max-w-6xl mx-auto animate-in fade-in duration-1000 px-4 sm:px-8">
+    <form (submit)="handleSave($event)" class="bg-[#fbfcff] min-h-screen relative pb-40 font-sans max-w-2xl mx-auto">
       
-      <!-- EDITORIAL CONTEXTUAL HEADER -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-10 pt-4 sm:pt-8 border-b border-border/5 pb-8 sm:pb-12">
-        <div class="flex items-start gap-4 sm:gap-8">
-          <!-- Back Button (Desktop ONLY) -->
-          <button
-            type="button"
-            (click)="goBack()"
-            class="hidden sm:flex h-14 w-14 rounded-2xl bg-surface-container-lowest border border-border/5 shadow-sm hover:bg-surface transition-all active:scale-95 items-center justify-center text-text-muted hover:text-text group"
-          >
-            <lucide-angular [img]="icons.ArrowLeft" class="h-6 w-6 transition-transform group-hover:-translate-x-1"></lucide-angular>
-          </button>
-          <div class="space-y-1 sm:space-y-3">
-            <div class="flex items-center gap-2 sm:gap-3">
-              <div [class]="cn('h-1.5 w-1.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]', forcedStatus === 'QUOTATION' ? 'bg-blue-500 shadow-blue-500/50' : 'bg-primary shadow-primary/50')"></div>
-              <span [class]="cn('text-[7px] sm:text-[9px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em]', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
-                {{ forcedStatus === 'QUOTATION' ? 'Propuesta Comercial' : 'Carga de Registro Operativo' }}
-              </span>
-            </div>
-            <h1 class="text-3xl md:text-6xl font-black tracking-tighter text-text uppercase leading-none font-display">
-              {{ forcedStatus === 'QUOTATION' ? 'Nuevo' : (orderType() === 'CLIENT' ? 'Nuevo' : 'Producción de') }} 
-              <span [class]="cn('italic', forcedStatus === 'QUOTATION' ? 'text-blue-500' : 'text-primary')">
-                {{ forcedStatus === 'QUOTATION' ? 'Presupuesto' : (orderType() === 'CLIENT' ? 'Pedido' : 'Stock') }}
-              </span>
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      <!-- SYSTEM ARCHITECTURE LAYOUT -->
-      <fieldset [disabled]="isSaving()" class="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-start">
-        
-        <!-- MAIN COLUMN: FORM ARCHITECTURE -->
-        <div class="lg:col-span-8 space-y-12 sm:space-y-16">
-          
-          <!-- SECCIÓN 1: IDENTIDAD DE LA ORDEN -->
-          <div class="rounded-[2rem] sm:rounded-[3rem] border border-border/5 bg-surface-container-low p-6 sm:p-14 shadow-2xl shadow-text/5 transition-all duration-700 hover:shadow-text/10">
-             <h2 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-8 sm:mb-12 flex items-center gap-4">
-                <span class="w-6 sm:w-8 h-px bg-border/10"></span>
-                Identificación del Sistema
-             </h2>
-             
-             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
-                @if (!forcedType) {
-                  <div class="sm:col-span-2 space-y-3 sm:space-y-4">
-                    <label class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Propósito de Carga</label>
-                    <div class="grid grid-cols-2 gap-3 sm:gap-4 p-1.5 rounded-2xl sm:rounded-[2rem] bg-surface-container-lowest border border-border/5">
-                      <button type="button" (click)="orderType.set('CLIENT')" [class]="cn('h-12 sm:h-14 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'CLIENT' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Externo (Cliente)</button>
-                      <button type="button" (click)="orderType.set('STOCK')" [class]="cn('h-12 sm:h-14 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500', orderType() === 'STOCK' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-text-muted/40 hover:text-text')">Interno (Stock)</button>
-                    </div>
-                  </div>
-                }
-
-                @if (orderType() === 'CLIENT') {
-                  <app-client-selector
-                    label="Entidad Cliente"
-                    [value]="clienteId"
-                    (valueChange)="clienteId = $event"
-                    (clientSelected)="selectedClientName = $event.name"
-                    [error]="vErrors['clienteId']"
-                    [disabled]="isSaving()"
-                    class="sm:col-span-2"
-                  ></app-client-selector>
-                  
-                  <app-intelligent-date-picker
-                    label="Promesa de Entrega"
-                    [(value)]="fechaEntrega"
-                    [disabled]="isSaving()"
-                    placeholder="DD/MM/AAAA"
-                  ></app-intelligent-date-picker>
-                }
-
-                <app-employee-selector
-                  label="Arquitecto de Producción"
-                  [value]="responsableId"
-                  (valueChange)="responsableId = $event"
-                  [disabled]="isSaving()"
-                ></app-employee-selector>
-
-                <div class="sm:col-span-2 space-y-3 sm:space-y-4">
-                  <label class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-2">Manifiesto / Observaciones</label>
-                  <input [(ngModel)]="observaciones" name="notas" placeholder="DETALLES TÉCNICOS O LOGÍSTICOS..." 
-                    class="w-full h-14 sm:h-16 px-6 rounded-2xl border border-border/5 bg-surface-container-lowest text-sm font-black outline-none focus:border-primary/20 focus:ring-[12px] focus:ring-primary/5 transition-all placeholder:opacity-20 uppercase tracking-widest">
+      <!-- Side-Sheet Sidebar Overlay -->
+      @if (editingItemIndex() !== null) {
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] animate-in fade-in duration-500" (click)="closeSidebar()">
+          <div class="fixed right-0 top-0 h-screen w-full max-w-[520px] bg-white shadow-2xl flex flex-col z-[110]" (click)="$event.stopPropagation()">
+            
+            <!-- Sidebar Header (Fixed) -->
+            <div class="px-10 pt-12 pb-8 flex items-center justify-between border-b border-slate-50 shrink-0">
+              <div class="flex items-center gap-6">
+                <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-[#8b5cf6] text-white flex items-center justify-center shadow-lg shadow-primary/20">
+                  <lucide-angular [img]="icons.Layers" class="h-6 w-6"></lucide-angular>
                 </div>
-             </div>
-          </div>
-
-          <!-- SECCIÓN 2: LÍNEAS DE CONFIGURACIÓN -->
-          <div class="space-y-8 sm:space-y-10">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between px-4 gap-6">
-              <div class="space-y-1 sm:space-y-2">
-                <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Componentes de Producción</h3>
-                <p class="text-[10px] sm:text-xs text-text-muted font-medium italic opacity-60">Configuración detallada de {{ items().length }} unidades.</p>
+                <div>
+                  <h2 class="text-xl font-black text-[#193357] leading-tight">Detalle del Ítem</h2>
+                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Posición #{{ (editingItemIndex() || 0) + 1 }}</p>
+                </div>
               </div>
-              <div class="flex gap-3 sm:gap-4">
-                @if (items().length > 5) {
-                  <button type="button" (click)="removeDuplicates()" class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] px-4 sm:px-6 py-2 rounded-full border border-danger/10 text-danger hover:bg-danger/5 transition-all italic">
-                    Limpiar Duplicados
-                  </button>
-                }
-              </div>
+              
+              <button type="button" (click)="closeSidebar()" class="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-primary transition-all">
+                <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
+              </button>
             </div>
 
-            <div class="space-y-8 sm:space-y-12">
-              @for (item of items(); track $index) {
-                <app-item-details-form
-                  [index]="$index"
-                  [item]="item"
-                  [config]="config()"
-                  [rubro]="rubro()"
-                  [orderType]="orderType()"
-                  [isSaving]="isSaving()"
-                  [canRemove]="items().length > 1"
-                  (onRemove)="removeItem($index)"
-                  (onUpdate)="recalcTotales()"
-                  (onFileUpload)="trackPendingFile($event)"
-                  (onFileDelete)="untrackFile($event)"
-                ></app-item-details-form>
+            <!-- Sidebar Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto px-10 py-10 custom-scrollbar">
+              @if (editingItemIndex() !== null && items()[editingItemIndex()!]) {
+                <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <app-item-details-form
+                    [index]="editingItemIndex()!"
+                    [item]="items()[editingItemIndex()!]"
+                    [config]="config()"
+                    [rubro]="rubro"
+                    [orderType]="orderType()"
+                    [isSaving]="isSaving()"
+                    [canRemove]="items().length > 1"
+                    [forceEdit]="true"
+                    (onRemove)="removeItem(editingItemIndex()!); closeSidebar()"
+                    (onUpdate)="recalcTotales()"
+                    (onFileUpload)="trackPendingFile($event)"
+                    (onFileDelete)="untrackFile($event)"
+                  ></app-item-details-form>
+                </div>
               }
-
-              <!-- ADD ITEM BUTTON (PERSISTENT FLOW) -->
-              <div class="flex justify-center pt-4">
-                <button type="button" (click)="addItem()" 
-                    class="h-14 w-14 sm:w-auto sm:px-10 rounded-full bg-zinc-900 text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:scale-[1.05] active:scale-[0.95] transition-all shadow-xl shadow-zinc-900/10 group">
-                  <lucide-angular [img]="icons.Plus" class="h-5 w-5 sm:h-4 sm:w-4 transition-transform group-hover:rotate-90"></lucide-angular>
-                  <span class="hidden sm:inline">Anexar Ítem</span>
-                </button>
-              </div>
             </div>
 
+            <!-- Sidebar Footer (Fixed) -->
+            <div class="p-8 border-t border-slate-100 bg-white shrink-0">
+               <button type="button" (click)="closeSidebar()" class="w-full h-14 rounded-2xl bg-slate-900 text-white font-bold text-sm uppercase tracking-[0.2em] shadow-lg hover:bg-slate-800 transition-all">
+                  Confirmar y Guardar
+               </button>
+            </div>
           </div>
-        </div>
-
-        <!-- SIDEBAR: MATRIZ DE VALORES (FLOTANTE STICKY EN DESKTOP) -->
-        <div class="lg:col-span-4 h-full relative overflow-visible mt-8 lg:mt-0">
-           <div class="sticky top-24 space-y-10">
-              
-              <!-- Luxury Summary Matrix -->
-              <div class="p-8 sm:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] bg-surface-container-low border border-border/5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] relative overflow-hidden group">
-                 <!-- Subtle Branding Accent -->
-                 <div [class]="cn('absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity duration-1000 group-hover:opacity-20', forcedStatus === 'QUOTATION' ? 'bg-blue-500' : 'bg-primary')"></div>
-
-                 <h3 class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-text-muted mb-8 sm:mb-12 flex items-center gap-4">
-                   <div [class]="cn('w-2 h-2 rounded-full', forcedStatus === 'QUOTATION' ? 'bg-blue-500' : 'bg-primary')"></div>
-                   Arquitectura de Costos
-                 </h3>
-                 
-                 <div class="space-y-8 sm:space-y-10">
-                     <div class="flex justify-between items-center group/row">
-                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Volumen Config</span>
-                        <span class="text-lg sm:text-xl font-black text-text tabular-nums tracking-tighter">{{ items().length }} UN.</span>
-                     </div>
-
-                     <div class="flex justify-between items-center group/row">
-                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/60 italic group-hover/row:text-text transition-colors">Masa Crítica</span>
-                        <span class="text-lg sm:text-xl font-black text-text tabular-nums tracking-tighter">{{ totales().unidades }} PIEZAS</span>
-                     </div>
-
-                    <div class="h-px bg-border/5"></div>
-
-                    <div class="space-y-2 sm:space-y-3">
-                       <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40">Inversión Bruta</span>
-                       <div class="flex items-baseline gap-1">
-                          <span class="text-4xl sm:text-5xl font-black text-text tabular-nums tracking-tighter leading-none">
-                            {{ totales().total | currency:'':'symbol':'1.0-0' }}
-                          </span>
-                       </div>
-                    </div>
-
-                    @if (orderType() !== 'STOCK') {
-                      <div class="space-y-4 sm:space-y-6 pt-2 sm:pt-4 animate-in fade-in duration-700">
-                         <div class="flex items-center justify-between px-1">
-                            <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-text-muted/40">Adelantos Registrados</span>
-                            <span class="text-[10px] sm:text-xs font-black text-success tabular-nums">- {{ totales().totalSenias | currency:'':'symbol':'1.0-0' }}</span>
-                         </div>
-                         
-                         <div class="p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] bg-surface-container-lowest border border-primary/5 space-y-1 sm:space-y-2">
-                            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.5em] text-primary">Saldo en Entrega</span>
-                            <div class="text-3xl sm:text-4xl font-black text-primary tabular-nums tracking-tighter">{{ totales().saldoPendiente | currency:'':'symbol':'1.0-0' }}</div>
-                         </div>
-                      </div>
-                    }
-
-                    <div class="hidden sm:block pt-8">
-                      <app-button-spinner
-                        [loading]="isSaving()"
-                        (onClick)="handleSave($event)"
-                        [btnClass]="cn(
-                          'w-full h-20 rounded-[2rem] text-white font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl transition-all flex items-center justify-center gap-4 group relative overflow-hidden active:scale-95',
-                          forcedStatus === 'QUOTATION' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-primary shadow-primary/30'
-                        )"
-                      >
-                        <span class="relative z-10 whitespace-nowrap">{{ forcedStatus === 'QUOTATION' ? 'Emitir Cotización' : (id ? 'Sincronizar' : 'Finalizar Registro') }}</span>
-                        <lucide-angular [img]="icons.CheckCircle2" class="h-5 w-5 opacity-40 group-hover:opacity-100 group-hover:scale-125 transition-all relative z-10 shrink-0"></lucide-angular>
-                      </app-button-spinner>
-                    </div>
-
-                    <p class="text-[8px] font-black text-center text-text-muted/40 uppercase tracking-[0.3em] leading-relaxed pt-2 sm:pt-4 px-4 sm:px-6">
-                      {{ orderType() === 'STOCK' ? 'El registro impactará el inventario en tiempo real.' : 'Notificaciones automatizadas tras la firma digital.' }}
-                    </p>
-                 </div>
-              </div>
-           </div>
-        </div>
-      </fieldset>
-
-      <!-- EDITORIAL FLOATING DOCK (DESKTOP ONLY) -->
-      @if (showFloatingFooter()) {
-        <div class="hidden sm:flex fixed bottom-1 left-1/2 -translate-x-1/2 w-auto z-[100] items-center justify-center animate-in slide-in-from-bottom-16 duration-1000">
-           <div class="h-20 w-auto pl-12 pr-6 rounded-full bg-surface/90 backdrop-blur-3xl border border-border/5 shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex items-center justify-start gap-10">
-              <div class="flex flex-col">
-                 <span class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/60 leading-none mb-2 italic">Total Acumulado</span>
-                 <span class="text-2xl font-black text-text leading-none tabular-nums tracking-tighter">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
-              </div>
-              
-              <div class="w-px h-10 bg-border/5"></div>
-              
-              <app-button-spinner
-                [loading]="isSaving()"
-                (onClick)="handleSave($event)"
-                [btnClass]="'h-12 px-10 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-3 shadow-2xl shadow-primary/20'"
-              >
-                <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
-                <span class="inline">{{ id ? 'Guardar' : 'Finalizar' }}</span>
-              </app-button-spinner>
-           </div>
         </div>
       }
 
-      <!-- MOBILE CALCULATOR FAB -->
-      <button 
-        type="button" 
-        (click)="calcTrigger.isOpen.set(true)"
-        class="sm:hidden fixed bottom-28 right-4 h-14 w-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 bg-primary/80 backdrop-blur-3xl border border-white/20 text-white z-[120]"
-      >
-        <lucide-angular [img]="icons.Calculator" class="h-6 w-6"></lucide-angular>
-      </button>
+      <!-- Top Actions -->
 
-      <app-floating-calculator #calcTrigger [hideTrigger]="layoutService.isMobile()"></app-floating-calculator>
+      <div class="flex items-center justify-between px-10 py-10 sticky top-0 bg-[#fbfcff]/90 backdrop-blur-xl z-50">
+        <button type="button" (click)="goBack()" class="h-14 w-14 flex items-center justify-center rounded-[1.5rem] bg-white border border-slate-100 text-primary shadow-sm hover:bg-purple-50 transition-all">
+          <lucide-angular [img]="icons.ArrowLeft" class="h-7 w-7"></lucide-angular>
+        </button>
+        
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-[10px] font-black uppercase tracking-[0.4em] text-primary/40 leading-none">Terminal de Operaciones</span>
+          <h1 class="text-[22px] font-black text-[#193357] tracking-tight leading-none">Nuevo Pedido</h1>
+        </div>
+
+        <div class="h-14 w-14"></div> <!-- Balanced side -->
+      </div>
+
+      <div class="px-6 space-y-10 pb-20">
+        
+        <!-- Bloque Superior (Tipo, Cliente, Prioridad, Fecha) -->
+        <div class="bg-white rounded-[4rem] p-10 space-y-10 shadow-2xl shadow-purple-500/5 relative overflow-hidden group border border-white/50">
+          <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none"></div>
+
+          <!-- Selector de Tipo de Pedido (Cliente vs Stock) -->
+          <div class="flex items-center justify-center">
+            <div class="bg-white p-1 rounded-2xl flex gap-1 shadow-sm border border-slate-100">
+               <button 
+                 type="button"
+                 (click)="orderType.set('CLIENT')"
+                 [class]="cn('px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all', orderType() === 'CLIENT' ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'text-slate-400 hover:bg-slate-50')"
+               >Cliente</button>
+               <button 
+                 type="button"
+                 (click)="orderType.set('STOCK')"
+                 [class]="cn('px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all', orderType() === 'STOCK' ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'text-slate-400 hover:bg-slate-50')"
+               >Stock / Reposición</button>
+            </div>
+          </div>
+          
+          <!-- Selección de Cliente (Solo si es CLIENT) -->
+          @if (orderType() === 'CLIENT') {
+            <div class="space-y-3">
+            <label class="text-[10px] font-bold text-[#64748b] tracking-[0.1em] ml-1 uppercase">Selección de Cliente</label>
+            
+            <div class="bg-white rounded-[2rem] p-1 flex items-center justify-between shadow-sm cursor-pointer border border-[#e2e8f0]/50 relative">
+               <div class="w-full relative client-selector-override">
+                 <app-client-selector
+                   [value]="clienteId()"
+                   (valueChange)="clienteId.set($event)"
+                   (clientSelected)="onClientSelected($event)"
+                   [error]="vErrors['clienteId']"
+                   [disabled]="isSaving()"
+                   placeholder="Seleccionar..."
+                 ></app-client-selector>
+               </div>
+            </div>
+          </div>
+          }
+          
+          <div [class]="cn('grid grid-cols-2 gap-4', orderType() === 'CLIENT' ? '' : '')">
+            <div class="space-y-3">
+               <label class="text-[10px] font-bold text-[#64748b] tracking-[0.1em] ml-1 uppercase">Prioridad</label>
+               <div (click)="cyclePriority()" class="bg-white rounded-full px-5 h-12 flex items-center justify-between shadow-sm border border-[#e2e8f0]/50 cursor-pointer select-none active:scale-95 transition-all">
+                 <span class="text-sm font-medium text-[#334155]">{{ priorityLabel() }}</span>
+                 <div [class]="cn('w-2 h-2 rounded-full shadow-[0_0_8px_rgba(var(--priority-color),0.4)]', priorityColorClass())"></div>
+               </div>
+            </div>
+            
+            <div class="space-y-3">
+               <label class="text-[10px] font-bold text-[#64748b] tracking-[0.1em] ml-1 uppercase">Fecha de Entrega</label>
+               <app-intelligent-date-picker
+                 [value]="fechaEntrega()"
+                 (valueChange)="fechaEntrega.set($event)"
+                 [disabled]="isSaving()"
+                 placeholder="Oct 24, 2023"
+               ></app-intelligent-date-picker>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <label class="text-[10px] font-bold text-[#64748b] tracking-[0.1em] ml-1 uppercase">Responsable de Producción</label>
+            <div class="bg-white rounded-full px-1 h-14 flex items-center shadow-sm border border-[#e2e8f0]/50 relative">
+                <div class="w-full relative client-selector-override">
+                  <app-employee-selector
+                    [value]="responsableId()"
+                    (valueChange)="responsableId.set($event)"
+                    [disabled]="isSaving()"
+                  ></app-employee-selector>
+                </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Ítems del Pedido -->
+        <div class="space-y-5">
+          <div class="flex items-center justify-between px-2">
+            <h2 class="text-xl font-black text-[#1e293b] tracking-tight">Ítems del Pedido</h2>
+            <span class="px-4 py-1.5 rounded-full bg-[#f0eaff] text-[#6c3ce9] text-[11px] font-bold">{{ items().length }} ítems agregados</span>
+          </div>
+          
+          <div class="space-y-4">
+            @for (item of items(); track $index) {
+              <div 
+                (click)="openSidebar($index)" 
+                class="bg-white rounded-[2rem] p-5 shadow-sm border border-[#e2e8f0]/40 flex items-center justify-between hover:border-purple-200 hover:shadow-md transition-all cursor-pointer group animate-in zoom-in-95 duration-300"
+              >
+                 <div class="flex items-center gap-4">
+                    <div class="h-14 w-14 rounded-2xl bg-[#f4f6fe] flex items-center justify-center text-primary group-hover:bg-purple-50 transition-colors">
+                      <lucide-angular [img]="icons.Layers" class="h-6 w-6"></lucide-angular>
+                    </div>
+                    <div class="flex flex-col">
+                      <h3 class="font-bold text-[#1e293b] leading-tight truncate max-w-[200px]">
+                        {{ item.nombreProducto || 'Trabajo #' + ($index + 1) }}
+                      </h3>
+                      <div class="flex gap-2 mt-1">
+                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                          {{ item.rubro === 'IMPRESION_3D' ? (item.peso_gramos || 0) + 'g' : 'Personalizado' }}
+                        </span>
+                        <span class="text-[9px] font-bold text-zinc-400 opacity-30">•</span>
+                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                          {{ item.duracion_estimada_minutos ? (item.duracion_estimada_minutos + ' min') : 'Sin tiempo' }}
+                        </span>
+                      </div>
+                    </div>
+                 </div>
+                  <div class="flex items-center gap-4">
+                    <div class="flex flex-col items-end mr-4">
+                      <span class="text-sm font-black text-primary">{{ getItemTotal(item) | currency }}</span>
+                      <span class="text-[8px] font-black text-zinc-400 uppercase tracking-[0.1em]">Subtotal</span>
+                    </div>
+
+                    @if (items().length > 1) {
+                      <button 
+                        type="button" 
+                        (click)="removeItem($index); $event.stopPropagation()" 
+                        class="h-10 w-10 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500 opacity-0 group-hover:opacity-100 hover:bg-rose-100 transition-all active:scale-95 shadow-sm shadow-rose-500/10"
+                      >
+                        <lucide-angular [img]="icons.Trash2" class="h-4.5 w-4.5"></lucide-angular>
+                      </button>
+                    }
+
+                    <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 text-zinc-300 group-hover:text-primary group-hover:bg-purple-50 transition-all">
+                      <lucide-angular [img]="icons.ArrowRight" class="h-5 w-5 group-hover:translate-x-0.5 transition-transform"></lucide-angular>
+                    </div>
+                  </div>
+              </div>
+            }
+            
+            <button type="button" (click)="addItem()" class="w-full h-[4.5rem] rounded-[2rem] border-2 border-dashed border-[#d8b4fe]/60 flex items-center justify-center gap-3 text-[#7c3aed] font-bold bg-white/50 hover:bg-purple-50/50 transition-colors shadow-sm">
+              <lucide-angular [img]="icons.PlusCircle" class="h-5 w-5"></lucide-angular>
+              <span class="text-[15px]">Agregar Ítem al Pedido</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="space-y-3">
+          <label class="text-[10px] font-bold text-[#64748b] tracking-[0.1em] ml-1 uppercase">Manifiesto / Notas del Pedido</label>
+          <textarea 
+            [ngModel]="observaciones()" 
+            (ngModelChange)="observaciones.set($event)"
+            name="observaciones"
+            rows="3"
+            placeholder="Detalles técnicos, logísticos o aclaraciones particulares..."
+            class="w-full p-6 rounded-[2rem] border border-[#e2e8f0]/60 bg-white/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500/30 transition-all resize-none shadow-sm placeholder:text-slate-400"
+          ></textarea>
+        </div>
+        
+        <!-- Tiempo y Material (Cards Inferiores) -->
+        <div class="grid grid-cols-2 gap-4 pb-12">
+          <div class="bg-[#eef2ff] rounded-[2rem] p-6 flex flex-col justify-between shadow-sm min-h-[140px]">
+            <span class="text-[8px] font-bold text-[#4f46e5] uppercase tracking-widest leading-relaxed">Tiempo de entrega estimado</span>
+            <div class="space-y-2 mt-auto">
+              <span class="text-3xl font-black text-[#6c3ce9] tracking-tighter">{{ estimatedTimeLabel() }}</span>
+              <div class="h-1.5 w-full bg-[#4f46e5]/10 rounded-full">
+                <div class="h-full bg-[#6c3ce9] rounded-full" [style.width.%]="estimatedTimePercent()"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-[#e0e7ff] rounded-[2rem] p-6 flex flex-col justify-between shadow-sm min-h-[140px]">
+             <span class="text-[8px] font-bold text-[#3730a3]/80 uppercase tracking-widest leading-relaxed">Materiales</span>
+             <span class="text-xl font-bold text-[#3730a3] leading-tight mt-auto tracking-tight truncate-multiline">{{ materialsLabel() }}</span>
+          </div>
+        </div>
+
+      </div> <!-- End Main Container -->
+
+      <!-- Centered Bottom Bar -->
+      <div class="fixed bottom-0 bg-white/95 backdrop-blur-2xl border-t border-slate-100 p-5 md:p-6 z-[50] shadow-[0_-10px_50px_rgba(0,0,0,0.03)]" 
+           [style.left.px]="layoutService.sidebarWidth()"
+           [style.width]="'calc(100% - ' + layoutService.sidebarWidth() + 'px)'">
+        <div class="max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
+          
+          <div class="flex flex-col items-center md:items-start">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 leading-none">Presupuesto Estimado</span>
+            <span class="text-3xl font-black text-[#193357] leading-none">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
+          </div>
+          
+          <div class="flex items-center gap-8 lg:gap-10">
+            <button type="button" (click)="saveAsDraft()" [disabled]="isSaving()" class="flex items-center gap-3 text-slate-500 hover:text-primary transition-all group disabled:opacity-50">
+               <lucide-angular [img]="icons.Save" class="h-6 w-6 group-hover:scale-110 transition-transform"></lucide-angular>
+               <span class="text-[11px] font-black uppercase tracking-widest text-left leading-tight">Guardar<br/>Borrador</span>
+            </button>
+            
+            <button type="submit" [disabled]="isSaving()" class="h-15 px-10 rounded-full bg-gradient-to-r from-primary to-[#8b5cf6] text-white font-black text-[14px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50">
+               @if (isSaving()) {
+                 <app-button-spinner></app-button-spinner>
+               }
+               <span>{{ id ? 'Actualizar' : 'Finalizar Pedido' }}</span>
+               @if (!isSaving()) {
+                 <lucide-angular [img]="icons.ArrowRight" class="h-5 w-5"></lucide-angular>
+               }
+            </button>
+          </div>
+        </div>
+      </div>
     </form>
   `,
   styles: [`
     :host { display: block; }
+    ::ng-deep .client-selector-override div[class*="bg-zinc-50/50"] { background-color: transparent !important; }
+    ::ng-deep .client-selector-override .border-zinc-200 { border-color: transparent !important; }
+    ::ng-deep .client-selector-override .h-12 { height: 3.5rem !important; }
+    
+    .truncate-multiline {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   `]
 })
 export class OrderFormComponent implements OnInit, OnDestroy {
@@ -290,16 +331,13 @@ export class OrderFormComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private calculator = inject(OrderCalculatorService);
 
-  readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X };
+  readonly icons = { ArrowLeft, Plus, Save, Zap, Calendar, CheckCircle2, ChevronDown, RefreshCw, Calculator, ChevronUp, MoreVertical, X, PlusCircle, ArrowRight, Layers, PencilLine, Trash2 };
 
   ngOnInit() {
     this.layoutService.backAction.set(() => this.goBack());
     this.layoutService.headerTitle.set(this.forcedStatus === 'QUOTATION' ? 'NUEVO PRESUPUESTO' : 'NUEVO PEDIDO');
-    this.layoutService.customBottomAction.set({
-      label: this.id ? 'GUARDAR CAMBIOS' : 'FINALIZAR PEDIDO',
-      icon: Save,
-      action: () => this.handleSave()
-    });
+    this.layoutService.customBottomAction.set(null);
+    this.layoutService.bottomNavHidden.set(true);
   }
 
   @Input() set forcedType(val: 'CLIENT' | 'STOCK' | undefined) {
@@ -314,18 +352,27 @@ export class OrderFormComponent implements OnInit, OnDestroy {
   // State
   orderType = signal<'CLIENT' | 'STOCK'>('CLIENT');
   items = signal<any[]>([]);
-  clienteId = '';
+  clienteId = signal('');
   selectedClientName = '';
-  fechaEntrega = '';
-  responsableId = '';
-  observaciones = '';
+  fechaEntrega = signal('');
+  responsableId = signal('');
+  observaciones = signal('');
+  priority = signal(4); // 4: Normal, 3: Alta, 2: Urgente, 1: Crítica
   isSaving = signal(false);
+  vErrors: any = {};
+
+  // Side-Sheet State
+  editingItemIndex = signal<number | null>(null);
+
+  get rubro(): Rubro {
+    return this.session.rubro() || 'OTRO';
+  }
+
   showFloatingFooter = signal(false);
   isAtBottom = signal(false);
   actionsOpen = signal(false);
   isSaved = false;
   pendingFiles: string[] = [];
-  vErrors: Record<string, string> = {};
   private lastNegocioLoaded = '';
   private orderLoadedId = '';
 
@@ -334,7 +381,6 @@ export class OrderFormComponent implements OnInit, OnDestroy {
   employees = signal<Employee[]>([]);
   clients = signal<any[]>([]);
   negocioId = computed(() => this.session.activeNegocio()?.id || '');
-  rubro = computed(() => this.session.activeNegocio()?.rubro || 'GENERICO' as Rubro);
 
   totales = signal({
     subtotal: 0,
@@ -345,6 +391,87 @@ export class OrderFormComponent implements OnInit, OnDestroy {
     unidades: 0,
     saldoPendiente: 0
   });
+
+  // Computed Functional Logic
+  priorityLabel = computed(() => {
+    const p = this.priority();
+    if (p === 1) return 'Prioridad Crítica';
+    if (p === 2) return 'Prioridad Urgente';
+    if (p === 3) return 'Prioridad Alta';
+    return 'Prioridad Normal';
+  });
+
+  priorityColorClass = computed(() => {
+    const p = this.priority();
+    if (p === 1) return 'bg-red-600 shadow-red-500/40';
+    if (p === 2) return 'bg-orange-500 shadow-orange-500/40';
+    if (p === 3) return 'bg-[#f43f5e] shadow-[0_0_8px_rgba(244,63,94,0.4)]';
+    return 'bg-blue-500 shadow-blue-500/40';
+  });
+
+  materialsLabel = computed(() => {
+    const materiasSet = new Set<string>();
+    this.items().forEach(it => {
+      const mat = it.tipo_filamento || it.material;
+      if (mat) materiasSet.add(mat);
+    });
+
+    if (materiasSet.size === 0) return 'Sin material asignado';
+    return Array.from(materiasSet).join(', ');
+  });
+
+  estimatedTimeLabel = computed(() => {
+    // If delivery date is set, use that to calculate remaining days
+    const fecha = this.fechaEntrega();
+    if (fecha) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const delivery = new Date(fecha);
+      delivery.setHours(0, 0, 0, 0);
+
+      const diffTime = delivery.getTime() - today.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return 'Hoy';
+      if (diffDays < 0) return 'Atrasado';
+      if (diffDays === 1) return 'Mañana';
+      return `${diffDays} Días`;
+    }
+
+    // Fallback to production time if no delivery date set
+    const totalMin = this.items().reduce((acc, it) => acc + (Number(it.duracion_estimada_minutos) || 0), 0);
+    if (totalMin <= 0) return 'Por definir';
+
+    const hours = totalMin / 60;
+    const days = Math.ceil(hours / 24);
+
+    if (days === 1) return '1 Día';
+    if (days > 1) return `${days} Días`;
+    return `${Math.ceil(hours)} Horas`;
+  });
+
+  estimatedTimePercent = computed(() => {
+    const totalMin = this.items().reduce((acc, it) => acc + (Number(it.duracion_estimada_minutos) || 0), 0);
+    if (totalMin <= 0) return 0;
+    return Math.min(100, (totalMin / 10000) * 100); // Normalize somehow for visual
+  });
+
+  cyclePriority() {
+    this.priority.update(current => current === 1 ? 4 : current - 1);
+  }
+
+  onClientSelected(client: Client) {
+    this.selectedClientName = client.name;
+    // Auto-priority if client is VIP/Priority (example logic)
+    if ((client as any).tags?.includes('VIP')) {
+      this.priority.set(3);
+    }
+  }
+
+  async saveAsDraft() {
+    this.forcedStatus = 'DRAFT';
+    await this.handleSave();
+  }
 
   constructor() {
     effect(() => {
@@ -370,11 +497,12 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       const order = await this.api.findOne(this.id);
 
       this.orderType.set(order.type);
-      this.clienteId = order.customerId || (order as any).clienteId;
+      this.clienteId.set(order.customerId || (order as any).clienteId);
       this.selectedClientName = order.clientName;
-      this.fechaEntrega = order.dueDate ? new Date(order.dueDate).toISOString().split('T')[0] : '';
-      this.responsableId = order.responsableGeneralId || (order as any).responsableId || (order as any).operatorId || order.responsableGeneral?.id || '';
-      this.observaciones = order.notes || '';
+      this.fechaEntrega.set(order.dueDate ? new Date(order.dueDate).toISOString().split('T')[0] : '');
+      this.responsableId.set(order.responsableGeneralId || (order as any).responsableId || (order as any).operatorId || order.responsableGeneral?.id || '');
+      this.observaciones.set(order.notes || '');
+      this.priority.set(order.priority || 4);
 
       // Phase 7: Integrity Sanitization
       const mappedItems = order.items.map(it => ({
@@ -415,7 +543,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.layoutService.backAction.set(null);
     this.layoutService.headerTitle.set(null);
-    this.layoutService.customBottomAction.set(null);
+    this.layoutService.bottomNavHidden.set(false);
     this.cleanupFiles();
   }
 
@@ -485,32 +613,81 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       ]);
       this.employees.set(emps);
       this.clients.set(cls);
-      if (this.clienteId) {
-        const client = cls.find(c => c.id === this.clienteId);
+      if (this.clienteId()) {
+        const client = cls.find(c => c.id === this.clienteId());
         this.selectedClientName = client?.name || '';
       }
     } catch (e) { console.error('Error loading data', e); }
   }
 
   addItem() {
-    this.items.update(prev => [{
+    const newItem = {
+      id: Math.random().toString(36).substring(7),
+      nombreProducto: '',
       cantidad: 1,
       precioUnitario: 0,
-      senia: 0,
-      nombreProducto: '',
-      seDiseñaSTL: false,
-    }, ...prev]);
+      rubro: this.rubro,
+      _isNew: true
+    };
+    this.items.update(it => [...it, newItem]);
+
+    // Auto-open sidebar for new items
+    setTimeout(() => {
+      this.openSidebar(this.items().length - 1);
+    }, 0);
   }
 
-  removeItem(index: number) {
-    if (this.items().length > 1) {
-      this.items.update(prev => prev.filter((_, i) => i !== index));
-      this.recalcTotales();
+  async removeItem(index: number, skipConfirm = false) {
+    const item = this.items()[index];
+    if (!item) return;
+
+    const hasData = (item.nombreProducto && item.nombreProducto.trim() !== '') ||
+      (item.precioUnitario > 0) ||
+      (item.referenceImages?.length > 0) ||
+      (item.url_stl && item.url_stl.trim() !== '');
+
+    if (!skipConfirm && hasData) {
+      const confirmDelete = confirm('¿Deseas eliminar este ítem? Se perderán todos los datos técnicos cargados.');
+      if (!confirmDelete) return;
     }
+
+    this.items.update(it => it.filter((_, i) => i !== index));
+    this.recalcTotales();
+  }
+
+  openSidebar(index: number) {
+    this.editingItemIndex.set(index);
+    // Lock background scroll (optional but recommended)
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeSidebar() {
+    // Clear the _isNew flag from the item if it was just added
+    const idx = this.editingItemIndex();
+    if (idx !== null) {
+      this.items.update(it => {
+        const newArr = [...it];
+        if (newArr[idx]) {
+          const { _isNew, ...rest } = newArr[idx];
+          newArr[idx] = rest as any;
+        }
+        return newArr;
+      });
+    }
+
+    this.editingItemIndex.set(null);
+    document.body.style.overflow = 'auto';
+    this.recalcTotales();
+  }
+
+  getItemTotal(item: any): number {
+    return this.calculator.calculateItem(item, this.rubro).total;
   }
 
   recalcTotales() {
-    this.totales.set(this.calculator.calculateOrder(this.items(), this.rubro()));
+    this.totales.set(this.calculator.calculateOrder(this.items(), this.rubro));
+    // Clear the auto-edit flag after first interaction
+    this.items().forEach(it => { if (it._isNew) it._isNew = false; });
   }
 
   scrollToBottom() {
@@ -527,7 +704,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
   async handleSave(e?: Event) {
     if (e) e.preventDefault();
     if (this.isSaving()) return;
-    if (this.orderType() === 'CLIENT' && !this.clienteId) {
+    if (this.orderType() === 'CLIENT' && !this.clienteId()) {
       alert('Debe seleccionar un cliente');
       return;
     }
@@ -536,14 +713,14 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       const payload: any = {
         type: this.orderType(),
         businessId: this.negocioId(),
-        customerId: this.orderType() === 'CLIENT' ? this.clienteId : undefined,
+        customerId: this.orderType() === 'CLIENT' ? this.clienteId() : undefined,
         clientName: this.orderType() === 'CLIENT' ? this.selectedClientName : 'STOCK',
-        dueDate: this.fechaEntrega ? new Date(this.fechaEntrega).toISOString() : undefined,
-        notes: this.observaciones,
-        priority: 4,
-        responsableGeneralId: this.responsableId || undefined,
+        dueDate: this.fechaEntrega() ? new Date(this.fechaEntrega()).toISOString() : undefined,
+        notes: this.observaciones(),
+        priority: this.priority(),
+        responsableGeneralId: this.responsableId() || undefined,
         items: this.items().map(it => {
-          const isPending = this.rubro() === 'IMPRESION_3D'
+          const isPending = this.rubro === 'IMPRESION_3D'
             ? (!it.peso_gramos || !it.duracion_estimada_minutos || (!it.url_stl && !it.stlFile))
             : (!it.duracion_estimada_minutos);
 
@@ -560,7 +737,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
             referenceImages: it.referenceImages || [],
             metadata: {
               ...it.metadata,
-              ...(this.rubro() === 'IMPRESION_3D' ? {
+              ...(this.rubro === 'IMPRESION_3D' ? {
                 print3d: {
                   designsStl: it.seDiseñaSTL,
                   stlUrl: it.url_stl,
@@ -575,9 +752,9 @@ export class OrderFormComponent implements OnInit, OnDestroy {
             }
           };
         }),
-        status: this.forcedStatus || (this.id ? undefined : (this.rubro() === 'METALURGICA' ? 'APPROVED' : 'PENDING')),
+        status: this.forcedStatus || (this.id ? undefined : (this.rubro === 'METALURGICA' ? 'APPROVED' : 'PENDING')),
         totalPrice: this.items().some(it => {
-          const isPending = this.rubro() === 'IMPRESION_3D'
+          const isPending = this.rubro === 'IMPRESION_3D'
             ? (!it.peso_gramos || !it.duracion_estimada_minutos || (!it.url_stl && !it.stlFile))
             : (!it.duracion_estimada_minutos);
           return isPending;
