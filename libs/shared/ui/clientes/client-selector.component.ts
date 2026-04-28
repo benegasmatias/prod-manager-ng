@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, computed, inject, ElementRef, HostListener, OnInit, effect, input, output, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed, inject, ElementRef, HostListener, OnInit, OnDestroy, effect, input, output, ViewChild, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, User, Search, ChevronDown, Check, X, UserPlus, Loader2, RefreshCw } from 'lucide-angular';
@@ -157,7 +157,7 @@ import { ClienteFormDialogComponent } from './cliente-form-dialog/cliente-form-d
     ></app-cliente-form-dialog>
   `
 })
-export class ClientSelectorComponent implements OnInit {
+export class ClientSelectorComponent implements OnInit, OnDestroy {
   private api = inject(ClientesApiService);
   private session = inject(SessionService);
   private eRef = inject(ElementRef);
@@ -186,8 +186,9 @@ export class ClientSelectorComponent implements OnInit {
 
   // Overlay State
   overlayCoords = signal({ top: 0, left: 0, width: 0 });
+  private scrollUnlistener?: () => void;
+  private renderer = inject(Renderer2);
 
-  @HostListener('document:scroll', ['$event', '{ capture: true }'])
   @HostListener('window:resize')
   updateOverlayPosition() {
     if (!this.isOpen()) return;
@@ -243,6 +244,17 @@ export class ClientSelectorComponent implements OnInit {
 
   ngOnInit() { 
     this.loadClients();
+    
+    // Escuchar scroll en fase de captura para detectar scroll dentro de modales
+    this.scrollUnlistener = this.renderer.listen('document', 'scroll', () => {
+      if (this.isOpen()) {
+        this.updateOverlayPosition();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.scrollUnlistener?.();
   }
 
   async loadClients() {
