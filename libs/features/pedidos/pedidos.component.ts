@@ -1,5 +1,7 @@
-﻿import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpContext } from '@angular/common/http';
+import { HTTP_CACHE_CONFIG } from '../../core/cache/cache.context';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { PageShellComponent } from '@shared/ui';
@@ -100,7 +102,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   isModalOpen = signal(false);
 
   // Pagination State
-  pageSize = 5;
+  pageSize = signal(5);
 
   ordersData = signal<Pedido[]>([]);
   currentPage = signal(1);
@@ -183,13 +185,28 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('historyTrigger') historyTrigger?: ElementRef;
   private observer?: IntersectionObserver;
+  private lastListingRequestKey: string | null = null;
 
   constructor() {
-    // Refresh when businessId changes
+    // Refresh Global Data (Employees) when businessId changes
     effect(() => {
       const bid = this.businessId();
       if (bid && bid !== this.lastLoadedBusinessId) {
-        this.loadData();
+        this.loadGlobalData();
+      }
+    });
+
+    // Unified Effect for Loading the Listing
+    // Reacts to businessId, filters, activeTab, currentPage, and pageSize
+    effect(() => {
+      const bid = this.businessId();
+      const f = this.filters();
+      const tab = this.activeTab();
+      const page = this.currentPage();
+      const size = this.pageSize();
+
+      if (bid) {
+        this.loadListing();
       }
     });
 
@@ -209,7 +226,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.activeTab.set(tab);
     this.activeMobileSector.set(tab);
     this.currentPage.set(1);
-    this.loadData();
+    // No need to call loadData(), effect handles it
   }
 
   scrollToSector(sector: 'active' | 'draft' | 'history') {
@@ -282,7 +299,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.filters.set(newFilters);
       if (newFilters.page) this.currentPage.set(newFilters.page);
-      this.loadData();
+      // No need to call loadData(), effect handles it
     });
 
     // Debounce search
@@ -383,8 +400,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.onFilterChange({ key, value: null });
   }
 
-  async loadData() {
-    this.loadGlobalData();
+  async loadListing() {
     const bId = this.businessId();
     if (!bId) return;
 
@@ -396,7 +412,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       const params: any = {
         ...this.getCommonParams(),
         page: this.currentPage(),
-        pageSize: this.pageSize
+        pageSize: this.pageSize()
       };
 
       if (tab === 'active') {
@@ -407,15 +423,37 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
         params.statuses = 'DELIVERED,CANCELLED';
       }
 
-      const res = await this.api.getListing(params);
+      // DEDUPLICACI├ôN: Evitar recarga si los par├ímetros son id├®nticos al ├║ltimo load exitoso
+      const currentRequestKey = JSON.stringify({ ...params, tab });
+      if (currentRequestKey === this.lastListingRequestKey) {
+        return;
+      }
+
+      this.loading.set(true);
+      this.session.refreshPlanUsage();
+
+      const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
+        enabled: true,
+        ttl: 30000
+      });
+
+      const res = await this.api.getListing(params, context);
       this.ordersData.set(res.data);
       this.totalOrders.set(res.total || 0);
       this.syncSelectedOrder(res.data);
+      this.lastListingRequestKey = currentRequestKey;
     } catch (err) {
       console.error('Error loading orders:', err);
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /**
+   * Alias for backwards compatibility if needed, though listing is the core now
+   */
+  async loadData() {
+    return this.loadListing();
   }
 
   private getCommonParams() {
@@ -437,7 +475,11 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     const bId = this.businessId();
     if (!bId) return;
     try {
-      const empsRes = await this.api.getEmployees(bId);
+      const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
+        enabled: true,
+        ttl: 300000
+      });
+      const empsRes = await this.api.getEmployees(bId, true, context);
       this.employees.set(empsRes);
       this.lastLoadedBusinessId = bId;
     } catch (err) { console.error('Error global data:', err); }
@@ -446,14 +488,12 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Consolidated methods replaced by loadData() logic above
 
   onPageSizeChange(size: number) {
-    this.pageSize = size;
+    this.pageSize.set(size);
     this.currentPage.set(1);
-    this.loadData();
   }
 
   onPageChange(page: number) {
     this.currentPage.set(page);
-    this.loadData();
   }
 
   private syncSelectedOrder(newData: Pedido[]) {
@@ -507,7 +547,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   async handleDelete(order: Pedido) {
     const ok = await this.confirm.confirm({
       title: 'Eliminar Pedido',
-      message: `┬┐Est├ís seguro de que deseas eliminar permanentemente el pedido #${order.code}? Esta acci├│n no se puede deshacer.`,
+      message: `¿Estás seguro de que deseas eliminar permanentemente el pedido #${order.code}? Esta acción no se puede deshacer.`,
       confirmLabel: 'Eliminar Ahora',
       cancelLabel: 'Cancelar',
       type: 'danger'

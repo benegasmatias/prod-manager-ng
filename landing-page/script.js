@@ -50,11 +50,53 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
     // Pricing Logic
-    const FALLBACK_PLANS = [
-        { name: 'Prueba Gratis', price: 0, desc: '1 Mes de regalo', items: ['15 pedidos / mes', '1 negocio', '1 usuario'], recommended: false },
-        { name: 'Pro', price: 10990, desc: 'Para crecer', items: ['50 pedidos / mes', '1 negocio', '3 usuarios'], recommended: true },
-        { name: 'Business', price: 29900, desc: 'Para escalar', items: ['500 pedidos / mes', '1 negocio', '7 usuarios', 'Soporte prioritario'], recommended: false }
-    ];
+    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:3000' 
+        : 'https://api.prodmanager.com.ar';
+
+    async function loadPlans() {
+        try {
+            // Buscamos planes de la categoría IMPRESION_3D
+            const response = await fetch(`${API_URL}/plans?category=IMPRESION_3D`);
+            if (!response.ok) throw new Error('Failed to fetch plans');
+            
+            const plans = await response.json();
+            
+            if (plans && plans.length > 0) {
+                // Mapeamos los planes del back al formato de la UI
+                const mappedPlans = plans
+                    .sort((a, b) => a.price - b.price)
+                    .map(plan => ({
+                        name: plan.name,
+                        price: plan.price,
+                        desc: plan.description || (plan.price === 0 ? '1 Mes de regalo' : 'Para crecer'),
+                        items: [
+                            `${plan.maxOrders === -1 ? 'Pedidos ilimitados' : plan.maxOrders + ' pedidos / mes'}`,
+                            `${plan.maxBusinesses} negocio`,
+                            `${plan.maxUsers} usuarios`,
+                            ...(plan.metadata?.features || [])
+                        ],
+                        recommended: plan.metadata?.recommended || false
+                    }));
+                
+                renderPlans(mappedPlans);
+            } else {
+                renderFallback();
+            }
+        } catch (error) {
+            console.error('Error loading plans from API:', error);
+            renderFallback();
+        }
+    }
+
+    function renderFallback() {
+        const FALLBACK_PLANS = [
+            { name: 'Prueba Gratis', price: 0, desc: '1 Mes de regalo', items: ['15 pedidos / mes', '1 negocio', '1 usuario'], recommended: false },
+            { name: 'Pro', price: 10990, desc: 'Para crecer', items: ['50 pedidos / mes', '1 negocio', '3 usuarios'], recommended: true },
+            { name: 'Business', price: 29900, desc: 'Para escalar', items: ['500 pedidos / mes', '1 negocio', '7 usuarios', 'Soporte prioritario'], recommended: false }
+        ];
+        renderPlans(FALLBACK_PLANS);
+    }
 
     function renderPlans(plans) {
         const grid = document.getElementById('pricing-grid');
@@ -63,8 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.innerHTML = plans.map(plan => `
             <div class="fade-in group p-12 rounded-[3rem] transition-all duration-500 ${plan.recommended ? 'bg-primary shadow-[0_32px_64px_-16px_rgba(116,47,229,0.3)] scale-105 z-10' : 'bg-white/5 shadow-xl border border-white/5'}" data-visible="false">
                 <h3 class="text-[10px] font-black uppercase tracking-[0.4em] mb-8 ${plan.recommended ? 'text-white/60' : 'text-primary'}">${plan.name}</h3>
-                <p class="text-5xl font-black mb-2 font-display ${plan.recommended ? 'text-white' : 'text-white'}">$${plan.price.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}<span class="text-sm opacity-40 font-sans"> /mes</span></p>
-                <p class="text-[9px] font-black uppercase tracking-[0.2em] mb-12 opacity-40">${plan.desc}</p>
+                <p class="text-5xl font-black mb-2 font-display text-white">$${plan.price.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}<span class="text-sm opacity-40 font-sans"> /mes</span></p>
+                <p class="text-[9px] font-black uppercase tracking-[0.2em] mb-12 opacity-40 text-white">${plan.desc}</p>
                 
                 <ul class="space-y-6 mb-12">
                     ${plan.items.map(item => `
@@ -84,5 +126,5 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     }
 
-    renderPlans(FALLBACK_PLANS);
+    loadPlans();
 });

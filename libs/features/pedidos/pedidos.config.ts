@@ -1,13 +1,13 @@
 ﻿export const PEDIDOS_LABELS = {
   TITLE: 'Seguimiento de Pedidos',
-  SUBTITLE: 'Administraci├│n de flujos de trabajo, ├│rdenes de clientes y estados de entrega en tiempo real.',
-  CATEGORY: 'Gesti├│n Comercial',
+  SUBTITLE: 'Administración de flujos de trabajo, ordenes de clientes y estados de entrega en tiempo real.',
+  CATEGORY: 'Gestión Comercial',
   ACTIONS: {
     NEW_ORDER: 'REGISTRAR PEDIDO'
   },
-  ACTIVE_SECTION: 'Pedidos en Producci├│n',
+  ACTIVE_SECTION: 'Pedidos en Producción',
   COMMERCIAL_SECTION: 'Preventas / Visitas / Presupuestos',
-  COMMERCIAL_SUBTITLE: 'Gesti├│n comercial y relevamientos t├®cnicos',
+  COMMERCIAL_SUBTITLE: 'Gestión comercial y relevamientos técnicos',
   HISTORY_SECTION: 'Historial de Pedidos',
   HISTORY_SUBTITLE: 'Entregados / Anulados',
   EMPTY_ACTIVE: 'Sin pedidos activos',

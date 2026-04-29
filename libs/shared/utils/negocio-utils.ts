@@ -26,16 +26,16 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
         },
         stats: [
           ...commonStats,
-          { key: 'productionOrders', label: 'Producci├│n en Curso', icon: 'Printer', format: 'number' },
+          { key: 'productionOrders', label: 'Producción en Curso', icon: 'Printer', format: 'number' },
           { key: 'activePrinters', label: 'Impresoras Activas', icon: 'Zap', format: 'number' },
         ],
         productionStages: [
           { key: 'PENDING', label: 'Pendiente', color: 'bg-zinc-100' },
-          { key: 'DESIGN', label: 'En Dise├▒o', color: 'bg-indigo-500' },
+          { key: 'DESIGN', label: 'En Diseño', color: 'bg-indigo-500' },
           { key: 'IN_PROGRESS', label: 'Imprimiendo', color: 'bg-blue-500' },
           { key: 'READY', label: 'Listo', color: 'bg-emerald-500' },
-          { key: 'FAILED', label: 'Fallo de Impresi├│n', color: 'bg-red-500' },
-          { key: 'REPRINT_PENDING', label: 'Pendiente Reimpresi├│n', color: 'bg-orange-400' },
+          { key: 'FAILED', label: 'Fallo de Impresión', color: 'bg-red-500' },
+          { key: 'REPRINT_PENDING', label: 'Pendiente Reimpresión', color: 'bg-orange-400' },
           { key: 'POST_PROCESS', label: 'Post-Proceso', color: 'bg-amber-500' },
           { key: 'DONE', label: 'Terminado', color: 'bg-emerald-500' },
           { key: 'DELIVERED', label: 'Entregado', color: 'bg-zinc-100' },
@@ -402,7 +402,7 @@ export function getStatusStyles(status: string, rubro?: Rubro): string {
   const stage = config.productionStages.find((s) => s.key === status);
 
   let color = stage?.color;
-  
+
   if (!color) {
     const fallbacks: Record<string, string> = {
       READY: 'bg-emerald-500',

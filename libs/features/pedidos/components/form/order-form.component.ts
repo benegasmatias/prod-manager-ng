@@ -150,12 +150,12 @@ import { LayoutService } from '@core/layout/layout.service';
           </div>
           }
           
-          <div [class]="cn('grid grid-cols-2 gap-4', orderType() === 'CLIENT' ? '' : '')">
+          <div [class]="cn('grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-4')">
             <div class="space-y-3">
                <label class="text-[10px] font-bold text-[#64748b] tracking-[0.1em] ml-1 uppercase">Prioridad</label>
-               <div (click)="cyclePriority()" class="bg-white rounded-full px-5 h-12 flex items-center justify-between shadow-sm border border-[#e2e8f0]/50 cursor-pointer select-none active:scale-95 transition-all">
-                 <span class="text-sm font-medium text-[#334155]">{{ priorityLabel() }}</span>
-                 <div [class]="cn('w-2 h-2 rounded-full shadow-[0_0_8px_rgba(var(--priority-color),0.4)]', priorityColorClass())"></div>
+               <div (click)="cyclePriority()" class="bg-white rounded-[2rem] px-6 h-14 flex items-center justify-between shadow-sm border border-[#e2e8f0]/50 cursor-pointer select-none active:scale-95 transition-all">
+                 <span class="text-sm font-black text-[#193357] uppercase tracking-tight">{{ priorityLabel() }}</span>
+                 <div [class]="cn('w-2.5 h-2.5 rounded-full shadow-lg transition-all duration-500', priorityColorClass())"></div>
                </div>
             </div>
             
@@ -165,7 +165,7 @@ import { LayoutService } from '@core/layout/layout.service';
                  [value]="fechaEntrega()"
                  (valueChange)="fechaEntrega.set($event)"
                  [disabled]="isSaving()"
-                 placeholder="Oct 24, 2023"
+                 placeholder="Seleccionar fecha..."
                ></app-intelligent-date-picker>
             </div>
           </div>
@@ -489,7 +489,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
       }
     });
     // Si no es edición, añadir un item inicial
-    if (!this.id) this.addItem();
+    if (!this.id) this.addItem(false);
   }
 
   async loadOrderForEditing() {
@@ -629,7 +629,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
     } catch (e) { console.error('Error loading data', e); }
   }
 
-  addItem() {
+  addItem(autoOpen = true) {
     const newItem = {
       id: Math.random().toString(36).substring(7),
       nombreProducto: '',
@@ -640,10 +640,12 @@ export class OrderFormComponent implements OnInit, OnDestroy {
     };
     this.items.update(it => [...it, newItem]);
 
-    // Auto-open sidebar for new items
-    setTimeout(() => {
-      this.openSidebar(this.items().length - 1);
-    }, 0);
+    // Auto-open sidebar only if requested (usually via manual click)
+    if (autoOpen) {
+      setTimeout(() => {
+        this.openSidebar(this.items().length - 1);
+      }, 0);
+    }
   }
 
   async removeItem(index: number, skipConfirm = false) {
