@@ -74,12 +74,23 @@ export class Print3dDashboardComponent {
       'failureRate': this.icons.AlertCircle
     };
 
-    return raw.map(kpi => ({
-      ...kpi,
-      title: mapping[kpi.title] || kpi.title,
-      icon: iconMap[kpi.title] || this.icons.Activity,
-      variant: kpi.variant as MetricCardVariant
-    }));
+    return raw.map(kpi => {
+      const title = mapping[kpi.title] || kpi.title;
+      let url = '';
+      if (title.includes('Ventas') || title.includes('Saldo')) url = '/finanzas';
+      else if (title.includes('Pedido') || title.includes('Activo')) url = '/pedidos';
+      else if (title.includes('Producción') || title.includes('Máquina') || title.includes('Impresora')) url = '/maquinas';
+      else if (title.includes('Carga') || title.includes('Produciendo')) url = '/maquinas';
+      else if (title.includes('Captación') || title.includes('Cliente')) url = '/clientes';
+
+      return {
+        ...kpi,
+        title,
+        icon: iconMap[kpi.title] || this.icons.Activity,
+        variant: kpi.variant as MetricCardVariant,
+        url
+      };
+    });
   });
 
   printers = computed(() => this.summary()?.printers || []);

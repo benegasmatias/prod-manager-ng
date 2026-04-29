@@ -39,11 +39,11 @@ import { LayoutService } from '@core/layout/layout.service';
       
       <!-- Side-Sheet Sidebar Overlay -->
       @if (editingItemIndex() !== null) {
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] animate-in fade-in duration-500" (click)="closeSidebar()">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[2000] animate-in fade-in duration-500" (click)="closeSidebar()">
           <div class="fixed right-0 top-0 h-screen w-full max-w-[520px] bg-white shadow-2xl flex flex-col z-[110]" (click)="$event.stopPropagation()">
             
             <!-- Sidebar Header (Fixed) -->
-            <div class="px-10 pt-12 pb-8 flex items-center justify-between border-b border-slate-50 shrink-0">
+            <div class="px-10 pt-19 pb-8 flex items-center justify-between border-b border-slate-50 shrink-0">
               <div class="flex items-center gap-6">
                 <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-[#8b5cf6] text-white flex items-center justify-center shadow-lg shadow-primary/20">
                   <lucide-angular [img]="icons.Layers" class="h-6 w-6"></lucide-angular>
@@ -60,7 +60,7 @@ import { LayoutService } from '@core/layout/layout.service';
             </div>
 
             <!-- Sidebar Body (Scrollable) -->
-            <div class="flex-1 overflow-y-auto px-10 py-10 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
               @if (editingItemIndex() !== null && items()[editingItemIndex()!]) {
                 <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <app-item-details-form
@@ -83,7 +83,7 @@ import { LayoutService } from '@core/layout/layout.service';
 
             <!-- Sidebar Footer (Fixed) -->
             <div class="p-8 border-t border-slate-100 bg-white shrink-0">
-               <button type="button" (click)="closeSidebar()" class="w-full h-14 rounded-2xl bg-slate-900 text-white font-bold text-sm uppercase tracking-[0.2em] shadow-lg hover:bg-slate-800 transition-all">
+               <button type="button" (click)="closeSidebar()" class="w-full h-14 rounded-full bg-gradient-to-br from-[#742fe5] to-[#8342f4] text-white font-bold text-sm uppercase tracking-[0.2em] shadow-lg hover:opacity-90 transition-all">
                   Confirmar y Guardar
                </button>
             </div>
@@ -109,8 +109,10 @@ import { LayoutService } from '@core/layout/layout.service';
       <div class="px-6 space-y-10 pb-20">
         
         <!-- Bloque Superior (Tipo, Cliente, Prioridad, Fecha) -->
-        <div class="bg-white rounded-[4rem] p-10 space-y-10 shadow-2xl shadow-purple-500/5 relative overflow-hidden group border border-white/50">
-          <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none"></div>
+        <div class="bg-white rounded-[4rem] p-10 space-y-10 shadow-2xl shadow-purple-500/5 relative group border border-white/50">
+          <div class="absolute inset-0 overflow-hidden rounded-[4rem] pointer-events-none">
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-[80px]"></div>
+          </div>
 
           <!-- Selector de Tipo de Pedido (Cliente vs Stock) -->
           <div class="flex items-center justify-center">
@@ -278,7 +280,7 @@ import { LayoutService } from '@core/layout/layout.service';
       </div> <!-- End Main Container -->
 
       <!-- Centered Bottom Bar -->
-      <div class="fixed bottom-0 bg-white/95 backdrop-blur-2xl border-t border-slate-100 p-5 md:p-6 z-[50] shadow-[0_-10px_50px_rgba(0,0,0,0.03)]" 
+      <div class="fixed bottom-0 sm:bottom-16 bg-white/95 backdrop-blur-2xl border-t border-slate-100 p-5 md:p-6 z-[50] shadow-[0_-10px_50px_rgba(0,0,0,0.03)]" 
            [style.left.px]="layoutService.sidebarWidth()"
            [style.width]="'calc(100% - ' + layoutService.sidebarWidth() + 'px)'">
         <div class="max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
@@ -288,19 +290,19 @@ import { LayoutService } from '@core/layout/layout.service';
             <span class="text-3xl font-black text-[#193357] leading-none">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
           </div>
           
-          <div class="flex items-center gap-8 lg:gap-10">
-            <button type="button" (click)="saveAsDraft()" [disabled]="isSaving()" class="flex items-center gap-3 text-slate-500 hover:text-primary transition-all group disabled:opacity-50">
-               <lucide-angular [img]="icons.Save" class="h-6 w-6 group-hover:scale-110 transition-transform"></lucide-angular>
-               <span class="text-[11px] font-black uppercase tracking-widest text-left leading-tight">Guardar<br/>Borrador</span>
+          <div class="flex items-center gap-4 md:gap-8 lg:gap-10">
+            <button type="button" (click)="saveAsDraft()" [disabled]="isSaving()" class="flex items-center gap-2 md:gap-3 text-slate-500 hover:text-primary transition-all group disabled:opacity-50">
+               <lucide-angular [img]="icons.Save" class="h-5 w-5 md:h-6 md:w-6 group-hover:scale-110 transition-transform"></lucide-angular>
+               <span class="text-[9px] md:text-[11px] font-black uppercase tracking-[0.15em] md:tracking-widest text-left leading-tight">Guardar<br/>Borrador</span>
             </button>
             
-            <button type="submit" [disabled]="isSaving()" class="h-15 px-10 rounded-full bg-gradient-to-r from-primary to-[#8b5cf6] text-white font-black text-[14px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50">
+            <button type="submit" [disabled]="isSaving()" class="h-12 md:h-15 px-6 md:px-10 rounded-full bg-gradient-to-br from-[#742fe5] to-[#8342f4] text-white font-black text-[11px] md:text-[14px] uppercase tracking-[0.1em] md:tracking-[0.2em] shadow-2xl shadow-[#742fe5]/30 hover:scale-[1.03] active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3 disabled:opacity-50 whitespace-nowrap">
                @if (isSaving()) {
                  <app-button-spinner></app-button-spinner>
                }
                <span>{{ id ? 'Actualizar' : 'Finalizar Pedido' }}</span>
                @if (!isSaving()) {
-                 <lucide-angular [img]="icons.ArrowRight" class="h-5 w-5"></lucide-angular>
+                 <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4 md:h-5 md:w-5"></lucide-angular>
                }
             </button>
           </div>
@@ -568,6 +570,13 @@ export class OrderFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  @HostListener('document:keydown.escape')
+  onKeydownHandler() {
+    if (this.editingItemIndex() !== null) {
+      this.closeSidebar();
+    }
+  }
+
   trackPendingFile(data: any) {
     const path = typeof data === 'string' ? data : data.file?.path;
     if (path && !this.pendingFiles.includes(path)) {
@@ -725,7 +734,7 @@ export class OrderFormComponent implements OnInit, OnDestroy {
             : (!it.duracion_estimada_minutos);
 
           return {
-            id: it.id,
+            id: it.id?.includes('-') ? it.id : undefined,
             name: it.nombreProducto || 'ITEM',
             qty: Math.max(1, Math.floor(Number(it.cantidad) || 1)),
             isPendingQuote: isPending,
