@@ -1,6 +1,6 @@
-<div class="space-y-10">
+﻿<div class="space-y-10">
   <!-- TABLE ARCHITECTURE (Desktop) -->
-  <div class="hidden lg:block overflow-x-auto pb-40">
+  <div class="hidden lg:block overflow-x-auto pb-6">
     <table class="w-full border-separate border-spacing-y-3 px-2">
       <thead>
         <tr class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/30">
@@ -57,7 +57,7 @@
                    {{ order.clientName || order.items[0]?.name || order.items[0]?.nombreProducto || fallbackClientName || 'S/N' }}
                  </span>
                  <span class="text-[8px] font-bold text-text-muted/40 line-clamp-1 uppercase tracking-widest mt-1 italic">
-                   {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' ítems)' : 'Stock') }}
+                   {{ order.clientName ? (order.items[0]?.name || order.items[0]?.nombreProducto || labels.TABLE.EMPTY_PRODUCTS) : (order.items.length > 1 ? '(+' + (order.items.length - 1) + ' ├¡tems)' : 'Stock') }}
                  </span>
                </div>
              </td>
@@ -108,8 +108,8 @@
               </span>
             </td>
 
-            <td class="px-5 py-6 last:rounded-r-[2.5rem] border-y border-r border-border/5 group-hover:border-primary/10">
-              <div class="flex items-center justify-end gap-2">
+            <td class="px-8 py-6 last:rounded-r-[2.5rem] border-y border-r border-border/5 group-hover:border-primary/10">
+              <div class="flex items-center justify-end gap-3">
                 <button (click)="viewClick.emit(order)" class="h-10 w-10 flex items-center justify-center rounded-xl bg-surface-container-lowest text-text-muted/40 hover:text-primary transition-all shadow-xl shadow-text/5 border border-border/5 hover:scale-110 active:scale-90">
                   <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
                 </button>

@@ -1,9 +1,10 @@
-import {
+﻿import {
   Component, computed, inject, signal, input, Output,
   EventEmitter, OnInit, effect, HostListener, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   LucideAngularModule, X, Gauge, Cpu, User, Calendar, CreditCard,
   DollarSign, AlertOctagon, Layers, CheckCircle2, MessageSquare,
@@ -56,6 +57,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   private materialesService = inject(MaterialesService);
   private cdr = inject(ChangeDetectorRef);
   private confirmService = inject(ConfirmService);
+  private router = inject(Router);
 
   order = input<Pedido | null>(null);
   isOpen = input<boolean>(false);
@@ -68,24 +70,25 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   responsableGeneralId = signal<string>('');
   notes = signal<string>('');
   
-  protected readonly GLOBAL_STAGES = [
+  protected readonly PRODUCTION_STAGES = [
     { key: 'PENDING', label: 'Pendiente', icon: 'Clock' },
     { key: 'IN_PROGRESS', label: 'En Proceso', icon: 'Cpu' },
     { key: 'READY', label: 'Listo', icon: 'CheckCircle2' },
-    { key: 'DELIVERED', label: 'Entregado', icon: 'Truck' },
-    { key: 'CANCELLED', label: 'Cancelado', icon: 'XCircle' }
+    { key: 'DELIVERED', label: 'Entregado', icon: 'Truck' }
   ];
+
+  activeStages = computed(() => {
+    return this.PRODUCTION_STAGES;
+  });
 
   currentGlobalStep = computed(() => {
     const s = this.status();
-    if (!s) return -1;
     if (s === 'PENDING') return 0;
     if (['DESIGN', 'IN_PRODUCTION', 'PRINTING', 'REPRINT_PENDING', 'RE_WORK', 'POST_PROCESS', 'CUTTING', 'WELDING', 'ASSEMBLY', 'PAINTING', 'INSTALACION_OBRA', 'IN_PROGRESS'].includes(s)) {
       return 1;
     }
     if (['READY', 'READY_FOR_DELIVERY', 'DONE'].includes(s)) return 2;
     if (s === 'DELIVERED') return 3;
-    if (s === 'CANCELLED') return 4;
     return 1;
   });
 
@@ -130,8 +133,8 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     this.failureAction.set('REDO');
     this.wastedTime.set(0);
     
-    // AUTO-DETECCIÓN DE FILAMENTOS:
-    // Priorizamos los materiales que fueron asignados específicamente a este trabajo (Job)
+    // AUTO-DETECCI├ôN DE FILAMENTOS:
+    // Priorizamos los materiales que fueron asignados espec├¡ficamente a este trabajo (Job)
     const activeJob: any = item.job || (item as any).productionJob;
     const jobMaterials = activeJob?.metadata?.materials;
     const machineMaterials = activeJob?.machine?.metadata?.materials;
@@ -144,16 +147,16 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       // Fallback a materialId simple si no hay multi-material
       this.failureMaterialWastes.set([{ materialId: activeJob.materialId, grams: 0 }]);
     } else if (machineMaterials && Array.isArray(machineMaterials) && machineMaterials.length > 0) {
-      // Fallback final a lo que tenga cargado la máquina actualmente
+      // Fallback final a lo que tenga cargado la m├íquina actualmente
       this.failureMaterialWastes.set(
         machineMaterials.map((m: any) => ({ materialId: m.materialId, grams: 0 }))
       );
     } else {
-      // Si no hay nada, ítem vacío para selección manual
+      // Si no hay nada, ├¡tem vac├¡o para selecci├│n manual
       this.failureMaterialWastes.set([{ materialId: '', grams: 0 }]);
     }
 
-    // Scroll suave al área de falla
+    // Scroll suave al ├írea de falla
     setTimeout(() => {
       const element = document.getElementById('failure-section');
       element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -208,6 +211,13 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   machines = signal<Machine[]>([]);
   materials = signal<Material[]>([]);
   itemToAssignId = signal<string | null>(null);
+
+  goToEdit() {
+    const order = this.order();
+    if (!order) return;
+    this.onClose.emit();
+    this.router.navigate(['/pedidos/editar', order.id]);
+  }
 
   icons: any = {
     Gauge, AlertOctagon, DollarSign, X, Layers, CheckCircle2,
@@ -474,7 +484,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       console.error('Error in handleSave:', err);
       this.confirmService.confirm({
         title: 'Error',
-        message: 'Error al procesar la operación.',
+        message: 'Error al procesar la operaci├│n.',
         hideCancel: true,
         type: 'danger'
       });
@@ -489,7 +499,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     if (!this.isFullyPaid()) {
       const confirmDebt = await this.confirmService.confirm({
         title: 'Saldo Pendiente',
-        message: `Atención: El pedido tiene un saldo pendiente de $${this.balanceVal()}. ¿Deseas entregarlo de todas formas?`,
+        message: `Atenci├│n: El pedido tiene un saldo pendiente de $${this.balanceVal()}. ┬┐Deseas entregarlo de todas formas?`,
         confirmLabel: 'Entregar Igual',
         type: 'warning'
       });
@@ -497,7 +507,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     } else {
       const confirmDelivery = await this.confirmService.confirm({
         title: 'Confirmar Entrega',
-        message: '¿Confirmar la entrega del pedido? Esta acción lo moverá al historial.',
+        message: '┬┐Confirmar la entrega del pedido? Esta acci├│n lo mover├í al historial.',
         confirmLabel: 'Entregar',
         type: 'info'
       });
@@ -530,9 +540,9 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
 
     if (status === 'CANCELLED') {
       const confirmed = await this.confirmService.confirm({
-        title: 'Cancelar Ítem',
-        message: `¿Estás seguro de cancelar el ítem "${name}"?`,
-        confirmLabel: 'Sí, cancelar',
+        title: 'Cancelar ├ìtem',
+        message: `┬┐Est├ís seguro de cancelar el ├¡tem "${name}"?`,
+        confirmLabel: 'S├¡, cancelar',
         type: 'warning'
       });
       if (!confirmed) return;
@@ -549,14 +559,14 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       this.onSave.emit();
     } catch (e: any) {
       console.error('Error updating item status:', e);
-      // Solo limpiamos si hay error, si es éxito esperamos al refresco del input order()
+      // Solo limpiamos si hay error, si es ├®xito esperamos al refresco del input order()
       this.updatingItemIds.update((ids: Set<string>) => {
         const newIds = new Set(ids);
         newIds.delete(itemId);
         return newIds;
       });
 
-      const isMachineError = e.error?.message?.includes('trabajo activo en máquina');
+      const isMachineError = e.error?.message?.includes('trabajo activo en m├íquina');
       
       if (isMachineError) {
          const targetItem = order.items?.find((i: any) => i.id === itemId);
@@ -569,8 +579,8 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
          }
 
          const confirmed = await this.confirmService.confirm({
-            title: 'Ítem en Máquina',
-            message: e.error.message + '\n¿Deseas liberar la máquina y forzar el cambio de estado ahora?',
+            title: '├ìtem en M├íquina',
+            message: e.error.message + '\n┬┐Deseas liberar la m├íquina y forzar el cambio de estado ahora?',
             confirmLabel: 'Liberar y Cambiar',
             cancelLabel: 'Cancelar',
             type: 'warning'
@@ -589,10 +599,10 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
                   await this.maquinasApi.release(machineId, order.businessId);
                   await this.api.updateItemStatus(order.id, itemId, status, order.businessId);
                   this.onSave.emit();
-                  // No limpiamos el ID aquí, esperamos al onOrderChange como en el flujo normal
+                  // No limpiamos el ID aqu├¡, esperamos al onOrderChange como en el flujo normal
                } catch (err2) {
                   console.error('Error in release and retry:', err2);
-                  // Si falló el re-intento, tenemos que limpiar el estado de carga manualmente
+                  // Si fall├│ el re-intento, tenemos que limpiar el estado de carga manualmente
                   this.updatingItemIds.update(ids => {
                     const newIds = new Set(ids);
                     newIds.delete(itemId);
@@ -600,15 +610,15 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
                   });
                   this.confirmService.confirm({
                       title: 'Error',
-                      message: 'No se pudo liberar la máquina automáticamente.',
+                      message: 'No se pudo liberar la m├íquina autom├íticamente.',
                       hideCancel: true,
                       type: 'danger'
                   });
                }
             } else {
                this.confirmService.confirm({
-                  title: 'Información Faltante',
-                  message: 'No pudimos identificar la máquina vinculada a este ítem. Intente refrescar la página.',
+                  title: 'Informaci├│n Faltante',
+                  message: 'No pudimos identificar la m├íquina vinculada a este ├¡tem. Intente refrescar la p├ígina.',
                   hideCancel: true,
                   type: 'warning'
                });
@@ -617,7 +627,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       } else {
          this.confirmService.confirm({
             title: 'Error',
-            message: e.error?.message || 'Error al actualizar el ítem.',
+            message: e.error?.message || 'Error al actualizar el ├¡tem.',
             hideCancel: true,
             type: 'danger'
          });
@@ -712,7 +722,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       console.error('Error starting item production:', e);
       this.confirmService.confirm({
         title: 'Error',
-        message: e.error?.message || 'No se pudo iniciar la producción.',
+        message: e.error?.message || 'No se pudo iniciar la producci├│n.',
         hideCancel: true,
         type: 'danger'
       });
@@ -730,7 +740,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
 
     const confirmed = await this.confirmService.confirm({
       title: 'Revertir Cobro',
-      message: '¿Estás seguro de que deseas eliminar este registro de cobro? El saldo pendiente se actualizará automáticamente.',
+      message: '┬┐Est├ís seguro de que deseas eliminar este registro de cobro? El saldo pendiente se actualizar├í autom├íticamente.',
       confirmLabel: 'Revertir',
       type: 'warning'
     });

@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+﻿<div class="min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
   <!-- Dynamic Background Aura -->
   <div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full animate-pulse"></div>
   <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-500/5 blur-[100px] rounded-full"></div>
@@ -29,7 +29,7 @@
         <div class="space-y-3">
           <h1 class="text-3xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-none uppercase">Sin acceso operativo</h1>
           <p class="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed max-w-sm mx-auto uppercase">
-            Todavía no pertenecés a ningún negocio en ProdManager.
+            Todav├¡a no pertenec├®s a ning├║n negocio en ProdManager.
           </p>
         </div>
 
@@ -40,9 +40,9 @@
               <div class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm">
                 <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-primary"></lucide-angular>
               </div>
-              <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Tengo Invitación</span>
+              <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Tengo Invitaci├│n</span>
             </div>
-            <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Si ya te invitaron, revisa tu correo electrónico para aceptar el link de acceso.</p>
+            <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Si ya te invitaron, revisa tu correo electr├│nico para aceptar el link de acceso.</p>
           </div>
 
           <!-- Option B: Create -->
@@ -56,7 +56,7 @@
               </div>
               <span class="text-[10px] font-black uppercase tracking-widest text-primary">Crear Negocio</span>
             </div>
-            <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Empieza tu propio espacio de trabajo industrial y gestiona tu producción.</p>
+            <p class="text-[10px] text-zinc-500 leading-relaxed uppercase">Empieza tu propio espacio de trabajo industrial y gestiona tu producci├│n.</p>
           </button>
         </div>
 
@@ -68,7 +68,7 @@
             </div>
           </div>
           <button (click)="logout()" class="text-[9px] font-black text-zinc-400 hover:text-rose-500 uppercase tracking-[0.2em] transition-all">
-            Cerrar Sesión
+            Cerrar Sesi├│n
           </button>
         </div>
       </div>
@@ -87,7 +87,7 @@
 
         <div class="text-center space-y-2">
           <h2 class="text-4xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter">Elige tu Rubro</h2>
-          <p class="text-zinc-500 text-sm uppercase font-bold tracking-widest">Configuraremos el sistema a medida según tu negocio.</p>
+          <p class="text-zinc-500 text-sm uppercase font-bold tracking-widest">Configuraremos el sistema a medida seg├║n tu negocio.</p>
         </div>
 
         <div class="grid md:grid-cols-2 gap-4">
@@ -121,47 +121,148 @@
         </div>
 
         @if (selectedTemplate()) {
-          <div class="bg-zinc-900 dark:bg-zinc-100 rounded-[2.5rem] p-8 text-white dark:text-zinc-900 space-y-8 animate-in slide-in-from-bottom-8 duration-500 shadow-2xl shadow-primary/20">
+            <div class="bg-zinc-900 dark:bg-zinc-100 rounded-[2.5rem] p-8 text-zinc-100 dark:text-zinc-900 space-y-8 animate-in slide-in-from-bottom-8 duration-500 shadow-2xl shadow-primary/20">
             <div class="grid md:grid-cols-2 gap-8">
+              <!-- Name -->
               <div class="space-y-1 md:col-span-2">
-                <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Nombre del Espacio</span>
+                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block">Nombre del Espacio</span>
                 <input 
                   type="text" 
                   [value]="businessName()" 
                   (input)="businessName.set($any($event.target).value)"
-                  placeholder="Ej: Mi Taller de Impresión"
-                  class="bg-transparent border-none text-2xl font-black uppercase tracking-tight focus:ring-0 w-full p-0 placeholder:text-zinc-800/20 dark:placeholder:text-zinc-200/20"
+                  placeholder="Ej: Mi Taller de Impresi├│n"
+                  class="bg-transparent border-none text-2xl font-black uppercase tracking-tight focus:ring-0 w-full p-0 text-zinc-100 dark:text-zinc-900 placeholder:text-zinc-100/20 dark:placeholder:text-zinc-900/20"
                 >
               </div>
 
+              <!-- Country & Province -->
+              <div class="space-y-1 relative">
+                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block">Pa├¡s</span>
+                <button 
+                  type="button"
+                  (click)="showCountryDropdown.set(!showCountryDropdown()); showProvinceDropdown.set(false)"
+                  class="flex items-center justify-between w-full text-left text-sm font-bold tracking-tight text-zinc-100 dark:text-zinc-900 py-1 transition-all hover:opacity-70"
+                >
+                  {{ selectedCountryName() }}
+                  <lucide-angular [img]="icons.ChevronDown" class="h-4 w-4 opacity-40 transition-transform" [class.rotate-180]="showCountryDropdown()"></lucide-angular>
+                </button>
+                @if (showCountryDropdown()) {
+                  <div class="absolute top-full left-0 w-full mt-2 bg-zinc-800 dark:bg-white border border-zinc-700 dark:border-zinc-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div class="max-h-48 overflow-y-auto py-2">
+                      @for (c of countries; track c.code) {
+                        <button 
+                          (click)="businessCountry.set(c.code); showCountryDropdown.set(false)"
+                          class="w-full px-6 py-3 text-left text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
+                          [class.bg-primary]="businessCountry() === c.code"
+                          [class.text-white]="businessCountry() === c.code"
+                          [class.text-zinc-400]="businessCountry() !== c.code && !showCountryDropdown()"
+                          [class.hover:bg-zinc-700]="businessCountry() !== c.code"
+                          [class.dark:hover:bg-zinc-50]="businessCountry() !== c.code"
+                        >
+                          {{ c.name }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="space-y-1 relative">
+                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block">Provincia / Regi├│n</span>
+                @if (businessCountry() === 'AR') {
+                  <button 
+                    type="button"
+                    (click)="showProvinceDropdown.set(!showProvinceDropdown()); showCountryDropdown.set(false)"
+                    class="flex items-center justify-between w-full text-left text-sm font-bold tracking-tight text-zinc-100 dark:text-zinc-900 py-1 transition-all hover:opacity-70"
+                  >
+                    {{ businessProvince() || 'Selecciona Provincia' }}
+                    <lucide-angular [img]="icons.ChevronDown" class="h-4 w-4 opacity-40 transition-transform" [class.rotate-180]="showProvinceDropdown()"></lucide-angular>
+                  </button>
+                  @if (showProvinceDropdown()) {
+                    <div class="absolute top-full left-0 w-full mt-2 bg-zinc-800 dark:bg-white border border-zinc-700 dark:border-zinc-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                      <div class="p-3 border-b border-zinc-700 dark:border-zinc-100 flex items-center gap-2">
+                        <lucide-angular [img]="icons.Search" class="h-3 w-3 text-zinc-500"></lucide-angular>
+                        <input 
+                          type="text" 
+                          [value]="provinceSearch()"
+                          (input)="provinceSearch.set($any($event.target).value)"
+                          placeholder="Buscar..."
+                          class="bg-transparent border-none text-[10px] font-bold uppercase tracking-widest focus:ring-0 w-full p-0 text-zinc-100 dark:text-zinc-900"
+                        >
+                      </div>
+                      <div class="max-h-48 overflow-y-auto py-2">
+                        @for (p of filteredProvinces(); track p) {
+                          <button 
+                            (click)="businessProvince.set(p); showProvinceDropdown.set(false)"
+                            class="w-full px-6 py-3 text-left text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
+                            [class.bg-primary]="businessProvince() === p"
+                            [class.text-white]="businessProvince() === p"
+                            [class.hover:bg-zinc-700]="businessProvince() !== p"
+                            [class.dark:hover:bg-zinc-50]="businessProvince() !== p"
+                          >
+                            {{ p }}
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                } @else {
+                  <input 
+                    type="text" 
+                    [value]="businessProvince()"
+                    (input)="businessProvince.set($any($event.target).value)"
+                    placeholder="Ej: Montevideo"
+                    class="bg-transparent border-none text-sm font-bold tracking-tight focus:ring-0 w-full p-0 text-zinc-100 dark:text-zinc-900 placeholder:text-zinc-100/20 dark:placeholder:text-zinc-900/20"
+                  >
+                }
+              </div>
+
+              <!-- Email -->
               <div class="space-y-1">
-                <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Email del Negocio (Opcional)</span>
+                <div class="flex items-center justify-between">
+                  <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block">Email del Negocio</span>
+                  @if (!isValidEmail() && businessEmail()) {
+                    <span class="text-[8px] font-black text-rose-500 uppercase">Email Inv├ílido</span>
+                  }
+                </div>
                 <input 
                   type="email" 
                   [value]="businessEmail()" 
                   (input)="businessEmail.set($any($event.target).value)"
                   placeholder="contacto@mi-negocio.com"
-                  class="bg-transparent border-none text-sm font-bold tracking-tight focus:ring-0 w-full p-0 placeholder:text-zinc-800/20 dark:placeholder:text-zinc-200/20"
+                  [class.text-rose-500]="!isValidEmail() && businessEmail()"
+                  class="bg-transparent border-none text-sm font-bold tracking-tight focus:ring-0 w-full p-0 text-zinc-100 dark:text-zinc-900 placeholder:text-zinc-100/20 dark:placeholder:text-zinc-900/20"
                 >
               </div>
 
+              <!-- Phone -->
               <div class="space-y-1">
-                <span class="text-[9px] font-black uppercase tracking-widest opacity-50 block">Teléfono del Negocio (Opcional)</span>
-                <input 
-                  type="text" 
-                  [value]="businessPhone()" 
-                  (input)="businessPhone.set($any($event.target).value)"
-                  placeholder="+54 9 264 ..."
-                  class="bg-transparent border-none text-sm font-bold tracking-tight focus:ring-0 w-full p-0 placeholder:text-zinc-800/20 dark:placeholder:text-zinc-200/20"
-                >
+                <div class="flex items-center justify-between">
+                  <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block">Tel├®fono de Contacto</span>
+                  @if (!isValidPhone() && businessPhone()) {
+                    <span class="text-[8px] font-black text-rose-500 uppercase">N├║mero Inv├ílido</span>
+                  }
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold opacity-40">{{ selectedCountryPrefix() }}</span>
+                  <input 
+                    type="text" 
+                    [value]="businessPhone()" 
+                    (input)="businessPhone.set($any($event.target).value)"
+                    placeholder="264 1234567"
+                    [class.text-rose-500]="!isValidPhone() && businessPhone()"
+                    class="bg-transparent border-none text-sm font-bold tracking-tight focus:ring-0 w-full p-0 text-zinc-100 dark:text-zinc-900 placeholder:text-zinc-100/20 dark:placeholder:text-zinc-900/20"
+                  >
+                </div>
               </div>
             </div>
             
             <div class="pt-4 border-t border-zinc-800/10 dark:border-zinc-200/10 flex justify-end">
               <app-button-spinner 
                 [loading]="isCreating()"
+                [disabled]="!canCreate()"
                 (click)="createBusiness()"
-                class="w-full md:w-auto h-14 px-10 bg-primary hover:bg-primary-dark text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 transition-all"
+                class="w-full md:w-auto h-14 px-10 bg-primary hover:bg-primary-dark disabled:opacity-30 disabled:grayscale text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 transition-all"
               >
                 Crear Sistema Industrial
               </app-button-spinner>
@@ -178,11 +279,11 @@
             <lucide-angular [img]="icons.CheckCircle2" class="h-16 w-16 text-white"></lucide-angular>
           </div>
           <div class="space-y-3">
-             <h2 class="text-4xl font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tighter">¡Todo listo!</h2>
-             <p class="text-zinc-500 text-sm uppercase font-bold tracking-widest">Estamos configurando tu planta de producción...</p>
+             <h2 class="text-4xl font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-tighter">┬íTodo listo!</h2>
+             <p class="text-zinc-500 text-sm uppercase font-bold tracking-widest">Estamos configurando tu planta de producci├│n...</p>
           </div>
        </div>
     }
 
   </div>
-</div>
+</div>

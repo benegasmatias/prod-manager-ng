@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed } from '@angular/core';
+﻿import { Component, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Filter, X, ChevronDown, User, Cpu, AlertCircle, Sparkles, RefreshCw, Settings2 } from 'lucide-angular';
@@ -29,7 +29,7 @@ export type FilterLayout = 'VERTICAL' | 'HORIZONTAL';
                 'px-5 md:px-8 py-2 md:py-3 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all duration-500 whitespace-nowrap italic shrink-0',
                 isReset() ? 'bg-primary text-white shadow-2xl shadow-primary/30 scale-105' : 'text-text-muted/30 hover:text-text'
               )">
-              Todos los Protocolos
+              Todos los Pedidos
             </button>
             
             @for (status of statusOptions(); track status.key) {
@@ -109,8 +109,8 @@ export type FilterLayout = 'VERTICAL' | 'HORIZONTAL';
               <lucide-angular [img]="icons.Filter" class="h-6 w-6"></lucide-angular>
             </div>
             <div class="flex flex-col">
-               <h3 class="text-xs font-black uppercase tracking-[0.4em] text-text italic">Refinar Parámetros</h3>
-               <p class="text-[9px] font-black uppercase tracking-widest text-text-muted/20 italic">Segmentación de Carga</p>
+               <h3 class="text-xs font-black uppercase tracking-[0.4em] text-text italic">Refinar Par├ímetros</h3>
+               <p class="text-[9px] font-black uppercase tracking-widest text-text-muted/20 italic">Segmentaci├│n de Carga</p>
             </div>
           </div>
           <button (click)="resetFilters()" class="text-[9px] font-black uppercase tracking-[0.3em] text-text-muted/30 hover:text-primary transition-all italic">Resetear</button>
@@ -155,7 +155,7 @@ export class CalendarFiltersComponent {
   employees = input.required<Employee[]>();
   statusOptions = input.required<{ key: string; label: string }[]>();
   layout = input<FilterLayout>('VERTICAL');
-  
+
   onFiltersChange = output<CalendarFilters>();
 
   filters = signal<CalendarFilters>({
@@ -163,7 +163,7 @@ export class CalendarFiltersComponent {
     onlyRisky: false,
     onlyOverdue: false
   });
-  
+
   showAdvanced = signal(false);
   operatorId = 'all';
 

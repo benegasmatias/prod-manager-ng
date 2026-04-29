@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, effect } from '@angular/core';
+﻿import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { ApiService } from '../api/api.service';
 import { AuthService } from '../auth/auth.service';
 import { CacheService } from '../cache/cache.service';
@@ -45,12 +45,12 @@ export class SessionService {
   private isInitializing = false;
   private initPromise: Promise<void> | null = null;
 
-  // La configuración se extrae del businessConfig dinámico si existe, sino cae al local
+  // La configuraci├│n se extrae del businessConfig din├ímico si existe, sino cae al local
   config = computed<NegocioConfig>(() => 
     this.businessConfig()?.config || getNegocioConfig(this.activeNegocio()?.rubro || APP_CONFIG.DEFAULT_RUBRO)
   );
 
-  // Rubro del negocio activo para fácil acceso
+  // Rubro del negocio activo para f├ícil acceso
   rubro = computed<Rubro>(() => 
     this.activeNegocio()?.rubro || APP_CONFIG.DEFAULT_RUBRO
   );
@@ -66,7 +66,7 @@ export class SessionService {
   private lastUserId: string | null = null;
 
   constructor() {
-    // Reaccionar al cambio de sesión de forma proactiva
+    // Reaccionar al cambio de sesi├│n de forma proactiva
     effect(() => {
       const session = this.auth.session();
       if (session) {
@@ -251,12 +251,13 @@ export class SessionService {
     return Array.from(new Set(existing || []));
   }
 
-  async addNegocio(name: string, templateKey: string, phone?: string, email?: string) {
+  async addNegocio(name: string, templateKey: string, phone?: string, email?: string, metadata?: any) {
     const newBusiness = await this.api.businesses.create({ 
       name, 
       templateKey,
       ...(phone && { phone }),
-      ...(email && { email })
+      ...(email && { email }),
+      ...(metadata && { metadata })
     });
     await this.initialize();
     return newBusiness;

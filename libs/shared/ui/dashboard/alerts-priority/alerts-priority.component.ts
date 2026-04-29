@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+﻿import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, AlertTriangle, AlertCircle, ArrowRight, ExternalLink, Search } from 'lucide-angular';
@@ -74,10 +74,12 @@ export class AlertsPriorityWidgetComponent {
 
   getQueryParams(alert: any): any | null {
     if (alert.queryParams) return alert.queryParams;
-    if (!alert.orderId && alert.searchQuery) {
-      return { search: alert.searchQuery };
-    }
-    return null;
+    
+    const params: any = {};
+    if (alert.alertFilter) params.alertFilter = alert.alertFilter;
+    if (alert.searchQuery) params.search = alert.searchQuery;
+
+    return Object.keys(params).length > 0 ? params : null;
   }
 
   cn = cn;

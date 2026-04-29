@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed, untracked } from '@angular/core';
+﻿import { Injectable, inject, signal, computed, untracked } from '@angular/core';
 import { HttpContext } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { SessionService } from '../session/session.service';
@@ -23,7 +23,7 @@ export class DashboardService {
 
   /**
    * Refreshes dashboard data. 
-   * La lógica de cache ahora vive en el interceptor, simplificando este servicio.
+   * La l├│gica de cache ahora vive en el interceptor, simplificando este servicio.
    */
   async refresh(force = false) {
     const businessId = this.session.activeId();
@@ -65,9 +65,17 @@ export class DashboardService {
         if (match) searchQuery = match[0];
       }
 
+      let alertFilter = null;
+      if (a.title === 'Entregas Inminentes' || a.message?.includes('PRONTO') || a.message?.includes('HOY o MA├æANA')) {
+        alertFilter = 'due-soon';
+      } else if (a.title === 'Pedidos Vencidos' || a.message?.includes('LISTOS') || a.message?.includes('sin entregar')) {
+        alertFilter = 'overdue';
+      }
+
       return {
         ...a,
-        searchQuery
+        searchQuery,
+        alertFilter
       };
     });
 

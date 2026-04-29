@@ -1,4 +1,4 @@
-import { Rubro, NegocioConfig, StatMetric } from '../models/negocio';
+﻿import { Rubro, NegocioConfig, StatMetric } from '../models/negocio';
 
 export function getNegocioConfig(rubro: Rubro): NegocioConfig {
   const commonStats: StatMetric[] = [
@@ -11,7 +11,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
       return {
         sidebarItems: ['/dashboard', '/pedidos', '/produccion', '/stock', '/clientes', '/personal', '/maquinas', '/materiales', '/reportes', '/ajustes'],
         labels: {
-          produccion: 'Producción',
+          produccion: 'Producci├│n',
           items: 'Modelos a Imprimir',
           maquinas: 'Impresoras',
           materiales: 'Filamentos',
@@ -26,16 +26,16 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
         },
         stats: [
           ...commonStats,
-          { key: 'productionOrders', label: 'Producción en Curso', icon: 'Printer', format: 'number' },
+          { key: 'productionOrders', label: 'Producci├│n en Curso', icon: 'Printer', format: 'number' },
           { key: 'activePrinters', label: 'Impresoras Activas', icon: 'Zap', format: 'number' },
         ],
         productionStages: [
           { key: 'PENDING', label: 'Pendiente', color: 'bg-zinc-100' },
-          { key: 'DESIGN', label: 'En Diseño', color: 'bg-indigo-500' },
+          { key: 'DESIGN', label: 'En Dise├▒o', color: 'bg-indigo-500' },
           { key: 'IN_PROGRESS', label: 'Imprimiendo', color: 'bg-blue-500' },
           { key: 'READY', label: 'Listo', color: 'bg-emerald-500' },
-          { key: 'FAILED', label: 'Fallo de Impresión', color: 'bg-red-500' },
-          { key: 'REPRINT_PENDING', label: 'Pendiente Reimpresión', color: 'bg-orange-400' },
+          { key: 'FAILED', label: 'Fallo de Impresi├│n', color: 'bg-red-500' },
+          { key: 'REPRINT_PENDING', label: 'Pendiente Reimpresi├│n', color: 'bg-orange-400' },
           { key: 'POST_PROCESS', label: 'Post-Proceso', color: 'bg-amber-500' },
           { key: 'DONE', label: 'Terminado', color: 'bg-emerald-500' },
           { key: 'DELIVERED', label: 'Entregado', color: 'bg-zinc-100' },
@@ -60,17 +60,17 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           ],
         },
         itemFields: [
-          { key: 'nombreProducto', label: 'Nombre del Modelo / Trabajo', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: 'Ej. Llavero de pared' },
-          { key: 'tipo_filamento', label: 'Tipo de Filamento (General)', tipo: 'select', section: 'INFORMACIÓN DEL TRABAJO', options: ['PLA', 'PETG', 'ABS', 'TPU', 'RESIN', 'NYLON', 'FLEX'], required: false },
-          { key: 'seDiseñaSTL', label: '¿Se diseña el STL?', tipo: 'boolean', section: 'INFORMACIÓN DEL TRABAJO' },
-          { key: 'precioDiseno', label: 'Costo de diseño ($)', tipo: 'money', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'Ej. 2500' },
-          { key: 'url_stl', label: 'URL STL', tipo: 'url', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'https://...' },
-          { key: 'reference_image', label: 'Imagen de Referencia', tipo: 'url', section: 'INFORMACIÓN DEL TRABAJO' },
-          { key: 'cantidad', label: 'Cantidad', tipo: 'number', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: '1' },
-          { key: 'peso_gramos', label: 'Peso estimado (G)', tipo: 'number', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej. 150' },
-          { key: 'duracion_estimada_minutos', label: 'Duración (MIN)', tipo: 'number', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej. 120' },
+          { key: 'nombreProducto', label: 'Nombre del Modelo / Trabajo', tipo: 'text', section: 'INFORMACI├ôN DEL TRABAJO', required: true, placeholder: 'Ej. Llavero de pared' },
+          { key: 'tipo_filamento', label: 'Tipo de Filamento (General)', tipo: 'select', section: 'INFORMACI├ôN DEL TRABAJO', options: ['PLA', 'PETG', 'ABS', 'TPU', 'RESIN', 'NYLON', 'FLEX'], required: false },
+          { key: 'seDise├▒aSTL', label: '┬┐Se dise├▒a el STL?', tipo: 'boolean', section: 'INFORMACI├ôN DEL TRABAJO' },
+          { key: 'precioDiseno', label: 'Costo de dise├▒o ($)', tipo: 'money', section: 'INFORMACI├ôN DEL TRABAJO', placeholder: 'Ej. 2500' },
+          { key: 'url_stl', label: 'URL STL', tipo: 'url', section: 'INFORMACI├ôN DEL TRABAJO', placeholder: 'https://...' },
+          { key: 'reference_image', label: 'Imagen de Referencia', tipo: 'url', section: 'INFORMACI├ôN DEL TRABAJO' },
+          { key: 'cantidad', label: 'Cantidad', tipo: 'number', section: 'INFORMACI├ôN DEL TRABAJO', required: true, placeholder: '1' },
+          { key: 'peso_gramos', label: 'Peso estimado (G)', tipo: 'number', section: 'ESPECIFICACIONES T├ëCNICAS', placeholder: 'Ej. 150' },
+          { key: 'duracion_estimada_minutos', label: 'Duraci├│n (MIN)', tipo: 'number', section: 'ESPECIFICACIONES T├ëCNICAS', placeholder: 'Ej. 120' },
         ],
-        staffPlaceholder: 'Ej: Operario de Impresión, Modelador, Post-procesado...',
+        staffPlaceholder: 'Ej: Operario de Impresi├│n, Modelador, Post-procesado...',
         features: {
           hasNozzle: true,
           hasMaxFilaments: true,
@@ -80,7 +80,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
         },
         machineStatusLabels: {
           WORKING: 'Imprimiendo',
-          MAINTENANCE: 'Mantenimiento / Calibración',
+          MAINTENANCE: 'Mantenimiento / Calibraci├│n',
           IDLE: 'Lista para Imprimir'
         }
       };
@@ -106,36 +106,36 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
         },
         stats: [
           ...commonStats,
-          { key: 'productionOrders', label: 'Fabricación en Curso', icon: 'Cog', format: 'number' },
+          { key: 'productionOrders', label: 'Fabricaci├│n en Curso', icon: 'Cog', format: 'number' },
           { key: 'activeOrders', label: 'Proyectos Activos', icon: 'HardHat', format: 'number' },
         ],
         productionStages: [
-          { key: 'SITE_VISIT', label: 'Visita Técnica', color: 'bg-indigo-500' },
+          { key: 'SITE_VISIT', label: 'Visita T├®cnica', color: 'bg-indigo-500' },
           { key: 'SITE_VISIT_DONE', label: 'Visita Realizada', color: 'bg-emerald-500' },
           { key: 'VISITA_REPROGRAMADA', label: 'Visita Reprogramada', color: 'bg-orange-400' },
           { key: 'VISITA_CANCELADA', label: 'Visita Cancelada', color: 'bg-red-400' },
           { key: 'QUOTATION', label: 'Presupuesto Pendiente', color: 'bg-blue-500' },
           { key: 'BUDGET_GENERATED', label: 'Presupuesto Enviado', color: 'bg-amber-500' },
           { key: 'BUDGET_REJECTED', label: 'Presupuesto Rechazado', color: 'bg-zinc-400' },
-          { key: 'SURVEY_DESIGN', label: 'Relevamiento / Diseño', color: 'bg-blue-400' },
+          { key: 'SURVEY_DESIGN', label: 'Relevamiento / Dise├▒o', color: 'bg-blue-400' },
           { key: 'APPROVED', label: 'Presupuesto Confirmado', color: 'bg-primary' },
           { key: 'OFFICIAL_ORDER', label: 'En Taller / Cola', color: 'bg-zinc-100' },
           { key: 'CUTTING', label: 'Corte', color: 'bg-orange-500' },
           { key: 'WELDING', label: 'Soldadura', color: 'bg-blue-600' },
           { key: 'ASSEMBLY', label: 'Armado', color: 'bg-amber-600' },
           { key: 'PAINTING', label: 'Pintura', color: 'bg-purple-500' },
-          { key: 'INSTALACION_OBRA', label: 'Instalación en Obra', color: 'bg-indigo-600' },
+          { key: 'INSTALACION_OBRA', label: 'Instalaci├│n en Obra', color: 'bg-indigo-600' },
           { key: 'FAILED', label: 'Fallo / Error', color: 'bg-red-500' },
           { key: 'DONE', label: 'Listo p/ Entrega', color: 'bg-emerald-500' },
           { key: 'DELIVERED', label: 'Entregado (Cerrado)', color: 'bg-zinc-100' },
         ],
         materialConfig: {
-          namePlaceholder: 'Ej: Caño 40x40 / Chapa N18 / Electrodo 6013',
+          namePlaceholder: 'Ej: Ca├▒o 40x40 / Chapa N18 / Electrodo 6013',
           brandPlaceholder: 'Ej: Acer Bragado / Acindar / Sin Marca',
           defaultUnit: 'm',
           defaultType: 'PERFIL',
           types: [
-            { key: 'PERFIL', label: 'PERFIL / CAÑO' },
+            { key: 'PERFIL', label: 'PERFIL / CA├æO' },
             { key: 'CHAPA', label: 'CHAPA' },
             { key: 'MACHO', label: 'MACHIMBRE' },
             { key: 'HERRAJE', label: 'HERRAJE / ACCESORIO' },
@@ -151,19 +151,19 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           ],
         },
         itemFields: [
-          { key: 'tipo_trabajo', label: 'Tipo de Trabajo', tipo: 'select', section: 'INFORMACIÓN DEL TRABAJO', options: ['Portón', 'Reja', 'Escalera', 'Estructura', 'Puerta', ' Paño Fijo', 'Otro'], required: true },
-          { key: 'nombreProducto', label: 'Descripción / Nombre', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: 'Ej: Portón principal frente' },
-          { key: 'medidas', label: 'Medidas (Ancho x Alto)', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'Ej: 3.50 x 2.10 m' },
-          { key: 'cantidad', label: 'Cantidad', tipo: 'number', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: '1' },
+          { key: 'tipo_trabajo', label: 'Tipo de Trabajo', tipo: 'select', section: 'INFORMACI├ôN DEL TRABAJO', options: ['Port├│n', 'Reja', 'Escalera', 'Estructura', 'Puerta', ' Pa├▒o Fijo', 'Otro'], required: true },
+          { key: 'nombreProducto', label: 'Descripci├│n / Nombre', tipo: 'text', section: 'INFORMACI├ôN DEL TRABAJO', required: true, placeholder: 'Ej: Port├│n principal frente' },
+          { key: 'medidas', label: 'Medidas (Ancho x Alto)', tipo: 'text', section: 'INFORMACI├ôN DEL TRABAJO', placeholder: 'Ej: 3.50 x 2.10 m' },
+          { key: 'cantidad', label: 'Cantidad', tipo: 'number', section: 'INFORMACI├ôN DEL TRABAJO', required: true, placeholder: '1' },
 
-          { key: 'material_estructura', label: 'Material Estructura', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Tubo 40x40' },
-          { key: 'revestimiento', label: 'Revestimiento (Machimbre/Chapa)', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Machimbre de Pino / Chapa N°18' },
-          { key: 'terminacion', label: 'Terminación / Proceso', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Pintura epoxi al horno' },
-          { key: 'color', label: 'Color Final', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej: Negro microtexturado' },
+          { key: 'material_estructura', label: 'Material Estructura', tipo: 'text', section: 'ESPECIFICACIONES T├ëCNICAS', placeholder: 'Ej: Tubo 40x40' },
+          { key: 'revestimiento', label: 'Revestimiento (Machimbre/Chapa)', tipo: 'text', section: 'ESPECIFICACIONES T├ëCNICAS', placeholder: 'Ej: Machimbre de Pino / Chapa N┬░18' },
+          { key: 'terminacion', label: 'Terminaci├│n / Proceso', tipo: 'text', section: 'ESPECIFICACIONES T├ëCNICAS', placeholder: 'Ej: Pintura epoxi al horno' },
+          { key: 'color', label: 'Color Final', tipo: 'text', section: 'ESPECIFICACIONES T├ëCNICAS', placeholder: 'Ej: Negro microtexturado' },
 
           { key: 'incluye_motor', label: 'Incluye Motor', tipo: 'boolean', section: 'OPCIONALES' },
-          { key: 'instalacion', label: 'Requiere Instalación', tipo: 'boolean', section: 'OPCIONALES' },
-          { key: 'incluye_guias', label: 'Incluye Guías/Rieles', tipo: 'boolean', section: 'OPCIONALES' },
+          { key: 'instalacion', label: 'Requiere Instalaci├│n', tipo: 'boolean', section: 'OPCIONALES' },
+          { key: 'incluye_guias', label: 'Incluye Gu├¡as/Rieles', tipo: 'boolean', section: 'OPCIONALES' },
           { key: 'cerradura_seguridad', label: 'Cerradura de Seguridad', tipo: 'boolean', section: 'OPCIONALES' },
           { key: 'refuerzos_estructurales', label: 'Refuerzos Estructurales', tipo: 'boolean', section: 'OPCIONALES' },
         ],
@@ -176,8 +176,8 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           hasMaterials: true,
         },
         machineStatusLabels: {
-          WORKING: 'En Producción',
-          MAINTENANCE: 'Fuera de Servicio / Reparación',
+          WORKING: 'En Producci├│n',
+          MAINTENANCE: 'Fuera de Servicio / Reparaci├│n',
           IDLE: 'Disponible / Espera'
         }
       };
@@ -205,24 +205,24 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'activeOrders', label: 'Pedidos Pendientes', icon: 'ShoppingCart', format: 'number' },
         ],
         productionStages: [
-          { key: 'PENDING', label: 'Planificación', color: 'bg-zinc-100' },
+          { key: 'PENDING', label: 'Planificaci├│n', color: 'bg-zinc-100' },
           { key: 'CUTTING', label: 'Corte de Placas', color: 'bg-orange-400' },
           { key: 'ARMADO', label: 'En Armado', color: 'bg-blue-500' },
           { key: 'BARNIZADO', label: 'Lustre / Barniz', color: 'bg-amber-600' },
           { key: 'FAILED', label: 'Rehacer / Error', color: 'bg-red-500' },
-          { key: 'RE_WORK', label: 'En Ajuste / Reparación', color: 'bg-orange-400' },
+          { key: 'RE_WORK', label: 'En Ajuste / Reparaci├│n', color: 'bg-orange-400' },
           { key: 'DONE', label: 'Terminado', color: 'bg-emerald-500' },
           { key: 'DELIVERED', label: 'Entregado', color: 'bg-zinc-100' },
           { key: 'IN_STOCK', label: 'Ingresado a Stock', color: 'bg-purple-500' },
         ],
         materialConfig: {
-          namePlaceholder: 'Ej: Placa Melamina 18mm / Cola Vinílica',
+          namePlaceholder: 'Ej: Placa Melamina 18mm / Cola Vin├¡lica',
           brandPlaceholder: 'Ej: Faplac / Egger / Sin Marca',
           defaultUnit: 'uds',
           defaultType: 'PLACA',
           types: [
             { key: 'PLACA', label: 'PLACA / TABLERO' },
-            { key: 'MADERA', label: 'MADERA MACIZA / LISTÓN' },
+            { key: 'MADERA', label: 'MADERA MACIZA / LIST├ôN' },
             { key: 'HERRAJE', label: 'HERRAJE / TIRADOR' },
             { key: 'INSUMO', label: 'INSUMO (COLA/LIJA)' },
             { key: 'OTRO', label: 'OTRO' },
@@ -234,12 +234,12 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           ],
         },
         itemFields: [
-          { key: 'nombreProducto', label: 'Mueble / Producto', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: 'Ej. Mesa ratona' },
-          { key: 'madera', label: 'Tipo de Madera', tipo: 'text', section: 'ESPECIFICACIONES TÉCNICAS', placeholder: 'Ej. Pino, Roble' },
-          { key: 'medidas', label: 'Dimensiones Finales', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', placeholder: 'Ej. 120 x 80 x 45 cm' },
-          { key: 'herrajes', label: 'Detalle de Herrajes', tipo: 'textarea', section: 'ESPECIFICACIONES TÉCNICAS' },
+          { key: 'nombreProducto', label: 'Mueble / Producto', tipo: 'text', section: 'INFORMACI├ôN DEL TRABAJO', required: true, placeholder: 'Ej. Mesa ratona' },
+          { key: 'madera', label: 'Tipo de Madera', tipo: 'text', section: 'ESPECIFICACIONES T├ëCNICAS', placeholder: 'Ej. Pino, Roble' },
+          { key: 'medidas', label: 'Dimensiones Finales', tipo: 'text', section: 'INFORMACI├ôN DEL TRABAJO', placeholder: 'Ej. 120 x 80 x 45 cm' },
+          { key: 'herrajes', label: 'Detalle de Herrajes', tipo: 'textarea', section: 'ESPECIFICACIONES T├ëCNICAS' },
         ],
-        staffPlaceholder: 'Ej: Carpintero, Lijador, Lustrador, Diseñador...',
+        staffPlaceholder: 'Ej: Carpintero, Lijador, Lustrador, Dise├▒ador...',
         features: {
           hasNozzle: false,
           hasMaxFilaments: false,
@@ -263,7 +263,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           maquinas: 'Cajas Registradoras',
           materiales: 'Proveedores',
           unidadName: 'Nombre de la Caja',
-          unidadModel: 'Ubicación / Sector',
+          unidadModel: 'Ubicaci├│n / Sector',
           staffPlaceholder: 'Vendedor, Cajero, Repositor...',
         },
         icons: {
@@ -301,12 +301,12 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
       return {
         sidebarItems: ['/dashboard', '/pedidos', '/stock', '/clientes', '/personal', '/produccion', '/reportes', '/ajustes'],
         labels: {
-          produccion: 'Producción',
-          items: 'Ítems de Pedido',
+          produccion: 'Producci├│n',
+          items: '├ìtems de Pedido',
           maquinas: 'Unidades de Trabajo',
           materiales: 'Materiales',
           unidadName: 'Nombre de la Unidad',
-          unidadModel: 'Tipo / Categoría',
+          unidadModel: 'Tipo / Categor├¡a',
         },
         icons: {
           pedidos: 'ShoppingCart',
@@ -323,7 +323,7 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           { key: 'PENDING', label: 'Pendiente', color: 'bg-zinc-100' },
           { key: 'IN_PROGRESS', label: 'En Proceso', color: 'bg-blue-500' },
           { key: 'FAILED', label: 'Fallo / Error', color: 'bg-red-500' },
-          { key: 'RE_WORK', label: 'En Reparación', color: 'bg-orange-400' },
+          { key: 'RE_WORK', label: 'En Reparaci├│n', color: 'bg-orange-400' },
           { key: 'DONE', label: 'Terminado', color: 'bg-emerald-500' },
           { key: 'DELIVERED', label: 'Entregado', color: 'bg-zinc-100' },
           { key: 'IN_STOCK', label: 'Ingresado a Stock', color: 'bg-purple-500' },
@@ -345,8 +345,8 @@ export function getNegocioConfig(rubro: Rubro): NegocioConfig {
           ],
         },
         itemFields: [
-          { key: 'nombreProducto', label: 'Producto/Servicio', tipo: 'text', section: 'INFORMACIÓN DEL TRABAJO', required: true, placeholder: 'Ej. Servicio de pintura' },
-          { key: 'descripcion', label: 'Descripción Extendida', tipo: 'textarea', section: 'INFORMACIÓN DEL TRABAJO' },
+          { key: 'nombreProducto', label: 'Producto/Servicio', tipo: 'text', section: 'INFORMACI├ôN DEL TRABAJO', required: true, placeholder: 'Ej. Servicio de pintura' },
+          { key: 'descripcion', label: 'Descripci├│n Extendida', tipo: 'textarea', section: 'INFORMACI├ôN DEL TRABAJO' },
         ],
         staffPlaceholder: 'Ej: Operario, Vendedor, Administrativo...',
         features: {
@@ -373,7 +373,7 @@ export function getStatusLabel(status: string, rubro?: Rubro, orderType?: 'CLIEN
       'DELIVERED': 'Ingresado a Stock',
       'IN_STOCK': 'Disponible / Inventario',
       'READY_FOR_DELIVERY': 'Pendiente Ingreso',
-      'SURVEY_DESIGN': 'Diseño Técnico'
+      'SURVEY_DESIGN': 'Dise├▒o T├®cnico'
     };
     if (stockLabels[status]) return stockLabels[status];
   }
@@ -391,6 +391,7 @@ export function getStatusLabel(status: string, rubro?: Rubro, orderType?: 'CLIEN
     READY: 'Listo',
     FAILED: 'Fallido',
     IN_STOCK: 'En Stock',
+    DRAFT: 'Borrador',
   };
 
   return fallbacks[status] || status;
@@ -409,7 +410,8 @@ export function getStatusStyles(status: string, rubro?: Rubro): string {
       IN_PROGRESS: 'bg-blue-500',
       PENDING: 'bg-zinc-100',
       CANCELLED: 'bg-red-500',
-      FAILED: 'bg-red-500'
+      FAILED: 'bg-red-500',
+      DRAFT: 'bg-zinc-100'
     };
     color = fallbacks[status] || 'bg-zinc-100';
   }

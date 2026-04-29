@@ -1,13 +1,13 @@
-export const PEDIDOS_LABELS = {
+﻿export const PEDIDOS_LABELS = {
   TITLE: 'Seguimiento de Pedidos',
-  SUBTITLE: 'Administración de flujos de trabajo, órdenes de clientes y estados de entrega en tiempo real.',
-  CATEGORY: 'Gestión Comercial',
+  SUBTITLE: 'Administraci├│n de flujos de trabajo, ├│rdenes de clientes y estados de entrega en tiempo real.',
+  CATEGORY: 'Gesti├│n Comercial',
   ACTIONS: {
     NEW_ORDER: 'REGISTRAR PEDIDO'
   },
-  ACTIVE_SECTION: 'Pedidos en Producción',
+  ACTIVE_SECTION: 'Pedidos en Producci├│n',
   COMMERCIAL_SECTION: 'Preventas / Visitas / Presupuestos',
-  COMMERCIAL_SUBTITLE: 'Gestión comercial y relevamientos técnicos',
+  COMMERCIAL_SUBTITLE: 'Gesti├│n comercial y relevamientos t├®cnicos',
   HISTORY_SECTION: 'Historial de Pedidos',
   HISTORY_SUBTITLE: 'Entregados / Anulados',
   EMPTY_ACTIVE: 'Sin pedidos activos',
@@ -26,7 +26,7 @@ export const PEDIDOS_LABELS = {
 import {
   Wallet, Package, Clock, Calendar, Box,
   ExternalLink, Plus, TrendingUp, Search,
-  List, LayoutGrid
+  List, LayoutGrid, X, SlidersHorizontal
 } from 'lucide-angular';
 
 export const PEDIDOS_ICONS = {
@@ -40,5 +40,7 @@ export const PEDIDOS_ICONS = {
   PLUS: Plus,
   TRENDING: TrendingUp,
   LIST: List,
-  LAYOUT_GRID: LayoutGrid
+  LAYOUT_GRID: LayoutGrid,
+  X: X,
+  FILTERS: SlidersHorizontal
 } as const;

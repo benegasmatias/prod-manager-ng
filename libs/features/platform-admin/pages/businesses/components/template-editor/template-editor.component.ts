@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal, output, input } from '@angular/core';
+﻿import { Component, OnInit, inject, signal, output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlatformAdminService } from '../../../../services/platform-admin.service';
-import { LucideAngularModule, X, Save, Plus, Trash2, Loader2, ShieldCheck } from 'lucide-angular';
+import { LucideAngularModule, X, Save, Plus, Trash2, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-angular';
 import { ToastService } from '../../../../../../shared/services/toast.service';
 
 @Component({
@@ -16,9 +16,14 @@ import { ToastService } from '../../../../../../shared/services/toast.service';
       <div class="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
         <!-- Header -->
         <div class="flex items-center justify-between p-8 border-b border-zinc-900 bg-zinc-900/20">
-          <div>
-            <h3 class="text-xl font-black text-white uppercase tracking-tight">Editar Template</h3>
-            <p class="text-zinc-500 text-xs font-bold italic">{{ template()?.name }}</p>
+          <div class="flex items-center gap-4">
+            <div [class]="form.get('isEnabled')?.value ? 'bg-emerald-500/10 text-emerald-500' : 'bg-zinc-800 text-zinc-500'" class="p-3 rounded-2xl transition-colors">
+              <lucide-angular [img]="form.get('isEnabled')?.value ? icons.Eye : icons.EyeOff" class="h-5 w-5"></lucide-angular>
+            </div>
+            <div>
+              <h3 class="text-xl font-black text-white uppercase tracking-tight">Editar Template</h3>
+              <p class="text-zinc-500 text-xs font-bold italic">{{ template()?.name }}</p>
+            </div>
           </div>
           <button (click)="close.emit()" class="p-2 hover:bg-zinc-800 rounded-xl text-zinc-500 transition-all">
             <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
@@ -27,6 +32,25 @@ import { ToastService } from '../../../../../../shared/services/toast.service';
 
         <form [formGroup]="form" (ngSubmit)="save()" class="p-8 space-y-6">
           <div class="space-y-4">
+            <!-- Visibility Toggle -->
+            <div class="bg-zinc-900/50 p-4 rounded-2xl border border-zinc-900 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Disponibilidad</span>
+                <p class="text-xs font-bold text-zinc-500 italic">Habilita o deshabilita la creaci├│n de negocios con este rubro.</p>
+              </div>
+              <button 
+                type="button"
+                (click)="form.get('isEnabled')?.setValue(!form.get('isEnabled')?.value)"
+                [class]="form.get('isEnabled')?.value ? 'bg-emerald-500 shadow-emerald-500/20' : 'bg-zinc-800'"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-zinc-950"
+              >
+                <span 
+                  [class]="form.get('isEnabled')?.value ? 'translate-x-5' : 'translate-x-0'"
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                ></span>
+              </button>
+            </div>
+
             <div>
               <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">Nombre del Template</label>
               <input 
@@ -36,7 +60,7 @@ import { ToastService } from '../../../../../../shared/services/toast.service';
             </div>
 
             <div>
-              <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">Descripción</label>
+              <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">Descripci├│n</label>
               <textarea 
                 formControlName="description"
                 rows="3"
@@ -105,7 +129,7 @@ export class TemplateEditorModalComponent implements OnInit {
   readonly close = output<void>();
   readonly updated = output<void>();
 
-  readonly icons = { X, Save, Plus, Trash2, Loader2, ShieldCheck };
+  readonly icons = { X, Save, Plus, Trash2, Loader2, ShieldCheck, Eye, EyeOff };
 
   form!: FormGroup;
   loading = signal(false);

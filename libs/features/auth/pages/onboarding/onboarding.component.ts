@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, computed, signal } from '@angular/core';
+﻿import { Component, inject, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SessionService } from '@core/session/session.service';
 import { AuthService } from '@core/auth/auth.service';
 import { ApiService } from '@core/api/api.service';
-import { LucideAngularModule, Building2, AlertCircle, Mail, Loader2, ChevronRight, Zap, Target, Hammer, ShoppingCart, CheckCircle2 } from 'lucide-angular';
+import { LucideAngularModule, Building2, AlertCircle, Mail, Loader2, ChevronRight, Zap, Target, Hammer, ShoppingCart, CheckCircle2, ChevronDown, Search } from 'lucide-angular';
 import { ButtonSpinnerComponent } from '@shared/ui';
 
 @Component({
@@ -20,7 +20,7 @@ export class OnboardingComponent implements OnInit {
   private router = inject(Router);
   private api = inject(ApiService);
 
-  readonly icons = { Building2, AlertCircle, Mail, Loader2, ChevronRight, Zap, Target, Hammer, ShoppingCart, CheckCircle2 };
+  readonly icons = { Building2, AlertCircle, Mail, Loader2, ChevronRight, Zap, Target, Hammer, ShoppingCart, CheckCircle2, ChevronDown, Search };
 
   // UI State
   step = signal<'WELCOME' | 'CHOOSE_TEMPLATE' | 'CREATING'>('WELCOME');
@@ -32,7 +32,67 @@ export class OnboardingComponent implements OnInit {
   businessName = signal('');
   businessPhone = signal('');
   businessEmail = signal('');
+  businessCountry = signal('AR');
+  businessProvince = signal('');
   isCreating = signal(false);
+
+  // Dropdown States
+  showCountryDropdown = signal(false);
+  showProvinceDropdown = signal(false);
+  provinceSearch = signal('');
+
+  countries = [
+    { code: 'AR', name: 'Argentina', prefix: '+54' },
+    { code: 'UY', name: 'Uruguay', prefix: '+598' },
+    { code: 'CL', name: 'Chile', prefix: '+56' },
+    { code: 'PY', name: 'Paraguay', prefix: '+595' },
+    { code: 'BO', name: 'Bolivia', prefix: '+591' },
+    { code: 'BR', name: 'Brasil', prefix: '+55' },
+    { code: 'ES', name: 'Espa├▒a', prefix: '+34' },
+    { code: 'MX', name: 'M├®xico', prefix: '+52' },
+    { code: 'CO', name: 'Colombia', prefix: '+57' },
+    { code: 'PE', name: 'Per├║', prefix: '+51' },
+  ];
+
+  provinces = [
+    'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'C├│rdoba', 'Corrientes', 'Entre R├¡os', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones', 'Neuqu├®n', 'R├¡o Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero', 'Tierra del Fuego', 'Tucum├ín'
+  ];
+
+  filteredProvinces = computed(() => {
+    const s = this.provinceSearch().toLowerCase();
+    if (!s) return this.provinces;
+    return this.provinces.filter(p => p.toLowerCase().includes(s));
+  });
+
+  selectedCountryName = computed(() => {
+    return this.countries.find(c => c.code === this.businessCountry())?.name || 'Selecciona Pa├¡s';
+  });
+
+  selectedCountryPrefix = computed(() => {
+    const c = this.countries.find(curr => curr.code === this.businessCountry());
+    return c?.prefix || '';
+  });
+
+  // Validations
+  isValidEmail = computed(() => {
+    const email = this.businessEmail();
+    if (!email) return true; // Optional
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  });
+
+  isValidPhone = computed(() => {
+    const phone = this.businessPhone();
+    if (!phone) return true; // Optional
+    // Basic digits check after prefix
+    return /^\d{7,15}$/.test(phone.replace(/\s/g, ''));
+  });
+
+  canCreate = computed(() => {
+    return this.businessName().length >= 3 && 
+           this.isValidEmail() && 
+           this.isValidPhone() &&
+           this.businessProvince().length > 0;
+  });
 
   userEmail = computed(() => this.auth.session()?.user.email || 'Usuario');
   negocios = computed(() => this.session.negocios());
@@ -70,15 +130,21 @@ export class OnboardingComponent implements OnInit {
   }
 
   async createBusiness() {
-    if (!this.selectedTemplate() || this.isCreating()) return;
+    if (!this.selectedTemplate() || this.isCreating() || !this.canCreate()) return;
     
     this.isCreating.set(true);
     try {
+      const fullPhone = `${this.selectedCountryPrefix()} ${this.businessPhone()}`;
+      
       await this.session.addNegocio(
         this.businessName(), 
         this.selectedTemplate().key,
-        this.businessPhone(),
-        this.businessEmail()
+        fullPhone,
+        this.businessEmail(),
+        {
+          country: this.businessCountry(),
+          province: this.businessProvince()
+        }
       );
       this.step.set('CREATING');
       

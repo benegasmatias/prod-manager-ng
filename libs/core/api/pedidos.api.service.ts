@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+﻿import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { Pedido, PedidosResponse, PedidoSummary, Employee } from '@shared/models';
@@ -16,6 +16,8 @@ export interface ListingParams {
   startDate?: string | Date;
   endDate?: string | Date;
   responsableId?: string;
+  urgency?: string;
+  alertFilter?: string;
 }
 
 export interface ReportFailureData {
@@ -53,6 +55,8 @@ export class PedidosApiService {
     if (params.startDate) httpParams = httpParams.set('startDate', params.startDate.toString());
     if (params.endDate) httpParams = httpParams.set('endDate', params.endDate.toString());
     if (params.responsableId) httpParams = httpParams.set('responsableId', params.responsableId);
+    if (params.urgency) httpParams = httpParams.set('urgency', params.urgency);
+    if (params.alertFilter) httpParams = httpParams.set('alertFilter', params.alertFilter);
 
     return firstValueFrom(this.http.get<PedidosResponse>(API_ENDPOINTS.ORDERS.LISTING, { params: httpParams, context }));
   }
@@ -122,7 +126,7 @@ export class PedidosApiService {
   }
 
   /**
-   * Reporta un fallo en un pedido (específicamente Impresión 3D o general).
+   * Reporta un fallo en un pedido (espec├¡ficamente Impresi├│n 3D o general).
    */
   async reportFailure(orderId: string, data: ReportFailureData): Promise<Pedido> {
     const { businessId, ...body } = data;
@@ -141,8 +145,8 @@ export class PedidosApiService {
   private workloadCache = new Map<string, any[]>();
 
   /**
-   * Obtiene la carga de trabajo (cantidad de pedidos) por día.
-   * Incluye caché en memoria para evitar llamadas redundantes.
+   * Obtiene la carga de trabajo (cantidad de pedidos) por d├¡a.
+   * Incluye cach├® en memoria para evitar llamadas redundantes.
    */
   async getWorkload(businessId: string, startDate?: string, endDate?: string): Promise<any[]> {
     const cacheKey = `${businessId}_${startDate}_${endDate}`;
@@ -157,7 +161,7 @@ export class PedidosApiService {
     const data = await firstValueFrom(this.http.get<any[]>(url));
     this.workloadCache.set(cacheKey, data);
 
-    // Auto-limpiar caché después de 5 minutos
+    // Auto-limpiar cach├® despu├®s de 5 minutos
     setTimeout(() => this.workloadCache.delete(cacheKey), 5 * 60 * 1000);
 
     return data;

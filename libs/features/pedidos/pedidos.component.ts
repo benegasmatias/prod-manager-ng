@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+﻿import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -17,6 +17,19 @@ import { cn } from '@shared/utils/cn';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { LayoutService } from '../../core/layout/layout.service';
 import { StockService } from '../../core/api/stock.service';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+
+export interface PedidosFilters {
+  search?: string;
+  status?: string;
+  urgency?: string;
+  alertFilter?: string;
+  technician?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+}
 
 @Component({
   selector: 'app-pedidos-page',
@@ -26,6 +39,7 @@ import { StockService } from '../../core/api/stock.service';
     RouterModule,
     LucideAngularModule,
     FormsModule,
+    ReactiveFormsModule,
     OrderStatusModalComponent,
     OrdersTableComponent,
     PaginatorComponent,
@@ -46,7 +60,8 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public stockService = inject(StockService);
   cn = cn;
 
-  activeMobileSector = signal<'active' | 'commercial' | 'history'>('active');
+  activeTab = signal<'active' | 'draft' | 'history'>('active');
+  activeMobileSector = signal<'active' | 'draft' | 'history'>('active');
   isMobile = computed(() => this.layout.isMobile());
   headerVisible = signal(true);
   private lastScroll = 0;
@@ -55,9 +70,6 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   protected readonly labels = PEDIDOS_LABELS;
   protected readonly icons = PEDIDOS_ICONS;
   loading = signal(false);
-  loadingProduction = signal(false);
-  loadingCommercial = signal(false);
-  loadingArchived = signal(false);
   error = signal<string | null>(null);
   summary = signal<PedidoSummary>({ totalVolume: 0, pendingBalance: 0, activeCount: 0 });
   employees = signal<Employee[]>([]);
@@ -66,13 +78,18 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   businessId = computed(() => this.session.activeNegocio()?.id || '');
   negocio = computed(() => this.session.activeNegocio());
 
-  // Filters State
-  searchTerm = signal('');
-  estadoFilter = signal('all');
-  urgenciaFilter = signal('all');
-  tecnicoFilter = signal('all');
-  dateDesde = signal('');
-  dateHasta = signal('');
+  // Filters State (Single Source of Truth)
+  filters = signal<PedidosFilters>({});
+  searchControl = new FormControl('');
+
+  // Backwards compatibility for templates/UI components
+  searchTerm = computed(() => this.filters().search || '');
+  estadoFilter = computed(() => this.filters().status || 'all');
+  urgenciaFilter = computed(() => this.filters().urgency || 'all');
+  tecnicoFilter = computed(() => this.filters().technician || 'all');
+  dateDesde = computed(() => this.filters().startDate || '');
+  dateHasta = computed(() => this.filters().endDate || '');
+  alertFilter = computed(() => this.filters().alertFilter || null);
 
   // Plan Usage
   planUsage = this.session.planUsage;
@@ -85,18 +102,10 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Pagination State
   pageSize = 5;
 
-  productionOrdersData = signal<Pedido[]>([]);
-  productionPage = signal(1);
-  productionTotal = signal(0);
-
-  commercialOrdersData = signal<Pedido[]>([]);
-  commercialPage = signal(1);
-  commercialTotal = signal(0);
-
-  archivedOrdersData = signal<Pedido[]>([]);
-  archivedPage = signal(1);
-  archivedTotal = signal(0);
-  archivedLoaded = signal(false);
+  ordersData = signal<Pedido[]>([]);
+  currentPage = signal(1);
+  totalOrders = signal(0);
+  showFilters = signal(false);
 
   // Sort State
   sortKey = signal<PedidoSortKey>('fechaActualizacion');
@@ -109,8 +118,47 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     urgency: this.urgenciaFilter(),
     technician: this.tecnicoFilter(),
     startDate: this.dateDesde(),
-    endDate: this.dateHasta()
+    endDate: this.dateHasta(),
+    alertFilter: this.alertFilter()
   }));
+
+  activeFilterCount = computed(() => {
+    const f = this.filters();
+    let count = 0;
+    if (f.search) count++;
+    if (f.status && f.status !== 'all') count++;
+    if (f.urgency && f.urgency !== 'all') count++;
+    if (f.technician && f.technician !== 'all') count++;
+    if (f.startDate || f.endDate) count++;
+    if (f.alertFilter) count++;
+    return count;
+  });
+
+  activeChips = computed(() => {
+    const f = this.filters();
+    const chips: { key: keyof PedidosFilters, label: string, value: string }[] = [];
+
+    if (f.status && f.status !== 'all') {
+      const label = this.filterOptions().statuses?.find(s => s.value === f.status)?.label || f.status;
+      chips.push({ key: 'status', label: `Estado: ${label}`, value: f.status });
+    }
+    if (f.technician && f.technician !== 'all') {
+      const emp = this.employees().find(e => e.id === f.technician);
+      const label = emp ? `${emp.firstName} ${emp.lastName}` : f.technician;
+      chips.push({ key: 'technician', label: `T├®cnico: ${label}`, value: f.technician });
+    }
+    if (f.urgency && f.urgency !== 'all') {
+      chips.push({ key: 'urgency', label: `Urgencia: ${f.urgency}`, value: f.urgency });
+    }
+    if (f.alertFilter) {
+      const label = f.alertFilter === 'due-soon' ? 'Vencen hoy o ma├▒ana' : 'Vencidos sin entregar';
+      chips.push({ key: 'alertFilter', label: `Alerta: ${label}`, value: f.alertFilter });
+    }
+    if (f.startDate) chips.push({ key: 'startDate', label: `Desde: ${f.startDate}`, value: f.startDate });
+    if (f.endDate) chips.push({ key: 'endDate', label: `Hasta: ${f.endDate}`, value: f.endDate });
+
+    return chips;
+  });
 
   filterOptions = computed<FilterOptions>(() => {
     const config = this.session.config();
@@ -119,7 +167,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       technicians: this.employees(),
       urgencies: [
         { label: 'VENCIDO', value: 'VENCIDO' },
-        { label: 'PRÓXIMO', value: 'PRÓXIMO' },
+        { label: 'PR├ôXIMO', value: 'PR├ôXIMO' },
         { label: 'EN TIEMPO', value: 'EN TIEMPO' },
         { label: 'LISTO', value: 'LISTO' }
       ]
@@ -127,11 +175,9 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   });
 
   // Sorted Computeds for UI
-  sortedProduction = computed(() => this.sortOrders([...this.productionOrdersData()]));
-  sortedCommercial = computed(() => this.sortOrders([...this.commercialOrdersData()]));
-  sortedArchived = computed(() => this.sortOrders([...this.archivedOrdersData()]));
+  sortedOrders = computed(() => this.sortOrders([...this.ordersData()]));
 
-  hasPedidos = computed(() => this.productionTotal() > 0 || this.commercialTotal() > 0 || this.archivedTotal() > 0);
+  hasPedidos = computed(() => this.totalOrders() > 0);
 
   private lastLoadedBusinessId: string | null = null;
 
@@ -143,7 +189,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     effect(() => {
       const bid = this.businessId();
       if (bid && bid !== this.lastLoadedBusinessId) {
-        this.loadData({ initial: true });
+        this.loadData();
       }
     });
 
@@ -159,9 +205,16 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  scrollToSector(sector: 'active' | 'commercial' | 'history') {
-    this.activeMobileSector.set(sector);
-    const element = document.getElementById(`${sector}-sector`);
+  setTab(tab: 'active' | 'draft' | 'history') {
+    this.activeTab.set(tab);
+    this.activeMobileSector.set(tab);
+    this.currentPage.set(1);
+    this.loadData();
+  }
+
+  scrollToSector(sector: 'active' | 'draft' | 'history') {
+    this.setTab(sector);
+    const element = document.getElementById(`pedidos-table`);
     if (element) {
       const offset = 180; // Offset for sticky header
       const bodyRect = document.body.getBoundingClientRect().top;
@@ -188,7 +241,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.headerVisible.set(true);
         return;
       }
-      
+
       if (currentScroll > this.lastScroll && currentScroll > 100) {
         // Scrolling down
         this.headerVisible.set(false);
@@ -205,30 +258,40 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setupObserver() {
-    this.observer = new IntersectionObserver(([entry]) => {
-      // REGLA: No cargar historial si las tablas principales todavía están cargando (falsa intersección por skeletons)
-      const mainLoading = this.loadingProduction() || this.loadingCommercial();
-
-      if (entry.isIntersecting && !mainLoading && !this.loadingArchived() && !this.archivedLoaded()) {
-        this.loadArchived();
-      }
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px' // Forzar a que entre al menos 100px en pantalla
-    });
-
-    if (this.historyTrigger) {
-      this.observer.observe(this.historyTrigger.nativeElement);
-    }
+    // Observer removed as we now use tabs instead of infinite scroll/lazy sectors
   }
 
   ngOnInit() {
-    // Handle search from QueryParams (deep linking)
-    const initialSearch = this.route.snapshot.queryParamMap.get('search');
-    if (initialSearch) {
-      this.searchTerm.set(initialSearch);
-      this.loadData({ initial: true });
-    }
+    // REGLA: Usar suscripci├│n para reaccionar a cambios en queryParams sin recargar componente
+    this.route.queryParamMap.subscribe(params => {
+      const newFilters: PedidosFilters = {
+        search: params.get('search') || undefined,
+        status: params.get('status') || undefined,
+        urgency: params.get('urgency') || undefined,
+        alertFilter: params.get('alertFilter') || undefined,
+        technician: params.get('technician') || undefined,
+        startDate: params.get('startDate') || undefined,
+        endDate: params.get('endDate') || undefined,
+        page: params.get('page') ? Number(params.get('page')) : undefined
+      };
+
+      // Sincronizar control de b├║squeda si el valor es diferente
+      if (this.searchControl.value !== (newFilters.search || '')) {
+        this.searchControl.setValue(newFilters.search || '', { emitEvent: false });
+      }
+
+      this.filters.set(newFilters);
+      if (newFilters.page) this.currentPage.set(newFilters.page);
+      this.loadData();
+    });
+
+    // Debounce search
+    this.searchControl.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      this.onFilterChange({ key: 'search', value });
+    });
   }
 
   onSort(key: string) {
@@ -271,62 +334,101 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  onFilterChange({ key, value }: { key: string, value: any }) {
-    switch (key) {
-      case 'search': this.searchTerm.set(value); break;
-      case 'status': this.estadoFilter.set(value); break;
-      case 'urgency': this.urgenciaFilter.set(value); break;
-      case 'technician': this.tecnicoFilter.set(value); break;
-      case 'startDate': this.dateDesde.set(value); break;
-      case 'endDate': this.dateHasta.set(value); break;
-    }
-
-    this.productionPage.set(1);
-    this.commercialPage.set(1);
-    this.archivedPage.set(1);
-    this.archivedLoaded.set(false); // REGLA: Resetear carga para forzar lazy loading en scroll
-
-    this.loadData();
+  toggleFilters() {
+    this.showFilters.set(!this.showFilters());
   }
 
-  async loadData(options: { initial?: boolean } = {}) {
-    // Global data is always needed
+  onFilterChange({ key, value }: { key: string, value: any }) {
+    const current = this.filters();
+    const queryParams: any = { ...current };
+
+    // Al cambiar un filtro, reseteamos a la p├ígina 1
+    queryParams.page = 1;
+
+    // Manejo de valores nulos/vac├¡os para limpiar URL
+    const cleanValue = (value === 'all' || value === '' || value === null || value === undefined) ? null : value;
+
+    if (key === 'search') queryParams.search = cleanValue;
+    if (key === 'status') queryParams.status = cleanValue;
+    if (key === 'technician') queryParams.technician = cleanValue;
+    if (key === 'urgency') {
+      queryParams.urgency = cleanValue;
+      // Al cambiar urgencia manualmente, el alertFilter del dashboard se anula por UX
+      queryParams.alertFilter = null;
+    }
+    if (key === 'startDate') queryParams.startDate = cleanValue;
+    if (key === 'endDate') queryParams.endDate = cleanValue;
+    if (key === 'alertFilter') queryParams.alertFilter = cleanValue;
+
+    // Actualizamos la URL. El suscriptor en ngOnInit se encargar├í de actualizar el signal y llamar a loadData()
+    // IMPORTANTE: Para eliminar par├ímetros, no usamos 'merge' sino que calculamos el set final
+    const currentParams = this.route.snapshot.queryParams;
+    const nextParams = { ...currentParams, ...queryParams };
+
+    // Limpiamos nulos/vac├¡os para que desaparezcan de la URL
+    Object.keys(nextParams).forEach(k => {
+      if (nextParams[k] === null || nextParams[k] === undefined || nextParams[k] === '') {
+        delete nextParams[k];
+      }
+    });
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: nextParams,
+      replaceUrl: true
+    });
+  }
+
+  removeFilter(key: keyof PedidosFilters) {
+    this.onFilterChange({ key, value: null });
+  }
+
+  async loadData() {
     this.loadGlobalData();
+    const bId = this.businessId();
+    if (!bId) return;
+
+    this.loading.set(true);
     this.session.refreshPlanUsage();
 
-    // 1. Always load production (Table 1)
-    this.loadProduction();
+    try {
+      const tab = this.activeTab();
+      const params: any = {
+        ...this.getCommonParams(),
+        page: this.currentPage(),
+        pageSize: this.pageSize
+      };
 
-    // 2. Only load commercial if it's the right rubro 
-    // or if we are filtering and want to see if there's anything there
-    const isMetalurgica = this.session.activeNegocio()?.rubro === 'METALURGICA';
-    if (isMetalurgica) {
-      this.loadCommercial();
-    } else {
-      // Clear it for other rubros to avoid the "ghost" section
-      this.commercialOrdersData.set([]);
-      this.commercialTotal.set(0);
-      this.loadingCommercial.set(false);
-    }
+      if (tab === 'active') {
+        params.excludeStatuses = 'DRAFT,DELIVERED,CANCELLED';
+      } else if (tab === 'draft') {
+        params.statuses = 'DRAFT';
+      } else if (tab === 'history') {
+        params.statuses = 'DELIVERED,CANCELLED';
+      }
 
-    // 3. History (Table 2) is lazy-loaded on scroll by the template
-    // REGLA OBLIGATORIA: El historial NUNCA se carga automáticamente en loadData principal
-    // Se resetea para que el IntersectionObserver lo dispare al scrollear
-    if (options.initial) {
-      this.archivedOrdersData.set([]);
-      this.archivedTotal.set(0);
-      this.archivedLoaded.set(false);
-      this.loadingArchived.set(false);
+      const res = await this.api.getListing(params);
+      this.ordersData.set(res.data);
+      this.totalOrders.set(res.total || 0);
+      this.syncSelectedOrder(res.data);
+    } catch (err) {
+      console.error('Error loading orders:', err);
+    } finally {
+      this.loading.set(false);
     }
   }
 
   private getCommonParams() {
+    const f = this.filters();
     return {
       businessId: this.businessId(),
-      search: this.searchTerm() || undefined,
-      startDate: this.dateDesde() || undefined,
-      endDate: this.dateHasta() || undefined,
-      responsableId: this.tecnicoFilter() === 'all' ? undefined : this.tecnicoFilter(),
+      search: f.search || undefined,
+      status: (f.status && f.status !== 'all') ? f.status : undefined,
+      startDate: f.startDate || undefined,
+      endDate: f.endDate || undefined,
+      responsableId: (f.technician && f.technician !== 'all') ? f.technician : undefined,
+      urgency: (f.urgency && f.urgency !== 'all') ? f.urgency : undefined,
+      alertFilter: f.alertFilter || undefined,
       type: 'CLIENT' // Excluir pedidos de Stock
     };
   }
@@ -341,85 +443,17 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch (err) { console.error('Error global data:', err); }
   }
 
-  async loadProduction() {
-    const bId = this.businessId();
-    if (!bId) return;
-    this.loadingProduction.set(true);
-    try {
-      const EXCLUDED_PRODUCTION = 'IN_STOCK,DELIVERED,CANCELLED,SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const res = await this.api.getListing({
-        ...this.getCommonParams(),
-        page: this.productionPage(),
-        pageSize: this.pageSize,
-        excludeStatuses: EXCLUDED_PRODUCTION
-      });
-      this.productionOrdersData.set(res.data);
-      this.productionTotal.set(res.total || 0);
-      this.syncSelectedOrder(res.data);
-    } catch (err) { console.error('Error production:', err); }
-    finally { this.loadingProduction.set(false); }
-  }
-
-  async loadCommercial() {
-    const bId = this.businessId();
-    if (!bId) return;
-    this.loadingCommercial.set(true);
-    try {
-      const COMMERCIAL_STATUSES = 'SITE_VISIT,SITE_VISIT_DONE,VISITA_REPROGRAMADA,VISITA_CANCELADA,QUOTATION,BUDGET_GENERATED,BUDGET_REJECTED,SURVEY_DESIGN';
-      const res = await this.api.getListing({
-        ...this.getCommonParams(),
-        page: this.commercialPage(),
-        pageSize: this.pageSize,
-        statuses: COMMERCIAL_STATUSES
-      });
-      this.commercialOrdersData.set(res.data);
-      this.commercialTotal.set(res.total || 0);
-      this.syncSelectedOrder(res.data);
-    } catch (err) { console.error('Error commercial:', err); }
-    finally { this.loadingCommercial.set(false); }
-  }
-
-  async loadArchived() {
-    const bId = this.businessId();
-    if (!bId) return;
-    this.loadingArchived.set(true);
-    try {
-      const HISTORY_STATUSES = 'DELIVERED,CANCELLED';
-      const res = await this.api.getListing({
-        ...this.getCommonParams(),
-        page: this.archivedPage(),
-        pageSize: this.pageSize,
-        statuses: HISTORY_STATUSES
-      });
-      this.archivedOrdersData.set(res.data);
-      this.archivedTotal.set(res.total || 0);
-      this.archivedLoaded.set(true);
-      this.syncSelectedOrder(res.data);
-    } catch (err) { console.error('Error archived:', err); }
-    finally { this.loadingArchived.set(false); }
-  }
+  // Consolidated methods replaced by loadData() logic above
 
   onPageSizeChange(size: number) {
     this.pageSize = size;
-    this.productionPage.set(1);
-    this.commercialPage.set(1);
-    this.archivedPage.set(1);
+    this.currentPage.set(1);
     this.loadData();
   }
 
-  onProductionPageChange(page: number) {
-    this.productionPage.set(page);
-    this.loadProduction();
-  }
-
-  onCommercialPageChange(page: number) {
-    this.commercialPage.set(page);
-    this.loadCommercial();
-  }
-
-  onArchivedPageChange(page: number) {
-    this.archivedPage.set(page);
-    this.loadArchived();
+  onPageChange(page: number) {
+    this.currentPage.set(page);
+    this.loadData();
   }
 
   private syncSelectedOrder(newData: Pedido[]) {
@@ -451,12 +485,15 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearFilters() {
-    this.searchTerm.set('');
-    this.estadoFilter.set('all');
-    this.urgenciaFilter.set('all');
-    this.tecnicoFilter.set('all');
-    this.dateDesde.set('');
-    this.dateHasta.set('');
+    this.searchControl.setValue('', { emitEvent: false });
+    this.router.navigate([], {
+      queryParams: {}, // Limpiar todos
+      replaceUrl: true
+    });
+  }
+
+  clearAlertFilter() {
+    this.onFilterChange({ key: 'alertFilter', value: null });
   }
 
   getStatusStyles(status: OrderStatus): string {
@@ -470,14 +507,13 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   async handleDelete(order: Pedido) {
     const ok = await this.confirm.confirm({
       title: 'Eliminar Pedido',
-      message: `¿Estás seguro de que deseas eliminar permanentemente el pedido #${order.code}? Esta acción no se puede deshacer.`,
+      message: `┬┐Est├ís seguro de que deseas eliminar permanentemente el pedido #${order.code}? Esta acci├│n no se puede deshacer.`,
       confirmLabel: 'Eliminar Ahora',
       cancelLabel: 'Cancelar',
       type: 'danger'
     });
 
     if (ok) {
-      this.loading.set(true);
       try {
         await this.api.delete(order.id, order.businessId);
         await this.loadData();
@@ -485,8 +521,6 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       } catch (err) {
         console.error('Error deleting order:', err);
         alert('No se pudo eliminar el pedido.');
-      } finally {
-        this.loading.set(false);
       }
     }
   }
