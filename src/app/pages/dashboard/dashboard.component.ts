@@ -19,6 +19,7 @@ import {
 } from 'lucide-angular';
 import { SessionService } from '@core/session/session.service';
 import { DashboardService } from '@core/api/dashboard.service';
+import { LayoutService } from '@core/layout/layout.service';
 import { PageShellComponent } from '@shared/ui/layout/page-shell.component';
 import { DASHBOARD_CONFIG, DEFAULT_DASHBOARD } from '@shared/constants/dashboard-config';
 import { KpiGridComponent } from '@shared/ui/dashboard/kpi-grid/kpi-grid.component';
@@ -143,6 +144,7 @@ import { MetricCardComponent } from '@shared/ui/metric-card/metric-card.componen
 export class DashboardComponent {
   private dashboardService = inject(DashboardService);
   private session = inject(SessionService);
+  private layout = inject(LayoutService);
 
   summary = this.dashboardService.summary;
   loading = this.dashboardService.loading;
@@ -168,6 +170,10 @@ export class DashboardComponent {
   constructor() {
     // Note: No manual refresh() here. The effect handles both 
     // initial load and business context switches.
+
+    effect(() => {
+      this.layout.fabAction.set(null);
+    });
 
     effect(() => {
       const activeId = this.session.activeId();

@@ -9,6 +9,7 @@ import { ProductionApiService } from '../../../core/api/production.api.service';
 import { SessionService } from '../../../core/session/session.service';
 import { ProductionJob, ProductionJobStatus, ProductionJobPriority } from '../../../shared/models/production-job';
 import { RouterModule } from '@angular/router';
+import { LayoutService } from '../../../core/layout/layout.service';
 
 @Component({
   selector: 'app-produccion-dashboard',
@@ -20,6 +21,7 @@ import { RouterModule } from '@angular/router';
 export class ProduccionDashboardComponent {
   private api = inject(ProductionApiService);
   private session = inject(SessionService);
+  private layout = inject(LayoutService);
 
   jobs = signal<ProductionJob[]>([]);
   loading = signal(true);
@@ -128,6 +130,11 @@ export class ProduccionDashboardComponent {
   }
 
   constructor() {
+    effect(() => {
+      // Clear FAB on dashboard to default to "Add Order" or clear previous page's FAB
+      this.layout.fabAction.set(null);
+    });
+
     effect(() => {
       const bId = this.session.activeId();
       if (bId) {
