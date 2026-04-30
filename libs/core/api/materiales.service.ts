@@ -13,6 +13,7 @@ export class MaterialesService {
   items = signal<Material[]>([]);
   schemaFields = signal<MaterialFormFieldSchema[]>([]);
   loadedBusinessId = signal<string | null>(null);
+  loadedSchemaKey = signal<string | null>(null);
 
   stats = computed(() => {
     const materials = this.items();
@@ -47,9 +48,14 @@ export class MaterialesService {
         this.schemaFields.set([]);
         return;
     }
+
+    const key = `${rubro}_${businessId}`;
+    if (this.loadedSchemaKey() === key) return;
+
     try {
       const schema = await this.api.getSchema(rubro, businessId);
       this.schemaFields.set(schema || []);
+      this.loadedSchemaKey.set(key);
     } catch (e) {
       console.error('Error loadSchema:', e);
       this.schemaFields.set([]);
