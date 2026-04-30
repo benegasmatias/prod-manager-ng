@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, ArrowUp, ArrowDown, ArrowUpDown, Eye, MessageCircle, TrendingUp, ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info, Trash2, Settings, Plus, Search } from 'lucide-angular';
+import { LucideAngularModule, ArrowUp, ArrowDown, ArrowUpDown, Eye, MessageCircle, TrendingUp, ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info, Trash2, Settings, Plus, Search, PencilLine } from 'lucide-angular';
 import { Pedido } from '../../models/pedido';
 import { Rubro } from '../../models/negocio';
 import { getStatusLabel, getStatusStyles } from '../../utils/negocio-utils';
@@ -33,12 +33,14 @@ export class OrdersTableComponent {
   @Output() viewClick = new EventEmitter<Pedido>();
   @Output() manageClick = new EventEmitter<Pedido>();
   @Output() deleteClick = new EventEmitter<Pedido>();
+  @Output() editClick = new EventEmitter<Pedido>();
 
   protected readonly labels = UI_LABELS;
 
   icons = {
     ArrowUp, ArrowDown, ArrowUpDown, Eye, MessageCircle, TrendingUp,
-    ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info, Trash2, Settings, Plus, Search
+    ExternalLink, MoreVertical, Package, User, Clock, Calendar, CheckCircle, Info, Trash2, Settings, Plus, Search,
+    PencilLine
   };
 
   activeMenuOrderId = signal<string | null>(null);
@@ -57,6 +59,11 @@ export class OrdersTableComponent {
     } else {
       this.activeMenuOrderId.set(order.id);
     }
+  }
+
+  openEdit(order: Pedido) {
+    this.activeMenuOrderId.set(null);
+    this.editClick.emit(order);
   }
 
   openStatus(order: Pedido) {

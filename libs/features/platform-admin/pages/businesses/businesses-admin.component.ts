@@ -8,6 +8,7 @@ import { ButtonSpinnerComponent } from '../../../../shared/ui/button-spinner/but
 
 import { BusinessPlanModalComponent } from './components/plan-modal/plan-modal.component';
 import { AuditCapabilitiesModalComponent } from './components/audit-modal/audit-modal.component';
+import { EditCapabilitiesModalComponent } from './components/capabilities-modal/capabilities-modal.component';
 
 @Component({
   selector: 'app-businesses-admin',
@@ -17,6 +18,7 @@ import { AuditCapabilitiesModalComponent } from './components/audit-modal/audit-
     LucideAngularModule, 
     BusinessPlanModalComponent, 
     AuditCapabilitiesModalComponent,
+    EditCapabilitiesModalComponent,
     ButtonSpinnerComponent
   ],
   templateUrl: './businesses-admin.component.html',
@@ -40,6 +42,7 @@ export class BusinessesAdminComponent implements OnInit {
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
   selectedBusinessForPlan = signal<any | null>(null);
+  selectedBusinessForCapabilities = signal<any | null>(null);
   showAuditModal = signal<boolean>(false);
 
   ngOnInit() {
@@ -87,6 +90,10 @@ export class BusinessesAdminComponent implements OnInit {
 
   configurePlan(business: any) {
     this.selectedBusinessForPlan.set(business);
+  }
+
+  configureCapabilities(business: any) {
+    this.selectedBusinessForCapabilities.set(business);
   }
 
   contactBusiness(business: any) {

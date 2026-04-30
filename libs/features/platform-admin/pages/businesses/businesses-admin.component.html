@@ -116,7 +116,7 @@
                 </div>
             </td>
              <td class="px-8 py-6 text-right">
-              <div class="flex items-center justify-end gap-2 md:translate-x-4 md:opacity-40 group-hover:translate-x-0 group-hover:opacity-100 transition-all">
+              <div class="flex items-center justify-end gap-2 transition-all">
                  
                  <button 
                   (click)="contactBusiness(b)"
@@ -143,12 +143,20 @@
                   <lucide-angular [img]="icons.Pause" class="h-4 w-4"></lucide-angular>
                 </button>
 
-                <button 
+                 <button 
                   (click)="configurePlan(b)"
                   class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-xl hover:text-white transition-all"
                   title="Configurar Plan"
                 >
                   <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
+                </button>
+
+                <button 
+                  (click)="configureCapabilities(b)"
+                  class="h-10 w-10 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-xl hover:text-primary transition-all"
+                  title="Gestionar Capacidades"
+                >
+                  <lucide-angular [img]="icons.ShieldAlert" class="h-4 w-4"></lucide-angular>
                 </button>
               </div>
             </td>
@@ -209,6 +217,9 @@
             <button (click)="configurePlan(b)" class="h-9 w-9 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-lg">
               <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
             </button>
+            <button (click)="configureCapabilities(b)" class="h-9 w-9 flex items-center justify-center bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-lg">
+              <lucide-angular [img]="icons.ShieldAlert" class="h-4 w-4"></lucide-angular>
+            </button>
           </div>
 
           <div class="flex gap-2">
@@ -246,4 +257,12 @@
      (close)="selectedBusinessForPlan.set(null)"
      (updated)="loadBusinesses()"
    ></app-business-plan-modal>
+
+   <!-- Capabilities Edit Modal -->
+   <app-edit-capabilities-modal
+     *ngIf="selectedBusinessForCapabilities()"
+     [business]="selectedBusinessForCapabilities()"
+     (close)="selectedBusinessForCapabilities.set(null)"
+     (updated)="loadBusinesses()"
+   ></app-edit-capabilities-modal>
 </div>

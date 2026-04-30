@@ -405,7 +405,6 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!bId) return;
 
     this.loading.set(true);
-    this.session.refreshPlanUsage();
 
     try {
       const tab = this.activeTab();
@@ -429,8 +428,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      this.loading.set(true);
-      this.session.refreshPlanUsage();
+    this.loading.set(true);
 
       const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
         enabled: true,
@@ -508,6 +506,10 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   goToDetail(order: Pedido) {
     this.router.navigate(['/pedidos', order.id]);
+  }
+
+  handleEdit(order: Pedido) {
+    this.router.navigate(['/pedidos/editar', order.id]);
   }
 
   openManageModal(order: Pedido) {

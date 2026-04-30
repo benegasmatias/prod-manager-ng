@@ -1,0 +1,30 @@
+:host { display: block; }
+
+::ng-deep .client-selector-override div[class*="bg-zinc-50/50"] { background-color: transparent !important; }
+::ng-deep .client-selector-override .border-zinc-200 { border-color: transparent !important; }
+::ng-deep .client-selector-override .h-12 { height: 3.5rem !important; }
+
+.truncate-multiline {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom scrollbar for sidebars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-color, rgba(0,0,0,0.05));
+  border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.05);
+}

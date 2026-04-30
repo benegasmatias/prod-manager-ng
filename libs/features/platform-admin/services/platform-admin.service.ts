@@ -141,6 +141,10 @@ export class PlatformAdminService {
     return firstValueFrom(this.http.patch(`${this.apiUrl}/businesses/${id}/subscription`, { planId, expiresAt }));
   }
 
+  async updateBusinessCapabilities(id: string, capabilities: string[]): Promise<any> {
+    return firstValueFrom(this.http.patch(`${this.apiUrl}/businesses/${id}/capabilities`, { capabilities }));
+  }
+
   // --- Templates & Capabilities ---
   async getTemplates(): Promise<any[]> {
     return firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/templates`));

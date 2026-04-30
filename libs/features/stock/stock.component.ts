@@ -142,6 +142,10 @@ export class StockPageComponent {
     this.isStatusModalOpen.set(true);
   }
 
+  handleEdit(order: Pedido) {
+    this.router.navigate(['/pedidos/editar', order.id]);
+  }
+
   goToDetail(order: Pedido) {
     this.router.navigate(['/pedidos', order.id]);
   }

@@ -276,7 +276,7 @@
       </div>
       } @else {
       <app-orders-table [orders]="sortedOrders()" [sortKey]="sortKey()" [sortDir]="sortDir()" [rubro]="session.rubro()"
-        (viewClick)="goToDetail($event)" (manageClick)="openManageModal($event)" (statusClick)="openManageModal($event)"
+        (viewClick)="goToDetail($event)" (manageClick)="openManageModal($event)" (statusClick)="openManageModal($event)" (editClick)="handleEdit($event)"
         (deleteClick)="handleDelete($event)"></app-orders-table>
 
       <div *ngIf="totalOrders() > pageSize()" class="flex justify-center py-8">

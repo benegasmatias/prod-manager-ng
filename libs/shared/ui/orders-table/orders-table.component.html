@@ -1,7 +1,7 @@
-﻿<div class="space-y-10">
+<div class="space-y-10">
   <!-- TABLE ARCHITECTURE (Desktop) -->
-  <div class="hidden lg:block overflow-x-auto pb-6">
-    <table class="w-full border-separate border-spacing-y-3 px-2">
+  <div class="hidden lg:block pb-32 -mb-32">
+    <table class="w-full border-separate border-spacing-y-3 px-2 relative z-10">
       <thead>
         <tr class="text-[8px] font-black uppercase tracking-[0.4em] text-text-muted/30">
           <th class="px-5 py-4 text-left cursor-pointer group" (click)="_onSort('code')">
@@ -89,10 +89,10 @@
             <td *ngIf="!hideDelivery" class="px-5 py-6 border-y border-border/5 group-hover:border-primary/10">
               <div class="flex flex-col">
                 <span class="text-sm font-black text-text font-display uppercase tracking-tighter">
-                  {{ order.dueDate | date:'dd MMM' }}
+                  {{ order.dueDate | date:'dd MMM':'UTC' }}
                 </span>
                 <span class="text-[8px] font-black text-text-muted/40 uppercase tracking-[0.3em]">
-                  {{ order.dueDate | date:'yy' }}
+                  {{ order.dueDate | date:'yy':'UTC' }}
                 </span>
               </div>
             </td>
@@ -121,7 +121,12 @@
 
                   <!-- Dropdown Menu Editorial -->
                   @if (activeMenuOrderId() === order.id) {
-                    <div class="absolute right-0 top-full mt-6 w-64 bg-surface rounded-[2.5rem] border border-border/10 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] z-[100] py-4 animate-in fade-in zoom-in-95 duration-500 overflow-hidden backdrop-blur-3xl">
+                    <div class="absolute right-0 top-full mt-2 w-64 bg-surface rounded-[2.5rem] border border-border/10 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.25)] z-[100] py-4 animate-in fade-in zoom-in-95 duration-300 overflow-hidden backdrop-blur-3xl">
+                      <button (click)="openEdit(order)" class="w-full px-8 py-5 flex items-center gap-5 text-text hover:bg-surface-container-low text-[10px] font-black uppercase tracking-[0.3em] transition-all group/opt">
+                        <lucide-angular [img]="icons.PencilLine" class="h-4 w-4 opacity-20 group-hover/opt:opacity-100 group-hover/opt:scale-110 transition-all text-primary"></lucide-angular>
+                        <span>Editar Pedido</span>
+                      </button>
+                      <div class="h-px bg-border/5 mx-8 my-2"></div>
                       <button (click)="openStatus(order)" class="w-full px-8 py-5 flex items-center gap-5 text-text hover:bg-surface-container-low text-[10px] font-black uppercase tracking-[0.3em] transition-all group/opt">
                         <lucide-angular [img]="icons.Settings" class="h-4 w-4 opacity-20 group-hover/opt:opacity-100 group-hover/opt:rotate-90 transition-all"></lucide-angular>
                         <span>Gestionar</span>
@@ -202,11 +207,23 @@
               </div>
            </div>
 
-           <!-- Action Button -->
-           <button class="w-full h-13 rounded-2xl bg-primary text-white text-[9px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-[0_15px_30px_-5px_rgba(var(--primary-rgb),0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all">
-              <lucide-angular [img]="icons.Eye" class="h-3.5 w-3.5"></lucide-angular>
-              Ver Movimientos
-           </button>
+           <div class="flex gap-2">
+             <button 
+                type="button"
+                (click)="openEdit(order); $event.stopPropagation()"
+                class="h-13 w-13 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-text-muted flex items-center justify-center border border-border/5 shadow-sm active:scale-95 transition-all"
+             >
+                <lucide-angular [img]="icons.PencilLine" class="h-4 w-4"></lucide-angular>
+             </button>
+             <button 
+                type="button"
+                (click)="viewClick.emit(order); $event.stopPropagation()"
+                class="flex-1 h-13 rounded-2xl bg-primary text-white text-[9px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-[0_15px_30px_-5px_rgba(var(--primary-rgb),0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+             >
+                <lucide-angular [img]="icons.Eye" class="h-3.5 w-3.5"></lucide-angular>
+                Ver Detalles
+             </button>
+           </div>
         </div>
 
         <!-- Glassmorphism Accent -->

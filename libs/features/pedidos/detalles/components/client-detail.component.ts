@@ -58,7 +58,7 @@ import { SessionService } from '@core/session/session.service';
 
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div class="lg:col-span-3">
-          <app-order-progress-stepper [status]="pedido()!.status" [age]="age()" [dueDate]="pedido()!.dueDate | date:'dd / MM / yyyy'"></app-order-progress-stepper>
+          <app-order-progress-stepper [status]="pedido()!.status" [age]="age()" [dueDate]="pedido()!.dueDate | date:'dd / MM / yyyy':'UTC'"></app-order-progress-stepper>
         </div>
 
         <div class="bg-text rounded-[3rem] p-10 text-white relative overflow-hidden flex flex-col justify-between group shadow-[0_40px_80px_-20px_rgba(var(--text-rgb),0.3)]">
@@ -73,7 +73,7 @@ import { SessionService } from '@core/session/session.service';
             </div>
             <div>
               <p class="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 leading-none mb-1 italic">Promesa Operativa</p>
-              <p class="text-xs font-black uppercase tracking-widest">{{ pedido()!.dueDate | date:'EEEE, dd MMM' }}</p>
+              <p class="text-xs font-black uppercase tracking-widest">{{ pedido()!.dueDate | date:'EEEE, dd MMM':'UTC' }}</p>
             </div>
           </div>
         </div>
