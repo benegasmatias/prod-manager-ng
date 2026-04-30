@@ -18,7 +18,7 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
             <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
             <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Inteligencia de Datos</span>
           </div>
-          <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
+          <h1 class="text-2xl lg:text-3xl font-bold tracking-tight text-foreground">
             Análisis y <span class="text-primary italic">Métricas</span>
           </h1>
           <p class="text-sm font-medium text-muted-foreground max-w-2xl leading-relaxed text-left">
@@ -148,7 +148,7 @@ import { LucideAngularModule, TrendingUp, BarChart as BarChartIcon, PieChart as 
                          <span class="text-sm font-black text-zinc-900 dark:text-zinc-100">{{ machine.name }}</span>
                       </div>
                       <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-tight ml-5">
-                        {{ machine.jobsDone }} expedientes completados esta semana
+                        {{ machine.jobsDone }} Items finalizados esta semana
                       </span>
                     </div>
                     <div class="text-right">
@@ -282,7 +282,7 @@ export class ReportesPageComponent implements OnInit {
 
   getBarHeight(value: number, allData: { total: number }[]): number {
     const max = Math.max(...allData.map(d => d.total), 1);
-    const maxHeight = 200; // max px height
+    const maxHeight = 160; // max px height
     return (value / max) * maxHeight;
   }
 

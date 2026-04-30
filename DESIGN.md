@@ -30,13 +30,30 @@ By nesting a `lowest` (pure white) card inside a `low` section, you achieve a na
 
 ---
 
-## 3. Typography
+## 3. Typography & Hierarchy System
 
-The system utilizes a dual-typeface strategy to balance authoritative editorial style with functional legibility.
+Our typography is designed for **technical precision** and **high-density readability**. It balances industrial aesthetics with premium editorial clarity.
 
-*   **Display & Headlines (Manrope):** Chosen for its geometric precision and modern "tech-premium" feel. Use `display-lg` (3.5rem) and `headline-md` (1.75rem) with tighter letter-spacing (-0.02em) to create impact.
-*   **Body & UI (Inter):** A workhorse for clarity. Inter is used for all functional data. Use `body-md` (0.875rem) for the majority of dashboard content to maximize information density while maintaining breathability.
-*   **Labels:** Use `label-md` (0.75rem) in `on_surface_variant` (#486086) for metadata. This keeps the interface quiet, allowing the headlines to lead the user's eye.
+### The Foundation
+- **Primary Sans:** `Inter` (Variable). Chosen for its neutral, technical clarity and exceptional readability at small sizes.
+- **Monospace:** `JetBrains Mono`. Used for IDs, technical specs, and status indicators to emphasize the "Industrial" nature of the platform.
+
+### Typography Tokens
+| Token | Size | Weight | Tracking | Line Height | Usage |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `display-lg` | 40px (2.5rem) | 900 (Black) | -0.04em | 1.1 | Hero metrics, extreme contrast |
+| `h1` | 32px (2rem) | 700 (Bold) | -0.03em | 1.2 | Main page titles |
+| `h2` | 24px (1.5rem) | 600 (Semibold) | -0.02em | 1.3 | Major section headers |
+| `h3` | 18px (1.125rem) | 600 (Semibold) | -0.01em | 1.4 | Card titles, modal headers |
+| `body-lg` | 16px (1rem) | 400 (Regular) | 0 | 1.5 | Long-form content, descriptions |
+| `body` | 14px (0.875rem) | 400 (Regular) | 0 | 1.5 | Standard UI text, table data |
+| `label` | 12px (0.75rem) | 500 (Medium) | 0.05em | 1.0 | Meta tags, table headers (Uppercase) |
+| `caption` | 11px (0.6875rem) | 400 (Regular) | 0.01em | 1.4 | Supporting text, timestamps |
+
+### Hierarchy Rules
+1. **The "Tonal Split":** Use `text-text` (Primary) for headlines and core data. Use `text-text-muted` (Secondary) for supporting labels and descriptions. This creates immediate visual focus without adding color noise.
+2. **Industrial Labels:** Any text acting as a classification or metadata must be `uppercase` with `0.05em` (tracking-widest) and `font-medium`. 
+3. **Number Display:** All numerical values in tables or metrics must use `tabular-nums` and `italic` (for that "High-Performance" lean).
 
 ---
 

@@ -1,106 +1,77 @@
-<div class="space-y-8 sm:space-y-12 pb-10 px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 animate-in fade-in duration-500">
-  <!-- Header Area -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
-    <div class="flex flex-col gap-1">
-      <div class="flex items-center gap-2 mb-1">
-        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Recursos Humanos</span>
+<app-page-shell
+  title="Equipo de"
+  titleAccent="Trabajo"
+  category="RECURSOS HUMANOS"
+  description="Administración de integrantes, roles y gestión de acceso para el personal del negocio."
+>
+  <div actions class="flex items-center gap-6">
+    @if (planUsage()) {
+      <div [class]="cn('flex items-center gap-4 px-6 py-3 border rounded-2xl transition-all shadow-2xl shadow-text/5 backdrop-blur-md', !canAddMember() ? 'bg-rose-500/10 border-rose-500/20' : 'bg-surface-container-low border-border/5')">
+        <div [class]="cn('h-2 w-2 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]', !canAddMember() ? 'bg-rose-500 animate-pulse' : 'bg-primary')"></div>
+        <span [class]="cn('text-[10px] font-black uppercase tracking-[0.2em] leading-none italic', !canAddMember() ? 'text-rose-500' : 'text-text-muted/60')">
+          {{ !canAddMember() ? 'Límite de integrantes' : 'Integrantes' }} ({{ planUsage()?.usage?.users }}/{{ planUsage()?.limits?.users }})
+        </span>
+        <a routerLink="/billing" class="text-[9px] font-black text-primary hover:text-primary-hover underline underline-offset-4 transition-colors uppercase tracking-[0.2em] ml-2 italic">Optimizar</a>
       </div>
-      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 text-left">
-        Equipo <span class="text-primary italic">de Trabajo</span>
-      </h1>
-      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed text-left">
-        Administración de integrantes, roles y gestión de acceso para el personal del negocio.
-      </p>
-    </div>
-    <div class="flex items-center gap-4">
-      @if (planUsage()) {
-        <div [class]="cn('flex items-center gap-3 px-4 py-2 border rounded-xl', !canAddMember() ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/20' : 'bg-zinc-50 dark:bg-zinc-900/40 border-zinc-100 dark:border-zinc-800')">
-          <div [class]="cn('h-2 w-2 rounded-full', !canAddMember() ? 'bg-amber-500 animate-pulse' : 'bg-primary')"></div>
-          <span [class]="cn('text-[10px] md:text-[11px] font-black uppercase tracking-widest leading-none', !canAddMember() ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-500')">
-            {{ !canAddMember() ? 'Límite de integrantes' : 'Integrantes' }} ({{ planUsage()?.usage?.users }}/{{ planUsage()?.limits?.users }})
-          </span>
-          <a routerLink="/ajustes" class="text-[9px] md:text-[10px] font-black text-primary underline underline-offset-2 transition-colors uppercase tracking-widest">MEJORAR</a>
-        </div>
-      }
-      <button 
-        *ngIf="!layout.isMobile()"
-        (click)="openNew()"
-        [disabled]="!canAddMember()"
-        class="flex items-center justify-center w-full sm:w-auto h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed gap-2">
-        <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Invitar Integrante
-      </button>
-    </div>
+    }
+    <button
+      *ngIf="!layout.isMobile()"
+      (click)="openNew()"
+      [disabled]="!canAddMember()"
+      class="h-14 px-10 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-[0_20px_40px_-12px_rgba(var(--primary-rgb),0.4)] hover:scale-[1.05] active:scale-[0.95] transition-all duration-500 flex items-center gap-4 border border-primary/20 group italic disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+    >
+      <lucide-angular [img]="icons.Plus" class="h-5 w-5 group-hover:rotate-90 transition-transform duration-500"></lucide-angular>
+      <span>Invitar Integrante</span>
+    </button>
   </div>
-
 
   <!-- PENDING INVITATIONS SECTION -->
   @if (invitations().length > 0) {
-  <div class="space-y-6 animate-in fade-in slide-in-from-top-4 duration-700">
-    <div class="flex items-center gap-3 px-1">
-      <div class="h-8 w-1 bg-amber-400 rounded-full"></div>
-      <h2 class="text-xs font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Invitaciones Pendientes
-      </h2>
-      <span
-        class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-[9px] font-black text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">{{
-        invitations().length }}</span>
+  <div class="space-y-8 mb-16 animate-in fade-in slide-in-from-top-4 duration-1000">
+    <div class="flex items-center gap-4 px-1">
+      <div class="h-10 w-1.5 bg-amber-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.5)]"></div>
+      <h2 class="text-xs font-black uppercase tracking-[0.3em] text-text-muted/40 italic">Protocolos de Invitación Pendiente</h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @for (invite of invitations(); track invite.id) {
-      <div
-        class="group relative bg-white dark:bg-zinc-900/40 p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm hover:shadow-md transition-all">
-        <div class="flex items-start justify-between mb-4">
-          <div
-            class="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-            <lucide-angular [img]="icons.Mail" class="h-5 w-5"></lucide-angular>
+      <div class="group relative bg-surface-container-low/50 border border-border/5 p-8 rounded-[2.5rem] shadow-2xl shadow-text/5 transition-all hover:-translate-y-1 duration-700 overflow-hidden">
+        <div class="absolute -right-10 -top-10 h-32 w-32 bg-amber-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+        
+        <div class="flex items-start justify-between mb-8">
+          <div class="h-14 w-14 rounded-2xl bg-surface-container-low flex items-center justify-center border border-border/5 shadow-sm text-amber-500">
+            <lucide-angular [img]="icons.Mail" class="h-6 w-6"></lucide-angular>
           </div>
-          <div class="flex flex-col items-end gap-1">
-            <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Pendiente</span>
-            <span class="text-[8px] text-zinc-400 font-medium italic">{{ invite.createdAt | date:'short' }}</span>
+          <div class="flex flex-col items-end gap-1 text-right">
+            <span class="text-[9px] font-black text-amber-500 uppercase tracking-[0.2em] italic">Pendiente de Aceptación</span>
+            <span class="text-[8px] text-text-muted/30 font-black uppercase tracking-tight italic">{{ invite.createdAt | date:'short' }}</span>
           </div>
         </div>
 
-        <div class="space-y-1 text-left min-w-0">
-          <h3 class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{{ invite.email }}</h3>
-          <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-            Rol: {{ invite.role }}
-          </p>
+        <div class="space-y-2 mb-8">
+          <h3 class="text-sm font-black text-text uppercase italic tracking-tighter truncate">{{ invite.email }}</h3>
+          <div class="flex items-center gap-3">
+            <div class="px-3 py-1 rounded-lg bg-surface border border-border/5 text-[8px] font-black uppercase tracking-widest text-text-muted/40">ROL: {{ invite.role }}</div>
+          </div>
         </div>
 
-        <div
-          class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-zinc-50 dark:border-zinc-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
-          <div class="flex items-center gap-2">
-            <div
-              class="h-6 w-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-400 uppercase flex-shrink-0">
+        <div class="flex items-center justify-between pt-6 border-t border-border/5 gap-4 relative z-10">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="h-8 w-8 rounded-lg bg-surface-container-high flex items-center justify-center text-[10px] font-black text-text-muted/40 uppercase border border-border/5 shrink-0">
               {{ invite.invitedByUser?.fullName?.charAt(0) || 'A' }}
             </div>
-            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter truncate max-w-24">Por {{
-              invite.invitedByUser?.fullName || 'Admin' }}</span>
+            <span class="text-[9px] font-black text-text-muted/20 uppercase tracking-tighter truncate italic italic">Origen: {{ invite.invitedByUser?.fullName || 'Admin' }}</span>
           </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <!-- Resend Button -->
+          
+          <div class="flex items-center gap-3 shrink-0">
             <button (click)="handleResend(invite)" [disabled]="!canResend(invite) || resendingId() === invite.id"
-              [class]="cn(
-                'h-8 px-3 rounded-xl flex items-center justify-center gap-1.5 text-[9px] font-bold uppercase tracking-wider transition-all border',
-                canResend(invite) && resendingId() !== invite.id
-                  ? 'bg-primary/5 text-primary border-primary/20 hover:bg-primary/10 hover:border-primary/40'
-                  : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-400 border-zinc-100 dark:border-zinc-800 cursor-not-allowed opacity-70'
-              )">
-              @if (resendingId() === invite.id) {
-              <lucide-angular [img]="icons.Loader2" class="h-3 w-3 animate-spin"></lucide-angular>
-              } @else if (!canResend(invite)) {
-              <lucide-angular [img]="icons.Clock" class="h-3 w-3"></lucide-angular>
-              <span>{{ getResendLabel(invite) }}</span>
-              } @else {
-              <lucide-angular [img]="icons.RefreshCw" class="h-3 w-3"></lucide-angular>
-              <span>Reenviar</span>
-              }
+              class="h-10 px-4 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-widest transition-all border border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white disabled:opacity-30 italic">
+              <lucide-angular [img]="icons.RefreshCw" class="h-3.5 w-3.5" [class.animate-spin]="resendingId() === invite.id"></lucide-angular>
+              <span>{{ resendingId() === invite.id ? 'VERIFICANDO' : 'REENVIAR' }}</span>
             </button>
-            <!-- Delete Button -->
             <button (click)="handleDeleteInvitation(invite)"
-              class="h-8 w-8 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-900/20 text-zinc-400 hover:text-rose-500 flex items-center justify-center transition-all">
-              <lucide-angular [img]="icons.Trash2" class="h-3.5 w-3.5"></lucide-angular>
+              class="h-10 w-10 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center">
+              <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
             </button>
           </div>
         </div>
@@ -111,133 +82,105 @@
   }
 
   <!-- ACTIVE STAFF SECTION -->
-  <div class="space-y-6">
-    <div class="flex items-center gap-3 px-1">
-      <div class="h-8 w-1 bg-emerald-400 rounded-full"></div>
-      <h2 class="text-xs font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Equipo Activo</h2>
+  <div class="space-y-8 mb-16">
+    <div class="flex items-center gap-4 px-1">
+      <div class="h-10 w-1.5 bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
+      <h2 class="text-xs font-black uppercase tracking-[0.3em] text-text-muted/40 italic">Estructura de Capital Humano Activo</h2>
     </div>
 
-    <!-- Search and Filters Section -->
-    <div
-      class="flex flex-col md:flex-row gap-4 items-center bg-white/70 dark:bg-zinc-900/40 p-3 sm:p-4 rounded-2xl sm:rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-sm backdrop-blur-sm">
-      <div class="relative flex-1 w-full group">
-        <lucide-angular [img]="icons.Search"
-          class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors duration-200"></lucide-angular>
-        <input type="search" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-          placeholder="Buscar por nombre o especialidad..."
-          class="h-11 w-full rounded-2xl border-none bg-zinc-50/50 dark:bg-zinc-950/50 pl-11 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-950">
+    <!-- Search Protocol -->
+    <div class="relative group">
+      <div class="absolute left-8 top-1/2 -translate-y-1/2 flex items-center gap-4 pointer-events-none z-10">
+        <lucide-angular [img]="icons.Search" class="h-6 w-6 text-text-muted/20 group-focus-within:text-primary transition-all duration-700"></lucide-angular>
+        <div class="h-4 w-px bg-border/10"></div>
       </div>
+      <input type="search" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+             placeholder="Localizar integrante por nombre, ID o especialidad..."
+             class="h-20 w-full rounded-[2.5rem] border border-border/5 bg-surface-container-low/40 backdrop-blur-xl pl-20 pr-32 text-[12px] font-black uppercase tracking-[0.2em] text-text placeholder:text-text-muted/20 focus:outline-none focus:ring-[12px] focus:ring-primary/5 focus:bg-surface-container-low transition-all duration-700 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] italic" />
     </div>
 
     <!-- Desktop Table View -->
-    <div
-      class="hidden lg:block overflow-hidden bg-white dark:bg-zinc-900/20 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800/50 shadow-sm">
+    <div class="hidden lg:block overflow-hidden bg-surface-container-low/30 rounded-[4rem] border border-border/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.1)] backdrop-blur-3xl p-1">
       <table class="w-full text-left">
         <thead>
-          <tr class="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800/50">
-            <th class="h-16 px-8 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Integrante</th>
-            <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Rol</th>
-            <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Especialidad</th>
-            <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Canal de Contacto</th>
-            <th class="h-16 px-6 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 text-center">Estado</th>
-            <th class="h-16 px-8 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 text-right">Acciones
-            </th>
+          <tr class="bg-surface-container-low/50">
+            <th class="px-12 py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-text-muted/30 italic">Integrante</th>
+            <th class="px-6 py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-text-muted/30 italic">Nivel de Acceso</th>
+            <th class="px-6 py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-text-muted/30 italic text-center">Especialidad</th>
+            <th class="px-6 py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-text-muted/30 italic">Canales de Enlace</th>
+            <th class="px-6 py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-text-muted/30 italic text-center">Protocolo</th>
+            <th class="px-12 py-8 text-[10px] font-bold uppercase tracking-[0.3em] text-text-muted/30 italic text-right">Protocolos</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-border/5">
           @for (staff of filteredStaff(); track staff.id) {
-          <tr [class]="cn(
-                'group transition-colors hover:bg-zinc-50/30 dark:hover:bg-zinc-900/40 border-b border-zinc-50 dark:border-zinc-800/30',
-                !staff.active && 'opacity-60 grayscale-[0.5]'
-              )">
-            <td class="px-8 py-5">
-              <div class="flex items-center gap-4">
-                <div [class]="cn(
-                    'h-12 w-12 rounded-2xl flex items-center justify-center font-bold transition-all duration-300',
-                    staff.active 
-                      ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary'
-                      : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300'
-                  )">
+          <tr [class]="cn('group transition-all duration-700 hover:bg-surface-container-low cursor-pointer', !staff.active && 'opacity-60 grayscale-[0.5]')">
+            <td class="px-12 py-8">
+              <div class="flex items-center gap-10">
+                <div [class]="cn('h-16 w-16 flex-shrink-0 rounded-[2rem] flex items-center justify-center text-xl font-black transition-all duration-700 shadow-2xl shadow-text/5 border border-border/5 group-hover:rotate-6', 
+                                staff.active ? 'bg-surface text-text-muted/20 group-hover:bg-primary group-hover:text-white' : 'bg-surface-container-low text-text-muted/10')">
                   {{ staff.firstName.charAt(0).toUpperCase() }}
                 </div>
-                <div class="flex flex-col gap-0.5">
-                  <span
-                    class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-primary transition-colors">
-                    {{ staff.firstName }} {{ staff.lastName }}
-                  </span>
-                  <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-tight text-left">
-                    ID {{ staff.id.slice(0, 8) }}
-                  </span>
+                <div class="flex flex-col gap-3">
+                  <span class="text-lg font-black text-text group-hover:text-primary transition-colors tracking-tighter uppercase italic leading-none">{{ staff.firstName }} {{ staff.lastName }}</span>
+                  <span class="text-[9px] text-text-muted/30 font-black uppercase tracking-[0.3em] italic">ID {{ staff.id.slice(0, 8) }}</span>
                 </div>
               </div>
             </td>
-            <td class="px-6 py-5">
-              <span [class]="cn(
-                  'px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] border',
-                  staff.role === 'OWNER' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                  staff.role === 'BUSINESS_ADMIN' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                  staff.role === 'SALES' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                  'bg-zinc-100 text-zinc-600 border-zinc-200'
-                )">
-                {{ staff.role }}
-              </span>
-            </td>
-            <td class="px-6 py-5">
-              <div
-                class="inline-flex items-center px-3 py-1 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 border border-zinc-100 dark:border-zinc-800 uppercase tracking-widest">
-                {{ staff.specialties || 'General' }}
-              </div>
-            </td>
-            <td class="px-6 py-5">
-              <div class="space-y-1.5">
-                <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                  <lucide-angular [img]="icons.Mail" class="h-3 w-3 text-zinc-400"></lucide-angular>
-                  {{ staff.email || 'Sin email' }}
-                </div>
-                <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                  <lucide-angular [img]="icons.Phone" class="h-3 w-3 text-zinc-400"></lucide-angular>
-                  {{ staff.phone || 'Sin teléfono' }}
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-5">
-              <div class="flex justify-center">
-                <span [class]="cn(
-                    'inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border transform transition-transform group-hover:scale-105',
-                    staff.blockedByQuota
-                      ? 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/30'
-                      : (staff.active
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10'
-                          : 'bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700')
-                  )">
-                    <span
-                    [class]="cn('h-1.5 w-1.5 rounded-full mr-2', staff.blockedByQuota ? 'bg-amber-500' : (staff.active ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400'))"></span>
-                  @if (staff.blockedByQuota) {
-                    BLOQUEADO
-                  } @else {
-                    {{ staff.active ? 'ACTIVO' : 'INACTIVO' }}
-                  }
+            <td class="px-6 py-8">
+              <div class="flex">
+                <span [class]="cn('px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.2em] italic border shadow-sm',
+                    staff.role === 'OWNER' ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' :
+                    staff.role === 'BUSINESS_ADMIN' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                    staff.role === 'SALES' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                    'bg-surface-container-low text-text-muted/40 border-border/5')">
+                  {{ staff.role }}
                 </span>
               </div>
             </td>
-            <td class="px-8 py-5 text-right">
-              <div class="flex items-center justify-end gap-2 transition-all">
+            <td class="px-6 py-8 text-center">
+              <span class="text-[10px] font-bold text-text-muted/60 uppercase tracking-widest italic bg-surface-container-low/50 px-5 py-2 rounded-full border border-border/5">
+                {{ staff.specialties || 'Operativo General' }}
+              </span>
+            </td>
+            <td class="px-6 py-8">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center gap-4 px-6 py-2 rounded-full bg-surface-container-low border border-border/5 group-hover:bg-surface transition-all duration-700">
+                  <lucide-angular [img]="icons.Mail" class="h-3.5 w-3.5 text-primary/30"></lucide-angular>
+                  <span class="text-[10px] font-bold text-text-muted uppercase tracking-[0.1em] leading-none italic">{{ staff.email || 'SIN_ENLACE' }}</span>
+                </div>
+                <div class="flex items-center gap-4 px-6 py-2 rounded-full bg-surface-container-low border border-border/5 group-hover:bg-surface transition-all duration-700">
+                  <lucide-angular [img]="icons.Phone" class="h-3.5 w-3.5 text-primary/30"></lucide-angular>
+                  <span class="text-[10px] font-bold text-text-muted tracking-[0.1em] leading-none tabular-nums">{{ staff.phone || '--- --- ---' }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-8">
+              <div class="flex justify-center">
+                <span [class]="cn('inline-flex items-center px-6 py-3 rounded-full text-[9px] font-black border transition-all duration-700 group-hover:-translate-y-1',
+                    staff.blockedByQuota
+                      ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                      : (staff.active
+                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_10px_20px_-5px_rgba(16,185,129,0.2)]'
+                          : 'bg-surface-container-low text-text-muted/40 border-border/5')
+                  )">
+                  <span [class]="cn('h-1.5 w-1.5 rounded-full mr-3', staff.blockedByQuota ? 'bg-amber-500' : (staff.active ? 'bg-emerald-500 animate-pulse' : 'bg-text-muted/20'))"></span>
+                  @if (staff.blockedByQuota) { BLOQUEADO } @else { {{ staff.active ? 'ACTIVO' : 'INACTIVO' }} }
+                </span>
+              </div>
+            </td>
+            <td class="px-12 py-8 text-right">
+              <div class="flex items-center justify-end gap-5 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-x-10 group-hover:translate-x-0">
                 <button (click)="handleEdit(staff)"
-                  class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-800 hover:text-primary shadow-sm transition-all border border-transparent hover:border-zinc-200 flex items-center justify-center text-zinc-500">
-                  <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+                  class="h-14 w-14 flex items-center justify-center rounded-2xl bg-surface border border-border/5 text-text-muted hover:text-primary hover:scale-110 active:scale-90 transition-all shadow-2xl shadow-text/5">
+                  <lucide-angular [img]="icons.Pencil" class="h-5 w-5"></lucide-angular>
                 </button>
-
-                <button (click)="handleToggleStatus(staff)" [class]="cn(
-                      'h-10 w-10 rounded-xl transition-all shadow-sm border border-transparent hover:border-zinc-200 flex items-center justify-center text-zinc-500',
-                      staff.active
-                        ? 'hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-500'
-                        : 'hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-500'
-                    )">
-                  <lucide-angular [img]="icons.Power" class="h-4 w-4"></lucide-angular>
+                <button (click)="handleToggleStatus(staff)" 
+                  class="h-14 w-14 flex items-center justify-center rounded-2xl bg-surface border border-border/5 text-text-muted hover:text-emerald-500 hover:scale-110 active:scale-90 transition-all shadow-2xl shadow-text/5">
+                  <lucide-angular [img]="icons.Power" class="h-5 w-5"></lucide-angular>
                 </button>
-
                 <button (click)="handleDelete(staff)"
-                  class="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-rose-900/20 hover:text-rose-500 shadow-sm transition-all border border-transparent hover:border-rose-100 flex items-center justify-center text-zinc-500">
+                  class="h-14 w-14 flex items-center justify-center rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white hover:scale-110 active:scale-90 transition-all shadow-2xl shadow-rose-500/10">
                   <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
                 </button>
               </div>
@@ -245,18 +188,16 @@
           </tr>
           } @empty {
           <tr>
-            <td colSpan="5" class="h-64 text-center">
-              <div class="flex flex-col items-center justify-center gap-4">
-                <div
-                  class="h-16 w-16 rounded-3xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800">
-                  <lucide-angular [img]="icons.User"
-                    class="h-8 w-8 text-zinc-200 dark:text-zinc-800"></lucide-angular>
+            <td colSpan="6" class="h-[600px] text-center">
+              <div class="flex flex-col items-center justify-center gap-12">
+                <div class="h-32 w-32 rounded-[3.5rem] bg-surface border border-border/5 flex items-center justify-center shadow-2xl shadow-text/5 animate-pulse">
+                    <lucide-angular [img]="icons.User" class="h-12 w-12 text-text-muted/10"></lucide-angular>
                 </div>
-                <div class="space-y-1">
-                  <p class="text-sm font-bold text-zinc-400 uppercase tracking-widest">
-                    {{ loading() ? 'Sincronizando equipo...' : 'Sin registros encontrados' }}
+                <div class="space-y-6">
+                  <p class="text-[11px] font-black text-text-muted/30 uppercase tracking-[0.6em] italic">
+                    {{ loading() ? 'Sincronizando Archivo Humano...' : 'Nexo No Localizado' }}
                   </p>
-                  <p class="text-xs text-zinc-400 italic">Probá ajustando los términos de búsqueda</p>
+                  <p class="text-[10px] text-text-muted/10 font-black uppercase tracking-[0.2em] italic max-w-sm mx-auto leading-relaxed">Expanda su equipo para aumentar el rendimiento operativo del sistema.</p>
                 </div>
               </div>
             </td>
@@ -267,264 +208,140 @@
     </div>
 
     <!-- Mobile Cards View -->
-    <div class="grid grid-cols-1 gap-6 lg:hidden">
+    <div class="grid grid-cols-1 gap-8 lg:hidden">
       @for (staff of filteredStaff(); track staff.id) {
-      <div [class]="cn(
-          'group relative p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] border transition-all hover:shadow-xl animate-slide-up text-left',
-          staff.active 
-            ? 'bg-white dark:bg-zinc-900/40 border-zinc-100 dark:border-zinc-800/50 shadow-sm'
-            : 'bg-zinc-50/50 dark:bg-zinc-950/20 border-zinc-100 dark:border-zinc-800/30 opacity-70'
-        )">
-        <div class="flex items-start justify-between mb-5 sm:mb-8">
-          <div class="flex items-center gap-4">
-            <div [class]="cn(
-                'h-11 w-11 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl flex items-center justify-center font-bold transition-all duration-300 shadow-sm text-sm sm:text-base',
-                staff.active 
-                  ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:bg-primary/10 group-hover:text-primary'
-                  : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300'
-              )">
+      <div [class]="cn('group relative p-10 rounded-[3rem] border transition-all duration-700 shadow-2xl shadow-text/5 overflow-hidden',
+          staff.active ? 'bg-surface-container-low/50 border-border/5' : 'bg-surface-container-low/20 border-border/5 opacity-60 grayscale-[0.5]')">
+        <div class="flex items-start justify-between mb-10">
+          <div class="flex items-center gap-6">
+            <div [class]="cn('h-16 w-16 rounded-[2rem] flex items-center justify-center font-black transition-all duration-700 shadow-2xl shadow-text/5 border border-border/5',
+                staff.active ? 'bg-surface text-text-muted/20' : 'bg-surface-container-low text-text-muted/10')">
               {{ staff.firstName.charAt(0).toUpperCase() }}
             </div>
-            <div class="space-y-1">
-              <p
-                class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight group-hover:text-primary transition-colors text-base">
-                {{ staff.firstName }} {{ staff.lastName }}
-              </p>
-              <div class="flex items-center gap-2">
-                <span
-                  [class]="cn('h-1.5 w-1.5 rounded-full', staff.blockedByQuota ? 'bg-amber-500' : (staff.active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-zinc-400'))"></span>
-                <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest text-left">
-                  @if (staff.blockedByQuota) {
-                    Bloqueado por Plan
-                  } @else {
-                    {{ staff.active ? 'Activo' : 'Inactivo' }}
-                  }
-                </p>
+            <div class="space-y-2">
+              <p class="font-black text-text uppercase italic tracking-tighter text-xl">{{ staff.firstName }} {{ staff.lastName }}</p>
+              <div class="flex items-center gap-3">
+                <div [class]="cn('h-1.5 w-1.5 rounded-full', staff.active ? 'bg-emerald-500 animate-pulse' : 'bg-text-muted/20')"></div>
+                <p class="text-[9px] text-text-muted/40 font-black uppercase tracking-widest italic">{{ staff.active ? 'Protocolo Activo' : 'Desconectado' }}</p>
               </div>
             </div>
           </div>
-          <button (click)="handleEdit(staff)"
-            class="h-10 w-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-transparent shadow-sm flex items-center justify-center flex-shrink-0 text-zinc-500">
-            <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+          <button (click)="handleEdit(staff)" class="h-14 w-14 rounded-2xl bg-surface border border-border/5 flex items-center justify-center text-text-muted shadow-sm">
+            <lucide-angular [img]="icons.Pencil" class="h-5 w-5"></lucide-angular>
           </button>
         </div>
 
-        <div
-          class="grid grid-cols-1 gap-3 sm:gap-4 pb-5 sm:pb-8 mb-5 sm:mb-8 border-b border-zinc-50 dark:border-zinc-800/50">
-          <div
-            class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-transparent dark:border-zinc-800/50">
-            <lucide-angular [img]="icons.Award" class="h-4 w-4 text-primary"></lucide-angular>
-            <span class="uppercase tracking-widest font-bold text-[10px]">{{ staff.specialties || 'General' }}</span>
-          </div>
-          <div
-            class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-transparent dark:border-zinc-800/50 min-w-0">
-            <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-zinc-400"></lucide-angular>
-            <span class="truncate">{{ staff.email || '—' }}</span>
-          </div>
-          <div
-            class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-50/50 dark:bg-zinc-950/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-transparent dark:border-zinc-800/50">
-            <lucide-angular [img]="icons.Phone" class="h-4 w-4 text-zinc-400"></lucide-angular>
-            <span>{{ staff.phone || '—' }}</span>
-          </div>
+        <div class="space-y-4 mb-10 pb-10 border-b border-border/5">
+           <div class="flex items-center gap-5 px-6 py-3 rounded-2xl bg-surface-container-low border border-border/5">
+             <lucide-angular [img]="icons.Award" class="h-4 w-4 text-primary"></lucide-angular>
+             <span class="text-[10px] font-black uppercase tracking-widest text-text-muted/60 italic">{{ staff.specialties || 'Operativo General' }}</span>
+           </div>
+           <div class="flex items-center gap-5 px-6 py-3 rounded-2xl bg-surface-container-low border border-border/5">
+             <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-text-muted/20"></lucide-angular>
+             <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest truncate italic">{{ staff.email || 'SIN_ENLACE' }}</span>
+           </div>
         </div>
 
-        <div class="flex items-center justify-between gap-4">
-          <button (click)="handleToggleStatus(staff)" [class]="cn(
-                'flex-1 h-11 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] border shadow-sm transition-all active:scale-95 flex items-center justify-center',
-                staff.active
-                  ? 'text-rose-600 border-rose-100 bg-white hover:bg-rose-500 hover:text-white hover:border-rose-500'
-                  : 'text-emerald-600 border-emerald-100 bg-white hover:bg-emerald-500 hover:text-white hover:border-emerald-500'
-              )">
-            <lucide-angular [img]="icons.Power" class="h-3.5 w-3.5 mr-2"></lucide-angular> {{ staff.active ? 'Baja' :
-            'Alta' }}
+        <div class="flex items-center gap-4">
+          <button (click)="handleToggleStatus(staff)" [class]="cn('flex-1 h-14 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border transition-all active:scale-95 italic',
+                staff.active ? 'text-rose-500 border-rose-500/20 bg-rose-500/5' : 'text-emerald-500 border-emerald-500/20 bg-emerald-500/5')">
+            {{ staff.active ? 'BAJA PROTOCOLO' : 'ALTA PROTOCOLO' }}
           </button>
-
-          <button (click)="handleDelete(staff)"
-            class="h-11 w-11 rounded-2xl bg-rose-50 dark:bg-rose-900/20 text-rose-500 border-transparent hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center flex-shrink-0">
-            <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+          <button (click)="handleDelete(staff)" class="h-14 w-14 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center">
+            <lucide-angular [img]="icons.Trash2" class="h-5 w-5"></lucide-angular>
           </button>
         </div>
       </div>
       }
     </div>
   </div>
-</div>
+</app-page-shell>
 
-<!-- Modal: Invitar Integrante -->
+<!-- MODAL: INVITAR INTEGRANTE (DIGITAL CURATOR) -->
 @if (isFormOpen()) {
-<div
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-  <div
-    class="bg-white dark:bg-zinc-950 w-full max-w-lg rounded-2xl sm:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden m-2 sm:m-4 max-h-[95vh] slide-in-from-bottom-4 animate-in duration-300">
-
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-500 p-6">
+  <div class="bg-surface w-full max-w-2xl rounded-[4rem] shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] border border-border/5 overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-1000">
     <!-- Header -->
-    <div
-      class="p-5 sm:p-8 border-b border-zinc-100 dark:border-zinc-800/50 text-left relative bg-zinc-50/20 dark:bg-zinc-900/10">
-      <div class="flex items-center gap-4">
-        <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group">
-          <lucide-angular [img]="icons.Mail"
-            class="h-6 w-6 transition-transform group-hover:scale-110"></lucide-angular>
+    <div class="p-12 border-b border-border/5 relative bg-surface-container-low/30 backdrop-blur-xl">
+      <div class="flex items-center gap-8">
+        <div class="h-20 w-20 rounded-[2.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/10 border border-primary/20">
+          <lucide-angular [img]="icons.Mail" class="h-8 w-8"></lucide-angular>
         </div>
-        <div class="space-y-1">
-          <h2 class="text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            {{ editingStaffId() ? 'Editar integrante' : 'Invitar integrante' }}
-          </h2>
-          <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
-            {{ editingStaffId() ? 'Gestión de Permisos' : 'Identity & Membership' }}
-          </p>
+        <div>
+          <h2 class="text-3xl font-black tracking-tighter text-text uppercase italic leading-tight">{{ editingStaffId() ? 'Ajustar' : 'Invitar' }} Integrante</h2>
+          <p class="text-[11px] font-black text-text-muted/40 uppercase tracking-[0.4em] mt-2 italic">Membership & Identity Protocol</p>
         </div>
       </div>
-      <button (click)="isFormOpen.set(false)"
-        class="absolute right-5 sm:right-8 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors">
+      <button (click)="isFormOpen.set(false)" class="absolute right-12 top-12 h-12 w-12 rounded-2xl bg-surface-container-low border border-border/5 flex items-center justify-center text-text-muted/40 hover:text-text hover:rotate-90 transition-all duration-700">
         <lucide-angular [img]="icons.X" class="h-5 w-5"></lucide-angular>
       </button>
     </div>
 
     <!-- Content -->
-    <div class="p-5 sm:p-8 space-y-6 overflow-y-auto">
-
-      <!-- STEP 1: Input -->
+    <div class="p-12 space-y-10 overflow-y-auto max-h-[60vh] scrollbar-hide">
+      <!-- Input Phase -->
       @if (modalState() === 'INPUT' || modalState() === 'CHECKING') {
-      <div class="space-y-4">
-        <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest text-left leading-relaxed">
-          Ingresá el email de la persona para enviarle una invitación a este negocio.
-        </p>
-
-        <div class="relative group">
-          <lucide-angular [img]="icons.Mail"
-            class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
-          <input [ngModel]="formEmail()" (ngModelChange)="formEmail.set($event)" type="email"
-            placeholder="ejemplo@correo.com" [disabled]="modalState() === 'CHECKING'"
-            class="w-full h-14 rounded-2xl border-none bg-zinc-50 dark:bg-zinc-900 px-14 text-sm font-bold focus:ring-4 focus:ring-primary/10 transition-all focus:bg-white dark:focus:bg-zinc-800 focus:outline-none disabled:opacity-50"
-            (keyup.enter)="handleVerifyEmail()" />
-          @if (modalState() === 'CHECKING') {
-          <lucide-angular [img]="icons.Loader2"
-            class="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-primary animate-spin"></lucide-angular>
-          }
+      <div class="space-y-8 animate-in fade-in duration-700">
+        <div class="space-y-4 px-2">
+            <h4 class="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] italic">Identificador Digital</h4>
+            <div class="relative group">
+              <input [ngModel]="formEmail()" (ngModelChange)="formEmail.set($event)" type="email" placeholder="ENLACE_CORREO_ELECTRONICO" 
+                     class="h-20 w-full rounded-[2rem] border border-border/5 bg-surface-container-low/40 px-10 text-[12px] font-black uppercase tracking-[0.2em] text-text placeholder:text-text-muted/10 focus:outline-none focus:ring-[12px] focus:ring-primary/5 transition-all duration-700 italic" 
+                     (keyup.enter)="handleVerifyEmail()" />
+              @if (modalState() === 'CHECKING') {
+              <div class="absolute right-8 top-1/2 -translate-y-1/2">
+                <lucide-angular [img]="icons.Loader2" class="h-6 w-6 text-primary animate-spin"></lucide-angular>
+              </div>
+              }
+            </div>
         </div>
+        <p class="text-[10px] font-bold text-text-muted/30 uppercase tracking-[0.2em] leading-relaxed italic px-2">Ingrese el canal de comunicación oficial para la emisión de las credenciales de acceso al sistema.</p>
       </div>
       }
 
-      <!-- STEP 2: Result -->
+      <!-- Result Phase -->
       @if (modalState() === 'RESULT' && checkResult(); as res) {
-      <div class="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
-
-        @if (!editingStaffId()) {
-        <!-- Already Member -->
-        @if (res.alreadyMember) {
-        <div
-          class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-rose-50 border border-rose-100 flex items-center gap-3 sm:gap-4 text-rose-600">
-          <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
-          <div>
-            <h4 class="text-xs font-black uppercase">¡Atención!</h4>
-            <p class="text-[11px] font-bold tracking-tight mt-1">Esta persona ya forma parte de este negocio.</p>
-          </div>
-        </div>
-        }
-
-        <!-- Pending Invitation -->
-        @else if (res.pendingInvitation) {
-        <div
-          class="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-amber-50 border border-amber-100 flex items-center gap-3 sm:gap-4 text-amber-600">
-          <lucide-angular [img]="icons.AlertCircle" class="h-6 w-6"></lucide-angular>
-          <div>
-            <h4 class="text-xs font-black uppercase">Invitación Pendiente</h4>
-            <p class="text-[11px] font-bold tracking-tight mt-1">Ya existe una invitación pendiente para este email.</p>
-          </div>
-        </div>
-        }
-
-        <!-- User Exists -->
-        @else if (res.userExists) {
-        <div class="space-y-4">
-          <div class="p-6 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center gap-5 text-emerald-600">
-            <div
-              class="h-14 w-14 rounded-2xl bg-emerald-100 flex items-center justify-center font-black text-xl shadow-inner uppercase">
-              {{ res.user?.firstName?.charAt(0) }}
+      <div class="space-y-12 animate-in slide-in-from-bottom-8 duration-1000">
+        <!-- Identity Status -->
+        <div class="px-2">
+            <h4 class="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] italic mb-6">Estado de Verificación</h4>
+            <div [class]="cn('p-8 rounded-[2.5rem] border flex items-center gap-8 shadow-2xl transition-all duration-700',
+                             res.alreadyMember ? 'bg-rose-500/5 border-rose-500/20 text-rose-500' :
+                             res.userExists ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500' :
+                             'bg-primary/5 border-primary/20 text-primary')">
+              <div [class]="cn('h-16 w-16 rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner border border-current/20',
+                               res.alreadyMember ? 'bg-rose-500/10' : res.userExists ? 'bg-emerald-500/10' : 'bg-primary/10')">
+                {{ res.user?.firstName?.charAt(0) || '?' }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-lg font-black uppercase italic tracking-tighter truncate">{{ res.user?.firstName || 'Entidad' }} {{ res.user?.lastName || 'Nueva' }}</h4>
+                <p class="text-[9px] font-black uppercase tracking-[0.2em] opacity-60 mt-1 italic">
+                    {{ res.alreadyMember ? 'PROTOCOLO YA EXISTENTE' : res.userExists ? 'ENTIDAD DETECTADA EN RED' : 'CANAL EXTERNO IDENTIFICADO' }}
+                </p>
+              </div>
             </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="text-xs font-black uppercase truncate">{{ res.user?.firstName }} {{ res.user?.lastName }}</h4>
-              <p class="text-[10px] font-bold opacity-80 uppercase mt-0.5">Usuario encontrado en la plataforma</p>
-            </div>
-          </div>
-          <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest px-1">
-            Esta persona ya tiene una cuenta en ProdManager. Está lista para recibir la invitación.
-          </p>
         </div>
-        }
 
-        <!-- User New -->
-        @else {
-        <div class="space-y-4">
-          <div class="p-6 rounded-3xl bg-blue-50 border border-blue-100 flex items-center gap-4 text-blue-600">
-            <lucide-angular [img]="icons.User" class="h-6 w-6"></lucide-angular>
-            <p class="text-xs font-bold uppercase tracking-tight">Email no registrado</p>
-          </div>
-          <p class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest px-1 leading-relaxed">
-            Al enviar la invitación, se le notificará para que pueda registrarse y unirse automáticamente.
-          </p>
-        </div>
-        }
-        } @else {
-        <!-- EDIT MODE HEADER (Simpler) -->
-        <div
-          class="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/50 flex items-center gap-4">
-          <div class="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black">
-            {{ res.user?.firstName?.charAt(0) }}
-          </div>
-          <div class="text-left">
-            <h4 class="text-xs font-black uppercase text-zinc-900 dark:text-zinc-100">{{ res.user?.firstName }} {{
-              res.user?.lastName }}</h4>
-            <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">{{ formEmail() }}</p>
-          </div>
-        </div>
-        }
-
-        <!-- ROLE SELECTION -->
-        <div class="space-y-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 text-left">
-          <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-1">Nivel de Acceso
-            (Rol)</label>
-          <div class="grid grid-cols-2 gap-3">
-            <button (click)="formRole.set('OPERATOR')"
-              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'OPERATOR' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Operario / Staff</span>
-                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'OPERATOR'"
-                  [class.bg-zinc-200]="formRole() !== 'OPERATOR'"></div>
+        <!-- Role Selector -->
+        <div class="space-y-8 px-2 border-t border-border/5 pt-12">
+          <h4 class="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] italic">Asignación de Protocolo (Rol)</h4>
+          <div class="grid grid-cols-2 gap-6">
+            @for (role of [
+              {id: 'OPERATOR', label: 'OPERARIO_BASE', desc: 'Acceso a líneas de producción y stock.'},
+              {id: 'SALES', label: 'COMERCIAL_PRO', desc: 'Gestión CRM y protocolos de facturación.'},
+              {id: 'BUSINESS_ADMIN', label: 'ADM_SISTEMA', desc: 'Control de equipo y ajustes operativos.'},
+              {id: 'OWNER', label: 'ROOT_OWNER', desc: 'Acceso absoluto y control de nexo.'}
+            ]; track role.id) {
+            <button (click)="formRole.set(role.id)"
+                    [class]="cn('p-8 rounded-[2.5rem] border text-left transition-all duration-700 relative group overflow-hidden', 
+                                 formRole() === role.id ? 'bg-primary border-primary shadow-[0_20px_40px_-10px_rgba(var(--primary-rgb),0.3)]' : 'bg-surface-container-low border-border/5 hover:border-text-muted/20')">
+              <div class="flex items-center justify-between mb-4 relative z-10">
+                <span [class]="cn('text-[11px] font-black uppercase tracking-[0.1em] italic', formRole() === role.id ? 'text-white' : 'text-text')">{{ role.label }}</span>
+                <div [class]="cn('h-2 w-2 rounded-full transition-all duration-700', formRole() === role.id ? 'bg-white scale-150 animate-pulse' : 'bg-text-muted/10')"></div>
               </div>
-              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Acceso a ventas, stock y operaciones diarias.</p>
+              <p [class]="cn('text-[9px] font-black uppercase tracking-tight leading-relaxed italic relative z-10', formRole() === role.id ? 'text-white/60' : 'text-text-muted/40')">{{ role.desc }}</p>
             </button>
-
-            <button (click)="formRole.set('SALES')"
-              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'SALES' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Ventas</span>
-                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'SALES'"
-                  [class.bg-zinc-200]="formRole() !== 'SALES'"></div>
-              </div>
-              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Gestión de clientes, presupuestos y pedidos.
-              </p>
-            </button>
-
-            <button (click)="formRole.set('BUSINESS_ADMIN')"
-              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'BUSINESS_ADMIN' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Administrador</span>
-                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'BUSINESS_ADMIN'"
-                  [class.bg-zinc-200]="formRole() !== 'BUSINESS_ADMIN'"></div>
-              </div>
-              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Configuración de equipo, precios y stock.</p>
-            </button>
-
-            <button (click)="formRole.set('OWNER')"
-              [class]="cn('p-4 rounded-[1.5rem] border text-left transition-all relative overflow-hidden group', formRole() === 'OWNER' ? 'bg-primary/5 border-primary ring-1 ring-primary' : 'bg-transparent border-zinc-100 hover:border-zinc-200')">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-black uppercase text-zinc-900 dark:text-zinc-100">Owner</span>
-                <div class="h-2 w-2 rounded-full" [class.bg-primary]="formRole() === 'OWNER'"
-                  [class.bg-zinc-200]="formRole() !== 'OWNER'"></div>
-              </div>
-              <p class="text-[9px] text-zinc-500 font-medium leading-tight">Control total y ajustes del negocio.</p>
-            </button>
+            }
           </div>
         </div>
       </div>
@@ -532,20 +349,13 @@
     </div>
 
     <!-- Footer -->
-    <div
-      class="p-5 sm:p-8 pt-0 flex flex-col-reverse sm:flex-row items-center justify-end gap-3 bg-white dark:bg-zinc-950">
-      <button (click)="isFormOpen.set(false)" [disabled]="invitationSaving()"
-        class="text-[11px] font-black uppercase tracking-widest px-6 h-12 text-zinc-400 hover:text-zinc-600 transition-colors">
-        Cancelar
+    <div class="p-12 bg-surface-container-low/30 backdrop-blur-xl border-t border-border/5 flex flex-col-reverse sm:flex-row items-center justify-end gap-6">
+      <button (click)="isFormOpen.set(false)" class="h-14 px-10 text-[10px] font-black text-text-muted/40 uppercase tracking-[0.4em] hover:text-text transition-colors italic">Cancelar</button>
+      <button (click)="modalState() === 'RESULT' ? handleSendInvitation() : handleVerifyEmail()"
+              [disabled]="modalState() === 'RESULT' && !!(checkResult()?.alreadyMember || checkResult()?.pendingInvitation) || !formEmail()"
+              class="h-16 px-12 rounded-[2rem] bg-primary text-white font-black text-[11px] uppercase tracking-[0.3em] shadow-[0_30px_60px_-12px_rgba(var(--primary-rgb),0.4)] hover:scale-[1.05] active:scale-[0.95] transition-all duration-500 border border-primary/20 italic disabled:opacity-30">
+        {{ modalState() === 'RESULT' ? (editingStaffId() ? 'SINCRONIZAR CAMBIOS' : 'EMITIR INVITACIÓN') : 'VERIFICAR CANAL' }}
       </button>
-
-      <app-button-spinner [loading]="modalState() === 'CHECKING' || invitationSaving()"
-        [disabled]="modalState() === 'RESULT' && !!(checkResult()?.alreadyMember || checkResult()?.pendingInvitation) || !formEmail()"
-        [loadingText]="modalState() === 'CHECKING' ? 'Verificando...' : 'Guardando...'"
-        btnClass="flex items-center justify-center rounded-2xl font-black uppercase tracking-[0.1em] text-[11px] h-12 px-10 w-full sm:w-auto bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
-        (onClick)="modalState() === 'RESULT' ? handleSendInvitation() : handleVerifyEmail()">
-        {{ editingStaffId() ? 'Guardar cambios' : 'Enviar invitación' }}
-      </app-button-spinner>
     </div>
   </div>
 </div>

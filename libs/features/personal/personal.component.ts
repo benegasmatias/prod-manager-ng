@@ -8,14 +8,14 @@ import { InvitationsService, InvitationCheckResult } from '@core/api/invitacione
 import { LayoutService } from '@core/layout/layout.service';
 import { Employee } from '@shared/models';
 import { LucideAngularModule, Plus, Search, HardHat, Award, Pencil, Trash2, Power, Mail, Phone, X, AlertCircle, Loader2, User, Send, ChevronRight, RefreshCw, Clock, UserPlus } from 'lucide-angular';
-import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner.component';
 import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.component';
 import { cn } from '@shared/utils/cn';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 
 @Component({
   selector: 'app-personal',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, LucideAngularModule, ButtonSpinnerComponent],
+  imports: [CommonModule, RouterLink, FormsModule, LucideAngularModule, PageShellComponent],
   templateUrl: './personal.component.html'
 })
 export class PersonalPageComponent implements OnDestroy {

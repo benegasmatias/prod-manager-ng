@@ -31,7 +31,7 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
       <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 items-center">
         <div class="flex-1 relative">
             <lucide-icon [name]="'Search'" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></lucide-icon>
-            <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre o código de barras..." 
+            <input type="text" [(ngModel)]="searchTerm" placeholder=" Buscar por nombre o código de barras..." 
                    class="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-indigo-500">
         </div>
       </div>
@@ -170,13 +170,13 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
 })
 export class RetailProductsComponent implements OnInit {
   private retailService = inject(RetailService);
-  
+
   readonly StockType = RetailStockMovementType;
-  
+
   products = signal<RetailProduct[]>([]);
   loading = signal(false);
   searchTerm = '';
-  
+
   productModal = false;
   currentProduct: Partial<RetailProduct> = { salePrice: 0, costPrice: 0 };
 
@@ -195,8 +195,8 @@ export class RetailProductsComponent implements OnInit {
   }
 
   filteredProducts() {
-    return this.products().filter(p => 
-      p.name.toLowerCase().includes(this.searchTerm.toLowerCase()) || 
+    return this.products().filter(p =>
+      p.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       p.barcode?.includes(this.searchTerm)
     );
   }
@@ -207,14 +207,14 @@ export class RetailProductsComponent implements OnInit {
   }
 
   async saveProduct() {
-      this.loading.set(true);
-      try {
-        await this.retailService.createProduct(this.currentProduct);
-        this.productModal = false;
-        this.loadProducts();
-      } finally {
-        this.loading.set(false);
-      }
+    this.loading.set(true);
+    try {
+      await this.retailService.createProduct(this.currentProduct);
+      this.productModal = false;
+      this.loadProducts();
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   openStockModal(product: RetailProduct) {
@@ -228,11 +228,11 @@ export class RetailProductsComponent implements OnInit {
     if (!this.selectedProductForStock) return;
     this.loading.set(true);
     try {
-        await this.retailService.adjustStock(this.selectedProductForStock.id, this.stockAmount, this.stockAction, 'Ajuste manual desde catálogo');
-        this.stockModal = false;
-        this.loadProducts();
+      await this.retailService.adjustStock(this.selectedProductForStock.id, this.stockAmount, this.stockAction, 'Ajuste manual desde catálogo');
+      this.stockModal = false;
+      this.loadProducts();
     } finally {
-        this.loading.set(false);
+      this.loading.set(false);
     }
   }
 

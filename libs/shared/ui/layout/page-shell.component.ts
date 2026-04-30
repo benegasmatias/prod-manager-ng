@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
               {{ category() }}
             </span>
           </div>
-          <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-text uppercase italic font-display leading-none">
+          <h1 class="text-2xl md:text-3xl font-black tracking-tighter text-text uppercase italic font-display leading-none">
             {{ title() }} <span class="text-primary">{{ titleAccent() }}</span>
           </h1>
           <p class="text-[10px] font-black text-text-muted/40 uppercase tracking-[0.4em] leading-relaxed max-w-2xl italic">

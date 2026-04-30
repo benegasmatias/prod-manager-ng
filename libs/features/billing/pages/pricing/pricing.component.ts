@@ -28,32 +28,43 @@ export class PricingComponent implements OnInit, OnDestroy {
   plans: any[] = [
     {
       id: 'free-3d',
-      name: 'Free por Siempre',
+      name: 'Maker',
       price: 0,
-      description: 'Ideal para hobbistas y makers solitarios.',
-      features: ['30 pedidos / mes', '1 impresora', '1 Usuario', 'Smart Dashboard'],
-      buttonText: 'Cambiar a Gratis',
+      description: 'Digitalizá tu flujo de trabajo sin costos operativos.',
+      features: [
+        { label: 'Gestión esencial', items: ['30 pedidos mensuales', '1 impresora activa', '1 Usuario'] },
+        { label: 'Visibilidad', items: ['Smart Dashboard básico'] }
+      ],
+      buttonText: 'Empezar ahora',
       popular: false
     },
     {
       id: 'pro-3d',
-      name: 'Taller Inicial',
+      name: 'Taller Pro',
       price: 8900,
       promoPrice: 4900,
       promoDurationMonths: 6,
-      promoLabel: 'Oferta de Lanzamiento',
-      description: 'Para pequeños talleres que empiezan a crecer.',
-      features: ['60 pedidos / mes', '2 impresoras', '2 Usuarios', 'Control de materiales', 'Soporte prioritario'],
-      buttonText: 'Cambiarse a Pro',
+      promoLabel: '60% OFF',
+      description: 'Potenciá tu producción con herramientas de precisión.',
+      features: [
+        { label: 'Escalabilidad', highlight: true, items: ['60 pedidos mensuales', '2 impresoras activas', '2 Usuarios'] },
+        { label: 'Control Industrial', items: ['Gestión de materiales', 'Trazabilidad de fallas'] },
+        { label: 'Soporte', items: ['Prioridad de respuesta'] }
+      ],
+      buttonText: 'Activar Taller Pro',
       popular: true
     },
     {
       id: 'business-3d',
-      name: 'Pequeñas Granja Produccion',
+      name: 'Fábrica Industrial',
       price: 29500,
-      description: 'Control total y escalabilidad para fábricas de gran escala.',
-      features: ['Pedidos ilimitados', '5 impresoras', '5 Usuarios', 'Reportes avanzados', 'Soporte prioritario'],
-      buttonText: 'Mejorar a Business',
+      description: 'Ecosistema total para operaciones de alto volumen.',
+      features: [
+        { label: 'Capacidad Total', highlight: true, items: ['Pedidos ilimitados', '5 impresoras activas'] },
+        { label: 'Analytics Pro', items: ['Reportes avanzados', 'Auditoría de operarios'] },
+        { label: 'Infraestructura', items: ['Soporte dedicado 24/7'] }
+      ],
+      buttonText: 'Contactar Ventas',
       popular: false
     }
   ];

@@ -1,67 +1,81 @@
-<div class="space-y-8 pb-10 px-8 pt-8 animate-in fade-in duration-500">
-  <!-- Header Area -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-    <div class="flex flex-col gap-1">
-      <div class="flex items-center gap-2 mb-1">
-        <div class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></div>
-        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Gestión de Recursos</span>
-      </div>
-      <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-        Depósito de <span class="text-primary italic">{{ config().labels.materiales || 'Materiales' }}</span>
-      </h1>
-      <p class="text-sm font-medium text-zinc-500 max-w-2xl leading-relaxed">
-        Control de inventario, costos de adquisición y trazabilidad de insumos de manufactura.
-      </p>
-    </div>
-    <button *ngIf="!layout.isMobile()" (click)="openNew()"
-      class="flex items-center justify-center h-11 px-6 lg:h-12 lg:px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] gap-2">
-      <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular> Nuevo Registro
+<app-page-shell
+  title="Depósito de"
+  titleAccent="Filamentos"
+  category="GESTIÓN DE RECURSOS"
+  description="Control de inventario, costos de adquisición y trazabilidad de insumos de manufactura."
+>
+  <div actions>
+    <button
+      (click)="openNew()"
+      class="h-14 px-10 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-[0_20px_40px_-12px_rgba(var(--primary-rgb),0.4)] hover:scale-[1.05] active:scale-[0.95] transition-all duration-500 flex items-center gap-4 border border-primary/20 group italic"
+    >
+      <lucide-angular [img]="icons.Plus" class="h-5 w-5 group-hover:rotate-90 transition-transform duration-500"></lucide-angular>
+      <span>Nuevo Registro</span>
     </button>
   </div>
 
-  <!-- Dashboard Stats -->
-  <app-material-stats *ngIf="!layout.isMobile()" [stats]="stats()"></app-material-stats>
+  <!-- RESOURCE TELEMETRY -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+    <div class="relative overflow-hidden bg-surface-container-low/50 border border-border/5 p-10 rounded-[3rem] shadow-2xl shadow-text/5 group">
+       <div class="absolute -right-10 -top-10 h-40 w-40 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+       <span class="block text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/30 mb-6 italic">Variedad</span>
+       <div class="flex items-end gap-5 relative z-10">
+          <h3 class="text-5xl font-black tracking-tighter text-text tabular-nums italic leading-none">{{ stats().count }}</h3>
+          <div class="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-1">
+            <span class="text-[8px] font-black text-primary uppercase tracking-widest italic">Ítems</span>
+          </div>
+       </div>
+    </div>
 
-  <!-- SEARCH & FILTERS (EDITORIAL STYLE) -->
-  <div class="space-y-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700 uppercase">
-    <!-- Robotic Search Bar -->
+    <div class="relative overflow-hidden bg-surface-container-low/50 border border-border/5 p-10 rounded-[3rem] shadow-2xl shadow-text/5 group">
+       <div class="absolute -right-10 -top-10 h-40 w-40 bg-rose-500/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+       <span class="block text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/30 mb-6 italic">Estado Stock</span>
+       <div class="flex items-end gap-5 relative z-10">
+          <h3 class="text-5xl font-black tracking-tighter text-text tabular-nums italic leading-none" [class.text-rose-500]="stats().critical > 0">{{ stats().critical }}</h3>
+          <div class="px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 mb-1">
+            <span class="text-[8px] font-black text-rose-500 uppercase tracking-widest italic">Críticos</span>
+          </div>
+       </div>
+    </div>
+
+    <div class="relative overflow-hidden bg-surface-container-low/50 border border-border/5 p-10 rounded-[3rem] shadow-2xl shadow-text/5 group">
+       <div class="absolute -right-10 -top-10 h-40 w-40 bg-emerald-500/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+       <span class="block text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/30 mb-6 italic">Valor Estimado</span>
+       <div class="flex items-end gap-5 relative z-10">
+          <h3 class="text-5xl font-black tracking-tighter text-text tabular-nums italic leading-none">${{ stats().estimatedValue | number }}</h3>
+          <lucide-angular [img]="icons.TrendingUp" class="h-6 w-6 text-emerald-500 mb-1.5 animate-pulse"></lucide-angular>
+       </div>
+    </div>
+  </div>
+
+  <!-- SEARCH & PROTOCOLS -->
+  <div class="space-y-8 mb-16">
     <div class="relative group">
-      <div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-        <lucide-angular [img]="icons.Search"
-          class="h-5 w-5 text-primary/40 group-focus-within:text-primary transition-colors"></lucide-angular>
+      <div class="absolute left-8 top-1/2 -translate-y-1/2 flex items-center gap-4 pointer-events-none z-10">
+        <lucide-angular [img]="icons.Search" class="h-6 w-6 text-text-muted/20 group-focus-within:text-primary transition-all duration-700"></lucide-angular>
+        <div class="h-4 w-px bg-border/10"></div>
       </div>
-      <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-        placeholder="Buscar por nombre o marca..."
-        class="w-full h-16 bg-zinc-50 dark:bg-zinc-900/50 border-none rounded-[2rem] pl-16 pr-16 text-sm font-bold text-zinc-600 dark:text-zinc-300 focus:ring-4 focus:ring-primary/5 transition-all" />
-      <div class="absolute inset-y-0 right-6 flex items-center">
-        <button class="p-2 text-primary/40 hover:text-primary transition-colors">
-          <lucide-angular [img]="icons.Filter" class="h-5 w-5"></lucide-angular>
-        </button>
+      <input type="text"
+             [ngModel]="searchTerm()"
+             (ngModelChange)="searchTerm.set($event)"
+             placeholder="Buscar materiales por nombre o marca..."
+             class="h-20 w-full rounded-[2.5rem] border border-border/5 bg-surface-container-low/40 backdrop-blur-xl pl-20 pr-32 text-[12px] font-black uppercase tracking-[0.2em] text-text placeholder:text-text-muted/20 focus:outline-none focus:ring-[12px] focus:ring-primary/5 focus:bg-surface-container-low transition-all duration-700 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] italic" />
+      <div class="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none hidden md:block">
+        <div class="flex items-center gap-2 px-4 py-2 rounded-2xl bg-surface-container-low border border-border/5 shadow-sm opacity-40 group-focus-within:opacity-0 transition-opacity">
+          <span class="text-[9px] font-black text-text-muted uppercase tracking-widest">Protocol</span>
+          <kbd class="text-[10px] font-mono font-black text-text-muted/40">K</kbd>
+        </div>
       </div>
     </div>
 
-    <!-- Filter Pills (Horizontal Scroll) -->
-    <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-      <button (click)="typeFilter.set('all')"
-        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
-                           typeFilter() === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
-        Todos
-      </button>
-      <button (click)="typeFilter.set('PLA')"
-        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
-                           typeFilter() === 'PLA' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
-        PLA
-      </button>
-      <button (click)="typeFilter.set('PETG')"
-        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
-                           typeFilter() === 'PETG' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
-        PETG
-      </button>
-      <button (click)="typeFilter.set('Resina')"
-        [class]="cn('shrink-0 h-11 px-8 rounded-full text-[10px] font-black uppercase tracking-widest transition-all', 
-                           typeFilter() === 'Resina' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400')">
-        Resina
-      </button>
+    <div class="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      @for (tipo of ['TODOS', 'PLA', 'PETG', 'RESINA']; track tipo) {
+        <button (click)="typeFilter.set(tipo)"
+                [class]="cn('shrink-0 h-12 px-10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all italic border', 
+                             typeFilter() === tipo ? 'bg-primary text-white border-primary shadow-xl shadow-primary/20' : 'bg-surface-container-low text-text-muted/40 border-border/5 hover:text-text-muted/60')">
+          {{ tipo }}
+        </button>
+      }
     </div>
   </div>
 
@@ -94,7 +108,7 @@
     </div>
   </div>
   }
-</div>
+</app-page-shell>
 
 <!-- Modal Creation/Edit -->
 <app-material-form [(isOpen)]="isDialogOpen" [materialId]="selectedMaterialId()" [config]="config()"

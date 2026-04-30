@@ -22,7 +22,7 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
         <!-- Hero Section -->
         <div class="space-y-4">
           <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Suscripción Premium</span>
-          <h1 class="text-5xl font-black text-text tracking-tight leading-none uppercase italic font-display">{{ plan()?.name || 'Taller Inicial' }}</h1>
+          <h1 class="text-3xl font-black text-text tracking-tight leading-none uppercase italic font-display">{{ plan()?.name || 'Taller Inicial' }}</h1>
           <p class="text-sm text-text-muted font-medium leading-relaxed pr-8">
             Potencia tu negocio con las herramientas esenciales de gestión y control.
           </p>
@@ -187,10 +187,10 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
               <div class="space-y-16 animate-in slide-in-from-left-8 duration-700">
                 <div class="space-y-6">
                     <div class="inline-flex items-center px-4 py-1.5 bg-primary/10 rounded-full text-[11px] font-black uppercase tracking-[0.3em] text-primary">DETALLES DE SELECCIÓN</div>
-                    <h1 class="text-8xl font-black text-text tracking-tight leading-[0.85] uppercase italic font-display">{{ plan()?.name }}</h1>
+                    <h1 class="text-3xl lg:text-4xl font-black text-text tracking-tight leading-[0.85] uppercase italic font-display">{{ plan()?.name }}</h1>
                 </div>
 
-                <div class="p-10 rounded-[3rem] bg-surface-container-low border border-border/5 flex items-center justify-between group transition-all duration-500 hover:bg-surface-container">
+                <div class="p-8 rounded-3xl bg-surface-container-low border border-border/5 flex items-center justify-between group transition-all duration-500 hover:bg-surface-container">
                     <div class="flex items-center gap-8">
                         <div class="h-20 w-20 bg-surface rounded-2xl flex items-center justify-center shadow-xl shadow-primary/5 border border-border/5 group-hover:scale-105 transition-transform shrink-0">
                             <lucide-angular [img]="icons.Rocket" class="h-10 w-10 text-primary"></lucide-angular>
@@ -217,7 +217,7 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
               <!-- Step 2: Payment Architecture -->
               <div class="space-y-16 animate-in slide-in-from-left-8 duration-700">
                 <div class="space-y-8">
-                    <h1 class="text-8xl font-black text-text tracking-tight leading-[0.85] uppercase italic font-display">Acceso <br> <span class="text-primary">Premium.</span></h1>
+                    <h1 class="text-3xl lg:text-5xl font-black text-text tracking-tight leading-[0.85] uppercase italic font-display">Acceso <br> <span class="text-primary">Premium.</span></h1>
                     <p class="text-xl text-text-muted font-medium max-w-md leading-relaxed">Únete al círculo de fabricantes eficientes. Experimenta el control absoluto de tu producción.</p>
                 </div>
 
@@ -247,8 +247,8 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
 
           <!-- Right Column: The Summary Card -->
           <div class="col-span-5 sticky top-12">
-            <div class="bg-surface-container-low rounded-[3rem] shadow-2xl shadow-text/5 overflow-hidden relative group border border-border/5">
-                <div class="p-14 pb-0">
+            <div class="bg-surface-container-low rounded-[2rem] shadow-2xl shadow-text/5 overflow-hidden relative group border border-border/5">
+                <div class="p-10 pb-0">
                     <h3 class="text-3xl font-black text-text tracking-tighter uppercase italic font-display mb-12">Resumen</h3>
                     
                     <div class="space-y-8">
@@ -278,7 +278,7 @@ import { ButtonSpinnerComponent } from '@shared/ui/button-spinner/button-spinner
                                </div>
                                <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-2 italic">{{ plan()?.promoLabel }} por {{ plan()?.promoDurationMonths }} meses</p>
                              } @else {
-                               <p class="text-6xl font-black text-text tracking-tighter tabular-nums">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') }}</p>
+                               <p class="text-4xl font-black text-text tracking-tighter tabular-nums">{{ (plan()?.price | currency:plan()?.currency:'symbol':'1.0-0') }}</p>
                              }
                         </div>
                         <div class="px-5 py-2 bg-primary/10 text-primary rounded-full text-[11px] font-black uppercase tracking-[0.2em] italic">

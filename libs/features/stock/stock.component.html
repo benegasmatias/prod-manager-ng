@@ -1,20 +1,15 @@
-<app-page-shell 
-  title="Inventario de" 
-  titleAccent="Producción" 
-  category="Monitoreo de Activos"
+<app-page-shell title="Inventario de" titleAccent="Producción" category="Monitoreo de Activos"
   description="Control centralizado de manufactura interna, gestión de activos terminados y proyecciones de rentabilidad."
-  [loading]="loading()"
->
+  [loading]="loading()">
   <div actions class="flex items-center gap-4">
-    <div class="hidden sm:flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700/50">
+    <div
+      class="hidden sm:flex items-center gap-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700/50">
       <div class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-      <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ filteredInStock().length }} Disponibles</span>
+      <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ filteredInStock().length }}
+        Disponibles</span>
     </div>
-    <a 
-      *ngIf="!layout.isMobile()"
-      routerLink="/stock/nuevo" 
-      class="hidden sm:flex h-12 px-8 rounded-2xl bg-primary text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all items-center gap-3"
-    >
+    <a *ngIf="!layout.isMobile()" routerLink="/stock/nuevo"
+      class="hidden sm:flex h-12 px-8 rounded-2xl bg-primary text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all items-center gap-3">
       <lucide-angular [img]="icons.Plus" class="h-4.5 w-4.5"></lucide-angular>
       Generar Reposición
     </a>
@@ -24,25 +19,35 @@
     <!-- FILTERS BAR: GLASSMORPHISM STYLE -->
     <div class="sticky top-0 z-20 flex flex-col lg:flex-row items-center gap-4 p-4 rounded-[2.5rem] bg-white/60 dark:bg-zinc-950/60 backdrop-blur-2xl border border-white dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none animate-in slide-in-from-top-4 duration-500">
       <div class="relative flex-1 w-full group">
-        <lucide-angular [img]="icons.Search" class="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-primary transition-colors"></lucide-angular>
+        <div class="absolute left-8 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:scale-110 group-focus-within:rotate-12 transition-all duration-700">
+          <lucide-angular [img]="icons.Search" class="h-6 w-6 text-primary/40 group-focus-within:text-primary transition-colors duration-700"></lucide-angular>
+        </div>
         <input type="text"
                placeholder="Número de orden, producto o responsable..."
-               class="h-14 w-full rounded-[1.8rem] border-none bg-zinc-100/30 dark:bg-zinc-900/40 pl-14 pr-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all focus:bg-white dark:focus:bg-zinc-900"
+               class="h-20 w-full rounded-[2.5rem] border border-border/5 bg-surface-container-low/40 backdrop-blur-xl pl-20 pr-32 text-[12px] font-black uppercase tracking-[0.2em] text-text placeholder:text-text-muted/20 focus:outline-none focus:ring-[12px] focus:ring-primary/5 focus:bg-surface-container-low transition-all duration-700 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] italic"
                [ngModel]="searchTerm()" 
                (ngModelChange)="searchTerm.set($event)" />
+        <div class="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none hidden md:block">
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-container border border-border/10 shadow-sm">
+            <span class="text-[9px] font-black text-text-muted/40 uppercase tracking-widest">Protocol</span>
+            <div class="h-4 w-px bg-border/20"></div>
+            <span class="text-[9px] font-black text-primary uppercase tracking-widest">K</span>
+          </div>
+        </div>
       </div>
 
       <div class="flex items-center gap-3 w-full lg:w-auto">
         <div class="relative w-full lg:w-[240px] group">
-          <select class="w-full h-14 rounded-[1.8rem] border-none bg-zinc-100/30 dark:bg-zinc-900/40 px-6 pr-12 text-xs font-black uppercase tracking-widest text-zinc-500 focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer"
-                  [ngModel]="estadoFilter()" 
-                  (ngModelChange)="estadoFilter.set($event)">
+          <select
+            class="w-full h-14 rounded-[1.8rem] border-none bg-zinc-100/30 dark:bg-zinc-900/40 px-6 pr-12 text-xs font-black uppercase tracking-widest text-zinc-500 focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer"
+            [ngModel]="estadoFilter()" (ngModelChange)="estadoFilter.set($event)">
             <option value="all">TODOS LOS ESTADOS</option>
             @for (stage of config().productionStages; track stage.key) {
-              <option [value]="stage.key">{{ stage.label | uppercase }}</option>
+            <option [value]="stage.key">{{ stage.label | uppercase }}</option>
             }
           </select>
-          <lucide-angular [img]="icons.ChevronDown" class="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none"></lucide-angular>
+          <lucide-angular [img]="icons.ChevronDown"
+            class="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none"></lucide-angular>
         </div>
       </div>
     </div>
@@ -55,99 +60,77 @@
             <lucide-angular [img]="icons.Cpu" class="h-5 w-5 text-primary"></lucide-angular>
           </div>
           <div>
-            <h2 class="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-[0.25em]">En Línea de Producción</h2>
+            <h2 class="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-[0.25em]">En Línea de
+              Producción</h2>
             <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Activos en transformación</p>
           </div>
         </div>
-        <div class="flex items-center gap-2 px-4 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-[10px] font-black text-zinc-500 tabular-nums">
+        <div
+          class="flex items-center gap-2 px-4 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-[10px] font-black text-zinc-500 tabular-nums">
           {{ filteredActive().length }} TOTAL
         </div>
       </div>
 
       @if (filteredActive().length > 0) {
-        <div class="overflow-hidden rounded-[3rem] border border-zinc-100 dark:border-zinc-800 bg-white/40 dark:bg-zinc-900/20 backdrop-blur-sm shadow-xl shadow-zinc-100/50 dark:shadow-none">
-          <app-orders-table 
-            [orders]="filteredActive()"
-            [sortKey]="sortKey()"
-            [sortDir]="sortDir()"
-            (sortChange)="handleSort($event)"
-            [hideTypeColumn]="true"
-            [hideUrgency]="true"
-            [hideDelivery]="true"
-            [hideFinancials]="true"
-            [hideClientColumn]="true"
-            [rubro]="session.rubro()"
-            [isCompact]="layout.isMobile()"
-            (editClick)="handleEdit($event)"
-            (statusClick)="openStatusModal($event)"
-            (manageClick)="openStatusModal($event)"
-            (viewClick)="goToDetail($event)"
-          ></app-orders-table>
-        </div>
+      <div
+        class="overflow-hidden rounded-[3rem] border border-zinc-100 dark:border-zinc-800 bg-white/40 dark:bg-zinc-900/20 backdrop-blur-sm shadow-xl shadow-zinc-100/50 dark:shadow-none">
+        <app-orders-table [orders]="filteredActive()" [sortKey]="sortKey()" [sortDir]="sortDir()"
+          (sortChange)="handleSort($event)" [hideTypeColumn]="true" [hideUrgency]="true" [hideDelivery]="true"
+          [hideFinancials]="true" [hideClientColumn]="true" [rubro]="session.rubro()" [isCompact]="layout.isMobile()"
+          (editClick)="handleEdit($event)" (statusClick)="openStatusModal($event)"
+          (manageClick)="openStatusModal($event)" (viewClick)="goToDetail($event)"></app-orders-table>
+      </div>
       } @else {
-        <div class="py-24 text-center flex flex-col items-center justify-center gap-8 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/5 dark:bg-zinc-900/5">
-          <div class="h-20 w-20 rounded-[2rem] bg-white dark:bg-zinc-800 shadow-2xl flex items-center justify-center border border-zinc-100 dark:border-zinc-700">
-            <lucide-angular [img]="icons.Package2" class="h-8 w-8 text-zinc-200"></lucide-angular>
-          </div>
-          <div class="space-y-2">
-            <p class="text-lg font-black text-zinc-400 tracking-tight uppercase">Línea de producción despejada</p>
-            <p class="text-[10px] text-zinc-500 max-w-sm mx-auto font-bold uppercase tracking-widest">No hay procesos activos en manufactura.</p>
-          </div>
+      <div
+        class="py-24 text-center flex flex-col items-center justify-center gap-8 border-2 border-dashed rounded-[3rem] border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/5 dark:bg-zinc-900/5">
+        <div
+          class="h-20 w-20 rounded-[2rem] bg-white dark:bg-zinc-800 shadow-2xl flex items-center justify-center border border-zinc-100 dark:border-zinc-700">
+          <lucide-angular [img]="icons.Package2" class="h-8 w-8 text-zinc-200"></lucide-angular>
         </div>
+        <div class="space-y-2">
+          <p class="text-lg font-black text-zinc-400 tracking-tight uppercase">Línea de producción despejada</p>
+          <p class="text-[10px] text-zinc-500 max-w-sm mx-auto font-bold uppercase tracking-widest">No hay procesos
+            activos en manufactura.</p>
+        </div>
+      </div>
       }
     </section>
 
     <!-- SECCIÓN: DEPÓSITO / LISTOS (ELITE CARD) -->
     @if (filteredInStock().length > 0) {
-      <section class="space-y-6 animate-in fade-in duration-700 delay-300">
-        <div class="flex items-center justify-between px-6">
-          <div class="flex items-center gap-4">
-            <div class="p-3 bg-emerald-500/10 rounded-2xl">
-              <lucide-angular [img]="icons.Layers" class="h-5 w-5 text-emerald-500"></lucide-angular>
-            </div>
-            <div>
-              <h2 class="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-[0.25em]">Disponibles en Depósito</h2>
-              <p class="text-[9px] font-bold text-emerald-500/70 uppercase tracking-widest">Listos para entrega inmediata</p>
-            </div>
+    <section class="space-y-6 animate-in fade-in duration-700 delay-300">
+      <div class="flex items-center justify-between px-6">
+        <div class="flex items-center gap-4">
+          <div class="p-3 bg-emerald-500/10 rounded-2xl">
+            <lucide-angular [img]="icons.Layers" class="h-5 w-5 text-emerald-500"></lucide-angular>
+          </div>
+          <div>
+            <h2 class="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-[0.25em]">Disponibles en
+              Depósito</h2>
+            <p class="text-[9px] font-bold text-emerald-500/70 uppercase tracking-widest">Listos para entrega inmediata
+            </p>
           </div>
         </div>
+      </div>
 
-        <div class="overflow-hidden rounded-[3rem] border border-zinc-100 dark:border-zinc-800 bg-white/40 dark:bg-zinc-900/20 backdrop-blur-sm shadow-xl shadow-zinc-100/50 dark:shadow-none">
-          <app-orders-table 
-            [orders]="filteredInStock()"
-            [sortKey]="sortKey()"
-            [sortDir]="sortDir()"
-            (sortChange)="handleSort($event)"
-            [hideTypeColumn]="true"
-            [hideUrgency]="true"
-            [hideDelivery]="true"
-            [hideFinancials]="true"
-            [hideClientColumn]="true"
-            [rubro]="session.rubro()"
-            [isCompact]="layout.isMobile()"
-            (editClick)="handleEdit($event)"
-            (statusClick)="openSellModal($event)"
-            (manageClick)="openSellModal($event)"
-            (viewClick)="goToDetail($event)"
-          ></app-orders-table>
-        </div>
-      </section>
+      <div
+        class="overflow-hidden rounded-[3rem] border border-zinc-100 dark:border-zinc-800 bg-white/40 dark:bg-zinc-900/20 backdrop-blur-sm shadow-xl shadow-zinc-100/50 dark:shadow-none">
+        <app-orders-table [orders]="filteredInStock()" [sortKey]="sortKey()" [sortDir]="sortDir()"
+          (sortChange)="handleSort($event)" [hideTypeColumn]="true" [hideUrgency]="true" [hideDelivery]="true"
+          [hideFinancials]="true" [hideClientColumn]="true" [rubro]="session.rubro()" [isCompact]="layout.isMobile()"
+          (editClick)="handleEdit($event)" (statusClick)="openSellModal($event)" (manageClick)="openSellModal($event)"
+          (viewClick)="goToDetail($event)"></app-orders-table>
+      </div>
+    </section>
     }
   </div>
 </app-page-shell>
 
 <!-- DIALOGS -->
-<app-stock-sale-dialog 
-  [order]="selectedOrder()" 
-  [isOpen]="isSellModalOpen()" 
-  [isSubmitting]="isSelling()"
-  (onClose)="isSellModalOpen.set(false)" 
-  (onConfirm)="handleSellConfirm($event)">
+<app-stock-sale-dialog [order]="selectedOrder()" [isOpen]="isSellModalOpen()" [isSubmitting]="isSelling()"
+  (onClose)="isSellModalOpen.set(false)" (onConfirm)="handleSellConfirm($event)">
 </app-stock-sale-dialog>
 
-<app-stock-production-modal 
-  [isOpen]="isStatusModalOpen()" 
-  [order]="selectedOrderForStatus()!"
-  (onClose)="isStatusModalOpen.set(false)"
-  (onSaved)="handleStatusSaved()">
+<app-stock-production-modal [isOpen]="isStatusModalOpen()" [order]="selectedOrderForStatus()!"
+  (onClose)="isStatusModalOpen.set(false)" (onSaved)="handleStatusSaved()">
 </app-stock-production-modal>

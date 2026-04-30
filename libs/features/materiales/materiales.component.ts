@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus, Filter, Settings, Thermometer } from 'lucide-angular';
+import { LucideAngularModule, Package, Trash2, Droplets, Weight, MoreVertical, Search, AlertTriangle, Edit2, Activity, ChevronDown, Plus, Filter, Settings, Thermometer, TrendingUp } from 'lucide-angular';
 import { MaterialesService } from '../../core/api/materiales.service';
 import { SessionService } from '../../core/session/session.service';
 import { Material } from '../../shared/models/material';
@@ -10,9 +10,9 @@ import { ConfirmService } from '@shared/ui/confirm-dialog/confirm-dialog.compone
 import { LayoutService } from '../../core/layout/layout.service';
 import { cn } from '../../shared/utils/cn';
 
-import { MaterialStatsComponent } from './ui/material-stats/material-stats.component';
 import { MaterialCardComponent } from './ui/material-card/material-card.component';
 import { MaterialFormComponent } from './ui/material-form/material-form.component';
+import { PageShellComponent } from '../../shared/ui/layout/page-shell.component';
 
 @Component({
   selector: 'app-materiales-page',
@@ -21,7 +21,7 @@ import { MaterialFormComponent } from './ui/material-form/material-form.componen
     CommonModule, 
     FormsModule, 
     LucideAngularModule, 
-    MaterialStatsComponent, 
+    PageShellComponent,
     MaterialCardComponent,
     MaterialFormComponent
   ],
@@ -34,7 +34,7 @@ export class MaterialesPageComponent implements OnInit {
   private confirmService = inject(ConfirmService);
   public layout = inject(LayoutService);
 
-  readonly icons = { Search, Plus, Package, Filter, Settings, Thermometer, Droplets, Activity };
+  readonly icons = { Search, Plus, Package, Filter, Settings, Thermometer, Droplets, Activity, TrendingUp };
 
   // Expose signals from service
   loading = this.service.loading;

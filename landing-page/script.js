@@ -106,53 +106,64 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!grid) return;
 
         grid.innerHTML = plans.map(plan => `
-            <div class="fade-in group p-8 sm:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] transition-all duration-500 ${plan.recommended ? 'bg-zinc-900 ring-4 ring-primary/20 shadow-[0_32px_64px_-16px_rgba(116,47,229,0.3)] scale-100 lg:scale-105 z-10' : 'bg-zinc-900 shadow-xl border border-white/5'}" data-visible="false">
-                <div class="flex justify-between items-start mb-8">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.4em] ${plan.recommended ? 'text-primary' : 'text-white/40'}">${plan.name}</h3>
-                    ${plan.recommended ? '<span class="bg-primary text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Recomendado</span>' : ''}
+            <div class="fade-in group p-12 sm:p-16 rounded-[4rem] transition-all duration-700 relative overflow-hidden flex flex-col ${plan.recommended ? 'bg-text shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] scale-100 lg:scale-105 z-10' : 'bg-surface-container-low/50 border border-border/5'}" data-visible="false">
+                
+                ${plan.recommended ? `
+                <div class="absolute top-0 right-0 p-12">
+                    <div class="h-4 w-4 rounded-full bg-primary animate-pulse shadow-[0_0_20px_rgba(var(--primary-rgb),0.8)]"></div>
                 </div>
+                ` : ''}
 
-                <div class="mb-10">
-                    <div class="flex items-baseline gap-2">
-                        <p class="text-4xl sm:text-5xl font-black font-display text-white tracking-tighter">
-                            $${plan.price.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                        </p>
-                        <span class="text-xs opacity-40 font-sans text-white">/ mes</span>
+                <div class="flex justify-between items-start mb-12">
+                    <div class="space-y-3">
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.4em] italic ${plan.recommended ? 'text-primary' : 'text-text-muted/40'}">${plan.name}</h3>
+                        ${plan.recommended ? '<p class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] italic">Protocolo Recomendado</p>' : ''}
                     </div>
-                    
-                    ${plan.promoPrice ? `
-                        <div class="mt-6 p-5 rounded-[1.5rem] sm:rounded-[2rem] bg-primary/10 border border-primary/20 flex flex-col gap-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-[8px] font-black text-primary uppercase tracking-[0.2em] mb-1">${plan.promoLabel || 'OFERTA LANZAMIENTO'}</p>
-                                    <div class="flex items-baseline gap-2 flex-wrap">
-                                        <span class="text-xl sm:text-2xl font-black text-white">$${plan.promoPrice.toLocaleString('es-AR')}</span>
-                                        <span class="text-[8px] font-black text-white/40 uppercase tracking-widest">PRECIO PROMO</span>
-                                    </div>
-                                </div>
-                                <div class="bg-primary/20 px-3 py-2 rounded-xl border border-primary/30 flex flex-col items-center justify-center shrink-0">
-                                    <span class="text-[10px] font-black text-primary leading-none">${plan.promoDuration || 6}</span>
-                                    <span class="text-[6px] font-black text-primary uppercase tracking-tighter">MESES</span>
-                                </div>
-                            </div>
-                            <p class="text-[8px] font-black text-white/20 uppercase tracking-[0.1em]">Precio regular: $${plan.price.toLocaleString('es-AR')}</p>
-                        </div>
-                    ` : ''}
                 </div>
 
-                <p class="text-[10px] font-bold text-white/50 uppercase tracking-tight mb-12 min-h-8 leading-tight">${plan.desc}</p>
+                <div class="mb-14">
+                    @if (plan.promoPrice) {
+                        <div class="flex flex-col gap-2">
+                             <div class="flex items-baseline gap-4">
+                                <span class="text-6xl sm:text-7xl font-black font-display tracking-tighter ${plan.recommended ? 'text-white' : 'text-text'} italic">
+                                    $${plan.promoPrice.toLocaleString('es-AR')}
+                                </span>
+                                <span class="text-[10px] font-black uppercase tracking-widest ${plan.recommended ? 'text-white/40' : 'text-text-muted/40'} italic">/ Mes</span>
+                             </div>
+                             <div class="flex items-center gap-4 mt-2">
+                                <span class="text-2xl font-black text-rose-500 line-through opacity-50 italic">$${plan.price.toLocaleString('es-AR')}</span>
+                                <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[9px] font-black uppercase tracking-widest italic border border-emerald-500/20">Ahorro Activo</span>
+                             </div>
+                        </div>
+                    } @else {
+                        <div class="flex items-baseline gap-4">
+                            <span class="text-6xl sm:text-7xl font-black font-display tracking-tighter ${plan.recommended ? 'text-white' : 'text-text'} italic">
+                                $${plan.price.toLocaleString('es-AR')}
+                            </span>
+                            <span class="text-[10px] font-black uppercase tracking-widest ${plan.recommended ? 'text-white/40' : 'text-text-muted/40'} italic">/ Mes</span>
+                        </div>
+                    }
+                </div>
+
+                <p class="text-[11px] font-bold uppercase tracking-tight mb-14 leading-relaxed italic ${plan.recommended ? 'text-white/60' : 'text-text-muted/60'}">${plan.desc}</p>
                 
-                <ul class="space-y-6 mb-12">
-                    ${plan.items.map(item => `
-                        <li class="flex items-center gap-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white/70">
-                            <i data-lucide="check-circle-2" class="h-4 w-4 text-emerald-500 shrink-0"></i> 
-                            <span class="leading-relaxed">${item}</span>
-                        </li>
-                    `).join('')}
-                </ul>
+                <div class="space-y-8 mb-16 flex-1">
+                    <h4 class="text-[9px] font-black uppercase tracking-[0.4em] ${plan.recommended ? 'text-white/20' : 'text-text-muted/20'} italic">Capacidades del Sistema</h4>
+                    <ul class="space-y-6">
+                        ${plan.items.map(item => `
+                            <li class="flex items-start gap-6 text-[11px] font-black uppercase tracking-[0.15em] italic ${plan.recommended ? 'text-white' : 'text-text'}">
+                                <div class="h-5 w-5 rounded-lg flex items-center justify-center shrink-0 ${plan.recommended ? 'bg-primary/20 text-primary' : 'bg-surface-container-high text-text-muted/40'}">
+                                    <i data-lucide="check" class="h-3 w-3"></i> 
+                                </div>
+                                <span class="pt-0.5">${item}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
                 
-                <a href="https://app.prodmanager.com.ar/register" class="block text-center py-5 rounded-2xl ${plan.recommended ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'} text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95">
-                    Comenzar ahora
+                <a href="https://app.prodmanager.com.ar/register" 
+                   class="flex h-20 items-center justify-center rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] transition-all duration-500 italic ${plan.recommended ? 'bg-primary text-white shadow-2xl shadow-primary/30 hover:scale-[1.03]' : 'bg-surface-container-high text-text hover:bg-surface-container-highest border border-border/5 shadow-xl shadow-text/5 hover:translate-y-[-4px]'}">
+                    Sincronizar Plan
                 </a>
             </div>
         `).join('');

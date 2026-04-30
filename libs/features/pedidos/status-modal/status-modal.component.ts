@@ -1,4 +1,4 @@
-﻿import {
+import {
   Component, computed, inject, signal, input, Output,
   EventEmitter, OnInit, effect, HostListener, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
@@ -93,6 +93,7 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   });
 
   isSaving = signal(false);
+  isLoading3DData = signal(false);
 
   @ViewChild('stepperViewport') stepperViewport?: ElementRef<HTMLElement>;
   canScrollLeft = signal(false);
@@ -147,16 +148,16 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
       // Fallback a materialId simple si no hay multi-material
       this.failureMaterialWastes.set([{ materialId: activeJob.materialId, grams: 0 }]);
     } else if (machineMaterials && Array.isArray(machineMaterials) && machineMaterials.length > 0) {
-      // Fallback final a lo que tenga cargado la m├íquina actualmente
+      // Fallback final a lo que tenga cargado la máquina actualmente
       this.failureMaterialWastes.set(
         machineMaterials.map((m: any) => ({ materialId: m.materialId, grams: 0 }))
       );
-    } else {
-      // Si no hay nada, ├¡tem vac├¡o para selecci├│n manual
-      this.failureMaterialWastes.set([{ materialId: '', grams: 0 }]);
     }
-
-    // Scroll suave al ├írea de falla
+    // If business is 3D, we need machines and materials
+    if (this.is3D()) {
+      this.load3DData(true); // Force refresh both via unified method
+    }
+    // Scroll suave al área de falla
     setTimeout(() => {
       const element = document.getElementById('failure-section');
       element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -208,8 +209,8 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
   // 3D Specific
   selectedMachineId = signal<string>('');
   multiMaterials = signal<MultiMaterial[]>([]);
-  machines = signal<Machine[]>([]);
-  materials = signal<Material[]>([]);
+  machines = this.maquinasService.items;
+  materials = this.materialesService.items;
   itemToAssignId = signal<string | null>(null);
 
   goToEdit() {
@@ -217,6 +218,16 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     if (!order) return;
     this.onClose.emit();
     this.router.navigate(['/pedidos/editar', order.id]);
+  }
+
+  goToMachines() {
+    this.onClose.emit();
+    this.router.navigate(['/maquinas']);
+  }
+
+  goToMaterials() {
+    this.onClose.emit();
+    this.router.navigate(['/materiales']);
   }
 
   icons: any = {
@@ -371,14 +382,17 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
 
   async load3DData(force = false) {
     const businessId = this.session.activeId();
-    if (!businessId || (!force && this.machines().length > 0)) return;
+    if (!businessId) return;
+    this.isLoading3DData.set(true);
     try {
-      const resp = await this.maquinasApi.getAll(businessId);
-      const mats = await this.materialesApi.getAll(businessId);
-      this.machines.set(resp.data || []);
-      this.materials.set(mats || []);
+      await Promise.all([
+        this.maquinasService.loadMaquinas(force),
+        this.materialesService.loadMateriales(force)
+      ]);
     } catch (error) {
       console.error('Error loading 3D data:', error);
+    } finally {
+      this.isLoading3DData.set(false);
     }
   }
 
@@ -671,9 +685,6 @@ export class OrderStatusModalComponent implements OnInit, AfterViewInit, OnDestr
     const available = this.machines().filter(m => m.status === 'IDLE');
     if (available.length > 0) {
       this.selectedMachineIdForItem.set(available[0].id);
-    }
-    if (this.is3D()) {
-      this.materialesService.loadMateriales(true);
     }
   }
 

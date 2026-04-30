@@ -153,7 +153,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
       chips.push({ key: 'urgency', label: `Urgencia: ${f.urgency}`, value: f.urgency });
     }
     if (f.alertFilter) {
-      const label = f.alertFilter === 'due-soon' ? 'Vencen hoy o ma├▒ana' : 'Vencidos sin entregar';
+      const label = f.alertFilter === 'due-soon' ? 'Vencen hoy o mañana' : 'Vencidos sin entregar';
       chips.push({ key: 'alertFilter', label: `Alerta: ${label}`, value: f.alertFilter });
     }
     if (f.startDate) chips.push({ key: 'startDate', label: `Desde: ${f.startDate}`, value: f.startDate });
@@ -223,6 +223,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setTab(tab: 'active' | 'draft' | 'history') {
+    this.ordersData.set([]); // Clear data to trigger skeletons during transition
     this.activeTab.set(tab);
     this.activeMobileSector.set(tab);
     this.currentPage.set(1);
@@ -428,7 +429,7 @@ export class PedidosPageComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-    this.loading.set(true);
+      this.loading.set(true);
 
       const context = new HttpContext().set(HTTP_CACHE_CONFIG, {
         enabled: true,

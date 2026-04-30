@@ -78,7 +78,7 @@ import { LayoutService } from '@core/layout/layout.service';
         <div class="space-y-6">
           <span class="text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/40 italic">Carga de Protocolos</span>
           <div class="flex flex-col">
-            <p class="text-6xl font-black text-text tracking-tighter tabular-nums font-display italic leading-none">{{ filteredEvents().length }}</p>
+            <p class="text-4xl font-black text-text tracking-tighter tabular-nums font-display italic leading-none">{{ filteredEvents().length }}</p>
             <div class="flex items-center gap-3 mt-4">
                <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
                <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest italic animate-pulse">Flujo Estable</span>
@@ -96,7 +96,7 @@ import { LayoutService } from '@core/layout/layout.service';
         <div class="space-y-6">
           <span class="text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/40 italic">Protocolos en Riesgo</span>
           <div class="flex flex-col">
-            <p class="text-6xl font-black text-accent tracking-tighter tabular-nums font-display italic leading-none">{{ riskyCount() }}</p>
+            <p class="text-4xl font-black text-accent tracking-tighter tabular-nums font-display italic leading-none">{{ riskyCount() }}</p>
             <div class="flex items-center gap-3 mt-4">
                <span class="text-[9px] font-black uppercase tracking-widest text-accent/60 italic leading-none">Intervención Requerida</span>
             </div>
@@ -113,7 +113,7 @@ import { LayoutService } from '@core/layout/layout.service';
         <div class="space-y-6">
           <span class="text-[9px] font-black uppercase tracking-[0.5em] text-text-muted/40 italic">Vencimientos Activos</span>
           <div class="flex flex-col">
-            <p class="text-6xl font-black text-text tracking-tighter tabular-nums font-display italic leading-none">
+            <p class="text-4xl font-black text-text tracking-tighter tabular-nums font-display italic leading-none">
               {{ overdueCount() < 10 ? '0' + overdueCount() : overdueCount() }}
             </p>
             <div class="flex items-center gap-3 mt-4 text-error">

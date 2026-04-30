@@ -17,7 +17,7 @@ export type CardDensity = 'FULL' | 'COMPACT' | 'AGENDA';
       [class]="cn(
         'group relative border transition-all duration-1000 cursor-pointer active:scale-[0.98] select-none overflow-hidden backdrop-blur-3xl',
         getUrgencyStyles(),
-        density() === 'AGENDA' ? 'p-6 flex items-center gap-8 rounded-[2.5rem]' : 'p-8 rounded-[3rem] flex flex-col gap-6',
+        density() === 'AGENDA' ? 'p-6 flex items-center gap-8 rounded-3xl' : 'p-6 rounded-3xl flex flex-col gap-6',
         event().risk.level === 'CRITICAL' && density() !== 'AGENDA' ? 'shadow-2xl shadow-error/10' : 'shadow-2xl shadow-text/5'
       )"
     >

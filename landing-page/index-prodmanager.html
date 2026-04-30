@@ -35,13 +35,27 @@
             
             --font-display: "Outfit", "Inter", sans-serif;
             --font-sans: "Inter", sans-serif;
+            --font-mono: "JetBrains Mono", monospace;
+        }
+
+        @layer base {
+            body {
+                @apply font-sans text-text antialiased;
+                letter-spacing: -0.02em;
+            }
+            h1, h2, h3, h4, .font-display {
+                @apply font-display tracking-[-0.04em];
+            }
+            .italic-curator {
+                @apply italic tracking-[-0.06em];
+            }
         }
     </style>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -96,49 +110,48 @@
     </nav>
 
     <!-- Hero -->
-    <section class="relative pt-40 pb-20 md:pt-60 md:pb-40 overflow-hidden">
+    <section class="relative pt-48 pb-24 md:pt-64 md:pb-48 overflow-hidden">
         <div class="pointer-events-none absolute inset-0">
             <div class="absolute -top-40 -right-40 h-[800px] w-[800px] rounded-full bg-primary/5 blur-[120px]"></div>
             <div class="absolute top-20 -left-40 h-[600px] w-[600px] rounded-full bg-surface-container-low/50 blur-[100px]"></div>
         </div>
 
         <div class="relative mx-auto max-w-6xl px-8 text-center">
-            <div class="fade-in inline-flex items-center gap-3 rounded-full bg-surface-container-low px-5 py-2 text-[9px] font-black text-primary uppercase tracking-[0.3em] mb-12 shadow-sm border border-border/5" data-visible="false">
-                <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
-                Evolución Multi-Industria
+            <div class="fade-in inline-flex items-center gap-4 rounded-full bg-surface-container-low px-6 py-2.5 text-[10px] font-black text-primary uppercase tracking-[0.4em] mb-12 shadow-sm border border-border/5 italic" data-visible="false">
+                <i data-lucide="cpu" class="h-4 w-4"></i>
+                Evolución Industrial 4.0
             </div>
 
-            <h1 class="fade-in text-6xl font-black leading-[0.9] tracking-tighter sm:text-7xl md:text-[9rem] font-display text-text" data-visible="false" style="transition-delay: 100ms">
-                Gestión de <br>
-                <span class="italic text-primary">Impresiones.</span>
+            <h1 class="fade-in text-6xl font-black leading-[0.85] tracking-tighter sm:text-7xl md:text-[9.5rem] font-display text-text" data-visible="false" style="transition-delay: 100ms">
+                Control de <br>
+                <span class="italic-curator text-primary">Producción.</span>
             </h1>
 
-            <p class="fade-in mx-auto mt-12 max-w-2xl text-lg text-text-muted font-medium leading-relaxed md:text-2xl" data-visible="false" style="transition-delay: 200ms">
-                La plataforma definitiva para profesionalizar tu taller de impresión 3D. Gestioná pedidos, materiales y tu granja de máquinas en un solo ecosistema inteligente.
+            <p class="fade-in mx-auto mt-16 max-w-2xl text-xl text-text-muted font-bold leading-relaxed md:text-2xl" data-visible="false" style="transition-delay: 200ms">
+                La plataforma definitiva para profesionalizar tu ecosistema de fabricación. Gestioná pedidos, materiales y maquinaria en una red inteligente de alta precisión.
             </p>
 
-            <div class="fade-in mt-14 flex flex-col sm:flex-row items-center justify-center gap-6" data-visible="false" style="transition-delay: 300ms">
-                <a href="https://app.prodmanager.com.ar/register" class="group inline-flex h-16 items-center gap-4 rounded-2xl bg-primary px-10 text-xs font-black uppercase tracking-widest text-white shadow-2xl shadow-primary/30 hover:shadow-primary/40 hover:translate-y-[-2px] transition-all active:scale-95">
-                    Comenzar gratis
-                    <i data-lucide="arrow-right" class="h-5 w-5 transition-transform group-hover:translate-x-1"></i>
+            <div class="fade-in mt-20 flex flex-col sm:flex-row items-center justify-center gap-8" data-visible="false" style="transition-delay: 300ms">
+                <a href="https://app.prodmanager.com.ar/register" class="group inline-flex h-20 items-center gap-6 rounded-[2rem] bg-text px-12 text-xs font-black uppercase tracking-[0.3em] text-surface shadow-2xl shadow-text/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 italic">
+                    Iniciar Protocolo
+                    <i data-lucide="arrow-right" class="h-5 w-5 transition-transform group-hover:translate-x-2"></i>
                 </a>
-                <a href="https://app.prodmanager.com.ar/login" class="inline-flex h-16 items-center gap-3 rounded-2xl bg-surface-container-low px-10 text-xs font-black uppercase tracking-widest text-text-muted hover:text-text hover:bg-surface-container transition-all">
-                    Explorar demo
+                <a href="https://app.prodmanager.com.ar/login" class="inline-flex h-20 items-center gap-4 rounded-[2rem] bg-surface-container-low px-12 text-xs font-black uppercase tracking-[0.3em] text-text-muted hover:text-text hover:bg-surface-container-high transition-all duration-500 border border-border/5 italic">
+                    Explorar Demo
                 </a>
             </div>
 
             <!-- Real System Screenshot -->
-            <div class="fade-in mt-32 relative mx-auto max-w-6xl px-4" data-visible="false" style="transition-delay: 500ms">
-                <div class="absolute -inset-10 bg-primary/20 rounded-[5rem] blur-[100px] opacity-30"></div>
-                <div class="relative rounded-[2.5rem] p-2 bg-white/10 backdrop-blur-3xl border border-white/20 shadow-2xl">
-                    <img src="assets/dashboard.png" alt="Sistema Real ProdManager" class="w-full rounded-[2rem] shadow-2xl object-cover">
-                    <div class="absolute -bottom-6 -right-6 bg-emerald-500 text-white text-[9px] font-black px-6 py-3 rounded-full uppercase tracking-widest shadow-xl flex items-center gap-2">
-                        <div class="h-2 w-2 rounded-full bg-white animate-pulse"></div>
-                        Sistema en producción
+            <div class="fade-in mt-40 relative mx-auto max-w-6xl" data-visible="false" style="transition-delay: 500ms">
+                <div class="absolute -inset-20 bg-primary/20 rounded-[10rem] blur-[140px] opacity-20"></div>
+                <div class="relative rounded-[4rem] p-3 bg-white/20 backdrop-blur-3xl border border-white/30 shadow-[0_80px_160px_-40px_rgba(0,0,0,0.3)]">
+                    <img src="assets/dashboard.png" alt="Sistema Real ProdManager" class="w-full rounded-[3.2rem] shadow-2xl object-cover">
+                    <div class="absolute -bottom-8 -right-8 bg-emerald-500 text-white text-[10px] font-black px-8 py-4 rounded-[1.5rem] uppercase tracking-[0.2em] shadow-2xl flex items-center gap-3 italic">
+                        <div class="h-2.5 w-2.5 rounded-full bg-white animate-pulse"></div>
+                        Sistema en Producción Real
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </section>
 
@@ -287,6 +300,41 @@
                     <div class="bg-surface-container-low rounded-[3rem] p-4 relative overflow-hidden group">
                         <div class="absolute -inset-4 bg-primary/20 rounded-[3rem] blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
                         <img src="assets/form.png" alt="Carga de Pedidos Real" class="relative w-full rounded-2xl shadow-2xl border border-white/20 transform group-hover:rotate-1 transition-transform duration-700">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Experience -->
+    <section class="py-32 md:py-48 bg-surface-container-low/30 overflow-hidden relative">
+        <div class="mx-auto max-w-6xl px-8 relative z-10">
+            <div class="fade-in text-center max-w-3xl mx-auto mb-24" data-visible="false">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-primary mb-6">Movilidad Total</p>
+                <h2 class="text-4xl font-black tracking-tighter sm:text-5xl md:text-7xl font-display text-text leading-[0.9]">Tu planta en <br> <span class="italic text-primary">tu bolsillo.</span></h2>
+                <p class="mt-8 text-lg text-text-muted font-bold leading-relaxed uppercase tracking-tight italic">Control operativo absoluto desde cualquier dispositivo, diseñado para la acción inmediata.</p>
+            </div>
+
+            <div class="grid gap-12 md:grid-cols-3 items-start">
+                <div class="fade-in flex justify-center" data-visible="false">
+                    <div class="relative w-full max-w-[280px] group">
+                        <div class="absolute -inset-10 bg-primary/20 rounded-full blur-[100px] opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <img src="assets/mobile_dashboard_v3.png" alt="Dashboard Real" class="relative w-full rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] transition-transform duration-700 hover:scale-[1.02] hover:-rotate-2 border border-white/10">
+                        <div class="absolute -bottom-6 -left-6 bg-text text-surface text-[9px] font-black px-6 py-3 rounded-full uppercase tracking-widest shadow-xl italic z-20">Consola Central</div>
+                    </div>
+                </div>
+                <div class="fade-in flex justify-center md:translate-y-16" data-visible="false" style="transition-delay: 200ms">
+                    <div class="relative w-full max-w-[280px] group">
+                        <div class="absolute -inset-10 bg-indigo-500/10 rounded-full blur-[100px] opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <img src="assets/mobile_orders_v3.png" alt="Pedidos Real" class="relative w-full rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] transition-transform duration-700 hover:scale-[1.02] hover:rotate-2 border border-white/10">
+                        <div class="absolute -top-6 -right-6 bg-primary text-white text-[9px] font-black px-6 py-3 rounded-full uppercase tracking-widest shadow-xl italic z-20">Gestión de Flujo</div>
+                    </div>
+                </div>
+                <div class="fade-in flex justify-center md:translate-y-32" data-visible="false" style="transition-delay: 400ms">
+                    <div class="relative w-full max-w-[280px] group">
+                        <div class="absolute -inset-10 bg-emerald-500/10 rounded-full blur-[100px] opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <img src="assets/mobile_menu_v3.png" alt="Menu Real" class="relative w-full rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] transition-transform duration-700 hover:scale-[1.02] hover:-rotate-1 border border-white/10">
+                        <div class="absolute -bottom-6 -right-6 bg-white text-text text-[9px] font-black px-6 py-3 rounded-full uppercase tracking-widest shadow-xl italic z-20">Nexo Operativo</div>
                     </div>
                 </div>
             </div>
